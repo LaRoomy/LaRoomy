@@ -15,7 +15,6 @@ import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
-private const val SCAN_PERIOD: Long = 10000
 private const val MAX_CONNECTION_ATTEMPTS = 10
 
 class LaRoomyDeviceProperty{
