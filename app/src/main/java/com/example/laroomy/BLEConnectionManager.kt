@@ -246,39 +246,6 @@ class LaRoomyDevicePropertyGroup{
 
 class BLEConnectionManager {
 
-    // callback implementation for the bleScanner
-    private val bleScanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            super.onScanResult(callbackType, result)
-
-            // check weather the device was discovered before
-            var exec = true
-            scanResultList.forEachIndexed { _, scanResult ->
-
-                if(scanResult?.device?.address == result?.device?.address){
-                    exec = false
-                }
-            }
-            // only execute the next step if the device is new
-            when(exec) {
-                true -> {
-                    // only execute if the device-name is not null
-                    if (!TextUtils.isEmpty(result?.device?.name))
-                    {
-                        scanResultList.add(result)
-
-                        // make sure it will executed in the ui-thread
-                        callingActivity.runOnUiThread {
-                            // inform the calling segment of the result
-                            callback.onDeviceDiscovered(result!!.device)
-                        }
-                    }
-                }
-                false -> Log.d("E:onScanResult", "Device already added")
-            }
-        }
-    }
-
     // callback implementation for BluetoothGatt
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
@@ -462,14 +429,6 @@ class BLEConnectionManager {
         this.propertyCallback = pEvents
     }
 
-    // bluetooth scanner object
-    private val bluetoothLeScanner: BluetoothLeScanner
-        get() {
-            val bluetoothManager = activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-            val bluetoothAdapter = bluetoothManager.adapter
-            return bluetoothAdapter.bluetoothLeScanner
-        }
-
     // constant properties (regarding the device!) ////////////////////////
     private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
@@ -525,10 +484,6 @@ class BLEConnectionManager {
     private var propertyRequestIndexCounter = 0
     private var groupRequestIndexCounter = 0
 
-    fun isScanActive() :Boolean {
-        return this.mScanning
-    }
-
     fun clear(){
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
@@ -537,17 +492,6 @@ class BLEConnectionManager {
         this.currentDevice = null
         this.isConnected = false
         this.authRequired = true
-    }
-
-    private fun clearScanResults(){
-        // reset the preselect-index
-        this.preselectIndex = -1
-        // delete the list-content
-        this.scanResultList.clear()
-        // trigger event for calling class
-        callingActivity.runOnUiThread {
-            callback.onScanResultsDiscarded()
-        }
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -699,41 +643,6 @@ class BLEConnectionManager {
             // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             callingActivity.startActivityForResult(enableBtIntent, requestEnableBT)
-        }
-    }
-
-    fun scanLEDevice(enable: Boolean){
-        when(enable){
-            true -> {
-                // set up a delayed handler for stopping the scan (10s interval)
-                this.mHandler= Handler()
-                this.mHandler.postDelayed({
-                    // stop scanning after 10s
-                    mScanning = false
-                    bluetoothLeScanner.stopScan(this.bleScanCallback)
-                    // inform the caller
-                    callingActivity.runOnUiThread {
-                        callback.onScanStopped()
-                    }
-                    Log.d("M:scanLEDevice", "Scan stopped by delayed handler")
-
-                }, SCAN_PERIOD)
-                // clear the result list and trigger event
-                this.clearScanResults()
-                // start scan
-                mScanning = true
-                bluetoothLeScanner.startScan(this.bleScanCallback)
-            }
-            else -> {
-                // stop scan
-                this.mScanning = false
-                bluetoothLeScanner.stopScan(this.bleScanCallback)
-                // inform the caller
-                callingActivity.runOnUiThread {
-                    callback.onScanStopped()
-                }
-                Log.d("M:scanLEDevice", "Scan stopped by user")
-            }
         }
     }
 
@@ -1679,16 +1588,13 @@ class BLEConnectionManager {
 
     // the callback definition for the event handling in the calling class
     interface BleEventCallback : Serializable{
-        fun onDeviceDiscovered(device: BluetoothDevice)
-        fun onConnectionStateChanged(state: Boolean)
-        fun onScanStopped()
-        fun onScanResultsDiscarded()
-        fun onConnectionAttemptFailed(message: String)
-        fun onDataReceived(data: String?)
-        fun onDataSent(data: String?)
-        fun onComponentError(message: String)
-        fun onAuthenticationSuccessful()
-        fun onDeviceReadyForCommunication()
+        fun onConnectionStateChanged(state: Boolean){}
+        fun onConnectionAttemptFailed(message: String){}
+        fun onDataReceived(data: String?){}
+        fun onDataSent(data: String?){}
+        fun onComponentError(message: String){}
+        fun onAuthenticationSuccessful(){}
+        fun onDeviceReadyForCommunication(){}
     }
 
     interface PropertyCallback: Serializable {

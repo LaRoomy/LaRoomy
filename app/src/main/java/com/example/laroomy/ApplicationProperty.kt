@@ -13,7 +13,6 @@ class ApplicationProperty : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         bluetoothConnectionManger = BLEConnectionManager()
         systemLanguage = Locale.getDefault().displayLanguage
     }

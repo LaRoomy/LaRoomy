@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">LaRoomy</string>
+    <!-- UI Strings -->
+    <string name="MA_AvailableDevicesPresentationTextViewText">Please select your device:</string>
 
 
     <!-- Labels -->
