@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">LaRoomy</string>
+
+
+    <!-- Errors -->
+    <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
+
+    <!-- FileKeys: -->
+    <string name="FileKey_BLEManagerData">fileKeyBluetoothManagerData</string>
+
+    <!-- DataKeys: -->
+    <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
+
+</resources>
