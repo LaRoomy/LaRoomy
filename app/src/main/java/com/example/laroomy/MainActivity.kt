@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
     fun onClick(view: View){
 
         val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-        // intent.putExtra(...
+        // intent.putExtra(...)
         startActivity(intent)
     }
 }

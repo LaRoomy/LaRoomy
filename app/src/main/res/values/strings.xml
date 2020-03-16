@@ -2,6 +2,9 @@
     <string name="app_name">LaRoomy</string>
 
 
+    <!-- Labels -->
+    <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
+    <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
 
