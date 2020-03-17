@@ -5,17 +5,18 @@ import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.app.Activity
 import android.bluetooth.*
-import android.bluetooth.le.BluetoothLeScanner
-import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.os.*
-import android.text.TextUtils
 import android.util.Log
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
 private const val MAX_CONNECTION_ATTEMPTS = 10
+
+const val LAROOMYDEVICETYPE_NONE = 0
+const val LAROOMYDEVICETYPE_XNG = 1
+const val LAROOMYDEVICETYPE_CTX = 2
 
 class LaRoomyDeviceProperty{
 
@@ -243,6 +244,11 @@ class LaRoomyDevicePropertyGroup{
     }
 }
 
+class LaRoomyDevicePresentationModel {
+    var Name = ""
+    var Type = 0
+}
+
 class BLEConnectionManager {
 
     // callback implementation for BluetoothGatt
@@ -396,12 +402,12 @@ class BLEConnectionManager {
                 }
                 // TODO: important!!! enable the event-filter "dataProcessed" in the laRoomy-app
                 // launch event
-                //if(!dataProcessed){
-                //    callback.onDataReceived(dataAsString)
-                //}
+                if(!dataProcessed){
+                    callback.onDataReceived(dataAsString)
+                }
 
                 // only temporary for the ble-command-tester-app
-                callback.onDataReceived(dataAsString)//  TODO: only execute this if the reception is not part of the retrieving loops
+                //callback.onDataReceived(dataAsString)//  TODO: only execute this if the reception is not part of the retrieving loops
             }
         }
     }
@@ -563,13 +569,6 @@ class BLEConnectionManager {
             this.callback.onConnectionAttemptFailed(activityContext.getString(R.string.Error_ConnectionFailed_NoDevice))
     }
 
-    fun checkBondingState(): Boolean{
-        // TODO: This is a mark for the use of this method in another app: if we do not scan and only retrieve the bonded devices, this is obsolete
-        return if(this.currentDevice != null)
-            this.currentDevice?.bondState != BluetoothDevice.BOND_NONE
-        else false
-    }
-
     fun sendData(data: String){
 
         if(!this.isConnected){
@@ -622,6 +621,21 @@ class BLEConnectionManager {
         this.bleAdapter?.bondedDevices
     }
 
+    var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
+    get() {
+        field.clear()
+        this.bleAdapter?.bondedDevices?.forEach {
+            if(it.uuids.elementAt(0).equals(this.serviceUUID) && (it.name.startsWith("LaRoomy")))
+            {
+                val device = LaRoomyDevicePresentationModel()
+                device.Name = it.name
+                device.Type = laRoomyDeviceTypeFromName(it.name)
+                field.add(device)
+            }
+        }
+        return field
+    }
+
     private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
 
         val bluetoothManager =
@@ -649,6 +663,14 @@ class BLEConnectionManager {
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
         this.isConnected = false
+    }
+
+    private fun laRoomyDeviceTypeFromName(name: String): Int {
+        when(name){
+            "LaRoomy XNG" -> return LAROOMYDEVICETYPE_XNG
+            "LaRoomy CTX" -> return LAROOMYDEVICETYPE_CTX
+            else -> return LAROOMYDEVICETYPE_NONE
+        }
     }
 
     fun saveLastSuccessfulConnectedDeviceAddress(address: String){

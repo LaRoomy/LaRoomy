@@ -3,7 +3,8 @@
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Please select your device:</string>
 
-
+    <!-- Image content descriptions -->
+    <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <!-- Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
@@ -16,4 +17,6 @@
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
 
+    <!-- Working elements -->
+    <string name="UniversalPlaceholderName">This is a Placeholder</string>
 </resources>
