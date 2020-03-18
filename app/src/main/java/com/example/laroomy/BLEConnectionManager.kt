@@ -625,7 +625,8 @@ class BLEConnectionManager {
     get() {
         field.clear()
         this.bleAdapter?.bondedDevices?.forEach {
-            if(it.uuids.elementAt(0).equals(this.serviceUUID) && (it.name.startsWith("LaRoomy")))
+            //if(it.uuids.elementAt(0).equals(this.serviceUUID) && (it.name.startsWith("LaRoomy")))
+            if(it.name.startsWith("Laroomy"))
             {
                 val device = LaRoomyDevicePresentationModel()
                 device.Name = it.name
