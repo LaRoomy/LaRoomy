@@ -1,10 +1,13 @@
 package com.example.laroomy
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,17 +52,28 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
     override fun onResume() {
         super.onResume()
+
+        // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
+
         // update the device-list
         updateAvailableDevices()
         this.availableDevicesViewAdapter.notifyDataSetChanged()
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
-        if(index > 0) {
-            var intent = Intent(this@MainActivity, LoadingActivity::class.java)
-            intent.putExtra("BondedDeviceIndex", index)
-            startActivity(intent)
-        }
+
+        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
+        ll?.setBackgroundColor(getColor(R.color.colorAccent))
+
+        val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+        intent.putExtra("BondedDeviceIndex", index)
+        startActivity(intent)
+    }
+
+    fun onHelpImageClick(@Suppress("UNUSED_PARAMETER") view: View){
+        val openUrl = Intent(ACTION_VIEW)
+        openUrl.data = Uri.parse("https://www.laroomy.de")
+        startActivity(openUrl)
     }
 
     private fun notifyUser(message: String, type: Int){
@@ -76,6 +90,12 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
     private fun updateAvailableDevices(){
         this.availableDevices = (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.bondedLaRoomyDevices
+        if(this.availableDevices.size == 0){
+            findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)
+        }
+        else {
+            findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
+        }
     }
 
     class AvailableDevicesListAdapter(
@@ -117,27 +137,8 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         }
     }
 
-//    override fun onAuthenticationSuccessful() {
-//    }
-
+    // Interface methods:
     override fun onComponentError(message: String) {
         notifyUser(message, ERROR_MESSAGE)
     }
-
-/*
-    override fun onConnectionAttemptFailed(message: String) {
-    }
-
-    override fun onConnectionStateChanged(state: Boolean) {
-    }
-
-    override fun onDataReceived(data: String?) {
-    }
-
-    override fun onDataSent(data: String?) {
-    }
-
-    override fun onDeviceReadyForCommunication() {
-    }
-*/
 }

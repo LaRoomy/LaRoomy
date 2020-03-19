@@ -246,6 +246,7 @@ class LaRoomyDevicePropertyGroup{
 
 class LaRoomyDevicePresentationModel {
     var Name = ""
+    var Address = ""
     var Type = 0
 }
 
@@ -630,6 +631,7 @@ class BLEConnectionManager {
             {
                 val device = LaRoomyDevicePresentationModel()
                 device.Name = it.name
+                device.Address = it.address
                 device.Type = laRoomyDeviceTypeFromName(it.name)
                 field.add(device)
             }

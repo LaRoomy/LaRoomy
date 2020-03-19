@@ -2,6 +2,12 @@
     <string name="app_name">LaRoomy</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Please select your device:</string>
+    <string name="MA_NoAvailableDevices">No devices found. Please make sure the device is bonded to the system.</string>
+
+    <string name="CA_Connecting">Connecting..</string>
+    <string name="CA_Connected">Connected</string>
+    <string name="CA_Authenticate">Authenticate..</string>
+
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
