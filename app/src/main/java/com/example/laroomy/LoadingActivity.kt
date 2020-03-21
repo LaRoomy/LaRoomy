@@ -1,5 +1,6 @@
 package com.example.laroomy
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -36,7 +37,21 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     private fun setProgressText(text: String){
         // maybe include a drawable..? and a text-color ?
+
+//        val notificationTextView = findViewById<TextView>(R.id.LA_progressTextView)
+//        notificationTextView.setTextColor(getColor(R.color.InfoColor))
+//        notificationTextView.text = text
+
+        this.setMessageText(R.color.InfoColor, text)
+    }
+
+    private fun setErrorText(text: String){
+        setMessageText(R.color.ErrorColor, text)
+    }
+
+    private fun setMessageText(colorID: Int, text: String){
         val notificationTextView = findViewById<TextView>(R.id.LA_progressTextView)
+        notificationTextView.setTextColor(getColor(colorID))
         notificationTextView.text = text
     }
 
@@ -45,14 +60,22 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onAuthenticationSuccessful()
 
         // confirm or retrieve the device-properties...
+
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
+
+        // if the device is connected -> check if this is the last connected device
+        // if so -> load ui configuration and start confirmation process (if the authentication is successful!)
+        // otherwise -> start property retrieving process (if the authentication is successful!)
     }
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+        setErrorText(message)
+
+        // navigate back with delay??
     }
 
     override fun onDeviceReadyForCommunication() {
@@ -72,5 +95,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onComponentError(message: String) {
         super.onComponentError(message)
+        setErrorText(message)
     }
 }

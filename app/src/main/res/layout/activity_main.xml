@@ -8,14 +8,14 @@
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/bluetoothImage"
+        android:id="@+id/reloadImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/stat_sys_data_bluetooth" />
+        app:srcCompat="@android:drawable/stat_notify_sync" />
 
 
     <androidx.appcompat.widget.AppCompatImageView
