@@ -81,16 +81,20 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onDeviceReadyForCommunication() {
         super.onDeviceReadyForCommunication()
 
-        setProgressText(getString(R.string.CA_Connected))
+        runOnUiThread {
+            setProgressText(getString(R.string.CA_Connected))
 
-        Handler().postDelayed({
-            (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.sendData(
-                (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.authenticationString)
 
-            // to check: run in ui thread ??
-            setProgressText(getString(R.string.CA_Authenticate))
+            Handler().postDelayed({
+                (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.sendData(
+                    (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.authenticationString
+                )
 
-        }, 1500)
+                // to check: run in ui thread ??
+                setProgressText(getString(R.string.CA_Authenticate))
+
+            }, 1500)
+        }
     }
 
     override fun onComponentError(message: String) {
