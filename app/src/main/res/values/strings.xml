@@ -7,10 +7,16 @@
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
     <string name="CA_Authenticate">Authenticate..</string>
+    <string name="CA_AuthSuccess">Authentication successful<br />Checking Device Properties</string>
+
+    <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
+    <string name="DMA_ConnectionStatus_connected">connected</string>
 
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
+    <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
+    <string name="DeviceTypeHeaderImageButtonDescription">Button to remove the device and select a new device</string>
     <!-- Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
@@ -25,4 +31,5 @@
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
+    <string name="LaRoomyDevicePlaceholderName">LaRoomy XNG</string>
 </resources>

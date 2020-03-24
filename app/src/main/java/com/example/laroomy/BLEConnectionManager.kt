@@ -447,12 +447,12 @@ class BLEConnectionManager {
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
     /////////////////////////////////////////////////
 
-    var isConnected:Boolean = false
-    var authRequired = true
-    var propertyLoopActive = false
-    var propertyNameResolveLoopActive = false
-    var groupLoopActive = false
-    var groupInfoLoopActive = false
+    private var isConnected:Boolean = false
+    private var authRequired = true
+    private var propertyLoopActive = false
+    private var propertyNameResolveLoopActive = false
+    private var groupLoopActive = false
+    private var groupInfoLoopActive = false
     private var propertyConfirmationModeActive = false
     private var propertyNameResolveSingleAction = false
     private var propertyGroupNameResolveSingleAction = false
@@ -469,7 +469,9 @@ class BLEConnectionManager {
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
 
-    private var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
+    val connectionStatus : Boolean get() = this.isConnected
+
+    var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     private var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
 
     private val scanResultList: MutableList<ScanResult?> = ArrayList()
@@ -519,6 +521,16 @@ class BLEConnectionManager {
 
             }
         }
+    }
+
+    fun getLastConnectedDeviceAddress() : String {
+        val sharedPref = callingActivity.getSharedPreferences(
+            callingActivity.getString(R.string.FileKey_BLEManagerData),
+            Context.MODE_PRIVATE)
+        val address = sharedPref.getString(
+            callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
+            "not found")
+        return address ?: ""
     }
 
     fun connectToLastSuccessfulConnectedDevice() {
@@ -1622,10 +1634,10 @@ class BLEConnectionManager {
     }
 
     interface PropertyCallback: Serializable {
-        fun onPropertyDataRetrievalCompleted(properties: ArrayList<LaRoomyDeviceProperty>)
-        fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>)
-        fun onPropertyDataChanged(propertyIndex: Int, propertyID: Int)// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
-        fun onPropertyGroupDataChanged(groupIndex: Int, groupID: Int)// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
-        fun onCompletePropertyInvalidated()
+        fun onPropertyDataRetrievalCompleted(properties: ArrayList<LaRoomyDeviceProperty>){}
+        fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>){}
+        fun onPropertyDataChanged(propertyIndex: Int, propertyID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
+        fun onPropertyGroupDataChanged(groupIndex: Int, groupID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
+        fun onCompletePropertyInvalidated(){}
     }
 }

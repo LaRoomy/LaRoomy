@@ -1,24 +1,34 @@
 package com.example.laroomy
 
+import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.widget.TextView
 
-class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback {
+class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+
+    private var isLastConnectedDevice = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
         (applicationContext as ApplicationProperty).bluetoothConnectionManger.reAlignContextObjects(this, this@LoadingActivity, this)
+        (applicationContext as ApplicationProperty).bluetoothConnectionManger.setPropertyEventHandler(this)
 
         val index = this.intent.getIntExtra("BondedDeviceIndex", -1)
         if(index != -1){
-            (applicationContext as ApplicationProperty).bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(
+
+            val adr =
                 (applicationContext as ApplicationProperty).bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).Address
-            )
+
+            if(adr == (applicationContext as ApplicationProperty).bluetoothConnectionManger.getLastConnectedDeviceAddress()){
+                isLastConnectedDevice = true
+            }
+
+            (applicationContext as ApplicationProperty).bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
             setProgressText(getString(R.string.CA_Connecting))
         }
     }
@@ -59,10 +69,19 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onAuthenticationSuccessful() {
         super.onAuthenticationSuccessful()
 
+        this.setMessageText(R.color.InfoColor, getString(R.string.CA_AuthSuccess))
+
         // confirm or retrieve the device-properties...
 
+        if(this.isLastConnectedDevice && ((applicationContext as ApplicationProperty).bluetoothConnectionManger.laRoomyDevicePropertyList.size > 0)){
+            (applicationContext as ApplicationProperty).bluetoothConnectionManger.startDevicePropertyListing()
+        }
+        else{
+            (applicationContext as ApplicationProperty).bluetoothConnectionManger.startPropertyConfirmationProcess()
+        }
     }
 
+/*
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
 
@@ -70,12 +89,17 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // if so -> load ui configuration and start confirmation process (if the authentication is successful!)
         // otherwise -> start property retrieving process (if the authentication is successful!)
     }
+*/
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
         setErrorText(message)
 
-        // navigate back with delay??
+        // navigate back with delay
+        Handler().postDelayed({
+            // TODO: check if this works
+            finish()
+        },2000)
     }
 
     override fun onDeviceReadyForCommunication() {
@@ -84,15 +108,11 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         runOnUiThread {
             setProgressText(getString(R.string.CA_Connected))
 
-
             Handler().postDelayed({
                 (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.sendData(
                     (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.authenticationString
                 )
-
-                // to check: run in ui thread ??
                 setProgressText(getString(R.string.CA_Authenticate))
-
             }, 1500)
         }
     }
@@ -101,4 +121,13 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onComponentError(message)
         setErrorText(message)
     }
+
+    override fun onPropertyDataRetrievalCompleted(properties: ArrayList<LaRoomyDeviceProperty>) {
+        super.onPropertyDataRetrievalCompleted(properties)
+
+        val intent =
+            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+        startActivity(intent)
+    }
+
 }

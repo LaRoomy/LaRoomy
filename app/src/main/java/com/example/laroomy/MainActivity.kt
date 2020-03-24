@@ -57,13 +57,14 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
         // update the device-list
         updateAvailableDevices()
-        this.availableDevicesViewAdapter.notifyDataSetChanged()
+
+        //reset the selected color
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
         val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
-        ll?.setBackgroundColor(getColor(R.color.colorAccent))
+        ll?.setBackgroundColor(getColor(R.color.colorPrimary))
 
         val intent = Intent(this@MainActivity, LoadingActivity::class.java)
         intent.putExtra("BondedDeviceIndex", index)
@@ -96,6 +97,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         else {
             findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
         }
+        this.availableDevicesViewAdapter.notifyDataSetChanged()
     }
 
     class AvailableDevicesListAdapter(
