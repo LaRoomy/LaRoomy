@@ -9,7 +9,9 @@ const val INFO_MESSAGE = 2
 
 class ApplicationProperty : Application() {
 
-    lateinit var bluetoothConnectionManger: BLEConnectionManager
+    companion object {
+        lateinit var bluetoothConnectionManger: BLEConnectionManager
+    }
 
     lateinit var systemLanguage: String
 
@@ -17,7 +19,7 @@ class ApplicationProperty : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        bluetoothConnectionManger = BLEConnectionManager()
+       bluetoothConnectionManger = BLEConnectionManager()
         systemLanguage = Locale.getDefault().displayLanguage
     }
 }

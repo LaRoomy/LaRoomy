@@ -7,12 +7,20 @@ import android.widget.TextView
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback {
 
+    private var isUpToDate = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_main)
 
-        (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
-        (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        //(this.applicationContext as ApplicationProperty).bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
+        //(this.applicationContext as ApplicationProperty).bluetoothConnectionManger.setPropertyEventHandler(this)
+
+        // init recycler view!!
+
+
 
 
     }
@@ -27,10 +35,19 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onResume() {
         super.onResume()
-        setUIConnectionStatus((this.applicationContext as ApplicationProperty).bluetoothConnectionManger.connectionStatus)
+        setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected) //TODO: parameter is reset in new activity -> why???
+        this.isUpToDate =
+            ApplicationProperty.bluetoothConnectionManger.isPropertyUpToDate
+        if(this.isUpToDate){
+            this.adaptUIToPropertyListing()
+        }
     }
 
-    fun onDiscardDeviceButtonClick(view: View){
+    fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+        // finish the activity and navigate back to the start activity (MainActivity)
+    }
+
+    private fun adaptUIToPropertyListing(){
 
     }
 
@@ -52,5 +69,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
         this.setUIConnectionStatus(state)
+    }
+
+    override fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>) {
+        super.onGroupDataRetrievalCompleted(groups)
+
+        // this could be a race condition
+        // what happens when the device has no groups or the groups are retrieved before the activity is loaded
+
+        if(!this.isUpToDate){
+            this.adaptUIToPropertyListing()
+        }
     }
 }

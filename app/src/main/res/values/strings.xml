@@ -7,7 +7,7 @@
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
     <string name="CA_Authenticate">Authenticate..</string>
-    <string name="CA_AuthSuccess">Authentication successful<br />Checking Device Properties</string>
+    <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
@@ -21,6 +21,7 @@
     <!-- Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
+    <string name="DeviceMainActivity">Activity to show the primary properties of the device</string>
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
 

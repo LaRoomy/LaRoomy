@@ -15,33 +15,33 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
-        (applicationContext as ApplicationProperty).bluetoothConnectionManger.reAlignContextObjects(this, this@LoadingActivity, this)
-        (applicationContext as ApplicationProperty).bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@LoadingActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         val index = this.intent.getIntExtra("BondedDeviceIndex", -1)
         if(index != -1){
 
             val adr =
-                (applicationContext as ApplicationProperty).bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).Address
+                ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).Address
 
-            if(adr == (applicationContext as ApplicationProperty).bluetoothConnectionManger.getLastConnectedDeviceAddress()){
+            if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
                 isLastConnectedDevice = true
             }
 
-            (applicationContext as ApplicationProperty).bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
+            ApplicationProperty.bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
             setProgressText(getString(R.string.CA_Connecting))
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManger.clear()
         finish()
     }
 
     override fun onPause() {
         super.onPause()
-        (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManger.clear()
         finish()
     }
 
@@ -69,15 +69,16 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onAuthenticationSuccessful() {
         super.onAuthenticationSuccessful()
 
-        this.setMessageText(R.color.InfoColor, getString(R.string.CA_AuthSuccess))
-
+        this.runOnUiThread {
+            this.setMessageText(R.color.InfoColor, getString(R.string.CA_AuthSuccess))
+        }
         // confirm or retrieve the device-properties...
 
-        if(this.isLastConnectedDevice && ((applicationContext as ApplicationProperty).bluetoothConnectionManger.laRoomyDevicePropertyList.size > 0)){
-            (applicationContext as ApplicationProperty).bluetoothConnectionManger.startDevicePropertyListing()
+        if(this.isLastConnectedDevice && (ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.size == 0)){
+            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
         }
         else{
-            (applicationContext as ApplicationProperty).bluetoothConnectionManger.startPropertyConfirmationProcess()
+            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
         }
     }
 
@@ -109,9 +110,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             setProgressText(getString(R.string.CA_Connected))
 
             Handler().postDelayed({
-                (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.sendData(
-                    (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.authenticationString
-                )
+                //(this.applicationContext as ApplicationProperty).bluetoothConnectionManger.sendData(
+                    //(this.applicationContext as ApplicationProperty).bluetoothConnectionManger.authenticationString)
+                ApplicationProperty.bluetoothConnectionManger.sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
+
                 setProgressText(getString(R.string.CA_Authenticate))
             }, 1500)
         }

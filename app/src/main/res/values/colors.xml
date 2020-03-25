@@ -8,7 +8,7 @@
     <color name="ErrorColor">#FF0000</color>
     <color name="WarningColor">#FFFF00</color>
     <color name="InfoColor">#FFFFFF</color>
-    <color name="expectedBackground">#333333</color>
+    <color name="expectedBackground">#222222</color>
     <color name="separatorColor">#888888</color>
     <color name="disconnectedTextColor">#FF8888</color>
     <color name="connectedTextColor">#88FFAA</color>

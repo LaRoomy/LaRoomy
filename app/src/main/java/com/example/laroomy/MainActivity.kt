@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
         field.clear()
-        field = (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.bondedLaRoomyDevices
+        field = ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices
         return field
     }
 
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.reAlignContextObjects(this, this@MainActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@MainActivity, this)
 
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
     override fun onStart() {
         super.onStart()
-        (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.checkBluetoothEnabled()
+        ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled()
     }
 
     override fun onResume() {
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     }
 
     private fun updateAvailableDevices(){
-        this.availableDevices = (this.applicationContext as ApplicationProperty).bluetoothConnectionManger.bondedLaRoomyDevices
+        this.availableDevices = ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices
         if(this.availableDevices.size == 0){
             findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)
         }

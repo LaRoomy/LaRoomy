@@ -447,7 +447,9 @@ class BLEConnectionManager {
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
     /////////////////////////////////////////////////
 
-    private var isConnected:Boolean = false
+    var isConnected:Boolean = false
+        private set
+
     private var authRequired = true
     private var propertyLoopActive = false
     private var propertyNameResolveLoopActive = false
@@ -457,6 +459,7 @@ class BLEConnectionManager {
     private var propertyNameResolveSingleAction = false
     private var propertyGroupNameResolveSingleAction = false
     private var singleRetrievingAction = false
+    private var propertyUpToDate = false
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
     private var currentGroupResolveID = -1 // initialize with invalid marker
@@ -469,14 +472,15 @@ class BLEConnectionManager {
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
 
-    val connectionStatus : Boolean get() = this.isConnected
-
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     private var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
 
     private val scanResultList: MutableList<ScanResult?> = ArrayList()
 
     private lateinit var mHandler: Handler
+
+    val isPropertyUpToDate: Boolean
+    get() = this.propertyUpToDate
 
     private val requestEnableBT: Int = 13
 
@@ -500,6 +504,7 @@ class BLEConnectionManager {
         this.currentDevice = null
         this.isConnected = false
         this.authRequired = true
+        this.propertyUpToDate = false
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -681,10 +686,10 @@ class BLEConnectionManager {
     }
 
     private fun laRoomyDeviceTypeFromName(name: String): Int {
-        when(name){
-            "LaRoomy XNG" -> return LAROOMYDEVICETYPE_XNG
-            "LaRoomy CTX" -> return LAROOMYDEVICETYPE_CTX
-            else -> return LAROOMYDEVICETYPE_NONE
+        return when(name){
+            "LaRoomy XNG" -> LAROOMYDEVICETYPE_XNG
+            "LaRoomy CTX" -> LAROOMYDEVICETYPE_CTX
+            else -> LAROOMYDEVICETYPE_NONE
         }
     }
 
@@ -718,6 +723,7 @@ class BLEConnectionManager {
                 Log.d("M:StartPropListing", "Device property listing started.")
                 this.propertyRequestIndexCounter = 0
                 this.propertyLoopActive = true
+                this.propertyUpToDate = false
                 // only clear the list if this is not the confirmation mode
                 if(!this.propertyConfirmationModeActive)
                     this.laRoomyDevicePropertyList.clear()
@@ -896,6 +902,8 @@ class BLEConnectionManager {
                                 this.propertyCallback.onPropertyDataChanged(-1, 0)
                             }
                         }
+                        // set property up to date
+                        this.propertyUpToDate = true
                     }
                 }
                 else {
@@ -1131,6 +1139,7 @@ class BLEConnectionManager {
                     Log.d("M:resolveGroupInfo", "This was the last group-info to resolve: close loop and reset parameter")
                     // it's the last index, close loop
                     groupInfoLoopActive = false
+                    this.propertyUpToDate = true
                     // invalidate the index
                     this.currentGroupResolveIndex = -1
                     // check if this was a confirmation process
@@ -1620,6 +1629,7 @@ class BLEConnectionManager {
         this.propertyConfirmationModeActive = false
         this.groupDetailChangedOnConfirmation = false
         this.propertyDetailChangedOnConfirmation = false
+        this.propertyUpToDate = false // TODO: is the right???
     }
 
     // the callback definition for the event handling in the calling class
