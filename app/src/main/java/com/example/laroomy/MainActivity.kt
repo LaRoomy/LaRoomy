@@ -58,20 +58,30 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         // update the device-list
         updateAvailableDevices()
 
+
         //reset the selected color
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
-        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
-        ll?.setBackgroundColor(getColor(R.color.colorPrimary))
+//        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
+//        val leftView = ll?.findViewById<View>(R.id.leftBorderView)
+//        val rightView = ll?.findViewById<View>(R.id.rightBorderView)
+//
+//        leftView?.setBackgroundColor(getColor(R.color.selectedSeparatorColor))
+//        rightView?.setBackgroundColor(getColor(R.color.selectedSeparatorColor))
+
+        setItemColor(index, R.color.selectedSeparatorColor)
+
+        //ll?.setBackgroundColor(getColor(R.color.colorPrimary))
+        //ll?.setBackgroundColor()
 
         val intent = Intent(this@MainActivity, LoadingActivity::class.java)
         intent.putExtra("BondedDeviceIndex", index)
         startActivity(intent)
     }
 
-    fun onHelpImageClick(@Suppress("UNUSED_PARAMETER") view: View){
+    fun onHelpImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
         val openUrl = Intent(ACTION_VIEW)
         openUrl.data = Uri.parse("https://www.laroomy.de")
         startActivity(openUrl)
@@ -89,6 +99,16 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         }
     }
 
+    private fun setItemColor(index: Int, colorID: Int){
+        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
+        val leftView = ll?.findViewById<View>(R.id.leftBorderView)
+        val rightView = ll?.findViewById<View>(R.id.rightBorderView)
+
+        leftView?.setBackgroundColor(getColor(colorID))
+        rightView?.setBackgroundColor(getColor(colorID))
+
+    }
+
     private fun updateAvailableDevices(){
         this.availableDevices = ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices
         if(this.availableDevices.size == 0){
@@ -98,6 +118,13 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
             findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
         }
         this.availableDevicesViewAdapter.notifyDataSetChanged()
+        this.resetSelectionInDeviceListView()
+    }
+
+    private fun resetSelectionInDeviceListView(){
+        for(x in 0 until this.availableDevices.size){
+            setItemColor(x, R.color.separatorColor)
+        }
     }
 
     class AvailableDevicesListAdapter(
@@ -126,7 +153,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         }
 
         override fun onBindViewHolder(holder: DSLRViewHolder, position: Int) {
-            holder.linearLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].Name
+            holder.linearLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].name
 
             // currently there is only one image. In the future there must be implemented multiple images for multiple device-types
             // TODO: set the appropriate image for the device type

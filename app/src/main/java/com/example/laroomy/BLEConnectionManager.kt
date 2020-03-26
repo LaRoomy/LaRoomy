@@ -245,9 +245,9 @@ class LaRoomyDevicePropertyGroup{
 }
 
 class LaRoomyDevicePresentationModel {
-    var Name = ""
-    var Address = ""
-    var Type = 0
+    var name = ""
+    var address = ""
+    var type = 0
 }
 
 class BLEConnectionManager {
@@ -647,9 +647,9 @@ class BLEConnectionManager {
             if(it.name.startsWith("Laroomy"))
             {
                 val device = LaRoomyDevicePresentationModel()
-                device.Name = it.name
-                device.Address = it.address
-                device.Type = laRoomyDeviceTypeFromName(it.name)
+                device.name = it.name
+                device.address = it.address
+                device.type = laRoomyDeviceTypeFromName(it.name)
                 field.add(device)
             }
         }

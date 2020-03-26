@@ -1,7 +1,6 @@
 package com.example.laroomy
 
 import android.content.Intent
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -22,7 +21,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         if(index != -1){
 
             val adr =
-                ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).Address
+                ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
 
             if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
                 isLastConnectedDevice = true
@@ -41,7 +40,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onPause() {
         super.onPause()
-        ApplicationProperty.bluetoothConnectionManger.clear()
+        //ApplicationProperty.bluetoothConnectionManger.clear() this is fucking wrong!!
         finish()
     }
 
