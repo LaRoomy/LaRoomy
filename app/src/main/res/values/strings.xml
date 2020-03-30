@@ -18,6 +18,8 @@
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
     <string name="DeviceTypeHeaderImageButtonDescription">Button to remove the device and select a new device</string>
     <string name="DeviceInfoSubHeaderImageDescription">Image for the additional device info</string>
+    <string name="DevicePropertyListElementImageDescription">Image for the appropriate device property</string>
+    <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>
     <!-- Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
@@ -35,4 +37,5 @@
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
     <string name="LaRoomyDevicePlaceholderName">LaRoomy XNG</string>
     <string name="LaRoomyDeviceInfoPlaceholder">Additional Device Info</string>
+    <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
 </resources>
