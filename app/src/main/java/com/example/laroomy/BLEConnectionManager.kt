@@ -46,6 +46,11 @@ class LaRoomyDeviceProperty{
         return true
     }
 
+    fun needNavigation() : Boolean{
+        // TODO: if the property-type does not need navigation -> return false
+        return true
+    }
+
     fun fromString(string: String){
         // generate member content from string:
         try {
@@ -473,7 +478,7 @@ class BLEConnectionManager {
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
-    private var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
+    var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
 
     private val scanResultList: MutableList<ScanResult?> = ArrayList()
 

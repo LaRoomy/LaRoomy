@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_device_main.*
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
@@ -41,7 +40,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyList.add(dc)
 
         // bind array to adapter
-        this.devicePropertyListViewAdapter = devicePropertyListAdapter(this.devicePropertyList, this, this@DeviceMainActivity)
+        this.devicePropertyListViewAdapter = DevicePropertyListAdapter(this.devicePropertyList, this, this@DeviceMainActivity)
 
         // bind the elements to the recycler
         this.devicePropertyListRecyclerView =
@@ -72,7 +71,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
+        if(devicePropertyList.elementAt(index).canNavigateForward && (devicePropertyList.elementAt(index).elementType == PROPERTY_ELEMENT)){
 
+            // navigate to the appropriate property-page
+
+            // make sure the onPause routine does not disconnect the device
+
+            // animate the element to indicate the press
+        }
     }
 
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
@@ -80,7 +86,60 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun adaptUIToPropertyListing(){
-
+        // erase the recycler list
+        this.devicePropertyList.clear()
+        // create the new list -> start with the groups
+        if(ApplicationProperty.bluetoothConnectionManger.laRoomyPropertyGroupList.size > 0){
+            for(laRoomyDevicePropertyGroup in ApplicationProperty.bluetoothConnectionManger.laRoomyPropertyGroupList){
+                // create the group entry
+                val dpl = DevicePropertyListContentInformation()
+                dpl.elementType = GROUP_ELEMENT
+                dpl.canNavigateForward = false
+                dpl.elementID = laRoomyDevicePropertyGroup.groupID
+                dpl.elementText = laRoomyDevicePropertyGroup.groupName
+                dpl.imageID = laRoomyDevicePropertyGroup.imageID
+                // add the group to the list
+                this.devicePropertyList.add(dpl)
+                // add the device properties to the group by their IDs
+                for(ID in laRoomyDevicePropertyGroup.memberIDs){
+                    ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                        if(laRoomyDeviceProperty.propertyID == ID){
+                            // ID found -> add property to list
+                            val propertyEntry = DevicePropertyListContentInformation()
+                            propertyEntry.elementType = PROPERTY_ELEMENT
+                            propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
+                            propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
+                            propertyEntry.imageID = laRoomyDeviceProperty.imageID
+                            propertyEntry.elementID = laRoomyDeviceProperty.propertyID
+                            propertyEntry.elementIndex = index
+                            // add it to the list
+                            this.devicePropertyList.add(propertyEntry)
+                            // ID found -> further processing not necessary -> break the loop
+                            return@forEachIndexed
+                        }
+                    }
+                }
+            }
+        }
+        // now add the properties which are not part of a group
+        //for(laRoomyDeviceProperty in ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList){
+        ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+            // only add the non-group properties
+            if(!laRoomyDeviceProperty.isGroupMember){
+                // create the entry
+                val propertyEntry = DevicePropertyListContentInformation()
+                propertyEntry.elementType = PROPERTY_ELEMENT
+                propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
+                propertyEntry.elementID = laRoomyDeviceProperty.propertyID
+                propertyEntry.imageID = laRoomyDeviceProperty.imageID
+                propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
+                propertyEntry.elementIndex = index
+                // add it to the list
+                this.devicePropertyList.add(propertyEntry)
+            }
+        }
+        // update the recycler
+        this.devicePropertyListViewAdapter.notifyDataSetChanged()
     }
 
     private fun setUIConnectionStatus(status :Boolean){
@@ -115,11 +174,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     // device property list adapter:
-    class devicePropertyListAdapter(
+    class DevicePropertyListAdapter(
         private val devicePropertyAdapter: ArrayList<DevicePropertyListContentInformation>,
         private val itemClickListener: OnPropertyClickListener,
         private val activityContext: Context
-    ) : RecyclerView.Adapter<devicePropertyListAdapter.DPLViewHolder>() {
+    ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
 
         class DPLViewHolder(val linearLayout: LinearLayout)
             : RecyclerView.ViewHolder(linearLayout) {
