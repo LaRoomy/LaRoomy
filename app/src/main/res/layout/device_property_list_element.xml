@@ -10,6 +10,7 @@
         android:layout_height="1dp"
         android:background="@color/separatorColor"
         android:id="@+id/topSeparator"
+        android:layout_marginBottom="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -32,16 +33,16 @@
         android:contentDescription="@string/DevicePropertyListElementImageDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/placeholder_blue_white"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
+<!--        app:srcCompat="@drawable/placeholder_blue_white"-->
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/devicePropertyNameTextView"
         android:layout_marginStart="10dp"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:text="@string/LaRoomyDevicePropertyNamePlaceholder"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -52,7 +53,7 @@
         android:id="@+id/forwardImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_margin="8dp"
         android:contentDescription="@string/NavigateForwardImageDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,6 +67,7 @@
         android:layout_height="1dp"
         android:background="@color/separatorColor"
         android:id="@+id/bottomSeparator"
+        android:layout_marginTop="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/contentHolderLayout" />
