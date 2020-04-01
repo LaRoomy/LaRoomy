@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -124,6 +125,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                 propertyEntry.imageID = laRoomyDeviceProperty.imageID
                                 propertyEntry.elementID = laRoomyDeviceProperty.propertyID
                                 propertyEntry.elementIndex = index
+                                propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
                                 // add it to the list
                                 this.devicePropertyList.add(propertyEntry)
                                 // ID found -> further processing not necessary -> break the loop
@@ -150,6 +152,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     propertyEntry.imageID = laRoomyDeviceProperty.imageID
                     propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                     propertyEntry.elementIndex = index
+                    propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
                     // add it to the list
                     this.devicePropertyList.add(propertyEntry)
                 }
@@ -230,28 +233,73 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 //                    lParams.setMargins(0,20,0,20)
 
 
-                    // group elements are for subclassing properties, but cannot navigate forward (by now...)
+                    // make the element higher by setting the visibility of the group-border-view to: visible
+                    holder.constraintLayout.findViewById<View>(R.id.startSeparator).visibility = View.VISIBLE
+
+                    // group elements are for subclassing properties, but cannot navigate forward (by now... ;) )
                     holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.GONE
+
+                    // the button mustn't be visible (and isn't by default)
+                    //holder.constraintLayout.findViewById<Button>(R.id.elementButton).visibility = View.GONE
+
                     // set the image requested by the device (or a placeholder)
                     holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
                         resourceIdForImageId(devicePropertyAdapter.elementAt(position).imageID)
                     )
+                    // set the text for the element
                     holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = devicePropertyAdapter.elementAt(position).elementText
+
                     // make sure it is visible (TODO: is this really necessary??)
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
 
                 }
                 PROPERTY_ELEMENT -> {
-                    if(devicePropertyAdapter.elementAt(position).canNavigateForward)
+                    // get the element
+                    val element = devicePropertyAdapter.elementAt(position)
+                    // show / hide the navigate-image
+                    if(element.canNavigateForward)
                         holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
                     else  holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.GONE
-
+                    // set the appropriate image for the imageID
                     holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
-                        resourceIdForImageId(devicePropertyAdapter.elementAt(position).imageID)
-                    )
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = devicePropertyAdapter.elementAt(position).elementText
-                    // make sure it is visible (TODO: is this really necessary??)
-                    holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
+                        resourceIdForImageId(element.imageID))
+                    // set the appropriate elements for the type of the property:
+                    when(element.propertyType){
+                        -1 -> return // must be error
+                        0 -> return // must be error
+                        PROPERTY_TYPE_BUTTON -> {
+                            // show the button
+                            // set the text of the button
+                        }
+                        PROPERTY_TYPE_SWITCH -> {
+                            // show the switch
+                            // show the text-view
+                        }
+                        PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                            // show seek-bar layout container!
+                            // show text
+                        }
+                        PROPERTY_TYPE_LEVEL_INDICATOR -> {
+                            // show the text
+                            // show a level indication
+                        }
+                        PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
+                            // only show the text
+                        }
+                        else -> {
+                            // must be complex type
+
+                            // show text only
+                        }
+                    }
+
+
+
+                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = element.elementText
+
+
+                    // make sure it is visible (TODO: is this really necessary??) -No it's not!
+                    //holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
                 }
                 SEPARATOR_ELEMENT -> {
 
@@ -261,7 +309,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     // TODO: make it better!
 
                     //holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(R.drawable.placeholder_blue_white)
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = this.activityContext.getString(R.string.LaRoomyDevicePropertyNamePlaceholder)
+                    //holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = this.activityContext.getString(R.string.LaRoomyDevicePropertyNamePlaceholder)
+
+                    // maybe set background??
+
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
                 else -> {

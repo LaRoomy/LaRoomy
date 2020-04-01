@@ -13,6 +13,15 @@ const val GROUP_ELEMENT = 2
 const val SEPARATOR_ELEMENT = 3
 const val NO_CONTENT_ELEMENT = 4
 
+// the numbers must conform to the types of the device!
+const val PROPERTY_TYPE_BUTTON = 1
+const val PROPERTY_TYPE_SWITCH = 2
+const val PROPERTY_TYPE_LEVEL_SELECTOR = 3
+const val PROPERTY_TYPE_LEVEL_INDICATOR = 4
+const val PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY = 5
+
+
+
 class ApplicationProperty : Application() {
 
     companion object {
@@ -91,6 +100,7 @@ class DevicePropertyListContentInformation{
     var elementText = ""
     var elementID = -1
     var imageID = -1
+    var propertyType = -1
 }
 
 interface OnItemClickListener {
