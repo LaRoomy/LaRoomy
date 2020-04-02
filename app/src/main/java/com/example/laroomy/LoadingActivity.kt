@@ -20,6 +20,8 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         val index = this.intent.getIntExtra("BondedDeviceIndex", -1)
         if(index != -1){
 
+            // TODO: make this in the property activity !!!!
+
             val adr =
                 ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
 
@@ -71,14 +73,22 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         this.runOnUiThread {
             this.setMessageText(R.color.InfoColor, getString(R.string.CA_AuthSuccess))
         }
+        // navigate to the next activity and retrieve the properties there!
+
+        val intent =
+            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+        startActivity(intent)
+
+
+
         // confirm or retrieve the device-properties...
 
-        if(this.isLastConnectedDevice && (ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.size == 0)){
-            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
-        }
-        else{
-            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
-        }
+//        if(this.isLastConnectedDevice && (ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.size == 0)){
+//            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
+//        }
+//        else{
+//            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
+//        }
     }
 
 /*
@@ -122,6 +132,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         setErrorText(message)
     }
 
+/*
     override fun onPropertyDataRetrievalCompleted(properties: ArrayList<LaRoomyDeviceProperty>) {
         super.onPropertyDataRetrievalCompleted(properties)
 
@@ -129,5 +140,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
         startActivity(intent)
     }
+*/
 
 }

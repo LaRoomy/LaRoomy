@@ -9,9 +9,10 @@
     <color name="WarningColor">#FFFF00</color>
     <color name="InfoColor">#FFFFFF</color>
     <color name="expectedBackground">#222222</color>
-    <color name="separatorColor">#888888</color>
+    <color name="separatorColor">#777777</color>
     <color name="groupBorderColor">#00a1f1</color>
     <color name="selectedSeparatorColor">#F5CD06</color>
     <color name="disconnectedTextColor">#FF8888</color>
     <color name="connectedTextColor">#88FFAA</color>
+    <color name="groupColor">#444444</color>
 </resources>

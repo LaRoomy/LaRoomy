@@ -47,8 +47,15 @@ class LaRoomyDeviceProperty{
     }
 
     fun needNavigation() : Boolean{
-        // TODO: if the property-type does not need navigation -> return false
-        return true
+        // if the property-type does not need navigation -> return false
+        return when(this.propertyType){
+            PROPERTY_TYPE_BUTTON -> false
+            PROPERTY_TYPE_SWITCH -> false
+            PROPERTY_TYPE_LEVEL_SELECTOR -> false
+            PROPERTY_TYPE_LEVEL_INDICATOR -> false
+            PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> false
+            else -> true
+        }
     }
 
     fun fromString(string: String){
@@ -1610,7 +1617,7 @@ class BLEConnectionManager {
         }
     }
 
-    fun generateUIAdaptableArrayListFromDeviceProperties(){
+    private fun generateUIAdaptableArrayListFromDeviceProperties(){
 
         this.dataReadyToShow = false
         this.UIAdapterList.clear()
