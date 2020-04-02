@@ -255,6 +255,16 @@ class LaRoomyDevicePresentationModel {
     var type = 0
 }
 
+class DevicePropertyListContentInformation{
+    var canNavigateForward = false
+    var elementType = SEPARATOR_ELEMENT
+    var elementIndex = -1
+    var elementText = ""
+    var elementID = -1
+    var imageID = -1
+    var propertyType = -1
+}
+
 class BLEConnectionManager {
 
     // callback implementation for BluetoothGatt
@@ -465,6 +475,7 @@ class BLEConnectionManager {
     private var propertyGroupNameResolveSingleAction = false
     private var singleRetrievingAction = false
     private var propertyUpToDate = false
+    private var dataReadyToShow = false
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
     private var currentGroupResolveID = -1 // initialize with invalid marker
@@ -479,6 +490,7 @@ class BLEConnectionManager {
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
+    var UIAdapterList = ArrayList<DevicePropertyListContentInformation>()
 
     private val scanResultList: MutableList<ScanResult?> = ArrayList()
 
@@ -486,6 +498,9 @@ class BLEConnectionManager {
 
     val isPropertyUpToDate: Boolean
     get() = this.propertyUpToDate
+
+    val isUIDataReady: Boolean
+    get() = this.dataReadyToShow
 
     private val requestEnableBT: Int = 13
 
@@ -730,8 +745,10 @@ class BLEConnectionManager {
                 this.propertyLoopActive = true
                 this.propertyUpToDate = false
                 // only clear the list if this is not the confirmation mode
-                if(!this.propertyConfirmationModeActive)
+                if(!this.propertyConfirmationModeActive) {
+                    this.dataReadyToShow = false
                     this.laRoomyDevicePropertyList.clear()
+                }
                 // start:
                 this.sendData("A000$")// request first index (0)
             }
@@ -909,6 +926,7 @@ class BLEConnectionManager {
                         }
                         // set property up to date
                         this.propertyUpToDate = true
+                        this.generateUIAdaptableArrayListFromDeviceProperties()
                     }
                 }
                 else {
@@ -1167,6 +1185,7 @@ class BLEConnectionManager {
                         else {
                             // trigger retrieval event
                             this.propertyCallback.onGroupDataRetrievalCompleted(this.laRoomyPropertyGroupList)
+                            this.generateUIAdaptableArrayListFromDeviceProperties()
                         }
                     }
                 }
@@ -1591,6 +1610,73 @@ class BLEConnectionManager {
         }
     }
 
+    fun generateUIAdaptableArrayListFromDeviceProperties(){
+
+        this.dataReadyToShow = false
+        this.UIAdapterList.clear()
+
+        if(this.laRoomyDevicePropertyList.size > 0) {
+
+            if (this.laRoomyPropertyGroupList.size > 0) {
+                for (laRoomyDevicePropertyGroup in this.laRoomyPropertyGroupList) {
+                    // create the group entry
+                    val dpl = DevicePropertyListContentInformation()
+                    dpl.elementType = GROUP_ELEMENT
+                    dpl.canNavigateForward = false
+                    dpl.elementID = laRoomyDevicePropertyGroup.groupID
+                    dpl.elementText = laRoomyDevicePropertyGroup.groupName
+                    dpl.imageID = laRoomyDevicePropertyGroup.imageID
+                    // add the group to the list
+                    this.UIAdapterList.add(dpl)
+                    // add the device properties to the group by their IDs
+                    for (ID in laRoomyDevicePropertyGroup.memberIDs) {
+                        this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                            if (laRoomyDeviceProperty.propertyID == ID) {
+                                // ID found -> add property to list
+                                val propertyEntry = DevicePropertyListContentInformation()
+                                propertyEntry.elementType = PROPERTY_ELEMENT
+                                propertyEntry.canNavigateForward =
+                                    laRoomyDeviceProperty.needNavigation()
+                                propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
+                                propertyEntry.imageID = laRoomyDeviceProperty.imageID
+                                propertyEntry.elementID = laRoomyDeviceProperty.propertyID
+                                propertyEntry.elementIndex = index
+                                propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
+                                // add it to the list
+                                this.UIAdapterList.add(propertyEntry)
+                                // ID found -> further processing not necessary -> break the loop
+                                return@forEachIndexed
+                            }
+                        }
+                    }
+                    val dpl2 = DevicePropertyListContentInformation()
+                    dpl2.elementType = SEPARATOR_ELEMENT
+                    dpl2.canNavigateForward = false
+                    this.UIAdapterList.add(dpl2)
+                }
+            }
+            // now add the properties which are not part of a group
+            this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                // only add the non-group properties
+                if (!laRoomyDeviceProperty.isGroupMember) {
+                    // create the entry
+                    val propertyEntry = DevicePropertyListContentInformation()
+                    propertyEntry.elementType = PROPERTY_ELEMENT
+                    propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
+                    propertyEntry.elementID = laRoomyDeviceProperty.propertyID
+                    propertyEntry.imageID = laRoomyDeviceProperty.imageID
+                    propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
+                    propertyEntry.elementIndex = index
+                    propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
+                    // add it to the list
+                    this.UIAdapterList.add(propertyEntry)
+                }
+            }
+            this.dataReadyToShow = true
+            this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.UIAdapterList)
+        }
+    }
+
 
     private fun checkSingleAction(data: String) :Boolean {
 
@@ -1654,5 +1740,6 @@ class BLEConnectionManager {
         fun onPropertyDataChanged(propertyIndex: Int, propertyID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
         fun onPropertyGroupDataChanged(groupIndex: Int, groupID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
         fun onCompletePropertyInvalidated(){}
+        fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
     }
 }

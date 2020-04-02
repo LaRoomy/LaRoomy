@@ -101,14 +101,14 @@
 
             <ImageView
                 android:id="@+id/deviceInfoSubHeaderImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:layout_marginStart="40dp"
                 android:contentDescription="@string/DeviceInfoSubHeaderImageDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/lightbulb_darkblue" />
+                app:srcCompat="@drawable/settings1_white" />
 
             <TextView
                 android:id="@+id/deviceInfoSubHeaderTextView"
@@ -121,6 +121,18 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/deviceInfoSubHeaderImage"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/devicePageSpinKit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                style="@style/SpinKitView.Small.FadingCircle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View

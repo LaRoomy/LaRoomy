@@ -36,6 +36,6 @@
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
     <string name="LaRoomyDevicePlaceholderName">LaRoomy XNG</string>
-    <string name="LaRoomyDeviceInfoPlaceholder">Additional Device Info</string>
+    <string name="LaRoomyDeviceInfoPlaceholder">Loading Properties..</string>
     <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
 </resources>

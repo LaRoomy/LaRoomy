@@ -109,9 +109,8 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             setProgressText(getString(R.string.CA_Connected))
 
             Handler().postDelayed({
-                //(this.applicationContext as ApplicationProperty).bluetoothConnectionManger.sendData(
-                    //(this.applicationContext as ApplicationProperty).bluetoothConnectionManger.authenticationString)
-                ApplicationProperty.bluetoothConnectionManger.sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
+                ApplicationProperty.bluetoothConnectionManger.sendData(
+                    ApplicationProperty.bluetoothConnectionManger.authenticationString)
 
                 setProgressText(getString(R.string.CA_Authenticate))
             }, 1500)

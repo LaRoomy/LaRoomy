@@ -88,19 +88,10 @@ fun resourceIdForImageId(imageID: Int): Int {
         41 -> R.drawable.check_mark_blue
         42 -> R.drawable.star_white
         43 -> R.drawable.check_mark_white
+        44 -> R.drawable.asterisk_white
 
         else -> R.drawable.image_error_state
     }
-}
-
-class DevicePropertyListContentInformation{
-    var canNavigateForward = false
-    var elementType = SEPARATOR_ELEMENT
-    var elementIndex = -1
-    var elementText = ""
-    var elementID = -1
-    var imageID = -1
-    var propertyType = -1
 }
 
 interface OnItemClickListener {

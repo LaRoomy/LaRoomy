@@ -8,19 +8,15 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.ybq.android.spinkit.SpinKitView
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
-
-    private var isUpToDate = false
 
     // device property list elements
     private lateinit var devicePropertyListRecyclerView: RecyclerView
@@ -58,19 +54,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onPause() {
         super.onPause()
+
+        // TODO: suspend connection (maybe delayed in background???)
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
+
+        // TODO: finish activity
     }
 
     override fun onResume() {
         super.onResume()
         setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
-        this.isUpToDate =
-            ApplicationProperty.bluetoothConnectionManger.isPropertyUpToDate
-        if(this.isUpToDate){
-            this.adaptUIToPropertyListing()
+
+        if(ApplicationProperty.bluetoothConnectionManger.isUIDataReady){
+            this.devicePropertyList.clear()
+            this.devicePropertyList = ApplicationProperty.bluetoothConnectionManger.UIAdapterList
+            this.devicePropertyListViewAdapter.notifyDataSetChanged()
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+        }
+        else {
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
         }
     }
 
@@ -87,8 +92,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         // finish the activity and navigate back to the start activity (MainActivity)
+        // same procedure like onBackPressed!
     }
 
+/*
     private fun adaptUIToPropertyListing(){
 
 //        Looper.prepare()
@@ -161,6 +168,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.devicePropertyListViewAdapter.notifyDataSetChanged()
         }).start()
     }
+*/
 
     private fun setUIConnectionStatus(status :Boolean){
 
@@ -188,9 +196,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // this could be a race condition
         // what happens when the device has no groups or the groups are retrieved before the activity is loaded
 
+/*
         if(!this.isUpToDate){
-            this.adaptUIToPropertyListing()
+
         }
+*/
+    }
+
+    override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
+        super.onUIAdaptableArrayListGenerationComplete(UIArray)
+        runOnUiThread {
+            this.devicePropertyList.clear()
+            this.devicePropertyList = UIArray
+            this.devicePropertyListViewAdapter.notifyDataSetChanged()
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+        }
+
+        // TODO: if there is no DeviceInfoHeader -> Hide it!!!!
     }
 
     // device property list adapter:
@@ -219,20 +241,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             when(devicePropertyAdapter.elementAt(position).elementType){
                 UNDEFINED_ELEMENT -> {
-                    // will be treated like a separator!
-                    //holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(R.drawable.placeholder_blue_white)
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = this.activityContext.getString(R.string.LaRoomyDevicePropertyNamePlaceholder)
+                    // should not happen
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
                 GROUP_ELEMENT -> {
-                    // make the element higher than the properties
-                    //holder.constraintLayout.minHeight = 120
-                    // TODO: make it higher
-
-//                    val lParams = holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).layoutParams as ConstraintLayout.LayoutParams
-//                    lParams.setMargins(0,20,0,20)
-
-
                     // make the element higher by setting the visibility of the group-border-view to: visible
                     holder.constraintLayout.findViewById<View>(R.id.startSeparator).visibility = View.VISIBLE
 
@@ -268,57 +280,64 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         -1 -> return // must be error
                         0 -> return // must be error
                         PROPERTY_TYPE_BUTTON -> {
+                            val button = holder.constraintLayout.findViewById<Button>(R.id.elementButton)
                             // show the button
+                            button.visibility = View.VISIBLE
                             // set the text of the button
+                            button.text = element.elementText
                         }
                         PROPERTY_TYPE_SWITCH -> {
                             // show the switch
+                            holder.constraintLayout.findViewById<Switch>(R.id.elementSwitch).visibility = View.VISIBLE
                             // show the text-view
+                            val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                            textView.visibility = View.VISIBLE
+                            // set the text
+                            textView.text = element.elementText
                         }
                         PROPERTY_TYPE_LEVEL_SELECTOR -> {
-                            // show seek-bar layout container!
-                            // show text
+                            // show seek-bar layout container
+                            holder.constraintLayout.findViewById<ConstraintLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
+                            // show the text-view
+                            val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                            textView.visibility = View.VISIBLE
+                            // set the text
+                            textView.text = element.elementText
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
-                            // show the text
-                            // show a level indication
+                            val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                            textView.visibility = View.VISIBLE
+                            // set the text
+                            textView.text = element.elementText
+
+                            // show a level indication !!!!!!!!!!
                         }
                         PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
-                            // only show the text
+                            // show the textView
+                            val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                            textView.visibility = View.VISIBLE
+                            // set the text
+                            textView.text = element.elementText
                         }
                         else -> {
-                            // must be complex type
+                            // must be complex type!
 
-                            // show text only
+                            // show the textView
+                            val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                            textView.visibility = View.VISIBLE
+                            // set the text
+                            textView.text = element.elementText
+                            // show the navigate arrow
+                            holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
                         }
                     }
-
-
-
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = element.elementText
-
-
-                    // make sure it is visible (TODO: is this really necessary??) -No it's not!
-                    //holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
                 }
                 SEPARATOR_ELEMENT -> {
-
-                    //holder.constraintLayout.findViewById<View>(R.id.topSeparator).bottom = 10
-                    //holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).top = 10
-
-                    // TODO: make it better!
-
-                    //holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(R.drawable.placeholder_blue_white)
-                    //holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = this.activityContext.getString(R.string.LaRoomyDevicePropertyNamePlaceholder)
-
-                    // maybe set background??
-
+                    // only show the double line to separate elements
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
                 else -> {
-                    // will be treated like a separator!
-                    //holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(R.drawable.placeholder_blue_white)
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = this.activityContext.getString(R.string.LaRoomyDevicePropertyNamePlaceholder)
+                    // should not happen
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
             }
