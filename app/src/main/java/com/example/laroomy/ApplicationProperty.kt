@@ -1,6 +1,7 @@
 package com.example.laroomy
 
 import android.app.Application
+import android.widget.SeekBar
 import java.util.*
 
 const val ERROR_MESSAGE = 0
@@ -20,7 +21,10 @@ const val PROPERTY_TYPE_LEVEL_SELECTOR = 3
 const val PROPERTY_TYPE_LEVEL_INDICATOR = 4
 const val PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY = 5
 
-
+// seekBar handler types
+const val SEEKBAR_START_TRACK = 1
+const val SEEKBAR_STOP_TRACK = 2
+const val SEEKBAR_PROGRESS_CHANGING = 3
 
 class ApplicationProperty : Application() {
 
@@ -104,7 +108,10 @@ interface OnItemClickListener {
     fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel)
 }
 
-interface OnPropertyClickListener{
+interface OnPropertyClickListener {
     fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation)
     fun onPropertyElementButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
+    fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
+    fun onSeekBarPositionChange(index: Int, newValue: Int, changeType: Int)
+    fun onNavigatableElementClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
 }

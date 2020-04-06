@@ -45,13 +45,16 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
             }
     }
 
-    override fun onStart() {
-        super.onStart()
-        ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled()
-    }
+//    override fun onStart() {
+//        super.onStart()
+//
+//        //ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled()
+//    }
 
     override fun onResume() {
         super.onResume()
+
+        ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled()
 
         // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
 

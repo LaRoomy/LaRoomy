@@ -1,17 +1,15 @@
 package com.example.laroomy
 
 import android.content.Context
+import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
@@ -45,13 +43,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 */
 
         // bind array to adapter
-        this.devicePropertyListViewAdapter = DevicePropertyListAdapter(ApplicationProperty.bluetoothConnectionManger.UIAdapterList, this, this@DeviceMainActivity)
+        this.devicePropertyListViewAdapter =
+            DevicePropertyListAdapter(
+                ApplicationProperty.bluetoothConnectionManger.UIAdapterList,
+                this,
+                this@DeviceMainActivity,
+                this)
 
         // bind the elements to the recycler
         this.devicePropertyListRecyclerView =
             findViewById<RecyclerView>(R.id.devicePropertyListView)
                 .apply {
-                    setHasFixedSize(true)
+                    //setHasFixedSize(true)
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
                 }
@@ -62,7 +65,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // TODO: suspend connection (maybe delayed in background???)
 
-        ApplicationProperty.bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManger.close()
 
         this.activityWasSuspended = true
     }
@@ -90,9 +93,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 //            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
 //        }
 
-        if(this.activityWasSuspended)
+        if(this.activityWasSuspended) {
             ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
-        else
+            this.activityWasSuspended = false
+        } else
             ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
 
 
@@ -127,11 +131,56 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         index: Int,
         devicePropertyListContentInformation: DevicePropertyListContentInformation
     ) {
-        Log.d("M:CB:onPropBtnClk", "Property element was clicked. Element-Type is Button at index: $index\n\nData is:\n" +
+        Log.d("M:CB:onPropBtnClk", "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
                 "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                 "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                "Element-ID: ${devicePropertyListContentInformation.elementID}" +
-                "Element-Index: ${devicePropertyListContentInformation.elementIndex}")
+                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+    }
+
+    override fun onPropertyElementSwitchClick(
+        index: Int,
+        devicePropertyListContentInformation: DevicePropertyListContentInformation
+    ) {
+        Log.d("M:CB:onPropSwitchClk", "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
+                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+
+    }
+
+    override fun onSeekBarPositionChange(
+        index: Int,
+        newValue: Int,
+        changeType: Int
+    ) {
+        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManger.UIAdapterList.elementAt(index)
+
+        Log.d("M:CB:onSeekBarChange", "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
+                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                "Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
+                "SeekBar specific values:\n" +
+                "New Value: $newValue\n" +
+                "Change-Type: ${when(changeType){
+                    SEEKBAR_START_TRACK -> "Start tracking"
+                    SEEKBAR_PROGRESS_CHANGING -> "Tracking"
+                    SEEKBAR_STOP_TRACK -> "Stop tracking"
+                    else -> "error" }}")
+
+    }
+
+    override fun onNavigatableElementClick(
+        index: Int,
+        devicePropertyListContentInformation: DevicePropertyListContentInformation
+    ) {
+        Log.d("M:CB:onNavElementClk", "Property element was clicked. Element-Type is Complex/Navigate forward at index: $index\n\nData is:\n" +
+                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
     }
 
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
@@ -145,54 +194,78 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private fun setUIConnectionStatus(status :Boolean){
 
-        val statusText =
-            findViewById<TextView>(R.id.deviceConnectionStatusTextView)
+        runOnUiThread {
+            val statusText =
+                findViewById<TextView>(R.id.deviceConnectionStatusTextView)
 
-        if(status){
-            statusText.setTextColor(getColor(R.color.connectedTextColor))
-            statusText.text = getString(R.string.DMA_ConnectionStatus_connected)
-        }
-        else{
-            statusText.setTextColor(getColor(R.color.disconnectedTextColor))
-            statusText.text = getString(R.string.DMA_ConnectionStatus_disconnected)
+            if (status) {
+                statusText.setTextColor(getColor(R.color.connectedTextColor))
+                statusText.text = getString(R.string.DMA_ConnectionStatus_connected)
+            } else {
+                statusText.setTextColor(getColor(R.color.disconnectedTextColor))
+                statusText.text = getString(R.string.DMA_ConnectionStatus_disconnected)
+            }
         }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
         this.setUIConnectionStatus(state)
-    }
 
-    override fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>) {
-        super.onGroupDataRetrievalCompleted(groups)
-
-        // this could be a race condition
-        // what happens when the device has no groups or the groups are retrieved before the activity is loaded
-
-/*
-        if(!this.isUpToDate){
-
+        if(state) {
+            runOnUiThread {
+                this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+            }
         }
-*/
     }
+
+    override fun onDeviceReadyForCommunication() {
+        super.onDeviceReadyForCommunication()
+
+
+
+        //if(this.activityWasSuspended)
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+    }
+
+//    override fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>) {
+//        super.onGroupDataRetrievalCompleted(groups)
+//
+//        // this could be a race condition
+//        // what happens when the device has no groups or the groups are retrieved before the activity is loaded
+//
+///*
+//        if(!this.isUpToDate){
+//
+//        }
+//*/
+//    }
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
         runOnUiThread {
 //            this.devicePropertyList.clear()
 //            this.devicePropertyList = UIArray
-            this.devicePropertyListViewAdapter.notifyDataSetChanged()
+            //this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
         }
 
         // TODO: if there is no DeviceInfoHeader -> Hide it!!!!
     }
 
+    override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {
+        super.onUIAdaptableArrayListItemAdded(item)
+        runOnUiThread{
+            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.UIAdapterList.size - 1)
+        }
+    }
+
     // device property list adapter:
     class DevicePropertyListAdapter(
         private val devicePropertyAdapter: ArrayList<DevicePropertyListContentInformation>,
         private val itemClickListener: OnPropertyClickListener,
-        private val activityContext: Context
+        private val activityContext: Context,
+        private val callingActivity: DeviceMainActivity
     ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
 
         class DPLViewHolder(val constraintLayout: ConstraintLayout)
@@ -238,8 +311,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         resourceIdForImageId(devicePropertyAdapter.elementAt(position).imageID)
                     )
                     // set the text for the element and show the textView
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).visibility = View.VISIBLE
-                    holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = devicePropertyAdapter.elementAt(position).elementText
+                    val tV = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                    tV.visibility = View.VISIBLE
+                    tV.text = devicePropertyAdapter.elementAt(position).elementText
+                    tV.textSize = 16F
+                    tV.setTypeface(tV.typeface, Typeface.BOLD)
+                    //.visibility = View.VISIBLE
+                    //holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = devicePropertyAdapter.elementAt(position).elementText
                 }
                 PROPERTY_ELEMENT -> {
 
@@ -259,6 +337,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         -1 -> return // must be error
                         0 -> return // must be error
                         PROPERTY_TYPE_BUTTON -> {
+                            // get the button
                             val button = holder.constraintLayout.findViewById<Button>(R.id.elementButton)
                             // show the button
                             button.visibility = View.VISIBLE
@@ -266,17 +345,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             button.text = element.elementText
                             // hide the element text
                             holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).visibility = View.GONE
-
-
-                            // TODO: check this
-                            // set on click listener??? Or do it somewhere else??
+                            // set the onClick handler
                             button.setOnClickListener{
                                 itemClickListener.onPropertyElementButtonClick(position, devicePropertyAdapter.elementAt(position))
                             }
                         }
                         PROPERTY_TYPE_SWITCH -> {
+                            // get the switch
+                            val switch = holder.constraintLayout.findViewById<Switch>(R.id.elementSwitch)
                             // show the switch
-                            holder.constraintLayout.findViewById<Switch>(R.id.elementSwitch).visibility = View.VISIBLE
+                            switch.visibility = View.VISIBLE
+                            // set the onClick handler
+                            switch.setOnClickListener{
+                                itemClickListener.onPropertyElementSwitchClick(position, devicePropertyAdapter.elementAt(position))
+                            }
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
@@ -286,6 +368,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         PROPERTY_TYPE_LEVEL_SELECTOR -> {
                             // show seek-bar layout container
                             holder.constraintLayout.findViewById<ConstraintLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
+                            // set the handler for the seekBar
+                            devicePropertyAdapter.elementAt(position).handler = callingActivity
+                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(devicePropertyAdapter.elementAt(position))
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
@@ -309,6 +394,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                         else -> {
                             // must be complex type!
+
+                            // set handler
+                            holder.constraintLayout.setOnClickListener {
+                                itemClickListener.onNavigatableElementClick(
+                                    position,
+                                    devicePropertyAdapter.elementAt(position)
+                                )
+                            }
 
                             // show the textView
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
@@ -338,14 +431,4 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return devicePropertyAdapter.size
         }
     }
-
-//    fun onElementButtonClick(view: View){
-//        Log.d("M:onElementBtnClk", "ElementButton was clicked! Guess the index of the clicked Element?")
-//    }
-
-//    fun onElementButtonClick(index: Int, deviceDevicePropertyListContentInformation: DevicePropertyListContentInformation){
-//
-//    }
-    //
-    //  android:onClick="onElementButtonClick" // in itemdefinition
 }

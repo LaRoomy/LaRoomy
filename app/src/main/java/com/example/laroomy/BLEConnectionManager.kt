@@ -8,6 +8,7 @@ import android.bluetooth.*
 import android.bluetooth.le.ScanResult
 import android.os.*
 import android.util.Log
+import android.widget.SeekBar
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
@@ -262,14 +263,30 @@ class LaRoomyDevicePresentationModel {
     var type = 0
 }
 
-class DevicePropertyListContentInformation{
+class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
+
+    var handler: OnPropertyClickListener? = null
+
     var canNavigateForward = false
     var elementType = SEPARATOR_ELEMENT
-    var elementIndex = -1
+    var indexInsideGroup = -1
+    var globalIndex = -1
     var elementText = ""
     var elementID = -1
     var imageID = -1
     var propertyType = -1
+
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEKBAR_PROGRESS_CHANGING)
+    }
+
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEKBAR_START_TRACK)
+    }
+
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEKBAR_STOP_TRACK)
+    }
 }
 
 class BLEConnectionManager {
@@ -532,6 +549,7 @@ class BLEConnectionManager {
         this.isConnected = false
         this.authRequired = true
         this.propertyUpToDate = false
+        this.UIAdapterList.clear()
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -1624,6 +1642,8 @@ class BLEConnectionManager {
 
         if(this.laRoomyDevicePropertyList.size > 0) {
 
+            var globalIndex = 0
+
             if (this.laRoomyPropertyGroupList.size > 0) {
                 for (laRoomyDevicePropertyGroup in this.laRoomyPropertyGroupList) {
                     // create the group entry
@@ -1633,8 +1653,13 @@ class BLEConnectionManager {
                     dpl.elementID = laRoomyDevicePropertyGroup.groupID
                     dpl.elementText = laRoomyDevicePropertyGroup.groupName
                     dpl.imageID = laRoomyDevicePropertyGroup.imageID
+                    // add the global index of the position in the array
+                    dpl.globalIndex = globalIndex
+                    globalIndex++
                     // add the group to the list
                     this.UIAdapterList.add(dpl)
+                    // notify activity
+                    this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl)
                     // add the device properties to the group by their IDs
                     for (ID in laRoomyDevicePropertyGroup.memberIDs) {
                         this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
@@ -1647,19 +1672,31 @@ class BLEConnectionManager {
                                 propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                                 propertyEntry.imageID = laRoomyDeviceProperty.imageID
                                 propertyEntry.elementID = laRoomyDeviceProperty.propertyID
-                                propertyEntry.elementIndex = index
+                                propertyEntry.indexInsideGroup = index
                                 propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
+                                // set global index
+                                propertyEntry.globalIndex = globalIndex
+                                globalIndex++
                                 // add it to the list
                                 this.UIAdapterList.add(propertyEntry)
+                                // notify activity
+                                this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
                                 // ID found -> further processing not necessary -> break the loop
                                 return@forEachIndexed
                             }
                         }
                     }
+                    // separate the groups
                     val dpl2 = DevicePropertyListContentInformation()
                     dpl2.elementType = SEPARATOR_ELEMENT
                     dpl2.canNavigateForward = false
+                    // set globalIndex
+                    dpl2.globalIndex = globalIndex
+                    globalIndex++
+                    // add the separator to the array
                     this.UIAdapterList.add(dpl2)
+                    // notify activity
+                    this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2)
                 }
             }
             // now add the properties which are not part of a group
@@ -1673,10 +1710,15 @@ class BLEConnectionManager {
                     propertyEntry.elementID = laRoomyDeviceProperty.propertyID
                     propertyEntry.imageID = laRoomyDeviceProperty.imageID
                     propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
-                    propertyEntry.elementIndex = index
+                    propertyEntry.indexInsideGroup = index
                     propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
+                    // set global index
+                    propertyEntry.globalIndex = globalIndex
+                    globalIndex++
                     // add it to the list
                     this.UIAdapterList.add(propertyEntry)
+                    // notify activity
+                    this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
                 }
             }
             this.dataReadyToShow = true
@@ -1748,5 +1790,6 @@ class BLEConnectionManager {
         fun onPropertyGroupDataChanged(groupIndex: Int, groupID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
         fun onCompletePropertyInvalidated(){}
         fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
+        fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
     }
 }
