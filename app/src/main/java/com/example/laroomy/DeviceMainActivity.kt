@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var devicePropertyListViewAdapter: RecyclerView.Adapter<*>
     private lateinit var devicePropertyListLayoutManager: RecyclerView.LayoutManager
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
+
+    private var activityWasSuspended = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,16 +63,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // TODO: suspend connection (maybe delayed in background???)
 
         ApplicationProperty.bluetoothConnectionManger.clear()
+
+        this.activityWasSuspended = true
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
 
         // TODO: finish activity
+
+        ApplicationProperty.bluetoothConnectionManger.clear()
+        finish()
     }
 
     override fun onResume() {
         super.onResume()
+        Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
+
         setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
 
         this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
@@ -80,7 +90,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 //            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
 //        }
 
-        ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
+        if(this.activityWasSuspended)
+            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+        else
+            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
 
 
 /*
@@ -97,6 +110,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
+
+        Log.d("M:onPropEntryClk", "Property list entry was clicked at index: $index")
+
         //if(devicePropertyList.elementAt(index).canNavigateForward && (devicePropertyList.elementAt(index).elementType == PROPERTY_ELEMENT)){
 
             // navigate to the appropriate property-page
@@ -107,9 +123,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
        // }
     }
 
+    override fun onPropertyElementButtonClick(
+        index: Int,
+        devicePropertyListContentInformation: DevicePropertyListContentInformation
+    ) {
+        Log.d("M:CB:onPropBtnClk", "Property element was clicked. Element-Type is Button at index: $index\n\nData is:\n" +
+                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                "Element-ID: ${devicePropertyListContentInformation.elementID}" +
+                "Element-Index: ${devicePropertyListContentInformation.elementIndex}")
+    }
+
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         // finish the activity and navigate back to the start activity (MainActivity)
         // same procedure like onBackPressed!
+
+        ApplicationProperty.bluetoothConnectionManger.clear()
+        finish()
     }
 
 
@@ -236,6 +266,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             button.text = element.elementText
                             // hide the element text
                             holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).visibility = View.GONE
+
+
+                            // TODO: check this
+                            // set on click listener??? Or do it somewhere else??
+                            button.setOnClickListener{
+                                itemClickListener.onPropertyElementButtonClick(position, devicePropertyAdapter.elementAt(position))
+                            }
                         }
                         PROPERTY_TYPE_SWITCH -> {
                             // show the switch
@@ -292,10 +329,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
             }
+
+            // bind holder???
+            holder.bind(devicePropertyAdapter.elementAt(position), itemClickListener, position)
         }
 
         override fun getItemCount(): Int {
             return devicePropertyAdapter.size
         }
     }
+
+//    fun onElementButtonClick(view: View){
+//        Log.d("M:onElementBtnClk", "ElementButton was clicked! Guess the index of the clicked Element?")
+//    }
+
+//    fun onElementButtonClick(index: Int, deviceDevicePropertyListContentInformation: DevicePropertyListContentInformation){
+//
+//    }
+    //
+    //  android:onClick="onElementButtonClick" // in itemdefinition
 }

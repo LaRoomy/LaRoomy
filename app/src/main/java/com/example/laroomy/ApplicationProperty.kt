@@ -88,7 +88,13 @@ fun resourceIdForImageId(imageID: Int): Int {
         41 -> R.drawable.check_mark_blue
         42 -> R.drawable.star_white
         43 -> R.drawable.check_mark_white
-        44 -> R.drawable.asterisk_white
+        44 -> R.drawable.helpcircle_white
+        45 -> R.drawable.helpcircle_blue
+        46 -> R.drawable.star_round_white
+        47 -> R.drawable.star_round_blue
+        48 -> R.drawable.lock_blue_white
+        49 -> R.drawable.location_blue_white
+        50 -> R.drawable.printer_blue_white
 
         else -> R.drawable.image_error_state
     }
@@ -100,4 +106,5 @@ interface OnItemClickListener {
 
 interface OnPropertyClickListener{
     fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation)
+    fun onPropertyElementButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
 }
