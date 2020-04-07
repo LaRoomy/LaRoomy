@@ -268,6 +268,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     var handler: OnPropertyClickListener? = null
 
     var canNavigateForward = false
+    var isGroupMember = false
     var elementType = SEPARATOR_ELEMENT
     var indexInsideGroup = -1
     var globalIndex = -1
@@ -275,17 +276,18 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     var elementID = -1
     var imageID = -1
     var propertyType = -1
+    var initialElementValue = -1
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEKBAR_PROGRESS_CHANGING)
+        this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEK_BAR_PROGRESS_CHANGING)
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEKBAR_START_TRACK)
+        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_START_TRACK)
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEKBAR_STOP_TRACK)
+        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
     }
 }
 
@@ -514,7 +516,7 @@ class BLEConnectionManager {
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
-    var UIAdapterList = ArrayList<DevicePropertyListContentInformation>()
+    var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
 
     private val scanResultList: MutableList<ScanResult?> = ArrayList()
 
@@ -549,7 +551,7 @@ class BLEConnectionManager {
         this.isConnected = false
         this.authRequired = true
         this.propertyUpToDate = false
-        this.UIAdapterList.clear()
+        this.uIAdapterList.clear()
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -1638,7 +1640,7 @@ class BLEConnectionManager {
     private fun generateUIAdaptableArrayListFromDeviceProperties(){
 
         this.dataReadyToShow = false
-        this.UIAdapterList.clear()
+        this.uIAdapterList.clear()
 
         if(this.laRoomyDevicePropertyList.size > 0) {
 
@@ -1657,7 +1659,7 @@ class BLEConnectionManager {
                     dpl.globalIndex = globalIndex
                     globalIndex++
                     // add the group to the list
-                    this.UIAdapterList.add(dpl)
+                    this.uIAdapterList.add(dpl)
                     // notify activity
                     this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl)
                     // add the device properties to the group by their IDs
@@ -1669,6 +1671,7 @@ class BLEConnectionManager {
                                 propertyEntry.elementType = PROPERTY_ELEMENT
                                 propertyEntry.canNavigateForward =
                                     laRoomyDeviceProperty.needNavigation()
+                                propertyEntry.isGroupMember = true
                                 propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                                 propertyEntry.imageID = laRoomyDeviceProperty.imageID
                                 propertyEntry.elementID = laRoomyDeviceProperty.propertyID
@@ -1678,7 +1681,7 @@ class BLEConnectionManager {
                                 propertyEntry.globalIndex = globalIndex
                                 globalIndex++
                                 // add it to the list
-                                this.UIAdapterList.add(propertyEntry)
+                                this.uIAdapterList.add(propertyEntry)
                                 // notify activity
                                 this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
                                 // ID found -> further processing not necessary -> break the loop
@@ -1694,7 +1697,7 @@ class BLEConnectionManager {
                     dpl2.globalIndex = globalIndex
                     globalIndex++
                     // add the separator to the array
-                    this.UIAdapterList.add(dpl2)
+                    this.uIAdapterList.add(dpl2)
                     // notify activity
                     this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2)
                 }
@@ -1716,13 +1719,13 @@ class BLEConnectionManager {
                     propertyEntry.globalIndex = globalIndex
                     globalIndex++
                     // add it to the list
-                    this.UIAdapterList.add(propertyEntry)
+                    this.uIAdapterList.add(propertyEntry)
                     // notify activity
                     this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
                 }
             }
             this.dataReadyToShow = true
-            this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.UIAdapterList)
+            this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList)
         }
     }
 

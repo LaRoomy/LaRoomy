@@ -45,7 +45,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // bind array to adapter
         this.devicePropertyListViewAdapter =
             DevicePropertyListAdapter(
-                ApplicationProperty.bluetoothConnectionManger.UIAdapterList,
+                ApplicationProperty.bluetoothConnectionManger.uIAdapterList,
                 this,
                 this@DeviceMainActivity,
                 this)
@@ -155,7 +155,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         newValue: Int,
         changeType: Int
     ) {
-        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManger.UIAdapterList.elementAt(index)
+        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(index)
 
         Log.d("M:CB:onSeekBarChange", "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
                 "Type: ${devicePropertyListContentInformation.propertyType}\n" +
@@ -165,9 +165,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "SeekBar specific values:\n" +
                 "New Value: $newValue\n" +
                 "Change-Type: ${when(changeType){
-                    SEEKBAR_START_TRACK -> "Start tracking"
-                    SEEKBAR_PROGRESS_CHANGING -> "Tracking"
-                    SEEKBAR_STOP_TRACK -> "Stop tracking"
+                    SEEK_BAR_START_TRACK -> "Start tracking"
+                    SEEK_BAR_PROGRESS_CHANGING -> "Tracking"
+                    SEEK_BAR_STOP_TRACK -> "Stop tracking"
                     else -> "error" }}")
 
     }
@@ -181,6 +181,26 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
                 "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
                 "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+        when(devicePropertyListContentInformation.elementID){
+            COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
+                // navigate to the RGB Page
+            }
+            COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
+                // navigate to the extended level selector page
+            }
+            COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
+                // navigate to the time selector page with single-select-mode
+            }
+            COMPLEX_PROPERTY_TYPE_ID_TIME_ELAPSE_SELECTOR -> {
+                // navigate to the time selector page with the countdown-select-mode
+            }
+            COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
+                // navigate to the time selector page with the frame-select-mode
+            }
+            else -> {
+                // what to do here??
+            }
+        }
     }
 
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
@@ -256,7 +276,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {
         super.onUIAdaptableArrayListItemAdded(item)
         runOnUiThread{
-            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.UIAdapterList.size - 1)
+            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
         }
     }
 
@@ -291,6 +311,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
                 GROUP_ELEMENT -> {
+
+                    // make the bottom separator line transparent
+                    // TODO: test this
+                    holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
+
 
                     holder.constraintLayout.setBackgroundColor(activityContext.getColor(R.color.groupColor))
 
@@ -329,6 +354,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     if(element.canNavigateForward)
                         holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
                     else  holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.GONE
+                    // if the property is part of a group -> make the separator-lines transparent
+                    // TODO: test this
+                    holder.constraintLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.transparentViewColor)
+                    holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
                     // set the appropriate image for the imageID
                     holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
                         resourceIdForImageId(element.imageID))
@@ -357,7 +386,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             switch.visibility = View.VISIBLE
                             // set the onClick handler
                             switch.setOnClickListener{
-                                itemClickListener.onPropertyElementSwitchClick(position, devicePropertyAdapter.elementAt(position))
+                                itemClickListener.onPropertyElementSwitchClick(position, element)
                             }
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
@@ -369,8 +398,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             // show seek-bar layout container
                             holder.constraintLayout.findViewById<ConstraintLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
                             // set the handler for the seekBar
-                            devicePropertyAdapter.elementAt(position).handler = callingActivity
-                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(devicePropertyAdapter.elementAt(position))
+                            element.handler = callingActivity
+                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(element)
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
@@ -384,6 +413,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             textView.text = element.elementText
 
                             // show a level indication !!!!!!!!!!
+                            val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(element.initialElementValue)
+                            val levelIndication = holder.constraintLayout.findViewById<TextView>(R.id.levelIndicationTextView)
+                            levelIndication.visibility = View.VISIBLE
+                            levelIndication.text = percentageLevelPropertyGenerator.percentageString
+                            levelIndication.setTextColor(percentageLevelPropertyGenerator.colorID)
                         }
                         PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
                             // show the textView
@@ -399,7 +433,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             holder.constraintLayout.setOnClickListener {
                                 itemClickListener.onNavigatableElementClick(
                                     position,
-                                    devicePropertyAdapter.elementAt(position)
+                                    element
                                 )
                             }
 
@@ -422,8 +456,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
             }
-
-            // bind holder???
+            // bind it!
             holder.bind(devicePropertyAdapter.elementAt(position), itemClickListener, position)
         }
 

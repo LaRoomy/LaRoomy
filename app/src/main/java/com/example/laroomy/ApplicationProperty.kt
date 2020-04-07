@@ -21,10 +21,18 @@ const val PROPERTY_TYPE_LEVEL_SELECTOR = 3
 const val PROPERTY_TYPE_LEVEL_INDICATOR = 4
 const val PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY = 5
 
+// complex property type IDs
+const val COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR = 6
+const val COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR = 7
+const val COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR = 8
+const val COMPLEX_PROPERTY_TYPE_ID_TIME_ELAPSE_SELECTOR = 9
+const val COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR = 10
+
+
 // seekBar handler types
-const val SEEKBAR_START_TRACK = 1
-const val SEEKBAR_STOP_TRACK = 2
-const val SEEKBAR_PROGRESS_CHANGING = 3
+const val SEEK_BAR_START_TRACK = 1
+const val SEEK_BAR_STOP_TRACK = 2
+const val SEEK_BAR_PROGRESS_CHANGING = 3
 
 class ApplicationProperty : Application() {
 
@@ -41,8 +49,6 @@ class ApplicationProperty : Application() {
        bluetoothConnectionManger = BLEConnectionManager()
         systemLanguage = Locale.getDefault().displayLanguage
     }
-
-
 }
 
 fun resourceIdForImageId(imageID: Int): Int {

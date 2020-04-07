@@ -38,4 +38,5 @@
     <string name="LaRoomyDevicePlaceholderName">LaRoomy XNG</string>
     <string name="LaRoomyDeviceInfoPlaceholder">Loading Properties..</string>
     <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
+    <string name="LevelIndicationTextPlaceholder">100%</string>
 </resources>
