@@ -15,5 +15,6 @@
     <color name="disconnectedTextColor">#FF8888</color>
     <color name="connectedTextColor">#88FFAA</color>
     <color name="groupColor">#444444</color>
+    <color name="groupHeaderColor">#555555</color>
     <color name="transparentViewColor">#00FFFFFF</color>
 </resources>

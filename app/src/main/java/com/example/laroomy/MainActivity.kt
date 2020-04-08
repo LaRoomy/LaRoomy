@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
         // TODO: if the loading activity fails, the main activity must be re-initiated
 
-        finish()// questionable!!!!!!!!!!!!!!!
+        //finish()// questionable!!!!!!!!!!!!!!!
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {

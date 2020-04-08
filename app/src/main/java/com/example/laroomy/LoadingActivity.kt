@@ -43,7 +43,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onPause() {
         super.onPause()
         //ApplicationProperty.bluetoothConnectionManger.clear() this is fucking wrong!!
-        finish()
+        //finish()
     }
 
     private fun setProgressText(text: String){
@@ -92,15 +92,18 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 //        }
     }
 
-/*
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
+
+        if(!state) {
+            ApplicationProperty.bluetoothConnectionManger.clear()
+            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+        }
 
         // if the device is connected -> check if this is the last connected device
         // if so -> load ui configuration and start confirmation process (if the authentication is successful!)
         // otherwise -> start property retrieving process (if the authentication is successful!)
     }
-*/
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)

@@ -67,7 +67,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         ApplicationProperty.bluetoothConnectionManger.close()
         setUIConnectionStatus(false)
-        setDeviceInfoHeader(R.drawable.warning_white, getString(R.string.DMA_DeviceConnectionSuspended))
+        setDeviceInfoHeader(29, getString(R.string.DMA_DeviceConnectionSuspended))
 
         this.activityWasSuspended = true
     }
@@ -89,7 +89,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
 
         // make sure to set the right Name for the device
-        findViewById<TextView>(R.id.deviceNameTextView).text = ApplicationProperty.bluetoothConnectionManger.currentDevice?.name ?: "No Device"
+        findViewById<TextView>(R.id.deviceTypeHeaderName).text = ApplicationProperty.bluetoothConnectionManger.currentDevice?.name
 
         // Update the connection status
         setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
@@ -233,7 +233,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun setDeviceInfoHeader(imageID: Int, message: String){
-        findViewById<ImageView>(R.id.deviceInfoSubHeaderImage).setBackgroundResource(
+        findViewById<ImageView>(R.id.deviceInfoSubHeaderImage).setImageResource(
             resourceIdForImageId(imageID))
         findViewById<TextView>(R.id.deviceInfoSubHeaderTextView).text = message
     }
@@ -248,7 +248,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         if(state) {
             runOnUiThread {
                 this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-                this.setDeviceInfoHeader(R.drawable.check_mark_white, getString(R.string.DMA_Ready))
+                this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
             }
         }
     }
@@ -263,19 +263,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-//    override fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>) {
-//        super.onGroupDataRetrievalCompleted(groups)
-//
-//        // this could be a race condition
-//        // what happens when the device has no groups or the groups are retrieved before the activity is loaded
-//
-///*
-//        if(!this.isUpToDate){
-//
-//        }
-//*/
-//    }
-
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
 
@@ -283,7 +270,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         runOnUiThread {
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-            this.setDeviceInfoHeader(R.drawable.check_mark_white, getString(R.string.DMA_Ready))
+            this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
         }
     }
 
@@ -331,7 +318,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
 
 
-                    holder.constraintLayout.setBackgroundColor(activityContext.getColor(R.color.groupColor))
+                    holder.constraintLayout.setBackgroundColor(activityContext.getColor(R.color.groupHeaderColor))
 
                     // make sure it is visible (TODO: is this really necessary??)
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
