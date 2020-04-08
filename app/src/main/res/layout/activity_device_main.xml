@@ -71,10 +71,22 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/DeviceTypeHeaderImageButtonDescription"
                 android:onClick="onDiscardDeviceButtonClick"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/cross_white24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/deviceReConnectButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/DeviceReConnectImageButtonDescription"
+                android:onClick="onReconnectDeviceButtonClick"
+
+                android:src="@drawable/reload_turnright_white24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -11,6 +11,8 @@
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
+    <string name="DMA_Ready">Ready</string>
+    <string name="DMA_DeviceConnectionSuspended">Connection suspended</string>
 
 
     <!-- Image content descriptions -->
@@ -20,6 +22,7 @@
     <string name="DeviceInfoSubHeaderImageDescription">Image for the additional device info</string>
     <string name="DevicePropertyListElementImageDescription">Image for the appropriate device property</string>
     <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>
+    <string name="DeviceReConnectImageButtonDescription">ImageButton to reconnect the device</string>
     <!-- Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>

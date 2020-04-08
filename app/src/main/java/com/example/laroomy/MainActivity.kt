@@ -65,6 +65,14 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         //reset the selected color
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        // TODO: if the loading activity fails, the main activity must be re-initiated
+
+        finish()// questionable!!!!!!!!!!!!!!!
+    }
+
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
 //        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout

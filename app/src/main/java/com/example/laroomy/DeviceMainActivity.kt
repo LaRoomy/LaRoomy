@@ -66,6 +66,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // TODO: suspend connection (maybe delayed in background???)
 
         ApplicationProperty.bluetoothConnectionManger.close()
+        setUIConnectionStatus(false)
+        setDeviceInfoHeader(R.drawable.warning_white, getString(R.string.DMA_DeviceConnectionSuspended))
 
         this.activityWasSuspended = true
     }
@@ -73,25 +75,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onBackPressed() {
         super.onBackPressed()
 
-        // TODO: finish activity
+        // TODO: finish activity NO!
 
-        ApplicationProperty.bluetoothConnectionManger.clear()
-        finish()
+        // TODO: at this point, this is the only existing activity in the app-lifecycle, so:
+        // if the user presses back, he leaves the app, so onPause must be called???
+
+        //ApplicationProperty.bluetoothConnectionManger.clear()
+        //finish()
     }
 
     override fun onResume() {
         super.onResume()
         Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
 
+        // make sure to set the right Name for the device
+        findViewById<TextView>(R.id.deviceNameTextView).text = ApplicationProperty.bluetoothConnectionManger.currentDevice?.name ?: "No Device"
+
+        // Update the connection status
         setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
 
+        // show the loading circle
         this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
 
-//        if (this.isLastConnectedDevice && (ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.size == 0)) {
-//            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
-//        } else {
-//            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
-//        }
 
         if(this.activityWasSuspended) {
             ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
@@ -99,18 +104,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         } else
             ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
 
+        // how to confirm the device-properties
+        // maybe make a changed-parameter in the device firmware and call that to upgrade performance and hold the line clear for communication?
 
-/*
-        if(ApplicationProperty.bluetoothConnectionManger.isUIDataReady){
-            //this.devicePropertyList.clear()
-            //this.devicePropertyList = ApplicationProperty.bluetoothConnectionManger.UIAdapterList
-            this.devicePropertyListViewAdapter.notifyDataSetChanged()
-            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-        }
-        else {
-            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
-        }
-*/
     }
 
     override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
@@ -208,7 +204,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // same procedure like onBackPressed!
 
         ApplicationProperty.bluetoothConnectionManger.clear()
+
+        // start main activity to select a new device!!!
+
         finish()
+    }
+
+    fun onReconnectDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+        // re-connect
+        // of re-connect and re-new the device-properties???
     }
 
 
@@ -228,24 +232,35 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
+    private fun setDeviceInfoHeader(imageID: Int, message: String){
+        findViewById<ImageView>(R.id.deviceInfoSubHeaderImage).setBackgroundResource(
+            resourceIdForImageId(imageID))
+        findViewById<TextView>(R.id.deviceInfoSubHeaderTextView).text = message
+    }
+
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        this.setUIConnectionStatus(state)
+        // this callback will only invoked in this activity if this is a re-connect-process (the initial connection attempt will be executed in the loading activity!)
 
+        // set the UI State to connected:
+        this.setUIConnectionStatus(state)
+        // stop the loading circle and set the info-header
         if(state) {
             runOnUiThread {
                 this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+                this.setDeviceInfoHeader(R.drawable.check_mark_white, getString(R.string.DMA_Ready))
             }
         }
     }
 
     override fun onDeviceReadyForCommunication() {
         super.onDeviceReadyForCommunication()
+        // this callback will only invoked in this activity if this is a re-connect-process (the initial connection attempt will be executed in the loading activity!)
 
-
-
-        //if(this.activityWasSuspended)
+        // make sure to hide the loading circle
+        runOnUiThread {
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+        }
     }
 
 //    override fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>) {
@@ -263,14 +278,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
-        runOnUiThread {
-//            this.devicePropertyList.clear()
-//            this.devicePropertyList = UIArray
-            //this.devicePropertyListViewAdapter.notifyDataSetChanged()
-            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-        }
 
-        // TODO: if there is no DeviceInfoHeader -> Hide it!!!!
+        // ?? description!
+
+        runOnUiThread {
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+            this.setDeviceInfoHeader(R.drawable.check_mark_white, getString(R.string.DMA_Ready))
+        }
     }
 
     override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {

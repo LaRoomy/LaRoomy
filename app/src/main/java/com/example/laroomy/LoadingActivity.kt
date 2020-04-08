@@ -79,6 +79,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
         startActivity(intent)
 
+        finish()
 
 
         // confirm or retrieve the device-properties...

@@ -301,6 +301,8 @@ class BLEConnectionManager {
             when(newState){
                 BluetoothProfile.STATE_CONNECTED -> {
 
+                    //currentDevice = gatt?.device ??????
+
                     isConnected = true
 
                     Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
