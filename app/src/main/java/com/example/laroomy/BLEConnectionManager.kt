@@ -394,6 +394,7 @@ class BLEConnectionManager {
                 if(dataAsString == authenticationResponse){
                     Log.d("M:CB:CharChanged", "Data Received - Authentication successful - Device ID confirmed")
                     authRequired = false
+                    authenticationSuccess = true
                     // save the device address (but only if the authentication was successful)
                     saveLastSuccessfulConnectedDeviceAddress(gatt?.device?.address ?: "")
                     callback.onAuthenticationSuccessful()
@@ -492,6 +493,8 @@ class BLEConnectionManager {
 
     var isConnected:Boolean = false
         private set
+    var authenticationSuccess = false
+        private set
 
     private var authRequired = true
     private var propertyLoopActive = false
@@ -553,6 +556,7 @@ class BLEConnectionManager {
         this.isConnected = false
         this.authRequired = true
         this.propertyUpToDate = false
+        this.authenticationSuccess = false
         this.uIAdapterList.clear()
     }
 

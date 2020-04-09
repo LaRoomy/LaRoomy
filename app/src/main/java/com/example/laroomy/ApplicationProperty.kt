@@ -42,6 +42,9 @@ class ApplicationProperty : Application() {
 
     lateinit var systemLanguage: String
 
+    // navigation control parameter:
+    var navigatedFromPropertySubPage = false
+
     //var userNavigatedFromCommActivity = false
 
     override fun onCreate() {

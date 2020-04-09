@@ -1,6 +1,7 @@
 package com.example.laroomy
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,6 +25,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
 
     private var activityWasSuspended = false
+    private var restoreIndex = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,25 +90,62 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onResume()
         Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
 
-        // make sure to set the right Name for the device
-        findViewById<TextView>(R.id.deviceTypeHeaderName).text = ApplicationProperty.bluetoothConnectionManger.currentDevice?.name
+        // at first check if this callback will be invoked due to a back-navigation from a property sub-page
+        // or if it was invoked on creation or a resume from outside of the application
+        if((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
+            // this is a back navigation from a property sub-page
 
-        // Update the connection status
-        setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
+            // set property-item to normal background
+            if(restoreIndex >= 0) {
+                // check if the property is part of a group and set the appropriate background-color
+                if(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(restoreIndex).isGroupMember) {
+                    // set group background
+                    setItemBackgroundColor(restoreIndex, R.color.groupColor)
+                } else {
+                    // set default background
+                    setItemBackgroundColor(restoreIndex, R.color.transparentViewColor)
+                }
+            }
+            // reset the parameter
+            restoreIndex = -1
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
+            // realign the context objects to the bluetoothManager
+            ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
+            ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
-        // show the loading circle
-        this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
+        } else {
+            // creation or resume action:
 
+            // make sure to set the right Name for the device
+            findViewById<TextView>(R.id.deviceTypeHeaderName).text =
+                ApplicationProperty.bluetoothConnectionManger.currentDevice?.name
 
-        if(this.activityWasSuspended) {
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
-            this.activityWasSuspended = false
-        } else
-            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
+            // Update the connection status
+            setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
 
-        // how to confirm the device-properties
-        // maybe make a changed-parameter in the device firmware and call that to upgrade performance and hold the line clear for communication?
+            // show the loading circle
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
 
+            // check if this is a call on creation or resume:
+            if (this.activityWasSuspended) {
+                // try to reconnect
+                ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                this.activityWasSuspended = false
+            } else {
+                // must be the creation process -> start property listing
+                ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
+            }
+
+            // how to confirm the device-properties
+            // maybe make a changed-parameter in the device firmware and call that to upgrade performance and hold the line clear for communication?
+        }
+    }
+
+    private fun setItemBackgroundColor(index: Int, colorID: Int){
+        val constraintLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? ConstraintLayout
+        constraintLayout?.setBackgroundColor(getColor(colorID))
+
+        // maybe get the sub holder constraintLayout (ID: contentHolderLayout) ????
     }
 
     override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
@@ -177,9 +216,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
                 "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
                 "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+
+        // set it to selected color
+        setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
+        restoreIndex = index
+
+        // navigate
         when(devicePropertyListContentInformation.elementID){
             COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
                 // navigate to the RGB Page
+                val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
                 // navigate to the extended level selector page

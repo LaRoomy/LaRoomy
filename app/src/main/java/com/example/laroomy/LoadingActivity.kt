@@ -4,11 +4,14 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
 
 class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var isLastConnectedDevice = false
+    private var connectionAttemptCounter = 0
+    //private var authenticationAttemtCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,12 +50,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
 
     private fun setProgressText(text: String){
-        // maybe include a drawable..? and a text-color ?
-
-//        val notificationTextView = findViewById<TextView>(R.id.LA_progressTextView)
-//        notificationTextView.setTextColor(getColor(R.color.InfoColor))
-//        notificationTextView.text = text
-
         this.setMessageText(R.color.InfoColor, text)
     }
 
@@ -69,46 +66,45 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     // Interface methods:
     override fun onAuthenticationSuccessful() {
         super.onAuthenticationSuccessful()
+/*
 
         this.runOnUiThread {
             this.setMessageText(R.color.InfoColor, getString(R.string.CA_AuthSuccess))
         }
-        // navigate to the next activity and retrieve the properties there!
+*/
 
+        // navigate to the next activity and retrieve the properties there:
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
         startActivity(intent)
-
+        // finish this activity
         finish()
-
-
-        // confirm or retrieve the device-properties...
-
-//        if(this.isLastConnectedDevice && (ApplicationProperty.bluetoothConnectionManger.laRoomyDevicePropertyList.size == 0)){
-//            ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
-//        }
-//        else{
-//            ApplicationProperty.bluetoothConnectionManger.startPropertyConfirmationProcess()
-//        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
 
-        if(!state) {
+        if(connectionAttemptCounter <= 4) {
+            if (!state) {
+                // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
+                connectionAttemptCounter++
+                // clear the bluetoothManager
+                ApplicationProperty.bluetoothConnectionManger.clear()
+                // try to connect again with 1 sec delay
+                Handler().postDelayed({
+                    ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                }, 1000)
+            }
+        } else {
+            // all attempts to connect failed -> go back to start (main activity)
             ApplicationProperty.bluetoothConnectionManger.clear()
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            finish()
         }
-
-        // if the device is connected -> check if this is the last connected device
-        // if so -> load ui configuration and start confirmation process (if the authentication is successful!)
-        // otherwise -> start property retrieving process (if the authentication is successful!)
     }
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
         setErrorText(message)
-
         // navigate back with delay
         Handler().postDelayed({
             // TODO: check if this works
@@ -118,14 +114,24 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onDeviceReadyForCommunication() {
         super.onDeviceReadyForCommunication()
-
+        // device ready -> send authentication
         runOnUiThread {
             setProgressText(getString(R.string.CA_Connected))
-
+            // send authentication request
             Handler().postDelayed({
                 ApplicationProperty.bluetoothConnectionManger.sendData(
                     ApplicationProperty.bluetoothConnectionManger.authenticationString)
 
+                // check the authentication with delay an try again if it is false
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if(!ApplicationProperty.bluetoothConnectionManger.authenticationSuccess){
+                        //authenticationAttemptCounter++
+                        ApplicationProperty.bluetoothConnectionManger.sendData(
+                            ApplicationProperty.bluetoothConnectionManger.authenticationString)
+                    }
+                },1000)
+                
+                // notify User:
                 setProgressText(getString(R.string.CA_Authenticate))
             }, 1500)
         }
@@ -135,15 +141,4 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onComponentError(message)
         setErrorText(message)
     }
-
-/*
-    override fun onPropertyDataRetrievalCompleted(properties: ArrayList<LaRoomyDeviceProperty>) {
-        super.onPropertyDataRetrievalCompleted(properties)
-
-        val intent =
-            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
-        startActivity(intent)
-    }
-*/
-
 }
