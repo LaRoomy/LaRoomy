@@ -64,14 +64,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onPause() {
         super.onPause()
+        // only suspend the connection if the user left this application
+        if(!(this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution) {
 
-        // TODO: suspend connection (maybe delayed in background???)
+            // TODO: suspend connection (maybe delayed in background???)
 
-        ApplicationProperty.bluetoothConnectionManger.close()
-        setUIConnectionStatus(false)
-        setDeviceInfoHeader(29, getString(R.string.DMA_DeviceConnectionSuspended))
+            ApplicationProperty.bluetoothConnectionManger.close()
+            setUIConnectionStatus(false)
+            setDeviceInfoHeader(29, getString(R.string.DMA_DeviceConnectionSuspended))
 
-        this.activityWasSuspended = true
+            this.activityWasSuspended = true
+        } else {
+            // reset parameter:
+            (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = false
+        }
     }
 
     override fun onBackPressed() {
@@ -100,10 +106,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // check if the property is part of a group and set the appropriate background-color
                 if(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(restoreIndex).isGroupMember) {
                     // set group background
+
                     setItemBackgroundColor(restoreIndex, R.color.groupColor)
+
+                    setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
+
                 } else {
                     // set default background
+
                     setItemBackgroundColor(restoreIndex, R.color.transparentViewColor)
+
+                    setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
                 }
             }
             // reset the parameter
@@ -146,6 +159,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         constraintLayout?.setBackgroundColor(getColor(colorID))
 
         // maybe get the sub holder constraintLayout (ID: contentHolderLayout) ????
+    }
+
+    private fun setItemSeparatorViewColors(index: Int, colorID: Int){
+        val constraintLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? ConstraintLayout
+        val top = constraintLayout?.findViewById<View>(R.id.topSeparator)
+        val bottom = constraintLayout?.findViewById<View>(R.id.bottomSeparator)
+        top?.setBackgroundColor(getColor(colorID))
+        bottom?.setBackgroundColor(getColor(colorID))
+
     }
 
     override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
@@ -219,11 +241,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set it to selected color
         setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
+
+        setItemSeparatorViewColors(index, R.color.selectedSeparatorColor)
+
         restoreIndex = index
 
         // navigate
-        when(devicePropertyListContentInformation.elementID){
+        when(devicePropertyListContentInformation.propertyType){
             COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the RGB Page
                 val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)

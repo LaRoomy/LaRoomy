@@ -479,6 +479,14 @@ class BLEConnectionManager {
         this.propertyCallback = pEvents
     }
 
+    fun authenticate(){
+        Log.d("M:BLE:Authenticate", "Sending authentication string")
+        if(this.isConnected){
+            this.authRequired = true
+            this.sendData(this.authenticationString)
+        }
+    }
+
     // constant properties (regarding the device!) ////////////////////////
     private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")

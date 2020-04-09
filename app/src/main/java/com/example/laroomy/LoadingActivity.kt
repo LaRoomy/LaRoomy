@@ -91,7 +91,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 // clear the bluetoothManager
                 ApplicationProperty.bluetoothConnectionManger.clear()
                 // try to connect again with 1 sec delay
-                Handler().postDelayed({
+                Handler(Looper.getMainLooper()).postDelayed({
                     ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
                 }, 1000)
             }
@@ -119,15 +119,15 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             setProgressText(getString(R.string.CA_Connected))
             // send authentication request
             Handler().postDelayed({
-                ApplicationProperty.bluetoothConnectionManger.sendData(
-                    ApplicationProperty.bluetoothConnectionManger.authenticationString)
+                ApplicationProperty.bluetoothConnectionManger.authenticate()
+                //sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
 
                 // check the authentication with delay an try again if it is false
                 Handler(Looper.getMainLooper()).postDelayed({
                     if(!ApplicationProperty.bluetoothConnectionManger.authenticationSuccess){
                         //authenticationAttemptCounter++
-                        ApplicationProperty.bluetoothConnectionManger.sendData(
-                            ApplicationProperty.bluetoothConnectionManger.authenticationString)
+                        ApplicationProperty.bluetoothConnectionManger.authenticate()
+                        //sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
                     }
                 },1000)
                 

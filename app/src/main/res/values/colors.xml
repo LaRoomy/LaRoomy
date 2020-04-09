@@ -17,5 +17,5 @@
     <color name="groupColor">#444444</color>
     <color name="groupHeaderColor">#555555</color>
     <color name="transparentViewColor">#00FFFFFF</color>
-    <color name="DMA_ItemSelectedColor">#AAF5CD06</color>
+    <color name="DMA_ItemSelectedColor">#222222</color>
 </resources>
