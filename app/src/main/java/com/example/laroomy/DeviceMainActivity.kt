@@ -351,6 +351,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {
         super.onUIAdaptableArrayListItemAdded(item)
+
+        // TODO: check if the execution in the UI-Thread is really necessary, maybe this breaks the UI performance
+
         runOnUiThread{
             this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
         }
