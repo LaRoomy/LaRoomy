@@ -21,6 +21,19 @@ fun colorForPercentageLevel(level: Int): Int {
     else Color.GREEN
 }
 
+fun get8BitValueAsPercent(value: Int) : Int {
+    var ret = -1
+
+    if(value in 0..255){
+        ret = when {
+            value > 0 -> ((value*100)/255)
+            value == 0 -> 0
+            else -> ret -1
+        }
+    }
+    return ret
+}
+
 class PercentageLevelPropertyGenerator(E8bit_level: Int){
 
     private val percentAsInt = percentageFrom8BitValue(E8bit_level)

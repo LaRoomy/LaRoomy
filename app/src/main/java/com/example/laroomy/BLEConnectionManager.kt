@@ -29,6 +29,7 @@ class LaRoomyDeviceProperty{
     var groupID = -1
     var imageID = -1
     var hasChanged = false
+    var propertyState = -1
 
     override fun equals(other: Any?): Boolean {
         // check if this is the same reference
@@ -277,6 +278,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     var imageID = -1
     var propertyType = -1
     var initialElementValue = -1
+    var propertyState = -1
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEK_BAR_PROGRESS_CHANGING)
@@ -897,6 +899,7 @@ class BLEConnectionManager {
             Log.d("M:resolvePropNames", "The resolve-ID was invalidated, look if this is a description-name start indicator")
 
             var propertyID = ""
+            var propertyState = ""
 
             propertyName.forEachIndexed { index, c ->
                 when (index) {
@@ -907,6 +910,9 @@ class BLEConnectionManager {
                     4 -> if (c != '0')propertyID += c
                     5 -> if (c != '0')propertyID += c
                     6 -> propertyID += c
+                    7 -> if(c != '0')propertyState += c
+                    8 -> if(c != '0')propertyState += c
+                    9 -> propertyState += c
                     //7 -> if(c != '$') ...
                 }
             }
@@ -919,7 +925,18 @@ class BLEConnectionManager {
                 this.currentPropertyResolveID = id
                 // mark the string as processed
                 stringProcessed = true
+
+                // set the state in the appropriate deviceProperty
+                val state =
+                    propertyState.toInt()
+
+                if(state < 256 && state > -1){
+                    this.setPropertyStateForId(id, state)
+                }
             }
+
+
+
             Log.d("M:resolvePropNames", "This was a start indicator. The next received string should be the name for the property with ID: $propertyID")
         }
         else {
@@ -1691,6 +1708,7 @@ class BLEConnectionManager {
                                 propertyEntry.elementID = laRoomyDeviceProperty.propertyID
                                 propertyEntry.indexInsideGroup = index
                                 propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
+                                propertyEntry.propertyState = laRoomyDeviceProperty.propertyState
                                 // set global index
                                 propertyEntry.globalIndex = globalIndex
                                 globalIndex++
@@ -1729,6 +1747,7 @@ class BLEConnectionManager {
                     propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                     propertyEntry.indexInsideGroup = index
                     propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
+                    propertyEntry.propertyState = laRoomyDeviceProperty.propertyState
                     // set global index
                     propertyEntry.globalIndex = globalIndex
                     globalIndex++
@@ -1769,6 +1788,15 @@ class BLEConnectionManager {
             return false
         }
         else return false
+    }
+
+    fun setPropertyStateForId(propertyID: Int, propertyState: Int){
+        this.laRoomyDevicePropertyList.forEach {
+            if(it.propertyID == propertyID){
+                it.propertyState = propertyState
+                return@forEach
+            }
+        }
     }
 
     private fun stopAllPendingLoopsAndResetParameter(){

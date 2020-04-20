@@ -467,6 +467,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             switch.setOnClickListener{
                                 itemClickListener.onPropertyElementSwitchClick(position, element)
                             }
+                            if(element.propertyState > 0){
+                                switch.isChecked = true
+                            }
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
@@ -479,6 +482,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             // set the handler for the seekBar
                             element.handler = callingActivity
                             holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(element)
+                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).progress = get8BitValueAsPercent(element.propertyState)
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
@@ -491,8 +495,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             // set the text
                             textView.text = element.elementText
 
-                            // show a level indication !!!!!!!!!!
-                            val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(element.initialElementValue)
+                            // show a level indication e.g. "96%"
+                            val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
+                                get8BitValueAsPercent(element.propertyState)
+                            )
                             val levelIndication = holder.constraintLayout.findViewById<TextView>(R.id.levelIndicationTextView)
                             levelIndication.visibility = View.VISIBLE
                             levelIndication.text = percentageLevelPropertyGenerator.percentageString

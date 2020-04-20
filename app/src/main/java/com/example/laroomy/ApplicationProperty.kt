@@ -114,6 +114,7 @@ fun resourceIdForImageId(imageID: Int): Int {
     }
 }
 
+
 interface OnItemClickListener {
     fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel)
 }
