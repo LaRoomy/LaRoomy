@@ -2,6 +2,7 @@ package com.example.laroomy
 
 import android.app.Application
 import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
 const val ERROR_MESSAGE = 0

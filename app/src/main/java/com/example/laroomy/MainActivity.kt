@@ -15,6 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionManager.BleEventCallback {
 
+    companion object {
+        lateinit var main: AppCompatActivity
+    }
+
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
         field.clear()
@@ -29,6 +33,8 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        main = this
 
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@MainActivity, this)
 

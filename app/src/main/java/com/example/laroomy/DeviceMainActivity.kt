@@ -83,6 +83,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onBackPressed() {
         super.onBackPressed()
 
+        //ApplicationProperty.bluetoothConnectionManger.uIAdapterList.clear()
+
+
         // TODO: finish activity NO!
 
         // TODO: at this point, this is the only existing activity in the app-lifecycle, so:

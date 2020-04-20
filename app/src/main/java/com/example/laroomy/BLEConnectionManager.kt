@@ -910,8 +910,8 @@ class BLEConnectionManager {
                     4 -> if (c != '0')propertyID += c
                     5 -> if (c != '0')propertyID += c
                     6 -> propertyID += c
-                    7 -> if(c != '0')propertyState += c
-                    8 -> if(c != '0')propertyState += c
+                    7 -> propertyState += c
+                    8 -> propertyState += c
                     9 -> propertyState += c
                     //7 -> if(c != '$') ...
                 }
