@@ -14,6 +14,9 @@
     <string name="DMA_Ready">Ready</string>
     <string name="DMA_DeviceConnectionSuspended">Connection suspended</string>
 
+    <string name="RGB_HeaderText">RGB Control</string>
+    <string name="RGB_OnOff">On / Off</string>
+
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>

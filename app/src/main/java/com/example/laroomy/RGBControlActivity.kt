@@ -3,12 +3,21 @@ package com.example.laroomy
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.flask.colorpicker.ColorPickerView
+import com.flask.colorpicker.OnColorSelectedListener
 
-class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener {
+
+    lateinit var colorPickerView: ColorPickerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_r_g_b_control)
+
+        colorPickerView = findViewById(R.id.color_picker_view)
+        colorPickerView.addOnColorSelectedListener(this)
+        // TODO: set the current selected color to the view!
+        // TODO: set the name of the property to the headerView
 
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
@@ -38,4 +47,13 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         finish()
     }
+
+    fun onSwitchClick(view: View){
+
+    }
+
+    override fun onColorSelected(selectedColor: Int) {
+        TODO("Not yet implemented")
+    }
+
 }

@@ -75,26 +75,20 @@ class LaRoomyDeviceProperty{
                         0 -> if (c != 'I') return
                         1 -> if (c != 'P') return
                         2 -> if (c != 'R') return
-                        3 -> if (c != '0') propID += c
-                        4 -> if (c != '0') propID += c
+                        3 -> propID += c
+                        4 -> propID += c
                         5 -> propID += c
-                        6 -> if (c != '0') propType += c
-                        7 -> if (c != '0') propType += c
+                        6 -> propType += c
+                        7 -> propType += c
                         8 -> propType += c
-                        9 -> if (c != '0') propIndex += c
-                        10 -> if (c != '0') propIndex += c
+                        9 -> propIndex += c
+                        10 -> propIndex += c
                         11 -> propIndex += c
-                        12 -> if(isNumber(c)){
-                            if(c != '0')
-                                grID += c
-                        }
-                        13 -> if(isNumber(c)){
-                            if(c != '0')
-                                grID += c
-                        }
+                        12 -> if(isNumber(c)) grID += c
+                        13 -> if(isNumber(c)) grID += c
                         14 -> if(isNumber(c)) grID += c
-                        15 -> if(c != '0') imgID += c
-                        16 -> if(c != '0') imgID += c
+                        15 -> imgID += c
+                        16 -> imgID += c
                         17 -> imgID += c
                     }
                 }
@@ -198,17 +192,17 @@ class LaRoomyDevicePropertyGroup{
                         0 -> if (c != 'I') return
                         1 -> if (c != 'P') return
                         2 -> if (c != 'G') return
-                        3 -> if (c != '0') localGroupID += c
-                        4 -> if (c != '0') localGroupID += c
+                        3 -> localGroupID += c
+                        4 -> localGroupID += c
                         5 -> localGroupID += c
-                        6 -> if (c != '0') localGroupIndex += c
-                        7 -> if (c != '0') localGroupIndex += c
+                        6 -> localGroupIndex += c
+                        7 -> localGroupIndex += c
                         8 -> localGroupIndex += c
-                        9 -> if (c != '0') memberAmount += c
-                        10 -> if (c != '0') memberAmount += c
+                        9 -> memberAmount += c
+                        10 -> memberAmount += c
                         11 -> memberAmount += c
-                        12 -> if(c != '0') imgID += c
-                        13 -> if(c != '0') imgID += c
+                        12 -> imgID += c
+                        13 -> imgID += c
                         14 -> imgID += c
                     }
                 }
@@ -907,8 +901,8 @@ class BLEConnectionManager {
                     1 -> if (c != 'D')return false
                     2 -> if (c != ':')return false
                     3 -> if (c != 'S')return false
-                    4 -> if (c != '0')propertyID += c
-                    5 -> if (c != '0')propertyID += c
+                    4 -> propertyID += c
+                    5 -> propertyID += c
                     6 -> propertyID += c
                     7 -> propertyState += c
                     8 -> propertyState += c
@@ -1193,8 +1187,8 @@ class BLEConnectionManager {
                     1 -> if (c != 'I')return false
                     2 -> if (c != ':')return false
                     3 -> if (c != 'S')return false
-                    4 -> if (c != '0')groupID += c
-                    5 -> if (c != '0')groupID += c
+                    4 -> groupID += c
+                    5 -> groupID += c
                     6 -> groupID += c
                 }
             }
@@ -1366,20 +1360,20 @@ class BLEConnectionManager {
 
                 data.forEachIndexed { index, c ->
                     when (index) {
-                        3 -> if (c != '0') str1 += c
-                        4 -> if (c != '0') str1 += c
+                        3 -> str1 += c
+                        4 -> str1 += c
                         5 -> str1 += c
-                        6 -> if (c != '0') str2 += c
-                        7 -> if (c != '0') str2 += c
+                        6 -> str2 += c
+                        7 -> str2 += c
                         8 -> str2 += c
-                        9 -> if (c != '0') str3 += c
-                        10 -> if (c != '0') str3 += c
+                        9 -> str3 += c
+                        10 -> str3 += c
                         11 -> str3 += c
-                        12 -> if (c != '0') str4 += c
-                        13 -> if (c != '0') str4 += c
+                        12 -> str4 += c
+                        13 -> str4 += c
                         14 -> str4 += c
-                        15 -> if (c != '0') str5 += c
-                        16 -> if (c != '0') str5 += c
+                        15 -> str5 += c
+                        16 -> str5 += c
                         17 -> str5 += c
                     }
                 }
@@ -1427,20 +1421,20 @@ class BLEConnectionManager {
 
                 data.forEachIndexed { index, c ->
                     when (index) {
-                        3 -> if (c != '0') str1 += c
-                        4 -> if (c != '0') str1 += c
+                        3 -> str1 += c
+                        4 -> str1 += c
                         5 -> str1 += c
-                        6 -> if (c != '0') str2 += c
-                        7 -> if (c != '0') str2 += c
+                        6 -> str2 += c
+                        7 -> str2 += c
                         8 -> str2 += c
-                        9 -> if (c != '0') str3 += c
-                        10 -> if (c != '0') str3 += c
+                        9 -> str3 += c
+                        10 -> str3 += c
                         11 -> str3 += c
-                        12 -> if (c != '0') str4 += c
-                        13 -> if (c != '0') str4 += c
+                        12 -> str4 += c
+                        13 -> str4 += c
                         14 -> str4 += c
-                        15 -> if (c != '0') str5 += c
-                        16 -> if (c != '0') str5 += c
+                        15 -> str5 += c
+                        16 -> str5 += c
                         17 -> str5 += c
                     }
                 }
@@ -1513,11 +1507,11 @@ class BLEConnectionManager {
 
             data.forEachIndexed { index, c ->
                 when(index){
-                    7 -> if(c != '0')propID += c
-                    8 -> if(c != '0')propID += c
+                    7 -> propID += c
+                    8 -> propID += c
                     9 -> propID += c
-                    10 -> if(c != '0')propIndex += c
-                    11 -> if(c != '0')propIndex += c
+                    10 -> propIndex += c
+                    11 -> propIndex += c
                     12 -> propIndex += c
                     13 -> if(c != '0')entireProperty = true
                     14 -> if(c != '0')entireDetail = true
@@ -1557,11 +1551,11 @@ class BLEConnectionManager {
 
             data.forEachIndexed { index, c ->
                 when(index){
-                    7 -> if(c != '0')groupID += c
-                    8 -> if(c != '0')groupID += c
+                    7 -> groupID += c
+                    8 -> groupID += c
                     9 -> groupID += c
-                    10 -> if(c != '0')groupIndex += c
-                    11 -> if(c != '0')groupIndex += c
+                    10 -> groupIndex += c
+                    11 -> groupIndex += c
                     12 -> groupIndex += c
                     13 -> if(c != '0')entirePropertyGroup = true
                     14 -> if(c != '0')entireGroupDetail = true
