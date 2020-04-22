@@ -31,6 +31,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_main)
 
+        // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
@@ -257,6 +258,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // navigate to the RGB Page
                 val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
@@ -357,9 +359,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // TODO: check if the execution in the UI-Thread is really necessary, maybe this breaks the UI performance
 
-        runOnUiThread{
+        //runOnUiThread{
             this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
-        }
+        //}
+    }
+
+    override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
+        super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
+
+        TODO("not yet implemented")
     }
 
     // device property list adapter:
@@ -470,7 +478,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             switch.setOnClickListener{
                                 itemClickListener.onPropertyElementSwitchClick(position, element)
                             }
-                            if(element.propertyState > 0){
+                            if(element.simplePropertyState > 0){
                                 switch.isChecked = true
                             }
                             // show the text-view
@@ -485,7 +493,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             // set the handler for the seekBar
                             element.handler = callingActivity
                             holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(element)
-                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).progress = get8BitValueAsPercent(element.propertyState)
+                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).progress = get8BitValueAsPercent(element.simplePropertyState)
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
@@ -500,7 +508,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                             // show a level indication e.g. "96%"
                             val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
-                                get8BitValueAsPercent(element.propertyState)
+                                get8BitValueAsPercent(element.simplePropertyState)
                             )
                             val levelIndication = holder.constraintLayout.findViewById<TextView>(R.id.levelIndicationTextView)
                             levelIndication.visibility = View.VISIBLE

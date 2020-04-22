@@ -84,7 +84,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         startActivity(intent)
         // finish this activity
         finish()
-        // and finish first activity
+        // and finish first activity ??
         MainActivity.main.finish()
     }
 

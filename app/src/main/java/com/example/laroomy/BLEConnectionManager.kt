@@ -30,6 +30,7 @@ class LaRoomyDeviceProperty{
     var imageID = -1
     var hasChanged = false
     var propertyState = -1
+    var complexPropertyState = ComplexPropertyState()
 
     override fun equals(other: Any?): Boolean {
         // check if this is the same reference
@@ -253,12 +254,22 @@ class LaRoomyDevicePropertyGroup{
 }
 
 class LaRoomyDevicePresentationModel {
+    // NOTE: This is the data-model for the DeviceListItem in the start-activity
     var name = ""
     var address = ""
     var type = 0
 }
 
+class ComplexPropertyState {
+    var valueOne = -1      // (R-Value in RGB Selector)
+    var valueTwo = -1      // (G-Value in RGB Selector)
+    var valueThree = -1    // (B-Value in RGB Selector)
+    var commandValue = -1  // (Command in RGB Selector)
+    var enabledState = false
+}
+
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
+    // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
 
     var handler: OnPropertyClickListener? = null
 
@@ -271,8 +282,9 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     var elementID = -1
     var imageID = -1
     var propertyType = -1
-    var initialElementValue = -1
-    var propertyState = -1
+    //var initialElementValue = -1
+    var simplePropertyState = -1
+    var complexPropertyState = ComplexPropertyState()
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEK_BAR_PROGRESS_CHANGING)
@@ -491,6 +503,7 @@ class BLEConnectionManager {
     val authenticationResponse = "Auth:rsp:true"
     private val propertyLoopEndIndication = "RSP:A:PEND$"
     private val groupLoopEndIndication = "RSP:E:PGEND$"
+    private val complexDataStateTransmissionEntry = "PSC"
     private val propertyChangedNotificationEntry = "DnPcx1="
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
     /////////////////////////////////////////////////
@@ -979,6 +992,8 @@ class BLEConnectionManager {
                         // set property up to date
                         this.propertyUpToDate = true
                         this.generateUIAdaptableArrayListFromDeviceProperties()
+
+                        // TODO: start retrieving the complex property states
                     }
                 }
                 else {
@@ -1238,6 +1253,8 @@ class BLEConnectionManager {
                             // trigger retrieval event
                             this.propertyCallback.onGroupDataRetrievalCompleted(this.laRoomyPropertyGroupList)
                             this.generateUIAdaptableArrayListFromDeviceProperties()
+
+                            // TODO: start retrieving the complex property states
                         }
                     }
                 }
@@ -1493,6 +1510,11 @@ class BLEConnectionManager {
             dataProcessed = true
             Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
         }
+        else if(data.startsWith(this.complexDataStateTransmissionEntry)){
+            this.resolveComplexStateData(data)
+            dataProcessed = true
+            Log.d("M:CheckNotiEvent", "Complex-Property-State data received -> try to resolve it!")
+        }
         return dataProcessed
     }
 
@@ -1664,6 +1686,8 @@ class BLEConnectionManager {
 
     private fun generateUIAdaptableArrayListFromDeviceProperties(){
 
+        // TODO: do this async !!!!!!!!!!!!!!
+
         this.dataReadyToShow = false
         this.uIAdapterList.clear()
 
@@ -1702,7 +1726,7 @@ class BLEConnectionManager {
                                 propertyEntry.elementID = laRoomyDeviceProperty.propertyID
                                 propertyEntry.indexInsideGroup = index
                                 propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
-                                propertyEntry.propertyState = laRoomyDeviceProperty.propertyState
+                                propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
                                 // set global index
                                 propertyEntry.globalIndex = globalIndex
                                 globalIndex++
@@ -1741,7 +1765,7 @@ class BLEConnectionManager {
                     propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                     propertyEntry.indexInsideGroup = index
                     propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
-                    propertyEntry.propertyState = laRoomyDeviceProperty.propertyState
+                    propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
                     // set global index
                     propertyEntry.globalIndex = globalIndex
                     globalIndex++
@@ -1793,6 +1817,106 @@ class BLEConnectionManager {
         }
     }
 
+    private fun resolveComplexStateData(data: String){
+        // minimum complex data array must be 6!
+        if(data.length > 5) {
+
+            var propertyElement = LaRoomyDeviceProperty()
+
+            // 1. Transform ID and get the type for the ID
+            var id = ""
+            id += data.elementAt(3)
+            id += data.elementAt(4)
+            id += data.elementAt(5)
+
+            val propertyID =
+                id.toInt()
+
+            if(propertyID > -1 && propertyID < 256){
+                propertyElement = this.propertyElementFromID(propertyID)
+            }
+
+            // 2. Retrieve the type-associated data
+            val propertyStateChanged = when(propertyElement.propertyType){
+                COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> retrieveRGBStateData(propertyElement.propertyIndex,  data)
+                // TODO: handle all complex types here!
+                else -> false
+
+            }
+
+            // 3. Change UI Adapter
+            if(propertyStateChanged){
+
+                var changedIndex = -1
+
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if(devicePropertyListContentInformation.elementID == propertyElement.propertyID){
+                        devicePropertyListContentInformation.complexPropertyState =
+                            laRoomyDevicePropertyList.elementAt(propertyElement.propertyIndex).complexPropertyState
+                        changedIndex = index
+                    }
+                }
+
+                // 4. launch property changed event
+                this.propertyCallback.onComplexPropertyStateChanged(
+                    changedIndex,
+                    this.uIAdapterList.elementAt(changedIndex).complexPropertyState
+                )
+            }
+        }
+    }
+
+    fun propertyTypeFromID(ID: Int) : Int {
+        this.laRoomyDevicePropertyList.forEach {
+            if(ID == it.propertyID){
+                return it.propertyType
+            }
+        }
+        return -1
+    }
+
+    private fun propertyElementFromID(ID: Int): LaRoomyDeviceProperty {
+        this.laRoomyDevicePropertyList.forEach {
+            if(ID == it.propertyID){
+                return it
+            }
+        }
+        return LaRoomyDeviceProperty()
+    }
+
+    private fun retrieveRGBStateData(elementIndex: Int, data: String): Boolean {
+
+        if(data.length < 19)
+            return false
+        else {
+            var rVal = ""
+            var gVal = ""
+            var bVal = ""
+            var command = ""
+
+            for(i in 6..8)
+                command += data.elementAt(i)
+            for(i in 9..11)
+                rVal += data.elementAt(i)
+            for(i in 12..14)
+                gVal += data.elementAt(i)
+            for(i in 15..17)
+                bVal += data.elementAt(i)
+
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.commandValue = command.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = rVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = gVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = bVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.enabledState =
+                when(data.elementAt(18)){
+                    '0' -> false
+                    else -> true
+                }
+
+            return true
+        }
+    }
+
     private fun stopAllPendingLoopsAndResetParameter(){
         this.propertyLoopActive = false
         this.propertyNameResolveLoopActive = false
@@ -1830,5 +1954,7 @@ class BLEConnectionManager {
         fun onCompletePropertyInvalidated(){}
         fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
         fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
+        fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
+        fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
     }
 }

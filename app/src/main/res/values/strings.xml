@@ -17,6 +17,10 @@
     <string name="RGB_HeaderText">RGB Control</string>
     <string name="RGB_OnOff">On / Off</string>
 
+    <string name="GeneralMessage_reconnected">Device reconnected</string>
+    <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
+    <string name="GeneralMessage_connectingFailed">Connection failed:</string>
+
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
@@ -47,4 +51,5 @@
     <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
     <string name="LevelIndicationTextPlaceholder">100%</string>
     <string name="PropertySubPagePlaceholder">This is a property Page</string>
+    <string name="RGBPageColorSelectionInformation">Selected Color: </string>
 </resources>
