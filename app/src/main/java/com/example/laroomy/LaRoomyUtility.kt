@@ -34,6 +34,21 @@ fun get8BitValueAsPercent(value: Int) : Int {
     return ret
 }
 
+fun a8BitValueToString(value: Int) : String {
+    var worker = value
+    var hundred = 0
+    var tenth = 0
+    val single: Int
+
+    if (worker > 100) hundred = (worker / 100)
+    worker -= (hundred*100)
+    if (worker > 10) tenth = (worker / 10)
+    worker -= (tenth*10)
+    single = worker
+    // create the request string
+    return "$hundred$tenth$single"
+}
+
 class PercentageLevelPropertyGenerator(E8bit_level: Int){
 
     private val percentAsInt = get8BitValueAsPercent(E8bit_level)

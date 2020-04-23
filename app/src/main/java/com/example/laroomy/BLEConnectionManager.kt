@@ -31,6 +31,7 @@ class LaRoomyDeviceProperty{
     var hasChanged = false
     var propertyState = -1
     var complexPropertyState = ComplexPropertyState()
+    var isEnabled = true
 
     override fun equals(other: Any?): Boolean {
         // check if this is the same reference
@@ -268,6 +269,18 @@ class ComplexPropertyState {
     var enabledState = false
 }
 
+class DeviceInfoHeaderData {
+    var message = ""
+    var imageID = -1
+    var valid = false
+
+    fun clear(){
+        this.message = ""
+        this.imageID = -1
+        this.valid = false
+    }
+}
+
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
 
@@ -451,6 +464,13 @@ class BLEConnectionManager {
                             // if the detailed group info loop is active, check the string for group info
                             dataProcessed = resolveGroupInfo(dataAsString ?: "error")
                         }
+                        if(deviceHeaderRecordingActive){
+                            Log.d(
+                                "M:CB:CharChanged",
+                                "Data Received - deviceHeaderDataRecording is active -> add string to buffer. Data: $dataAsString"
+                            )
+                            deviceInfoHeaderData.message += dataAsString
+                        }
                     }
                 }
                 // TODO: important!!! enable the event-filter "dataProcessed" in the laRoomy-app
@@ -504,8 +524,11 @@ class BLEConnectionManager {
     private val propertyLoopEndIndication = "RSP:A:PEND$"
     private val groupLoopEndIndication = "RSP:E:PGEND$"
     private val complexDataStateTransmissionEntry = "PSC"
+    private val simpleDataStateTransmissionEntry = "PSS"
     private val propertyChangedNotificationEntry = "DnPcx1="
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
+    private val deviceHeaderStartEntry = "DnDIHs7"
+    private val deviceHeaderCloseMessage = "DnDIHe+$"
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -524,10 +547,13 @@ class BLEConnectionManager {
     private var singleRetrievingAction = false
     private var propertyUpToDate = false
     private var dataReadyToShow = false
+    private var complexStateLoopActive = false
+    private var deviceHeaderRecordingActive = false
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
     private var currentGroupResolveID = -1 // initialize with invalid marker
     private var currentGroupResolveIndex = -1 // initialize with invalid marker
+    private var currentStateRetrievingIndex = -1 // initialize with invalid marker
     private lateinit var activityContext: Context
     private lateinit var callingActivity: Activity
     private lateinit var callback: BleEventCallback
@@ -535,10 +561,13 @@ class BLEConnectionManager {
     var currentDevice: BluetoothDevice? = null
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
+    var deviceInfoHeaderData = DeviceInfoHeaderData()
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
+
+    var complexStatePropertyIDs = ArrayList<Int>()
 
     private val scanResultList: MutableList<ScanResult?> = ArrayList()
 
@@ -938,7 +967,7 @@ class BLEConnectionManager {
                     propertyState.toInt()
 
                 if(state < 256 && state > -1){
-                    this.setPropertyStateForId(id, state)
+                    this.setPropertyStateForId(id, state, true)
                 }
             }
 
@@ -994,6 +1023,8 @@ class BLEConnectionManager {
                         this.generateUIAdaptableArrayListFromDeviceProperties()
 
                         // TODO: start retrieving the complex property states
+
+                        this.startComplexStateDataLoop()
                     }
                 }
                 else {
@@ -1255,6 +1286,7 @@ class BLEConnectionManager {
                             this.generateUIAdaptableArrayListFromDeviceProperties()
 
                             // TODO: start retrieving the complex property states
+                            this.startComplexStateDataLoop()
                         }
                     }
                 }
@@ -1511,11 +1543,47 @@ class BLEConnectionManager {
             Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
         }
         else if(data.startsWith(this.complexDataStateTransmissionEntry)){
+            Log.d("M:CheckNotiEvent", "Complex-Property-State data received -> try to resolve it!")
             this.resolveComplexStateData(data)
             dataProcessed = true
-            Log.d("M:CheckNotiEvent", "Complex-Property-State data received -> try to resolve it!")
+        }
+        else if(data.startsWith(this.simpleDataStateTransmissionEntry)){
+            Log.d("M:CheckNotiEvent", "Simple-Property-State data received -> try to resolve it!")
+            this.resolveSimpleStateData(data)
+            dataProcessed = true
+        }
+        else if(data.startsWith(this.deviceHeaderStartEntry)){
+            Log.d("M:CheckNotiEvent", "DeviceHeader start notification detected -> start recording")
+            this.startDeviceHeaderRecording(data)
+            dataProcessed = true
+        }
+        else if(data == this.deviceHeaderCloseMessage){
+            Log.d("M:CheckNotiEvent", "DeviceHeader end notification detected -> reset parameter and trigger event")
+            this.endDeviceHeaderRecording()
+            dataProcessed = true
         }
         return dataProcessed
+    }
+
+    private fun startDeviceHeaderRecording(data: String){
+        if(data.length > 10) {
+
+            this.deviceInfoHeaderData.clear()
+
+            var imageID = ""
+            imageID += data.elementAt(7)
+            imageID += data.elementAt(8)
+            imageID += data.elementAt(9)
+
+            this.deviceInfoHeaderData.imageID = imageID.toInt()
+            this.deviceHeaderRecordingActive = true
+        }
+    }
+
+    private fun endDeviceHeaderRecording(){
+        this.deviceInfoHeaderData.valid = true
+        this.deviceHeaderRecordingActive = false
+        this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
     }
 
     private fun updateProperty(data: String){
@@ -1808,11 +1876,59 @@ class BLEConnectionManager {
         else return false
     }
 
-    fun setPropertyStateForId(propertyID: Int, propertyState: Int){
+    private fun setPropertyStateForId(propertyID: Int, propertyState: Int, enabled: Boolean){
         this.laRoomyDevicePropertyList.forEach {
             if(it.propertyID == propertyID){
                 it.propertyState = propertyState
+                it.isEnabled = enabled
                 return@forEach
+            }
+        }
+    }
+
+    private fun resolveSimpleStateData(data: String){
+        // simple state data transmission length is 11 chars, for example: "PSS0221840$
+        if(data.length > 10){
+            // resolve ID:
+            val propertyID: Int
+            var strID = ""
+            strID += data.elementAt(3)
+            strID += data.elementAt(4)
+            strID += data.elementAt(5)
+            propertyID = strID.toInt()
+
+            Log.d("M:resolveSimpleSData", "Trying to resolve simple state data for Property-ID: $propertyID")
+
+            if(propertyID > -1 && propertyID < 256) {
+                val propertyElement = this.propertyElementFromID(propertyID)
+
+                // resolve state
+                var state = ""
+                state += data.elementAt(6)
+                state += data.elementAt(7)
+                state += data.elementAt(8)
+                val newState = state.toInt()
+
+                // apply new state to property-array
+                setPropertyStateForId(propertyID, newState, (data.elementAt(9) == '1'))
+
+                // apply new state to uIAdapter
+                var changedIndex = -1
+
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if (devicePropertyListContentInformation.elementID == propertyElement.propertyID) {
+                        devicePropertyListContentInformation.simplePropertyState = newState
+                        changedIndex = index
+                    }
+                }
+
+                // 4. launch property changed event
+                this.propertyCallback.onSimplePropertyStateChanged(
+                    changedIndex,
+                    newState
+                )
+            } else {
+                Log.e("M:resolveSimpleSData", "Property-ID invalid! ID: $propertyID")
             }
         }
     }
@@ -1820,8 +1936,6 @@ class BLEConnectionManager {
     private fun resolveComplexStateData(data: String){
         // minimum complex data array must be 6!
         if(data.length > 5) {
-
-            var propertyElement = LaRoomyDeviceProperty()
 
             // 1. Transform ID and get the type for the ID
             var id = ""
@@ -1832,36 +1946,67 @@ class BLEConnectionManager {
             val propertyID =
                 id.toInt()
 
-            if(propertyID > -1 && propertyID < 256){
-                propertyElement = this.propertyElementFromID(propertyID)
-            }
+            Log.d("M:resolveComplexSData", "Trying to resolve complexStateData for ID: $propertyID")
 
-            // 2. Retrieve the type-associated data
-            val propertyStateChanged = when(propertyElement.propertyType){
-                COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> retrieveRGBStateData(propertyElement.propertyIndex,  data)
-                // TODO: handle all complex types here!
-                else -> false
+            if(propertyID > -1 && propertyID < 256) {
+                val propertyElement = this.propertyElementFromID(propertyID)
 
-            }
+                // 2. Retrieve the type-associated data
+                val propertyStateChanged = when (propertyElement.propertyType) {
+                    COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> retrieveRGBStateData(
+                        propertyElement.propertyIndex,
+                        data
+                    )
 
-            // 3. Change UI Adapter
-            if(propertyStateChanged){
+                    // TODO: handle all complex types here!
 
-                var changedIndex = -1
+                    else -> false
 
-                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if(devicePropertyListContentInformation.elementID == propertyElement.propertyID){
-                        devicePropertyListContentInformation.complexPropertyState =
-                            laRoomyDevicePropertyList.elementAt(propertyElement.propertyIndex).complexPropertyState
-                        changedIndex = index
-                    }
                 }
 
-                // 4. launch property changed event
-                this.propertyCallback.onComplexPropertyStateChanged(
-                    changedIndex,
-                    this.uIAdapterList.elementAt(changedIndex).complexPropertyState
-                )
+                // 3. Change UI Adapter
+                if (propertyStateChanged) {
+                    Log.d(
+                        "M:resolveComplexSData",
+                        "ComplexPropertyState has changed -> adapting changes to UI"
+                    )
+
+                    var changedIndex = -1
+
+                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                        if (devicePropertyListContentInformation.elementID == propertyElement.propertyID) {
+                            devicePropertyListContentInformation.complexPropertyState =
+                                laRoomyDevicePropertyList.elementAt(propertyElement.propertyIndex).complexPropertyState
+                            changedIndex = index
+                        }
+                    }
+
+                    // 4. launch property changed event
+                    this.propertyCallback.onComplexPropertyStateChanged(
+                        changedIndex,
+                        this.uIAdapterList.elementAt(changedIndex).complexPropertyState
+                    )
+                }
+
+                // 5. Check if the state-loop is active and continue or close it
+                if (this.complexStateLoopActive) {
+                    Log.d("M:resolveComplexSData", "Complex state loop is active")
+                    if (this.currentStateRetrievingIndex < this.complexStatePropertyIDs.size) {
+                        this.requestPropertyState(
+                            this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
+                        )
+                        this.currentStateRetrievingIndex++
+                    } else {
+                        Log.d(
+                            "M:resolveComplexSData",
+                            "Complex state loop reached invalid index -> close Loop"
+                        )
+                        this.complexStateLoopActive = false
+                        this.currentStateRetrievingIndex = -1
+                    }
+                }
+            } else {
+                Log.e("M:resolveComplexSData", "Property-ID invalid ID: $propertyID")
             }
         }
     }
@@ -1917,15 +2062,55 @@ class BLEConnectionManager {
         }
     }
 
+    private fun startComplexStateDataLoop(){
+        Log.d("M:startCompDataLoop", "ComplexStateDataLoop started - At first: Indexing the Property-IDs with complexStateData")
+        // clear the ID-Array
+        this.complexStatePropertyIDs.clear()
+        // loop the properties and save the ones with complex state
+        this.laRoomyDevicePropertyList.forEach {
+            // The type 6 (RGB Selector) is the first type with complex state data
+            if(it.propertyType > 5){
+                this.complexStatePropertyIDs.add(it.propertyID)
+            }
+        }
+        // if there are
+        if(this.complexStatePropertyIDs.isNotEmpty()) {
+            Log.d("M:startCompDataLoop", "Found ${this.complexStatePropertyIDs.size} Elements with ComplexStateData -> start collecting from device")
+
+            this.currentStateRetrievingIndex = 0
+            this.complexStateLoopActive = true
+
+            this.requestPropertyState(
+                this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
+            )
+            this.currentStateRetrievingIndex++
+        }
+    }
+
+    fun requestPropertyState(ID: Int){
+        val value = a8BitValueToString(ID)
+        val requestString = "D$value$"
+        this.sendData(requestString)
+    }
+
     private fun stopAllPendingLoopsAndResetParameter(){
+
+        // TODO: make sure to cover all parameter
+
         this.propertyLoopActive = false
         this.propertyNameResolveLoopActive = false
         this.groupLoopActive = false
         this.groupInfoLoopActive = false
+        this.complexStateLoopActive = false
+        this.deviceHeaderRecordingActive = false
+
+        this.complexStatePropertyIDs.clear()
+        this.deviceInfoHeaderData.clear()
 
         this.currentPropertyResolveID = -1
         this.currentGroupResolveIndex = -1
         this.groupRequestIndexCounter = -1
+        this.currentStateRetrievingIndex = -1
 
         this.propertyNameResolveSingleAction = false
         this.propertyGroupNameResolveSingleAction = false
@@ -1956,5 +2141,6 @@ class BLEConnectionManager {
         fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
+        fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData){}
     }
 }

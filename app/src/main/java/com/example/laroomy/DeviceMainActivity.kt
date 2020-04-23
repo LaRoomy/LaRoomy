@@ -130,6 +130,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
             ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
+            // update info-header and states
+            if(ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.valid) {
+                setDeviceInfoHeader(
+                    ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.imageID,
+                    ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.message
+                )
+            }
+
+            // TODO: detect state-changes and update the property-list-items
+
         } else {
             // creation or resume action:
 
@@ -367,7 +377,45 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
 
-        TODO("not yet implemented")
+        val uIElement =
+            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+
+        val constraintLayout =
+            this.devicePropertyListLayoutManager.findViewByPosition(UIAdapterElementIndex) as? ConstraintLayout
+
+        // update the appropriate element
+        when(uIElement.elementType){
+            PROPERTY_TYPE_BUTTON -> {
+                // NOTE: this is not used, because the button has no state (by now)
+            }
+            PROPERTY_TYPE_SWITCH -> {
+                val switch =
+                    constraintLayout?.findViewById<Switch>(R.id.elementSwitch)
+                switch?.isChecked = (newState != 0)
+            }
+            PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                val seekBar =
+                    constraintLayout?.findViewById<SeekBar>(R.id.elementSeekBar)
+                seekBar?.progress = get8BitValueAsPercent(newState)
+            }
+            PROPERTY_TYPE_LEVEL_INDICATOR -> {
+                val textView =
+                    constraintLayout?.findViewById<TextView>(R.id.levelIndicationTextView)
+                val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
+                    get8BitValueAsPercent(newState)
+                )
+                textView?.setTextColor(percentageLevelPropertyGenerator.colorID)
+                textView?.text = percentageLevelPropertyGenerator.percentageString
+            }
+            else -> {
+                // nothing by now
+            }
+        }
+    }
+
+    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onDeviceHeaderChanged(deviceHeaderData)
+        this.setDeviceInfoHeader(deviceHeaderData.imageID, deviceHeaderData.message)
     }
 
     // device property list adapter:
