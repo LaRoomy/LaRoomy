@@ -62,7 +62,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         super.onResume()
         Log.d("M:RGBPage:onResume", "onResume executed in RGBControlActivity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@RGBControlActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

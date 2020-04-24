@@ -32,7 +32,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         setContentView(R.layout.activity_device_main)
 
         // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         // init recycler view!!
@@ -127,7 +127,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             restoreIndex = -1
             (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
             // realign the context objects to the bluetoothManager
-            ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@DeviceMainActivity, this)
+            ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
             ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
             // update info-header and states
@@ -207,11 +207,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
                 "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
                 "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+        // NOTE: the button has no state the execution command contains always "1"
+        ApplicationProperty.bluetoothConnectionManger.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}1$")
     }
 
     override fun onPropertyElementSwitchClick(
         index: Int,
-        devicePropertyListContentInformation: DevicePropertyListContentInformation
+        devicePropertyListContentInformation: DevicePropertyListContentInformation,
+        switch: Switch
     ) {
         Log.d("M:CB:onPropSwitchClk", "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
                 "Type: ${devicePropertyListContentInformation.propertyType}\n" +
@@ -219,6 +222,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
                 "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
 
+        // TODO: check if the newState comes with the right terminology
+
+        val c = when(switch.isChecked){
+            true -> '1'
+            else -> '0'
+        }
+        ApplicationProperty.bluetoothConnectionManger.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}$c$")
     }
 
     override fun onSeekBarPositionChange(
@@ -241,6 +251,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     SEEK_BAR_STOP_TRACK -> "Stop tracking"
                     else -> "error" }}")
 
+        if(changeType == SEEK_BAR_PROGRESS_CHANGING){
+            val bitValue =
+                percentTo8Bit(newValue)
+
+            ApplicationProperty.bluetoothConnectionManger.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}${a8BitValueToString(bitValue)}$")
+        }
     }
 
     override fun onNavigatableElementClick(
@@ -524,7 +540,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             switch.visibility = View.VISIBLE
                             // set the onClick handler
                             switch.setOnClickListener{
-                                itemClickListener.onPropertyElementSwitchClick(position, element)
+                                itemClickListener.onPropertyElementSwitchClick(position, element, switch)
                             }
                             if(element.simplePropertyState > 0){
                                 switch.isChecked = true

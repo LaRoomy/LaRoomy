@@ -1,7 +1,10 @@
 package com.example.laroomy
 
 import android.app.Application
+import android.content.Context
+import android.util.Log
 import android.widget.SeekBar
+import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -35,6 +38,9 @@ const val SEEK_BAR_START_TRACK = 1
 const val SEEK_BAR_STOP_TRACK = 2
 const val SEEK_BAR_PROGRESS_CHANGING = 3
 
+// error indicator
+const val ERROR_NOTFOUND = "error - not found"
+
 class ApplicationProperty : Application() {
 
     companion object {
@@ -51,9 +57,42 @@ class ApplicationProperty : Application() {
 
     override fun onCreate() {
         super.onCreate()
-       bluetoothConnectionManger = BLEConnectionManager()
+        bluetoothConnectionManger = BLEConnectionManager(this)
         systemLanguage = Locale.getDefault().displayLanguage
     }
+
+    fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int) : String {
+        Log.d("M:LoadSavedStringData", "Loading String-Data. FileKey: ${getString(fileKeyID)} / DataKey: ${getString(dataKeyID)}")
+
+        val sharedPref = getSharedPreferences(
+            getString(fileKeyID),
+            Context.MODE_PRIVATE)
+        val data = sharedPref.getString(
+            getString(dataKeyID),
+            ERROR_NOTFOUND
+        )
+        return data ?: ""
+    }
+
+    fun saveStringData(data: String, fileKeyID: Int, dataKeyID: Int){
+        Log.d("M:SaveStringData", "Saving data to memory - Data: $data")
+
+        if(data.isNotEmpty()) {
+            val sharedPref =
+                getSharedPreferences(
+                    getString(fileKeyID),
+                    Context.MODE_PRIVATE
+                )
+            with(sharedPref.edit()) {
+                putString(
+                    getString(dataKeyID),
+                    data)
+                commit()
+            }
+        }
+    }
+
+
 }
 
 fun resourceIdForImageId(imageID: Int): Int {
@@ -123,7 +162,7 @@ interface OnItemClickListener {
 interface OnPropertyClickListener {
     fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation)
     fun onPropertyElementButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
-    fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
+    fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation, switch: Switch)
     fun onSeekBarPositionChange(index: Int, newValue: Int, changeType: Int)
     fun onNavigatableElementClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
 }

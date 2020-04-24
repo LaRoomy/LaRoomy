@@ -312,7 +312,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     }
 }
 
-class BLEConnectionManager {
+class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
     // callback implementation for BluetoothGatt
     private val gattCallback = object : BluetoothGattCallback() {
@@ -485,8 +485,7 @@ class BLEConnectionManager {
         }
     }
 
-    fun reAlignContextObjects(cActivity: Activity, cContext: Context, eventHandlerObject: BleEventCallback){
-        this.callingActivity = cActivity
+    fun reAlignContextObjects(cContext: Context, eventHandlerObject: BleEventCallback){
         this.activityContext = cContext
         this.callback = eventHandlerObject
     }
@@ -555,7 +554,7 @@ class BLEConnectionManager {
     private var currentGroupResolveIndex = -1 // initialize with invalid marker
     private var currentStateRetrievingIndex = -1 // initialize with invalid marker
     private lateinit var activityContext: Context
-    private lateinit var callingActivity: Activity
+    //private lateinit var callingActivity: Activity
     private lateinit var callback: BleEventCallback
     private lateinit var propertyCallback: PropertyCallback
     var currentDevice: BluetoothDevice? = null
@@ -628,25 +627,26 @@ class BLEConnectionManager {
     }
 
     fun getLastConnectedDeviceAddress() : String {
-        val sharedPref = callingActivity.getSharedPreferences(
-            callingActivity.getString(R.string.FileKey_BLEManagerData),
-            Context.MODE_PRIVATE)
-        val address = sharedPref.getString(
-            callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
-            "not found")
-        return address ?: ""
+//        val sharedPref = callingActivity.getSharedPreferences(
+//            callingActivity.getString(R.string.FileKey_BLEManagerData),
+//            Context.MODE_PRIVATE)
+//        val address = sharedPref.getString(
+//            callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
+//            "not found")
+
+        val address =
+            this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
+
+        return if(address == ERROR_NOTFOUND) ""
+        else address
     }
 
     fun connectToLastSuccessfulConnectedDevice() {
 
-        val sharedPref = callingActivity.getSharedPreferences(
-            callingActivity.getString(R.string.FileKey_BLEManagerData),
-            Context.MODE_PRIVATE)
-        val address = sharedPref.getString(
-            callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
-            "not found")
+        val address =
+            this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
 
-        if(address == "not found")
+        if(address == ERROR_NOTFOUND)
             this.callback.onConnectionAttemptFailed("Error: no device address found")
         else
             this.connectToRemoteDevice(address)
@@ -765,7 +765,7 @@ class BLEConnectionManager {
     private val BluetoothAdapter.isDisabled: Boolean
     get() = !isEnabled
 
-    fun checkBluetoothEnabled(){
+    fun checkBluetoothEnabled(caller: Activity){
 
         // TODO: check if this function works!
 
@@ -774,7 +774,7 @@ class BLEConnectionManager {
         bleAdapter?.takeIf{it.isDisabled}?.apply{
             // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            callingActivity.startActivityForResult(enableBtIntent, requestEnableBT)
+            caller.startActivityForResult(enableBtIntent, requestEnableBT)
         }
     }
 
@@ -796,20 +796,22 @@ class BLEConnectionManager {
 
         Log.d("M:SaveAddress", "Saving address of successful connected device - address: $address")
 
-        if(address.isNotEmpty()) {
-            val sharedPref =
-                this.callingActivity.getSharedPreferences(
-                    this.callingActivity.getString(R.string.FileKey_BLEManagerData),
-                    Context.MODE_PRIVATE
-                )
-            with(sharedPref.edit()) {
-                putString(
-                    callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
-                    address
-                )
-                commit()
-            }
-        }
+        this.applicationProperty.saveStringData(address, R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
+
+//        if(address.isNotEmpty()) {
+//            val sharedPref =
+//                this.callingActivity.getSharedPreferences(
+//                    this.callingActivity.getString(R.string.FileKey_BLEManagerData),
+//                    Context.MODE_PRIVATE
+//                )
+//            with(sharedPref.edit()) {
+//                putString(
+//                    callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
+//                    address
+//                )
+//                commit()
+//            }
+//        }
     }
 
     fun startDevicePropertyListing(){
@@ -1930,6 +1932,8 @@ class BLEConnectionManager {
             } else {
                 Log.e("M:resolveSimpleSData", "Property-ID invalid! ID: $propertyID")
             }
+        } else {
+            Log.e("M:resolveSimpleSData", "Simple-State transmission-length too short")
         }
     }
 

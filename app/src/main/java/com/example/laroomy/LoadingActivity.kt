@@ -19,7 +19,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@LoadingActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@LoadingActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         val index = this.intent.getIntExtra("BondedDeviceIndex", -1)
@@ -85,7 +85,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // finish this activity
         finish()
         // and finish first activity ??
-        MainActivity.main.finish()
+        //MainActivity.main.finish()
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
         main = this
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@MainActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@MainActivity, this)
 
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     override fun onResume() {
         super.onResume()
 
-        ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled()
+        ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled(this)
 
         // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
 

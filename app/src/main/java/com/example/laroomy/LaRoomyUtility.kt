@@ -34,6 +34,12 @@ fun get8BitValueAsPercent(value: Int) : Int {
     return ret
 }
 
+fun percentTo8Bit(percent: Int) : Int {
+    val value = 255*percent
+    return if(value == 0) 0
+    else value/100
+}
+
 fun a8BitValueToString(value: Int) : String {
     var worker = value
     var hundred = 0
