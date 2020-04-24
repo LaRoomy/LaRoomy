@@ -1568,7 +1568,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun startDeviceHeaderRecording(data: String){
-        if(data.length > 10) {
+        if(data.length > 9) {
 
             this.deviceInfoHeaderData.clear()
 
@@ -1964,7 +1964,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     // TODO: handle all complex types here!
 
-                    else -> false
+                    else -> true
 
                 }
 
@@ -2000,6 +2000,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
                         )
                         this.currentStateRetrievingIndex++
+
+
+
+                        // test:
+                        if (this.currentStateRetrievingIndex == this.complexStatePropertyIDs.size){
+
+                            // works!!!
+
+                            Log.d(
+                                "M:resolveComplexSData",
+                                "Complex state loop reached invalid index -> close Loop"
+                            )
+                            this.complexStateLoopActive = false
+                            this.currentStateRetrievingIndex = -1
+                        }
+
+
+
                     } else {
                         Log.d(
                             "M:resolveComplexSData",

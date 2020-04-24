@@ -339,9 +339,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun setDeviceInfoHeader(imageID: Int, message: String){
-        findViewById<ImageView>(R.id.deviceInfoSubHeaderImage).setImageResource(
-            resourceIdForImageId(imageID))
-        findViewById<TextView>(R.id.deviceInfoSubHeaderTextView).text = message
+
+        // TODO: Problem: the view is outside of the screen if the text is too long -> it must be wrapped
+
+        runOnUiThread {
+            findViewById<ImageView>(R.id.deviceInfoSubHeaderImage).setImageResource(
+                resourceIdForImageId(imageID)
+            )
+            findViewById<TextView>(R.id.deviceInfoSubHeaderTextView).text = message
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -385,46 +391,50 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // TODO: check if the execution in the UI-Thread is really necessary, maybe this breaks the UI performance
 
-        //runOnUiThread{
+        runOnUiThread{
             this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
-        //}
+        }
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
 
-        val uIElement =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
-
-        val constraintLayout =
-            this.devicePropertyListLayoutManager.findViewByPosition(UIAdapterElementIndex) as? ConstraintLayout
-
-        // update the appropriate element
-        when(uIElement.elementType){
-            PROPERTY_TYPE_BUTTON -> {
-                // NOTE: this is not used, because the button has no state (by now)
-            }
-            PROPERTY_TYPE_SWITCH -> {
-                val switch =
-                    constraintLayout?.findViewById<Switch>(R.id.elementSwitch)
-                switch?.isChecked = (newState != 0)
-            }
-            PROPERTY_TYPE_LEVEL_SELECTOR -> {
-                val seekBar =
-                    constraintLayout?.findViewById<SeekBar>(R.id.elementSeekBar)
-                seekBar?.progress = get8BitValueAsPercent(newState)
-            }
-            PROPERTY_TYPE_LEVEL_INDICATOR -> {
-                val textView =
-                    constraintLayout?.findViewById<TextView>(R.id.levelIndicationTextView)
-                val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
-                    get8BitValueAsPercent(newState)
+        runOnUiThread {
+            val uIElement =
+                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
+                    UIAdapterElementIndex
                 )
-                textView?.setTextColor(percentageLevelPropertyGenerator.colorID)
-                textView?.text = percentageLevelPropertyGenerator.percentageString
-            }
-            else -> {
-                // nothing by now
+
+            val constraintLayout =
+                this.devicePropertyListLayoutManager.findViewByPosition(UIAdapterElementIndex) as? ConstraintLayout
+
+            // update the appropriate element
+            when (uIElement.propertyType) {
+                PROPERTY_TYPE_BUTTON -> {
+                    // NOTE: this is not used, because the button has no state (by now)
+                }
+                PROPERTY_TYPE_SWITCH -> {
+                    val switch =
+                        constraintLayout?.findViewById<Switch>(R.id.elementSwitch)
+                    switch?.isChecked = (newState != 0)
+                }
+                PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                    val seekBar =
+                        constraintLayout?.findViewById<SeekBar>(R.id.elementSeekBar)
+                    seekBar?.progress = get8BitValueAsPercent(newState)
+                }
+                PROPERTY_TYPE_LEVEL_INDICATOR -> {
+                    val textView =
+                        constraintLayout?.findViewById<TextView>(R.id.levelIndicationTextView)
+                    val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
+                        get8BitValueAsPercent(newState)
+                    )
+                    textView?.setTextColor(percentageLevelPropertyGenerator.colorID)
+                    textView?.text = percentageLevelPropertyGenerator.percentageString
+                }
+                else -> {
+                    // nothing by now
+                }
             }
         }
     }

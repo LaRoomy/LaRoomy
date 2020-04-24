@@ -32,6 +32,11 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 //        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity, this)
 //        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
+        findViewById<Switch>(R.id.rgbSwitch).setOnClickListener{
+            onSwitchClick(it)
+            Log.d("ONSWITCHCLICK", "On switch click executed")
+        }
+
     }
 
     override fun onBackPressed() {
@@ -79,14 +84,20 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     fun onSwitchClick(view: View){
-        val state = (view as Switch).isChecked
+
 
         // only for testing switch!
         // TODO: check if the new state confirms with the state in the callback
-        if(state){
-            notifyUser("Checked", getColor(R.color.InfoColor))
-        } else {
-            notifyUser("Unchecked", getColor(R.color.InfoColor))
+
+        runOnUiThread {
+
+            val state = (view as Switch).isChecked
+
+            if (state) {
+                notifyUser("Checked", getColor(R.color.InfoColor))
+            } else {
+                notifyUser("Unchecked", getColor(R.color.InfoColor))
+            }
         }
     }
 
@@ -99,7 +110,13 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     override fun onColorSelected(selectedColor: Int) {
         Log.d("M:RGBPage:onColorSelect","New color selected in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
         // temporary hex color display
-        notifyUser("${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(selectedColor)}", selectedColor)
+        runOnUiThread {
+            notifyUser(
+                "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
+                    selectedColor
+                )}", selectedColor
+            )
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
