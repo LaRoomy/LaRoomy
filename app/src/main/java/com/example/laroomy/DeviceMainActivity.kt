@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
+import kotlinx.android.synthetic.main.activity_device_main.*
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
@@ -383,17 +384,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         runOnUiThread {
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
             this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
+
+            // TODO: test!
+            this.devicePropertyListViewAdapter.notifyDataSetChanged()
         }
     }
 
     override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {
         super.onUIAdaptableArrayListItemAdded(item)
 
+        Log.d("M:UIListItemAdded", "Item added to UIAdapter. Index: ${item.globalIndex} Name: ${item.elementText}")
+
         // TODO: check if the execution in the UI-Thread is really necessary, maybe this breaks the UI performance
 
-        runOnUiThread{
-            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
-        }
+//        runOnUiThread{
+
+                // maybe try setHasFixedSize(true) in onCreate...????
+                // maybe there is no need to call this???
+                // adapter.submitList(list) to proof
+                // maybe test if Thread.sleep(50) in the callback of the manager works??
+
+//            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
+//        }
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
@@ -469,7 +481,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
 
-            when(devicePropertyAdapter.elementAt(position).elementType){
+            val elementToRender = devicePropertyAdapter.elementAt(position)
+
+            when(elementToRender.elementType){
                 UNDEFINED_ELEMENT -> {
                     // should not happen
                     holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
@@ -497,12 +511,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                     // set the image requested by the device (or a placeholder)
                     holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
-                        resourceIdForImageId(devicePropertyAdapter.elementAt(position).imageID)
+                        resourceIdForImageId(elementToRender.imageID)
                     )
                     // set the text for the element and show the textView
                     val tV = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                     tV.visibility = View.VISIBLE
-                    tV.text = devicePropertyAdapter.elementAt(position).elementText
+                    tV.text = elementToRender.elementText
                     tV.textSize = 16F
                     tV.setTypeface(tV.typeface, Typeface.BOLD)
                     //.visibility = View.VISIBLE
@@ -513,20 +527,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.constraintLayout.setBackgroundColor(activityContext.getColor(R.color.groupColor))
 
                     // get the element
-                    val element = devicePropertyAdapter.elementAt(position)
+                    //val element = devicePropertyAdapter.elementAt(position)
                     // show / hide the navigate-image
-                    if(element.canNavigateForward)
+                    if(elementToRender.canNavigateForward)
                         holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
                     else  holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.GONE
                     // if the property is part of a group -> make the separator-lines transparent
+
                     // TODO: test this
                     holder.constraintLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.transparentViewColor)
                     holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
+
+
                     // set the appropriate image for the imageID
                     holder.constraintLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
-                        resourceIdForImageId(element.imageID))
+                        resourceIdForImageId(elementToRender.imageID))
                     // set the appropriate elements for the type of the property:
-                    when(element.propertyType){
+                    when(elementToRender.propertyType){
                         -1 -> return // must be error
                         0 -> return // must be error
                         PROPERTY_TYPE_BUTTON -> {
@@ -535,7 +552,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             // show the button
                             button.visibility = View.VISIBLE
                             // set the text of the button
-                            button.text = element.elementText
+                            button.text = elementToRender.elementText
                             // hide the element text
                             holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).visibility = View.GONE
                             // set the onClick handler
@@ -550,39 +567,39 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             switch.visibility = View.VISIBLE
                             // set the onClick handler
                             switch.setOnClickListener{
-                                itemClickListener.onPropertyElementSwitchClick(position, element, switch)
+                                itemClickListener.onPropertyElementSwitchClick(position, elementToRender, switch)
                             }
-                            if(element.simplePropertyState > 0){
+                            if(elementToRender.simplePropertyState > 0){
                                 switch.isChecked = true
                             }
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
                             // set the text
-                            textView.text = element.elementText
+                            textView.text = elementToRender.elementText
                         }
                         PROPERTY_TYPE_LEVEL_SELECTOR -> {
                             // show seek-bar layout container
                             holder.constraintLayout.findViewById<ConstraintLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
                             // set the handler for the seekBar
-                            element.handler = callingActivity
-                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(element)
-                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).progress = get8BitValueAsPercent(element.simplePropertyState)
+                            elementToRender.handler = callingActivity
+                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(elementToRender)
+                            holder.constraintLayout.findViewById<SeekBar>(R.id.elementSeekBar).progress = get8BitValueAsPercent(elementToRender.simplePropertyState)
                             // show the text-view
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
                             // set the text
-                            textView.text = element.elementText
+                            textView.text = elementToRender.elementText
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
                             // set the text
-                            textView.text = element.elementText
+                            textView.text = elementToRender.elementText
 
                             // show a level indication e.g. "96%"
                             val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
-                                get8BitValueAsPercent(element.simplePropertyState)
+                                get8BitValueAsPercent(elementToRender.simplePropertyState)
                             )
                             val levelIndication = holder.constraintLayout.findViewById<TextView>(R.id.levelIndicationTextView)
                             levelIndication.visibility = View.VISIBLE
@@ -594,7 +611,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
                             // set the text
-                            textView.text = element.elementText
+                            textView.text = elementToRender.elementText
                         }
                         else -> {
                             // must be complex type!
@@ -603,7 +620,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             holder.constraintLayout.setOnClickListener {
                                 itemClickListener.onNavigatableElementClick(
                                     position,
-                                    element
+                                    elementToRender
                                 )
                             }
 
@@ -611,7 +628,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             val textView = holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
                             // set the text
-                            textView.text = element.elementText
+                            textView.text = elementToRender.elementText
                             // show the navigate arrow
                             holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
                         }
@@ -627,7 +644,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
             }
             // bind it!
-            holder.bind(devicePropertyAdapter.elementAt(position), itemClickListener, position)
+            holder.bind(elementToRender, itemClickListener, position)
         }
 
         override fun getItemCount(): Int {

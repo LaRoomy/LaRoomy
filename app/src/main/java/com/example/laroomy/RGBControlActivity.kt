@@ -94,9 +94,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val state = (view as Switch).isChecked
 
             if (state) {
-                notifyUser("Checked", getColor(R.color.InfoColor))
+                notifyUser("Checked", R.color.InfoColor)
             } else {
-                notifyUser("Unchecked", getColor(R.color.InfoColor))
+                notifyUser("Unchecked", R.color.InfoColor)
             }
         }
     }
@@ -107,11 +107,17 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         textView.setTextColor(getColor(colorID))
     }
 
+    private fun notifyUserWithColorAsInt(message: String, color: Int){
+        val textView = findViewById<TextView>(R.id.rgbUserNotificationTextView)
+        textView.text = message
+        textView.setTextColor(color)
+    }
+
     override fun onColorSelected(selectedColor: Int) {
         Log.d("M:RGBPage:onColorSelect","New color selected in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
         // temporary hex color display
         runOnUiThread {
-            notifyUser(
+            notifyUserWithColorAsInt(
                 "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
                     selectedColor
                 )}", selectedColor
