@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,20 +10,17 @@
         android:id="@+id/topSeparator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/separatorColor"
+        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/contentHolderLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topSeparator">
+        android:layout_marginTop="5dp">
 
         <!-- This view has the purpose to expand the height in a group-element: -->
         <View
@@ -31,10 +29,10 @@
             android:layout_height="80dp"
             android:layout_marginStart="2dp"
             android:background="@color/groupBorderColor"
+
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+
+             />
 
         <!--    Do not show an initial image, the image will be set by filling
                 the recycler with the appropriate elements: -->
@@ -44,10 +42,10 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_marginStart="10dp"
+            android:layout_gravity="center_vertical"
+
             android:contentDescription="@string/DevicePropertyListElementImageDescription"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/startSeparator"
-            app:layout_constraintTop_toTopOf="parent" />
+             />
 
         <!--    The elements TextView and Button must be invisible (Visibility::Gone) and
                 will be set visible for the corresponding element:
@@ -59,29 +57,35 @@
             android:layout_marginStart="10dp"
             android:text="@string/LaRoomyDevicePropertyNamePlaceholder"
             android:textSize="14sp"
+            android:layout_gravity="center_vertical"
+
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/devicePropertyIdentificationImage"
-            app:layout_constraintTop_toTopOf="parent" />
+
+             />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/elementButton"
             android:layout_marginStart="10dp"
+            android:layout_gravity="center_vertical"
+
             android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/devicePropertyIdentificationImage"
+
+
             />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/controlElementContainer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="end"
+
             >
 
             <!--    The elements "forwardImage" and "elementSwitch" must be invisible (Visibility::Gone)
@@ -93,11 +97,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:layout_gravity="center_vertical"
                 android:contentDescription="@string/NavigateForwardImageDescription"
+
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+
+
                 app:srcCompat="@drawable/nav_arrow_right" />
 
             <Switch
@@ -106,11 +111,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="10dp"
+                android:layout_gravity="center_vertical"
+
+
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/forwardImage"
-                app:layout_constraintTop_toTopOf="parent" />
+
+                />
 
             <TextView
                 android:id="@+id/levelIndicationTextView"
@@ -121,26 +127,25 @@
                 android:text="@string/LevelIndicationTextPlaceholder"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:layout_gravity="center_vertical"
+
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/forwardImage"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                 />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/seekBarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/contentHolderLayout">
+
+        >
 
         <SeekBar
             android:id="@+id/elementSeekBar"
@@ -149,28 +154,22 @@
             android:layout_marginStart="30dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+             />
 
         <View
             android:id="@+id/seekBarSeparator"
             android:layout_width="match_parent"
             android:layout_height="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/elementSeekBar" />
+            />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <View
         android:id="@+id/bottomSeparator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@color/separatorColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seekBarContainer" />
+        android:background="@android:color/transparent"
+        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

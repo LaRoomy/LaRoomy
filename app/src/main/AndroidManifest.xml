@@ -18,14 +18,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RGBControlActivity"></activity>
+        <activity
+            android:name=".RGBControlActivity">
+
+        </activity>
         <activity
             android:name=".DeviceMainActivity"
-            android:label="@string/DeviceMainActivity"></activity>
+            android:label="@string/DeviceMainActivity"
+            android:screenOrientation="nosensor"
+            >
+        </activity>
         <activity
             android:name=".LoadingActivity"
-            android:label="@string/LoadingActivityLabel"></activity>
-        <activity android:name=".MainActivity">
+            android:label="@string/LoadingActivityLabel">
+        </activity>
+        <activity
+            android:name=".MainActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
