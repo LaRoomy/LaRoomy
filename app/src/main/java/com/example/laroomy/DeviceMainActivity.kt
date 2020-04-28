@@ -2,7 +2,6 @@ package com.example.laroomy
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
-import kotlinx.android.synthetic.main.activity_device_main.*
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
@@ -23,7 +21,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     // device property list elements
     private lateinit var devicePropertyListRecyclerView: RecyclerView
     private lateinit var devicePropertyListViewAdapter: RecyclerView.Adapter<*>
-    private lateinit var devicePropertyListLayoutManager: RecyclerView.LayoutManager
+    private lateinit var devicePropertyListLayoutManager: LinearLayoutManager//RecyclerView.LayoutManager
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
 
     private var activityWasSuspended = false
@@ -320,7 +318,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     fun onReconnectDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         // re-connect
-        // of re-connect and re-new the device-properties???
+        // confirm device-properties???
+        // re-connect and re-new the device-properties???
+
+
+        ApplicationProperty.bluetoothConnectionManger.close()
+        ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
     }
 
 
@@ -463,7 +466,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         private val callingActivity: DeviceMainActivity
     ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
 
-        class DPLViewHolder(val linearLayout: LinearLayout)
+        class DPLViewHolder(
+            val linearLayout: LinearLayout,
+            val identificationImage: ImageView)
             : RecyclerView.ViewHolder(linearLayout) {
 
 //            fun bind(data: DevicePropertyListContentInformation, itemClick: OnPropertyClickListener, position: Int){
@@ -475,7 +480,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             val linearLayout =
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.device_property_list_element, parent, false) as LinearLayout
-            return DPLViewHolder(linearLayout)
+
+            // test !!!!!!
+            val img = linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage)
+
+            return DPLViewHolder(linearLayout, img)
         }
 
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
@@ -494,10 +503,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     //holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
 
 
+
                     holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.groupHeaderColor))
 
                     // make sure it is visible (TODO: is this really necessary??)
-                    holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
+                    //holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
 
                     // make the element higher by setting the visibility of the group-border-view to: visible
                     holder.linearLayout.findViewById<View>(R.id.startSeparator).visibility = View.VISIBLE
@@ -509,9 +519,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     //holder.constraintLayout.findViewById<Button>(R.id.elementButton).visibility = View.GONE
 
                     // set the image requested by the device (or a placeholder)
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
+
+                    // test !!!!!!!!!!!!!!!
+                    //holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
+                    holder.identificationImage.setBackgroundResource(
                         resourceIdForImageId(elementToRender.imageID)
                     )
+
+
+
                     // set the text for the element and show the textView
                     val tV = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                     tV.visibility = View.VISIBLE
@@ -539,8 +555,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
 
                     // set the appropriate image for the imageID
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
+                    //holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
+                    holder.identificationImage.setBackgroundResource(
                         resourceIdForImageId(elementToRender.imageID))
+
+
+
                     // set the appropriate elements for the type of the property:
                     when(elementToRender.propertyType){
                         -1 -> return // must be error
@@ -582,8 +602,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             holder.linearLayout.findViewById<LinearLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
                             // set the handler for the seekBar
                             elementToRender.handler = callingActivity
-                            holder.linearLayout.findViewById<SeekBar>(R.id.elementSeekBar).setOnSeekBarChangeListener(elementToRender)
-                            holder.linearLayout.findViewById<SeekBar>(R.id.elementSeekBar).progress = get8BitValueAsPercent(elementToRender.simplePropertyState)
+
+
+                            // test!!!!
+                            holder.linearLayout.findViewById<SeekBar>(R.id.elementSeekBar).apply {
+                                this.setOnSeekBarChangeListener(elementToRender)
+                                this.progress =
+                                    get8BitValueAsPercent(elementToRender.simplePropertyState)
+                            }
+
                             // show the text-view
                             val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE
