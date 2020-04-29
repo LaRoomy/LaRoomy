@@ -79,7 +79,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
 
-        intent.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK
+        //intent.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK
 
         startActivity(intent)
         // finish this activity

@@ -1756,8 +1756,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun generateUIAdaptableArrayListFromDeviceProperties(){
 
-        // TODO: do this async !!!!!!!!!!!!!!
-
         this.dataReadyToShow = false
         this.uIAdapterList.clear()
 
@@ -1781,6 +1779,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.uIAdapterList.add(dpl)
                     // notify activity
                     this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl)
+
+                    Thread.sleep(100)
+
                     // add the device properties to the group by their IDs
                     for (ID in laRoomyDevicePropertyGroup.memberIDs) {
                         this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
@@ -1804,6 +1805,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 this.uIAdapterList.add(propertyEntry)
                                 // notify activity
                                 this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
+
+                                Thread.sleep(100)
+
                                 // ID found -> further processing not necessary -> break the loop
                                 return@forEachIndexed
                             }
@@ -1820,6 +1824,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.uIAdapterList.add(dpl2)
                     // notify activity
                     this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2)
+
+                    Thread.sleep(100)
                 }
             }
             // now add the properties which are not part of a group
@@ -1843,6 +1849,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.uIAdapterList.add(propertyEntry)
                     // notify activity
                     this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
+
+                    Thread.sleep(100)
                 }
             }
             this.dataReadyToShow = true
