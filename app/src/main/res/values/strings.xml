@@ -16,6 +16,8 @@
 
     <string name="RGB_HeaderText">RGB Control</string>
     <string name="RGB_OnOff">On / Off</string>
+    <string name="RGB_SingleColorModeButtonText">Single Color</string>
+    <string name="RGB_TransitionModeButtonText">Transition</string>
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>

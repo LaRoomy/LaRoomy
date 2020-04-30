@@ -4,10 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.OnColorSelectedListener
+
+const val RGB_MODE_OFF = 0
+const val RGB_MODE_SINGLE_COLOR = 1
+const val RGB_MODE_TRANSITION = 2
 
 class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener {
 
@@ -29,12 +35,17 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
+        findViewById<TextView>(R.id.rgbHeaderTextView).text =
+            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+
 //        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity, this)
 //        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         findViewById<Switch>(R.id.rgbSwitch).setOnClickListener{
             onSwitchClick(it)
-            Log.d("ONSWITCHCLICK", "On switch click executed")
+            Log.d("M:RGB:Switch:onClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
+
+            // send the on / off command to the device
         }
 
     }
@@ -78,12 +89,58 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
     }
 
-    fun onBackButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        //finish()
+    fun onSingleColorModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+        setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
     }
 
-    fun onSwitchClick(view: View){
+    fun onTransitionModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+        setPageSelectorModeState(RGB_MODE_TRANSITION)
+    }
+
+    private fun setPageSelectorModeState(state: Int){
+
+        runOnUiThread {
+
+            val singleButton = findViewById<Button>(R.id.singleColorSelectionButton)
+            val transButton = findViewById<Button>(R.id.transitionSelectionButton)
+            val colorPickerContainer =
+                findViewById<ConstraintLayout>(R.id.rgbSelectorWidgetContainer)
+            val transitionSelectorContainer =
+                findViewById<ConstraintLayout>(R.id.rgbTransitionControlContainer)
+
+            when (state) {
+                RGB_MODE_SINGLE_COLOR -> {
+                    singleButton.setBackgroundColor(getColor(R.color.RGB_SelectedButtonColor))
+                    singleButton.setTextColor(getColor(R.color.selectedTextColor))
+                    transButton.setBackgroundColor(getColor(R.color.transparentViewColor))
+                    transButton.setTextColor(getColor(R.color.normalTextColor))
+                    colorPickerContainer.visibility = View.VISIBLE
+                    transitionSelectorContainer.visibility = View.GONE
+
+                }
+                RGB_MODE_TRANSITION -> {
+                    transButton.setBackgroundColor(getColor(R.color.RGB_SelectedButtonColor))
+                    transButton.setTextColor(getColor(R.color.selectedTextColor))
+                    singleButton.setBackgroundColor(getColor(R.color.transparentViewColor))
+                    singleButton.setTextColor(getColor(R.color.normalTextColor))
+                    colorPickerContainer.visibility = View.GONE
+                    transitionSelectorContainer.visibility = View.VISIBLE
+
+                }
+                else -> {
+                    // set to rgb-mode "off"
+                    singleButton.setBackgroundColor(getColor(R.color.transparentViewColor))
+                    singleButton.setTextColor(getColor(R.color.normalTextColor))
+                    transButton.setBackgroundColor(getColor(R.color.transparentViewColor))
+                    transButton.setTextColor(getColor(R.color.normalTextColor))
+                    colorPickerContainer.visibility = View.GONE
+                    transitionSelectorContainer.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun onSwitchClick(view: View){
 
 
         // only for testing switch!
@@ -94,9 +151,11 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val state = (view as Switch).isChecked
 
             if (state) {
-                notifyUser("Checked", R.color.InfoColor)
+                setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+                //notifyUser("Checked", R.color.InfoColor)
             } else {
-                notifyUser("Unchecked", R.color.InfoColor)
+                setPageSelectorModeState(RGB_MODE_OFF)
+                //notifyUser("Unchecked", R.color.InfoColor)
             }
         }
     }

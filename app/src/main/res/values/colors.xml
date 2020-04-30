@@ -8,6 +8,8 @@
     <color name="ErrorColor">#FF0000</color>
     <color name="WarningColor">#FFFF00</color>
     <color name="InfoColor">#FFFFFF</color>
+    <color name="normalTextColor">#FFFFFF</color>
+    <color name="selectedTextColor">#F5CD06</color>
     <color name="expectedBackground">#222222</color>
     <color name="separatorColor">#777777</color>
     <color name="groupBorderColor">#00a1f1</color>
@@ -18,4 +20,5 @@
     <color name="groupHeaderColor">#555555</color>
     <color name="transparentViewColor">#00FFFFFF</color>
     <color name="DMA_ItemSelectedColor">#222222</color>
+    <color name="RGB_SelectedButtonColor">#444444</color>
 </resources>

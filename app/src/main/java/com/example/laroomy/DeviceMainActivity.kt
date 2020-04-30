@@ -483,8 +483,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.device_property_list_element, parent, false) as LinearLayout
 
-            // test !!!!!!
-
             return DPLViewHolder(linearLayout)
         }
 
