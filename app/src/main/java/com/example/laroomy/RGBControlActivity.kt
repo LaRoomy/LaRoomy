@@ -1,5 +1,6 @@
 package com.example.laroomy
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     var mustReconnect = false
     var relatedElementID = -1
     var relatedGlobalElementIndex = -1
+    var currentColor = Color.WHITE
+    var currentProgram = 12
+    var currentMode = RGB_MODE_SINGLE_COLOR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +50,24 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             Log.d("M:RGB:Switch:onClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
 
             // send the on / off command to the device
+
+            if(it.isChecked){
+
+                if(this.currentMode == RGB_MODE_SINGLE_COLOR){
+
+                    this.setCurrentSingleColor()
+
+                } else if(this.currentMode == RGB_MODE_TRANSITION){
+
+                    this.setCurrentProgram()
+                }
+
+            } else {
+                //this.currentMode = RGB_MODE_OFF
+
+                this.setAllOff()
+
+            }
         }
 
     }
@@ -91,10 +113,52 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     fun onSingleColorModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+
+        if(findViewById<Switch>(R.id.rgbSwitch).isChecked){
+            this.setCurrentSingleColor()
+        }
     }
 
     fun onTransitionModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         setPageSelectorModeState(RGB_MODE_TRANSITION)
+
+        // temp
+        //val elID = a8BitValueToString(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)
+
+        //val hardTransition = "C${elID}200000000000$"
+        //ApplicationProperty.bluetoothConnectionManger.sendData(hardTransition)
+
+        //val instruction = "C${elID}012000000000$"
+
+        //ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+
+        if(findViewById<Switch>(R.id.rgbSwitch).isChecked){
+            this.setCurrentProgram()
+        }
+    }
+
+    private fun sendInstruction(command: Int, redValue: Int, greenValue: Int, blueValue: Int){
+
+        val commandAsString = a8BitValueToString(command)
+        val redValueAsString = a8BitValueToString(redValue)
+        val greenValueAsString = a8BitValueToString(greenValue)
+        val blueValueAsString = a8BitValueToString(blueValue)
+
+        val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
+
+        ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+    }
+
+    private fun setCurrentSingleColor(){
+        this.sendInstruction(8, Color.red(this.currentColor), Color.green(this.currentColor), Color.blue(this.currentColor))
+    }
+
+    private fun setCurrentProgram(){
+        this.sendInstruction(this.currentProgram, 0, 0,0)
+    }
+
+    private fun setAllOff(){
+        this.sendInstruction(0,0,0,0)
     }
 
     private fun setPageSelectorModeState(state: Int){
@@ -117,6 +181,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     colorPickerContainer.visibility = View.VISIBLE
                     transitionSelectorContainer.visibility = View.GONE
 
+                    this.currentMode = RGB_MODE_SINGLE_COLOR
                 }
                 RGB_MODE_TRANSITION -> {
                     transButton.setBackgroundColor(getColor(R.color.RGB_SelectedButtonColor))
@@ -126,15 +191,19 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     colorPickerContainer.visibility = View.GONE
                     transitionSelectorContainer.visibility = View.VISIBLE
 
+                    this.currentMode = RGB_MODE_TRANSITION
                 }
                 else -> {
-                    // set to rgb-mode "off"
-                    singleButton.setBackgroundColor(getColor(R.color.transparentViewColor))
-                    singleButton.setTextColor(getColor(R.color.normalTextColor))
-                    transButton.setBackgroundColor(getColor(R.color.transparentViewColor))
-                    transButton.setTextColor(getColor(R.color.normalTextColor))
-                    colorPickerContainer.visibility = View.GONE
-                    transitionSelectorContainer.visibility = View.GONE
+                    // set to rgb-mode "off" ?
+
+                    // do nothing!
+
+                    //singleButton.setBackgroundColor(getColor(R.color.transparentViewColor))
+                    //singleButton.setTextColor(getColor(R.color.normalTextColor))
+                    //transButton.setBackgroundColor(getColor(R.color.transparentViewColor))
+                    //transButton.setTextColor(getColor(R.color.normalTextColor))
+                    //colorPickerContainer.visibility = View.GONE
+                    //transitionSelectorContainer.visibility = View.GONE
                 }
             }
         }
@@ -151,7 +220,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val state = (view as Switch).isChecked
 
             if (state) {
-                setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+                setPageSelectorModeState(this.currentMode)
                 //notifyUser("Checked", R.color.InfoColor)
             } else {
                 setPageSelectorModeState(RGB_MODE_OFF)
@@ -174,6 +243,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onColorSelected(selectedColor: Int) {
         Log.d("M:RGBPage:onColorSelect","New color selected in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
+
+        this.currentColor = selectedColor
+
         // temporary hex color display
         runOnUiThread {
             notifyUserWithColorAsInt(
@@ -181,6 +253,20 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     selectedColor
                 )}", selectedColor
             )
+        }
+
+        if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
+
+            val r = Color.red(selectedColor)
+            val g = Color.green(selectedColor)
+            val b = Color.blue(selectedColor)
+            val elID = a8BitValueToString(
+                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
+            )
+            val instruction =
+                "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
+
+            ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
         }
     }
 
