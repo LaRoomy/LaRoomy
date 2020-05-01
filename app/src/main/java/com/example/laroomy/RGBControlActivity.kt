@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -16,7 +17,7 @@ const val RGB_MODE_OFF = 0
 const val RGB_MODE_SINGLE_COLOR = 1
 const val RGB_MODE_TRANSITION = 2
 
-class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener {
+class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener, SeekBar.OnSeekBarChangeListener {
 
     lateinit var colorPickerView: ColorPickerView
     var mustReconnect = false
@@ -45,31 +46,14 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 //        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity, this)
 //        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
+        // set program-speed seekBar changeListener
+        findViewById<SeekBar>(R.id.rgbProgramSpeedSeekBar).setOnSeekBarChangeListener(this)
+
+        // set on/off Switch-state changeListener
         findViewById<Switch>(R.id.rgbSwitch).setOnClickListener{
-            onSwitchClick(it)
             Log.d("M:RGB:Switch:onClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
-
-            // send the on / off command to the device
-
-            if(it.isChecked){
-
-                if(this.currentMode == RGB_MODE_SINGLE_COLOR){
-
-                    this.setCurrentSingleColor()
-
-                } else if(this.currentMode == RGB_MODE_TRANSITION){
-
-                    this.setCurrentProgram()
-                }
-
-            } else {
-                //this.currentMode = RGB_MODE_OFF
-
-                this.setAllOff()
-
-            }
+            onSwitchClick(it)
         }
-
     }
 
     override fun onBackPressed() {
@@ -111,6 +95,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
     }
 
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        this.sendInstruction(11 + progress, 0, 0,0)
+    }
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+
     fun onSingleColorModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
 
@@ -121,16 +111,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     fun onTransitionModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         setPageSelectorModeState(RGB_MODE_TRANSITION)
-
-        // temp
-        //val elID = a8BitValueToString(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)
-
-        //val hardTransition = "C${elID}200000000000$"
-        //ApplicationProperty.bluetoothConnectionManger.sendData(hardTransition)
-
-        //val instruction = "C${elID}012000000000$"
-
-        //ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
 
         if(findViewById<Switch>(R.id.rgbSwitch).isChecked){
             this.setCurrentProgram()
@@ -211,13 +191,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private fun onSwitchClick(view: View){
 
-
-        // only for testing switch!
-        // TODO: check if the new state confirms with the state in the callback
+        val state = (view as Switch).isChecked
 
         runOnUiThread {
-
-            val state = (view as Switch).isChecked
 
             if (state) {
                 setPageSelectorModeState(this.currentMode)
@@ -226,6 +202,21 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 setPageSelectorModeState(RGB_MODE_OFF)
                 //notifyUser("Unchecked", R.color.InfoColor)
             }
+        }
+
+        // send the on / off command to the device
+        if(state){
+
+            if(this.currentMode == RGB_MODE_SINGLE_COLOR){
+
+                this.setCurrentSingleColor()
+
+            } else if(this.currentMode == RGB_MODE_TRANSITION){
+
+                this.setCurrentProgram()
+            }
+        } else {
+            this.setAllOff()
         }
     }
 
