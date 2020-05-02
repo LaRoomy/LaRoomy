@@ -11,13 +11,14 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.flask.colorpicker.ColorPickerView
+import com.flask.colorpicker.OnColorChangedListener
 import com.flask.colorpicker.OnColorSelectedListener
 
 const val RGB_MODE_OFF = 0
 const val RGB_MODE_SINGLE_COLOR = 1
 const val RGB_MODE_TRANSITION = 2
 
-class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener, SeekBar.OnSeekBarChangeListener {
+class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener, OnColorChangedListener, SeekBar.OnSeekBarChangeListener {
 
     lateinit var colorPickerView: ColorPickerView
     var mustReconnect = false
@@ -33,6 +34,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         colorPickerView = findViewById(R.id.color_picker_view)
         colorPickerView.addOnColorSelectedListener(this)
+        colorPickerView.addOnColorChangedListener(this)
+
         // TODO: set the current selected color to the view!
         // TODO: set the name of the property to the headerView??
 
@@ -234,6 +237,35 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onColorSelected(selectedColor: Int) {
         Log.d("M:RGBPage:onColorSelect","New color selected in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
+
+        this.currentColor = selectedColor
+
+        // temporary hex color display
+        runOnUiThread {
+            notifyUserWithColorAsInt(
+                "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
+                    selectedColor
+                )}", selectedColor
+            )
+        }
+
+        if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
+
+            val r = Color.red(selectedColor)
+            val g = Color.green(selectedColor)
+            val b = Color.blue(selectedColor)
+            val elID = a8BitValueToString(
+                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
+            )
+            val instruction =
+                "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
+
+            ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+        }
+    }
+
+    override fun onColorChanged(selectedColor: Int) {
+        Log.d("M:RGBPage:onColorChange","Color changed in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
 
         this.currentColor = selectedColor
 
