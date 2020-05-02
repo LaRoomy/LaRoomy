@@ -52,7 +52,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // set on/off Switch-state changeListener
         findViewById<Switch>(R.id.rgbSwitch).setOnClickListener{
             Log.d("M:RGB:Switch:onClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
-            onSwitchClick(it)
+            onMainOnOffSwitchClick(it)
         }
     }
 
@@ -189,7 +189,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
     }
 
-    private fun onSwitchClick(view: View){
+    private fun onMainOnOffSwitchClick(view: View){
 
         val state = (view as Switch).isChecked
 
