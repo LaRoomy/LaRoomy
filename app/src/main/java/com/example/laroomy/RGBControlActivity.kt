@@ -32,10 +32,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_r_g_b_control)
 
-        // TODO: set the current selected color to the view!
-        // TODO: set the name of the property to the headerView??
-
-        // TODO: get the element ID extra and set the state to the property-state
+        // get the element ID
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
@@ -43,32 +40,47 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         colorPickerView.addOnColorSelectedListener(this)
         colorPickerView.addOnColorChangedListener(this)
         val colorState = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+
+        // TODO: there is a problem with the lightness-slider
+
         colorPickerView.setInitialColor(Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree), false)
 
+        // set the header-text to the property-name
         findViewById<TextView>(R.id.rgbHeaderTextView).text =
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
 //        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity, this)
 //        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
+        // get program speed seekBar
+        val programSpeedSeekBar =
+            findViewById<SeekBar>(R.id.rgbProgramSpeedSeekBar)
+
+        // if a program is active set the view to transition-view and set the right value in the slider
+        val programStatus =
+            this.transitionSpeedSliderPositionFromCommandValue(colorState.commandValue)
+        if(programStatus != -1){
+            programSpeedSeekBar.progress = programStatus
+            setPageSelectorModeState(RGB_MODE_TRANSITION)
+        }
         // set program-speed seekBar changeListener
-        findViewById<SeekBar>(R.id.rgbProgramSpeedSeekBar).setOnSeekBarChangeListener(this)
-        // TODO: set the appropriate slider position if the command value identifies a program
-        // TODO: integrate the hard/soft transition in the state response and add a value for it in complexStateData
-        // TODO: if a program is active -> switch to transitionView
+        programSpeedSeekBar.setOnSeekBarChangeListener(this)
 
         // set on/off Switch-state changeListener and state
-        val sw = findViewById<Switch>(R.id.rgbSwitch)
-        sw.isChecked = when(colorState.commandValue){
+        val onOffSwitch = findViewById<Switch>(R.id.rgbSwitch)
+        onOffSwitch.isChecked = when(colorState.commandValue){
             0 -> false
             else -> true
         }
-        sw.setOnClickListener{
+        onOffSwitch.setOnClickListener{
             Log.d("M:RGB:OnOffSwitchClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
             onMainOnOffSwitchClick(it)
         }
 
-        findViewById<Switch>(R.id.transitionTypeSwitch).setOnClickListener{
+        // set transition switch condition onClick-Listener
+        val transitionSwitch = findViewById<Switch>(R.id.transitionTypeSwitch)
+        transitionSwitch.isChecked = !colorState.hardTransitionFlag
+        transitionSwitch.setOnClickListener{
             Log.d("M:RGB:transSwitchClick", "Transition Switch was clicked. New state is: ${(it as Switch).isChecked}")
             onTransitionTypeSwitchClicked(it)
         }
@@ -145,6 +157,17 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
 
         ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+    }
+
+    private fun transitionSpeedSliderPositionFromCommandValue(commandValue: Int): Int {
+        return when(commandValue){
+            11 -> 0
+            12 -> 1
+            13 -> 2
+            14 -> 3
+            15 -> 4
+            else -> -1
+        }
     }
 
     private fun setCurrentSingleColor(){
@@ -264,13 +287,13 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         this.currentColor = selectedColor
 
         // temporary hex color display
-        runOnUiThread {
-            notifyUserWithColorAsInt(
-                "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
-                    selectedColor
-                )}", selectedColor
-            )
-        }
+//        runOnUiThread {
+//            notifyUserWithColorAsInt(
+//                "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
+//                    selectedColor
+//                )}", selectedColor
+//            )
+//        }
 
         if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
 

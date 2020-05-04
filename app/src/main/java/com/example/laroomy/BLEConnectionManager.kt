@@ -266,7 +266,8 @@ class ComplexPropertyState {
     var valueTwo = -1      // (G-Value in RGB Selector)
     var valueThree = -1    // (B-Value in RGB Selector)
     var commandValue = -1  // (Command in RGB Selector)
-    var enabledState = false
+    var enabledState = true
+    var hardTransitionFlag = false // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
 }
 
 class DeviceInfoHeaderData {
@@ -399,12 +400,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
 
-            // log:
-            Log.d("M:CB:CharChanged", "Characteristic changed. Value: ${characteristic?.value}")
+            // log (binary):
+            //Log.d("M:CB:CharChanged", "Characteristic changed. Value: ${characteristic?.value}")
 
             // get data
             val dataAsString = characteristic?.getStringValue(0)
 
+            // log (string)
             Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $dataAsString")
 
             // check authentication
@@ -2082,7 +2084,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = rVal.toInt()
             this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = gVal.toInt()
             this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = bVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.enabledState =
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.hardTransitionFlag =
                 when(data.elementAt(18)){
                     '0' -> false
                     else -> true
