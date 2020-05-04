@@ -32,16 +32,18 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_r_g_b_control)
 
-        colorPickerView = findViewById(R.id.color_picker_view)
-        colorPickerView.addOnColorSelectedListener(this)
-        colorPickerView.addOnColorChangedListener(this)
-
         // TODO: set the current selected color to the view!
         // TODO: set the name of the property to the headerView??
 
         // TODO: get the element ID extra and set the state to the property-state
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        colorPickerView = findViewById(R.id.color_picker_view)
+        colorPickerView.addOnColorSelectedListener(this)
+        colorPickerView.addOnColorChangedListener(this)
+        val colorState = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        colorPickerView.setInitialColor(Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree), false)
 
         findViewById<TextView>(R.id.rgbHeaderTextView).text =
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
@@ -51,11 +53,24 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // set program-speed seekBar changeListener
         findViewById<SeekBar>(R.id.rgbProgramSpeedSeekBar).setOnSeekBarChangeListener(this)
+        // TODO: set the appropriate slider position if the command value identifies a program
+        // TODO: integrate the hard/soft transition in the state response and add a value for it in complexStateData
+        // TODO: if a program is active -> switch to transitionView
 
-        // set on/off Switch-state changeListener
-        findViewById<Switch>(R.id.rgbSwitch).setOnClickListener{
-            Log.d("M:RGB:Switch:onClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
+        // set on/off Switch-state changeListener and state
+        val sw = findViewById<Switch>(R.id.rgbSwitch)
+        sw.isChecked = when(colorState.commandValue){
+            0 -> false
+            else -> true
+        }
+        sw.setOnClickListener{
+            Log.d("M:RGB:OnOffSwitchClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
             onMainOnOffSwitchClick(it)
+        }
+
+        findViewById<Switch>(R.id.transitionTypeSwitch).setOnClickListener{
+            Log.d("M:RGB:transSwitchClick", "Transition Switch was clicked. New state is: ${(it as Switch).isChecked}")
+            onTransitionTypeSwitchClicked(it)
         }
     }
 
@@ -221,6 +236,14 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         } else {
             this.setAllOff()
         }
+    }
+
+    private fun onTransitionTypeSwitchClicked(view: View){
+        val type = when((view as Switch).isChecked){
+            true -> 201 // soft transition
+            else -> 200 // hard transition
+        }
+        this.sendInstruction(type, 0,0,0)
     }
 
     private fun notifyUser(message: String, colorID: Int){
