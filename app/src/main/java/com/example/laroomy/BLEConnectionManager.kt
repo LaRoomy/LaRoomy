@@ -1072,7 +1072,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             val languageIdentificationChar =
                 when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
-                    "de" -> 1
+                    "Deutsch" -> 1
                     else -> 0
                 }
             var id =

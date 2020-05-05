@@ -305,36 +305,39 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private fun setCurrentViewStateFromComplexPropertyState(colorState: ComplexPropertyState){
 
-        // 1. On/Off-State
-        val onOffState =
-            (colorState.commandValue != 0)
-        if(onOffState != this.onOffSwitch.isChecked)
-            this.onOffSwitch.isChecked = onOffState
+        runOnUiThread {
+            // 1. On/Off-State
+            val onOffState =
+                (colorState.commandValue != 0)
+            if (onOffState != this.onOffSwitch.isChecked)
+                this.onOffSwitch.isChecked = onOffState
 
-        // 2. Transition-Type
-        if(!colorState.hardTransitionFlag != this.transitionSwitch.isChecked)
-            this.transitionSwitch.isChecked = !colorState.hardTransitionFlag
+            // 2. Transition-Type
+            if (!colorState.hardTransitionFlag != this.transitionSwitch.isChecked)
+                this.transitionSwitch.isChecked = !colorState.hardTransitionFlag
 
-        // 3. ColorPicker view-color
-        val actualColor = Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
-        if(actualColor != this.currentColor) {
-            colorPickerView.setColor(actualColor, false)
-            lightnessSliderView.setColor(actualColor)
-        }
+            // 3. ColorPicker view-color
+            val actualColor =
+                Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
+            if (actualColor != this.currentColor) {
+                colorPickerView.setColor(actualColor, false)
+                lightnessSliderView.setColor(actualColor)
+            }
 
-        // 4. Current Mode and Program-Slider Position combined
-        val programStatus =
-            this.transitionSpeedSliderPositionFromCommandValue(colorState.commandValue)
-        if(programStatus != -1){
-            // program must be active
-            programSpeedSeekBar.progress = programStatus
+            // 4. Current Mode and Program-Slider Position combined
+            val programStatus =
+                this.transitionSpeedSliderPositionFromCommandValue(colorState.commandValue)
+            if (programStatus != -1) {
+                // program must be active
+                programSpeedSeekBar.progress = programStatus
 
-            if(this.currentMode != RGB_MODE_TRANSITION)
-                setPageSelectorModeState(RGB_MODE_TRANSITION)
-        } else {
-            // must be single color mode
-            if(this.currentMode != RGB_MODE_SINGLE_COLOR)
-                setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+                if (this.currentMode != RGB_MODE_TRANSITION)
+                    setPageSelectorModeState(RGB_MODE_TRANSITION)
+            } else {
+                // must be single color mode
+                if (this.currentMode != RGB_MODE_SINGLE_COLOR)
+                    setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+            }
         }
     }
 
