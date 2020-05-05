@@ -1996,10 +1996,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
 
                     // 4. launch property changed event
-                    this.propertyCallback.onComplexPropertyStateChanged(
-                        changedIndex,
-                        this.uIAdapterList.elementAt(changedIndex).complexPropertyState
-                    )
+                    //      !! = but only if the complex-state-loop is not active (because the successive invocation will impact the UI performance)
+                    if(!this.complexStateLoopActive) {
+                        this.propertyCallback.onComplexPropertyStateChanged(
+                            changedIndex,
+                            this.uIAdapterList.elementAt(changedIndex).complexPropertyState
+                        )
+                    }
                 }
 
                 // 5. Check if the state-loop is active and continue or close it

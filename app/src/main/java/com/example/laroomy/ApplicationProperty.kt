@@ -52,6 +52,7 @@ class ApplicationProperty : Application() {
     // navigation control parameter:
     var navigatedFromPropertySubPage = false
     var noConnectionKillOnPauseExecution = false
+    var uiAdapterChanged = false
 
     //var userNavigatedFromCommActivity = false
 

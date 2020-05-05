@@ -139,6 +139,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.message
                 )
             }
+            if((this.applicationContext as ApplicationProperty).uiAdapterChanged){
+                (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
+
+                // TODO: update data in a loop!
+
+            }
 
             // TODO: detect state-changes and update the property-list-items
 
