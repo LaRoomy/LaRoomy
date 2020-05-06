@@ -1,4 +1,4 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -55,7 +55,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // set the current device-color to the view (picker + slider)
         val actualColor = Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
-        colorPickerView.setInitialColor(actualColor, false)
+        // TODO: is this problem solved????
+        colorPickerView.setColor(actualColor, false)
         lightnessSliderView.setColor(actualColor)
 
         // set the header-text to the property-name
@@ -116,7 +117,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // set information parameter for onResume()
 
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:RGBPage:onPause", "The user closes the app -> suspend connection")
+            Log.d("M:RGBPage:onPause", "RGB Control Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManger.close()
@@ -141,6 +142,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        this.currentProgram = 11 + progress
         this.sendInstruction(11 + progress, 0, 0,0)
     }
     override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -330,6 +332,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             if (programStatus != -1) {
                 // program must be active
                 programSpeedSeekBar.progress = programStatus
+                this.currentProgram = colorState.commandValue // TODO: check this!!!
 
                 if (this.currentMode != RGB_MODE_TRANSITION)
                     setPageSelectorModeState(RGB_MODE_TRANSITION)

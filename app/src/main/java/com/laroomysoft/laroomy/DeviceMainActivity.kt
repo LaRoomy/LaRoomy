@@ -1,4 +1,4 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.content.Context
 import android.content.Intent
@@ -10,12 +10,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
-import kotlinx.android.synthetic.main.device_property_list_element.view.*
-import org.w3c.dom.Text
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
@@ -279,9 +276,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set it to selected color
         setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
-
         setItemSeparatorViewColors(index, R.color.selectedSeparatorColor)
-
+        // save the index of the highlighted item to reset it on back-navigation
         restoreIndex = index
 
         // navigate
@@ -296,7 +292,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the extended level selector page
+                val intent = Intent(this@DeviceMainActivity, ExtendedLevelSelectorControl::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
                 // navigate to the time selector page with single-select-mode

@@ -1,4 +1,4 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.content.Context
 import android.content.Context.BLUETOOTH_SERVICE
@@ -1393,7 +1393,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun setPropertyDescriptionForID(id:Int, description: String){
         laRoomyDevicePropertyList.forEach {
             if(it.propertyID == id){
-                it.propertyDescriptor = description
+                if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
+                    it.propertyDescriptor =
+                        encodeGermanString(description)
+                } else {
+                    it.propertyDescriptor = description
+                }
             }
         }
     }
@@ -1508,7 +1513,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun setGroupName(id: Int, data: String){
         laRoomyPropertyGroupList.forEach {
             if(it.groupID == id){
-                it.groupName = data
+                it.groupName = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
+                    "Deutsch" -> encodeGermanString(data)
+                    else -> data
+                }
             }
         }
     }
@@ -1587,6 +1595,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun endDeviceHeaderRecording(){
         this.deviceInfoHeaderData.valid = true
         this.deviceHeaderRecordingActive = false
+
+        if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
+            this.deviceInfoHeaderData.message =
+                encodeGermanString(this.deviceInfoHeaderData.message)
+        }
         this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
     }
 
@@ -2122,10 +2135,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun requestPropertyState(ID: Int){
+    private fun requestPropertyState(ID: Int){
         val value = a8BitValueToString(ID)
         val requestString = "D$value$"
         this.sendData(requestString)
+    }
+
+    private fun encodeGermanString(string: String) : String {
+
+        var encodedString = ""
+
+        string.forEach {
+            encodedString += when(it){
+                '^' -> 'ä'
+                '[' -> 'ö'
+                ']' -> 'ü'
+                '{' -> 'ß'
+                '}' -> 'Ä'
+                '|' -> 'Ö'
+                '~' -> 'Ü'
+                else -> it
+            }
+        }
+        return encodedString
     }
 
     private fun stopAllPendingLoopsAndResetParameter(){

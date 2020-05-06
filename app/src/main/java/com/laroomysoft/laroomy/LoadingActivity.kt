@@ -1,8 +1,6 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler

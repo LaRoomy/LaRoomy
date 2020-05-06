@@ -1,11 +1,9 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import android.widget.SeekBar
 import android.widget.Switch
-import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
 const val ERROR_MESSAGE = 0

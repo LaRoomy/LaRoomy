@@ -1,4 +1,4 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.graphics.Color
 

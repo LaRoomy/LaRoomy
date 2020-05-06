@@ -1,4 +1,4 @@
-package com.example.laroomy
+package com.laroomysoft.laroomy
 
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
