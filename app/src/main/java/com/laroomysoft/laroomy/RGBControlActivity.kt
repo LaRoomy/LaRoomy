@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -21,17 +22,17 @@ const val RGB_MODE_TRANSITION = 2
 
 class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener, OnColorChangedListener, SeekBar.OnSeekBarChangeListener {
 
-    lateinit var colorPickerView: ColorPickerView
-    lateinit var lightnessSliderView: LightnessSlider
-    lateinit var onOffSwitch: Switch
-    lateinit var transitionSwitch: Switch
-    lateinit var programSpeedSeekBar: SeekBar
+    private lateinit var colorPickerView: ColorPickerView
+    private lateinit var lightnessSliderView: LightnessSlider
+    private lateinit var onOffSwitch: Switch
+    private lateinit var transitionSwitch: Switch
+    private lateinit var programSpeedSeekBar: SeekBar
     private var mustReconnect = false
-    var relatedElementID = -1
-    var relatedGlobalElementIndex = -1
-    var currentColor = Color.WHITE
-    var currentProgram = 12
-    var currentMode = RGB_MODE_SINGLE_COLOR
+    private var relatedElementID = -1
+    private var relatedGlobalElementIndex = -1
+    private var currentColor = Color.WHITE
+    private var currentProgram = 12
+    private var currentMode = RGB_MODE_SINGLE_COLOR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +56,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // set the current device-color to the view (picker + slider)
         val actualColor = Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
-        // TODO: is this problem solved????
         colorPickerView.setColor(actualColor, false)
-        lightnessSliderView.setColor(actualColor)
+        lightnessSliderView.postDelayed({
+            lightnessSliderView.setColor(actualColor)
+        }, 500)
+
+        //.setColor(actualColor)
 
         // set the header-text to the property-name
         findViewById<TextView>(R.id.rgbHeaderTextView).text =
@@ -102,9 +106,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onBackPressed() {
         super.onBackPressed()
-
+        ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(this.relatedElementID)
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        //finish()
+        finish()
     }
 
     override fun onPause() {

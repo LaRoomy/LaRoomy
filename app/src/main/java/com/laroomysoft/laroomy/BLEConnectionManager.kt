@@ -2160,6 +2160,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return encodedString
     }
 
+    fun doComplexPropertyStateRequestForID(ID: Int) {
+        val str = a8BitValueToString(ID)
+        this.sendData("D$str$")
+    }
+
     private fun stopAllPendingLoopsAndResetParameter(){
 
         // TODO: make sure to cover all parameter
