@@ -55,14 +55,17 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // get the state for this RGB control
         val colorState = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
+
+        // get the current color (if all values are zero, set the default color)
+        val actualColor =
+            if((colorState.valueOne == 0)&&(colorState.valueTwo == 0)&&(colorState.valueThree == 0)) currentColor
+            else Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
+        
         // set the current device-color to the view (picker + slider)
-        val actualColor = Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
         colorPickerView.setColor(actualColor, false)
         lightnessSliderView.postDelayed({
             lightnessSliderView.setColor(actualColor)
         }, 500)
-
-        //.setColor(actualColor)
 
         // set the header-text to the property-name
         findViewById<TextView>(R.id.rgbHeaderTextView).text =
