@@ -27,7 +27,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private lateinit var onOffSwitch: Switch
     private lateinit var transitionSwitch: Switch
     private lateinit var programSpeedSeekBar: SeekBar
-    
+
     private var mustReconnect = false
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
