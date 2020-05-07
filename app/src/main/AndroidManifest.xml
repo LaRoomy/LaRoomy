@@ -18,23 +18,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.laroomysoft.laroomy.ExtendedLevelSelectorControl"></activity>
+        <activity
+            android:name="com.laroomysoft.laroomy.ExtendedLevelSelectorControl"
+            android:screenOrientation="nosensor">
+        </activity>
         <activity
             android:name="com.laroomysoft.laroomy.RGBControlActivity"
-            android:screenOrientation="nosensor"></activity>
+            android:screenOrientation="nosensor">
+        </activity>
         <activity
             android:name="com.laroomysoft.laroomy.DeviceMainActivity"
             android:label="@string/DeviceMainActivity"
-            android:screenOrientation="nosensor"></activity>
+            android:screenOrientation="nosensor">
+        </activity>
         <activity
             android:name="com.laroomysoft.laroomy.LoadingActivity"
             android:label="@string/LoadingActivityLabel"
-            android:screenOrientation="nosensor"></activity>
+            android:screenOrientation="nosensor">
+        </activity>
         <activity android:name="com.laroomysoft.laroomy.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

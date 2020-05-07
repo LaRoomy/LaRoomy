@@ -27,6 +27,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private lateinit var onOffSwitch: Switch
     private lateinit var transitionSwitch: Switch
     private lateinit var programSpeedSeekBar: SeekBar
+    
     private var mustReconnect = false
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
@@ -106,6 +107,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onBackPressed() {
         super.onBackPressed()
+        // when the user navigates back, do a final complex-state request to make sure the saved state is the same as the current state
         ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(this.relatedElementID)
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         finish()

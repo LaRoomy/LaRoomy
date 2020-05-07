@@ -21,6 +21,9 @@
     <string name="RGB_TransitionSpeedSeekBarText">Transition Speed</string>
     <string name="RGB_SoftTransitionSwitchText">Soft Transition</string>
 
+    <string name="ELS_HeaderText">Ex Level Select</string>
+    <string name="ELS_OnOff">On / Off</string>
+
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>

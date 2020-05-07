@@ -262,11 +262,12 @@ class LaRoomyDevicePresentationModel {
 }
 
 class ComplexPropertyState {
-    var valueOne = -1      // (R-Value in RGB Selector)
+    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)
     var valueTwo = -1      // (G-Value in RGB Selector)
     var valueThree = -1    // (B-Value in RGB Selector)
     var commandValue = -1  // (Command in RGB Selector)
     var enabledState = true
+    var onOffState = false      // used in ExLevelSelector
     var hardTransitionFlag = false // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
 }
 
@@ -1984,6 +1985,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyElement.propertyIndex,
                         data
                     )
+                    COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> retrieveExLevelSelectorData(
+                        propertyElement.propertyIndex,
+                        data
+                    )
 
                     // TODO: handle all complex types here!
 
@@ -2078,7 +2083,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun retrieveRGBStateData(elementIndex: Int, data: String): Boolean {
-
+        // check the transmission length first
         if(data.length < 19)
             return false
         else {
@@ -2104,6 +2109,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 when(data.elementAt(18)){
                     '0' -> false
                     else -> true
+                }
+
+            return true
+        }
+    }
+
+    private fun retrieveExLevelSelectorData(elementIndex: Int, data: String) : Boolean {
+        // check the transmission length first
+        if(data.length < 9){
+            return false
+        } else {
+            var strLevel = ""
+
+            for(i in 7..9)
+                strLevel += data.elementAt(i)
+
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = strLevel.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.onOffState =
+                when(data.elementAt(6)){
+                    '1' -> true
+                    else -> false
                 }
 
             return true

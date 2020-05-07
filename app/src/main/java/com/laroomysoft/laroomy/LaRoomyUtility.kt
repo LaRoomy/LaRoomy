@@ -34,6 +34,15 @@ fun get8BitValueAsPercent(value: Int) : Int {
     return ret
 }
 
+fun get8BitValueAsPartOfOne(value: Int) : Float {
+    val result = 0.01*get8BitValueAsPercent(value).toDouble()
+    return when{
+        (result < 0) -> 0.00
+        (result > 1) -> 1.00
+        else -> result
+    }.toFloat()
+}
+
 fun percentTo8Bit(percent: Int) : Int {
     val value = 255*percent
     return if(value == 0) 0

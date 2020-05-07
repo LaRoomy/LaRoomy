@@ -6,4 +6,128 @@
     android:layout_height="match_parent"
     tools:context=".ExtendedLevelSelectorControl">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/elsHeaderContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/elsHeaderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/ELS_HeaderText"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/elsHeaderSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="5dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/elsHeaderTextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/elsSwitchContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/elsHeaderContainer">
+
+        <TextView
+            android:id="@+id/elsOnOffTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ELS_OnOff"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Switch
+            android:id="@+id/elsSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/elsOnOffTextView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/controllerContainer"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/elsSwitchContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+<!--        <com.sdsmdg.harjot.crollerTest.Croller-->
+<!--            android:id="@+id/croller"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_centerInParent="true"-->
+<!--            app:back_circle_color="#EDEDED"-->
+<!--            app:indicator_color="#77BB00"-->
+<!--            app:indicator_width="10"-->
+<!--            app:is_continuous="false"-->
+<!--            app:label_color="#FFFFFF"-->
+<!--            app:main_circle_color="#FFFFFF"-->
+<!--            app:max="50"-->
+<!--            app:progress_primary_color="#77BB00"-->
+<!--            app:progress_secondary_color="#EEEEEE"-->
+<!--            app:start_offset="45" />-->
+
+        <com.ramotion.fluidslider.FluidSlider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/exLevelSlider"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:bar_color="@color/grayAccentColor"
+            app:bar_text_color="@color/goldAccentColor"
+            app:bubble_color="@color/goldAccentColor"
+            app:text_size="18sp"
+            app:size="normal"
+            app:initial_position="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/elsUserNotificationTextView"
+        android:layout_margin="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/controllerContainer"
+        />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
