@@ -60,7 +60,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         val actualColor =
             if((colorState.valueOne == 0)&&(colorState.valueTwo == 0)&&(colorState.valueThree == 0)) currentColor
             else Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
-        
+
+        if(actualColor != currentColor)
+            currentColor = actualColor
+
         // set the current device-color to the view (picker + slider)
         colorPickerView.setColor(actualColor, false)
         lightnessSliderView.postDelayed({
@@ -82,6 +85,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             this.transitionSpeedSliderPositionFromCommandValue(colorState.commandValue)
         if(programStatus != -1){
             // program must be active
+            this.currentProgram = colorState.commandValue
             programSpeedSeekBar.progress = programStatus
             setPageSelectorModeState(RGB_MODE_TRANSITION)
         }
@@ -271,10 +275,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
             if (state) {
                 setPageSelectorModeState(this.currentMode)
-                //notifyUser("Checked", R.color.InfoColor)
             } else {
                 setPageSelectorModeState(RGB_MODE_OFF)
-                //notifyUser("Unchecked", R.color.InfoColor)
             }
         }
 
@@ -308,12 +310,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         textView.setTextColor(getColor(colorID))
     }
 
-    private fun notifyUserWithColorAsInt(message: String, color: Int){
-        val textView = findViewById<TextView>(R.id.rgbUserNotificationTextView)
-        textView.text = message
-        textView.setTextColor(color)
-    }
-
     private fun setCurrentViewStateFromComplexPropertyState(colorState: ComplexPropertyState){
 
         runOnUiThread {
@@ -331,6 +327,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val actualColor =
                 Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
             if (actualColor != this.currentColor) {
+                this.currentColor = actualColor
                 colorPickerView.setColor(actualColor, false)
                 lightnessSliderView.setColor(actualColor)
             }
@@ -358,15 +355,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         this.currentColor = selectedColor
 
-        // temporary hex color display
-//        runOnUiThread {
-//            notifyUserWithColorAsInt(
-//                "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
-//                    selectedColor
-//                )}", selectedColor
-//            )
-//        }
-
         if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
 
             val r = Color.red(selectedColor)
@@ -386,15 +374,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         Log.d("M:RGBPage:onColorChange","Color changed in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
 
         this.currentColor = selectedColor
-
-        // temporary hex color display
-//        runOnUiThread {
-//            notifyUserWithColorAsInt(
-//                "${getString(R.string.RGBPageColorSelectionInformation)} ${Integer.toHexString(
-//                    selectedColor
-//                )}", selectedColor
-//            )
-//        }
 
         if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
 
