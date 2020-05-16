@@ -256,6 +256,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     // set to rgb-mode "off" ?
 
                     // do nothing!
+                    // do nothing!
 
                     //singleButton.setBackgroundColor(getColor(R.color.transparentViewColor))
                     //singleButton.setTextColor(getColor(R.color.normalTextColor))

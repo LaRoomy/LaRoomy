@@ -12,9 +12,9 @@ import kotlinx.android.synthetic.main.activity_simple_time_selector.*
 
 class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
-    var relatedElementID = -1
-    var relatedGlobalElementIndex = -1
-    var mustReconnect = false
+    private var relatedElementID = -1
+    private var relatedGlobalElementIndex = -1
+    private var mustReconnect = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
