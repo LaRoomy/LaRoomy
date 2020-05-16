@@ -129,6 +129,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // if the user closed the application -> suspend connection
         // set information parameter for onResume()
 
+        // if this is true, onBackPressed was executed before
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
             Log.d("M:RGBPage:onPause", "RGB Control Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter

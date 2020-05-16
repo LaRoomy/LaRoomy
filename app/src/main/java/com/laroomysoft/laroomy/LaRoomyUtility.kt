@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.graphics.Color
+import java.util.*
 
 //fun percentageFrom8BitValue(value: Int): Int{
 //
@@ -62,6 +63,19 @@ fun a8BitValueToString(value: Int) : String {
     single = worker
     // create the request string
     return "$hundred$tenth$single"
+}
+
+fun a8BitValueAsTwoCharString(value: Int) : String {
+    var worker = value
+    var tenth = 0
+    val single: Int
+
+    if (worker > 10) tenth = (worker / 10)
+    worker -= (tenth*10)
+    single = worker
+    // create the request string
+    return "$tenth$single"
+
 }
 
 class PercentageLevelPropertyGenerator(E8bit_level: Int){

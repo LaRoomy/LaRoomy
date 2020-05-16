@@ -10,7 +10,7 @@
         android:required="true" />
 
     <application
-        android:name="com.laroomysoft.laroomy.ApplicationProperty"
+        android:name=".ApplicationProperty"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
@@ -19,27 +19,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.laroomysoft.laroomy.ExtendedLevelSelectorControl"
-            android:screenOrientation="nosensor">
-        </activity>
+            android:name=".SimpleTimeSelectorActivity"
+            android:screenOrientation="nosensor"
+            />
         <activity
-            android:name="com.laroomysoft.laroomy.RGBControlActivity"
-            android:screenOrientation="nosensor">
-        </activity>
+            android:name=".ExtendedLevelSelectorControl"
+            android:screenOrientation="nosensor" />
         <activity
-            android:name="com.laroomysoft.laroomy.DeviceMainActivity"
+            android:name=".RGBControlActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".DeviceMainActivity"
             android:label="@string/DeviceMainActivity"
-            android:screenOrientation="nosensor">
-        </activity>
+            android:screenOrientation="nosensor" />
         <activity
-            android:name="com.laroomysoft.laroomy.LoadingActivity"
+            android:name=".LoadingActivity"
             android:label="@string/LoadingActivityLabel"
-            android:screenOrientation="nosensor">
-        </activity>
-        <activity android:name="com.laroomysoft.laroomy.MainActivity">
+            android:screenOrientation="nosensor" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

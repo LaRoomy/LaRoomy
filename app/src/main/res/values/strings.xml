@@ -24,6 +24,11 @@
     <string name="ELS_HeaderText">Ex Level Select</string>
     <string name="ELS_OnOff">On / Off</string>
 
+    <string name="STS_HeaderText">Time Selector</string>
+    <string name="STS_Hours">Hours</string>
+    <string name="STS_Minutes">Minutes</string>
+    <string name="STS_Seconds">Seconds</string>
+
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>

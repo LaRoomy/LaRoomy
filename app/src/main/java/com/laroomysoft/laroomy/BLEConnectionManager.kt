@@ -9,9 +9,13 @@ import android.bluetooth.le.ScanResult
 import android.os.*
 import android.util.Log
 import android.widget.SeekBar
+import androidx.annotation.RequiresApi
 import java.io.Serializable
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.time.hours
+import kotlin.time.minutes
 
 private const val MAX_CONNECTION_ATTEMPTS = 10
 
@@ -1871,6 +1875,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             this.dataReadyToShow = true
             this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList)
+
+            // set the device time
+            Log.d("M:GenUIAdapter", "UI Array List Generation complete. Now setting device Time")
+            this.setDeviceTime()
         }
     }
 
@@ -2184,6 +2192,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
         return encodedString
+    }
+
+    private fun setDeviceTime(){
+        // get the time and send the client command to the device
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
+        val min = calendar.get(Calendar.MINUTE)
+        val sec = calendar.get(Calendar.SECOND)
+        val outString = "Sct&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
+        Log.d("M:setDeviceTime", "Sending current local time to the device. Output Data is: $outString")
+        this.sendData(outString)
     }
 
     fun doComplexPropertyStateRequestForID(ID: Int) {

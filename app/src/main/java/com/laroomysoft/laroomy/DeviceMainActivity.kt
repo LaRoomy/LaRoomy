@@ -301,7 +301,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the time selector page with single-select-mode
+                val intent = Intent(this@DeviceMainActivity, SimpleTimeSelectorActivity::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_ELAPSE_SELECTOR -> {
                 // navigate to the time selector page with the countdown-select-mode
@@ -394,6 +400,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
 
         // ?? description!
+
 
         runOnUiThread {
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
