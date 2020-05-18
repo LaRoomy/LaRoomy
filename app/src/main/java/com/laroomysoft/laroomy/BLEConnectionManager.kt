@@ -1878,7 +1878,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // set the device time
             Log.d("M:GenUIAdapter", "UI Array List Generation complete. Now setting device Time")
-            this.setDeviceTime()
+
+            // TODO: set the device time at another point! this breaks the complex state loop!!!
+
+            //this.setDeviceTime()
         }
     }
 
