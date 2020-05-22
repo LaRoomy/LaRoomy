@@ -55,7 +55,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // get the state for this RGB control
         val colorState = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
-
         // get the current color (if all values are zero, set the default color)
         val actualColor =
             if((colorState.valueOne == 0)&&(colorState.valueTwo == 0)&&(colorState.valueThree == 0)) currentColor
