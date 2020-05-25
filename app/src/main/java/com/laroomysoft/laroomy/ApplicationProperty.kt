@@ -36,6 +36,11 @@ const val SEEK_BAR_START_TRACK = 1
 const val SEEK_BAR_STOP_TRACK = 2
 const val SEEK_BAR_PROGRESS_CHANGING = 3
 
+// rgb modes
+const val RGB_MODE_OFF = 0
+const val RGB_MODE_SINGLE_COLOR = 1
+const val RGB_MODE_TRANSITION = 2
+
 // error indicator
 const val ERROR_NOTFOUND = "error - not found"
 

@@ -3,7 +3,6 @@ package com.laroomysoft.laroomy
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -16,9 +15,6 @@ import com.flask.colorpicker.OnColorChangedListener
 import com.flask.colorpicker.OnColorSelectedListener
 import com.flask.colorpicker.slider.LightnessSlider
 
-const val RGB_MODE_OFF = 0
-const val RGB_MODE_SINGLE_COLOR = 1
-const val RGB_MODE_TRANSITION = 2
 
 class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, OnColorSelectedListener, OnColorChangedListener, SeekBar.OnSeekBarChangeListener {
 
