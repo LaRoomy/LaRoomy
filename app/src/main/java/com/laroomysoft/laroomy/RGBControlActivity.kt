@@ -109,9 +109,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onBackPressed() {
         super.onBackPressed()
-        // when the user navigates back, do a final complex-state request to make sure the saved state is the same as the current state
-        ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(this.relatedElementID)
+
+        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        // close activity
         finish()
     }
 

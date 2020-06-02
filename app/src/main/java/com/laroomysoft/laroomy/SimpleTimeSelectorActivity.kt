@@ -79,21 +79,22 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onPause() {
         super.onPause()
-        super.onBackPressed()
-        // when the user navigates back, do a final complex-state request to make sure the saved state is the same as the current state
-        ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(this.relatedElementID)
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        finish()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
             Log.d("M:STSPage:onPause", "Simple Time Selector Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManger.close()
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // when the user navigates back, do a final complex-state request to make sure the saved state is the same as the current state
+        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        // close activity
+        finish()
     }
 
     override fun onResume() {

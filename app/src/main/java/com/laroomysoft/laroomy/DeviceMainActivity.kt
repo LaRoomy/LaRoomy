@@ -102,7 +102,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // at first check if this callback will be invoked due to a back-navigation from a property sub-page
         // or if it was invoked on creation or a resume from outside of the application
         if((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
+
             // this is a back navigation from a property sub-page
+
+            // do a complex state- update if required...
+            if((this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired){
+                Log.d("M:onResume", "Complex-State-Update required for ID ${(this.applicationContext as ApplicationProperty).complexUpdateID}")
+
+                (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = false
+
+                ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                    (this.applicationContext as ApplicationProperty).complexUpdateID
+                )
+                (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+            }
 
             // set property-item to normal background
             if(restoreIndex >= 0) {

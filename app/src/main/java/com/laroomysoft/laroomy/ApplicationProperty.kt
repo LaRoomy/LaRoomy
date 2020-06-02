@@ -56,6 +56,8 @@ class ApplicationProperty : Application() {
     var navigatedFromPropertySubPage = false
     var noConnectionKillOnPauseExecution = false
     var uiAdapterChanged = false
+    var complexPropertyUpdateRequired = false
+    var complexUpdateID = -1
 
     //var userNavigatedFromCommActivity = false
 
