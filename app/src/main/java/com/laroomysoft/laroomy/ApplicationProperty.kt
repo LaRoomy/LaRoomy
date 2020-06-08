@@ -155,6 +155,19 @@ fun resourceIdForImageId(imageID: Int): Int {
         48 -> R.drawable.lock_blue_white
         49 -> R.drawable.location_blue_white
         50 -> R.drawable.printer_blue_white
+        51 -> R.drawable.listing_items_white_blue
+        52 -> R.drawable.world_blue_white
+        53 -> R.drawable.globe_blue_white
+        54 -> R.drawable.battery_loading
+        55 -> R.drawable.battery_100_perc
+        56 -> R.drawable.battery_75_perc
+        57 -> R.drawable.battery_50_perc
+        58 -> R.drawable.battery_25_perc
+        59 -> R.drawable.battery_empty_white
+        60 -> R.drawable.battery_empty_red
+        61 -> R.drawable.rectangle_empty_white
+        62 -> R.drawable.rectangle_white_checked_blue
+        63 -> R.drawable.rectangle_white_crossed_blue
 
         else -> R.drawable.image_error_state
     }
