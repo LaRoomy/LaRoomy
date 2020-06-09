@@ -168,6 +168,30 @@ fun resourceIdForImageId(imageID: Int): Int {
         61 -> R.drawable.rectangle_empty_white
         62 -> R.drawable.rectangle_white_checked_blue
         63 -> R.drawable.rectangle_white_crossed_blue
+        64 -> R.drawable.circle_empty_white
+        65 -> R.drawable.circle_checked_blue_white
+        66 -> R.drawable.circle_crossed_blue_white
+        67 -> R.drawable.cloud_white
+        68 -> R.drawable.cloud_blue_white
+        69 -> R.drawable.home
+        70 -> R.drawable.house_white
+        71 -> R.drawable.house_blue_white
+        72 -> R.drawable.share
+        73 -> R.drawable.wifi
+        74 -> R.drawable.calculator
+        75 -> R.drawable.people_blue_white
+        76 -> R.drawable.search
+        77 -> R.drawable.hierachy_blue_white
+        78 -> R.drawable.double_helix_white_blue
+        79 -> R.drawable.at_blue
+        80 -> R.drawable.at_white
+        81 -> R.drawable.one_circle_blue
+        82 -> R.drawable.two_circle_blue
+        83 -> R.drawable.three_circle_blue
+        84 -> R.drawable.one_circle_white
+        85 -> R.drawable.two_circle_white
+        86 -> R.drawable.three_circle_white
+
 
         else -> R.drawable.image_error_state
     }
