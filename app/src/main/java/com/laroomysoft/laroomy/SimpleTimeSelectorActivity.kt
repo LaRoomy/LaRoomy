@@ -15,6 +15,8 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var mustReconnect = false
+    private var currentHour = 0
+    private var currentMinute = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +29,15 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // set the header-text to the property Name
         findViewById<TextView>(R.id.stsHeaderTextView).text =
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+
+        // get the complex state data for the time selector
+        val timeSelectorState =
+            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+
+        // set the displayed time to the current device setting
+        this.currentHour = timeSelectorState.valueOne
+        this.currentMinute = timeSelectorState.valueTwo
+        this.updateTimeDisplay(this.currentHour, this.currentMinute)
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
@@ -44,9 +55,9 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 Color.parseColor("#00EDE9"),
                 Color.parseColor("#0087D9"),
                 Color.parseColor("#8A1CC3")))
-            gradientAngle = 220
+            gradientAngle = 0                               // was 220 !!!!!!!!!!!
             maxLapCount = 1
-            currentValue = 12
+            currentValue = currentHour
             maxValue = 59
             centeredTextSize = 60f
             centeredText = getString(R.string.STS_Hours)
@@ -62,9 +73,9 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 Color.parseColor("#FF8D00"),
                 Color.parseColor("#FF0058"),
                 Color.parseColor("#920084")))
-            gradientAngle = 220
+            gradientAngle = 0                               // was 220 !!!!!!!!!!!!
             maxLapCount = 1
-            currentValue = 30
+            currentValue = currentMinute
             maxValue = 59
             centeredTextSize = 60f
             centeredText = getString(R.string.STS_Minutes)
@@ -113,8 +124,14 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
+        this.currentHour = complexPropertyState.valueOne
+        this.currentMinute = complexPropertyState.valueTwo
+        updateTimeDisplay(complexPropertyState.valueOne, complexPropertyState.valueTwo)
 
-        // TODO !
+        // update the time selector
+        // TODO: check if this works!!!
+        view_pager.getView(0).currentValue = this.currentHour
+        view_pager.getView(1).currentValue = this.currentMinute
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -124,14 +141,56 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         userNotificationTextView.text = message
     }
 
+    private fun updateTimeDisplay(hour: Int, minute: Int){
+
+        val time: String = if((hour < 10) && (minute > 9)){
+            "0$hour : $minute"
+        } else if((hour > 9) && (minute < 10)){
+            "$hour : 0$minute"
+        } else {
+            "$hour : $minute"
+        }
+        findViewById<TextView>(R.id.stsHeaderTextView).text = time
+    }
+
+    private fun generateExecutionString() : String {
+        return "C${a8BitValueToString(relatedElementID)}" +
+                "${ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
+                    relatedGlobalElementIndex
+                ).complexPropertyState.timeSetterIndex}" +
+                a8BitValueAsTwoCharString(currentHour) +
+                a8BitValueAsTwoCharString(currentMinute) +
+                "00$"
+    }
+
     fun onHourValueChanged(value: Int){
+        Log.d("M:STSPage:HourChanged", "Hour value changed in SimpleTimeSelector Activity. New value is: $value")
+
         //temp:
-        notifyUser("Hour value changed: $value", R.color.normalTextColor)
+        //notifyUser("Hour value changed: $value", R.color.normalTextColor)
+
+        // update UI
+        this.currentHour = value
+        this.updateTimeDisplay(value, this.currentMinute)
+        // update device
+        ApplicationProperty.bluetoothConnectionManger.sendData(
+            this.generateExecutionString()
+        )
     }
 
     fun onMinuteValueChanged(value: Int){
+        Log.d("M:STSPage:MinuteChanged", "Minute value changed in SimpleTimeSelector Activity. New value is: $value")
+
         //temp:
-        notifyUser("Minute value changed: $value", R.color.normalTextColor)
+        //notifyUser("Minute value changed: $value", R.color.normalTextColor)
+
+        // update UI
+        this.currentMinute = value
+        this.updateTimeDisplay(this.currentHour, value)
+        // update device
+        ApplicationProperty.bluetoothConnectionManger.sendData(
+            this.generateExecutionString()
+        )
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

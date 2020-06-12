@@ -75,7 +75,6 @@ fun a8BitValueAsTwoCharString(value: Int) : String {
     single = worker
     // create the request string
     return "$tenth$single"
-
 }
 
 class PercentageLevelPropertyGenerator(E8bit_level: Int){

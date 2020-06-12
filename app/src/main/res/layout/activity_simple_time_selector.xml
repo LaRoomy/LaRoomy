@@ -40,13 +40,36 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/timeDisplayContainer"
+        app:layout_constraintTop_toBottomOf="@id/stsHeaderContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeDisplayTextView"
+            android:textSize="26sp"
+            android:text="@string/STS_TimePlaceholder"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.agilie.circularpicker.ui.view.CircularPickerPagerContainer
         android:id="@+id/timePickerPagerContainer"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/stsHeaderContainer"
+        app:layout_constraintTop_toBottomOf="@id/timeDisplayContainer"
         >
 
         <com.agilie.circularpicker.ui.view.CircularPickerViewPager

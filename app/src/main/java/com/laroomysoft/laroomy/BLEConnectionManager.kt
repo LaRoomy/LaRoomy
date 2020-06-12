@@ -266,13 +266,17 @@ class LaRoomyDevicePresentationModel {
 }
 
 class ComplexPropertyState {
-    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)
-    var valueTwo = -1      // (G-Value in RGB Selector)
-    var valueThree = -1    // (B-Value in RGB Selector)
-    var commandValue = -1  // (Command in RGB Selector)
-    var enabledState = true
-    var onOffState = false      // used in ExLevelSelector
-    var hardTransitionFlag = false // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
+    // shared state values (multi-purpose)
+    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)
+    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)
+    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??
+    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??
+    var enabledState = true// at this time only a placeholder (not implemented yet)
+    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector
+
+    // single used values (only valid in specific complex states)
+    var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
+    var timeSetterIndex = -1        // Value to identify the time setter type
 }
 
 class DeviceInfoHeaderData {
@@ -1877,7 +1881,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList)
 
             // set the device time
-            Log.d("M:GenUIAdapter", "UI Array List Generation complete. Now setting device Time")
+            //Log.d("M:GenUIAdapter", "UI Array List Generation complete. Now setting device Time")
 
             // TODO: set the device time at another point! this breaks the complex state loop!!!
 
@@ -2000,6 +2004,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyElement.propertyIndex,
                         data
                     )
+                    COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> retrieveSimpleTimeSelectorData(
+                        propertyElement.propertyIndex,
+                        data
+                    )
 
                     // TODO: handle all complex types here!
 
@@ -2056,6 +2064,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             )
                             this.complexStateLoopActive = false
                             this.currentStateRetrievingIndex = -1
+
+                            this.setDeviceTime()
                         }
 
 
@@ -2142,7 +2152,34 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     '1' -> true
                     else -> false
                 }
+            return true
+        }
+    }
 
+    private fun retrieveSimpleTimeSelectorData(elementIndex: Int, data: String): Boolean {
+        // check the transmission length first
+        if(data.length < 13){
+            return false
+        } else {
+            var hourVal = ""
+            var minVal = ""
+            var timeSetter = ""
+            timeSetter += data.elementAt(6)
+
+            for(i in 7..8)
+                hourVal += data.elementAt(i)
+
+            for(i in 9..10)
+                minVal += data.elementAt(i)
+
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.timeSetterIndex = timeSetter.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = hourVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = minVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.onOffState =
+                when(data.elementAt(11)){
+                    '1' -> true
+                    else -> false
+                }
             return true
         }
     }
@@ -2154,11 +2191,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // loop the properties and save the ones with complex state
         this.laRoomyDevicePropertyList.forEach {
             // The type 6 (RGB Selector) is the first type with complex state data
-            if(it.propertyType > 5){
+            if(it.propertyType >= COMPLEX_PROPERTY_START_INDEX){
                 this.complexStatePropertyIDs.add(it.propertyID)
             }
         }
-        // if there are
+
+
         if(this.complexStatePropertyIDs.isNotEmpty()) {
             Log.d("M:startCompDataLoop", "Found ${this.complexStatePropertyIDs.size} Elements with ComplexStateData -> start collecting from device")
 
@@ -2169,6 +2207,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
             )
             this.currentStateRetrievingIndex++
+        }
+        else {
+            // if there are no complex types, the retrieving-process is finished here, so set the device time, otherwise it must be done at the end of the complex-state-loop
+            this.setDeviceTime()
         }
     }
 
