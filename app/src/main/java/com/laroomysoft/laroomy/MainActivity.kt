@@ -15,10 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionManager.BleEventCallback {
 
-//    companion object {
-//        lateinit var main: AppCompatActivity
-//    }
-
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
         field.clear()
@@ -33,8 +29,6 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        //main = this
 
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@MainActivity, this)
 
@@ -98,11 +92,26 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         startActivity(intent)
     }
 
+    fun onReloadImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+        this.updateAvailableDevices()
+    }
+
     fun onHelpImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
         val openUrl = Intent(ACTION_VIEW)
         openUrl.data = Uri.parse("https://www.laroomy.de")
         startActivity(openUrl)
     }
+
+    fun onInfoImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+        val intent = Intent(this@MainActivity, InformationActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun onSettingsImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+        val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
+        startActivity(intent)
+    }
+
 
     private fun notifyUser(message: String, type: Int){
         val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)

@@ -14,6 +14,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:background="@android:color/transparent"
+        android:onClick="onReloadImageButtonClick"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/reload_turnleft_white" />
@@ -79,6 +80,19 @@
             app:layout_constraintTop_toBottomOf="@id/underlineView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/informationImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/InformationImageDescription"
+        android:onClick="onInfoImageButtonClick"
+        app:srcCompat="@drawable/info_image_48"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -86,8 +100,22 @@
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/informationImageButton"
+        app:layout_constraintEnd_toStartOf="@id/generalSettingsButton"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/generalSettingsButton"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/SettingsImageDescription"
+        android:onClick="onSettingsImageButtonClick"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/settings1_white"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

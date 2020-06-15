@@ -44,6 +44,8 @@
     <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>
     <string name="DeviceReConnectImageButtonDescription">ImageButton to reconnect the device</string>
     <string name="BackImageButtonDescription">Button with the purpose to navigate back to the deviceMainActivity</string>
+    <string name="InformationImageDescription">Button to open the info-activity</string>
+    <string name="SettingsImageDescription">Button to open the main-settings-activity</string>
     <!-- Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
@@ -65,4 +67,6 @@
     <string name="LevelIndicationTextPlaceholder">100%</string>
     <string name="PropertySubPagePlaceholder">This is a property Page</string>
     <string name="RGBPageColorSelectionInformation">Selected Color: </string>
+    <string name="info_activity_placeholder">Info Activity</string>
+    <string name="app_settings">App-Settings</string>
 </resources>
