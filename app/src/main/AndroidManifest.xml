@@ -18,13 +18,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AppSettingsActivity"></activity>
+        <activity android:name=".TimeFrameSelectorActivity"></activity>
+        <activity android:name=".AppSettingsActivity" />
         <activity android:name=".InformationActivity" />
         <activity
             android:name=".SimpleTimeSelectorActivity"
             android:screenOrientation="nosensor" />
         <activity
-            android:name=".ExtendedLevelSelectorControl"
+            android:name=".ExtendedLevelSelectorActivity"
             android:screenOrientation="nosensor" />
         <activity
             android:name=".RGBControlActivity"

@@ -308,7 +308,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // prevent the normal "onPause" execution
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the extended level selector page
-                val intent = Intent(this@DeviceMainActivity, ExtendedLevelSelectorControl::class.java)
+                val intent = Intent(this@DeviceMainActivity, ExtendedLevelSelectorActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 startActivity(intent)
@@ -326,7 +326,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // navigate to the time selector page with the countdown-select-mode
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
-                // navigate to the time selector page with the frame-select-mode
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+                // navigate to the time-frame selector page
+                val intent = Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                startActivity(intent)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
+                // navigate to the navigator page
             }
             else -> {
                 // what to do here??

@@ -21,6 +21,7 @@
     <color name="transparentViewColor">#00FFFFFF</color>
     <color name="DMA_ItemSelectedColor">#222222</color>
     <color name="RGB_SelectedButtonColor">#444444</color>
+    <color name="TFS_ReachedColor">#222222</color>
     <color name="goldAccentColor">#F5CD06</color>
     <color name="grayAccentColor">#777777</color>
 

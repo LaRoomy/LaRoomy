@@ -7,7 +7,7 @@ import android.widget.Switch
 import android.widget.TextView
 import com.ramotion.fluidslider.FluidSlider
 
-class ExtendedLevelSelectorControl : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     var mustReconnect = false
     var relatedElementID = -1
@@ -20,7 +20,7 @@ class ExtendedLevelSelectorControl : AppCompatActivity(), BLEConnectionManager.B
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_extended_level_selector_control)
+        setContentView(R.layout.activity_extended_level_selector)
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -31,7 +31,7 @@ class ExtendedLevelSelectorControl : AppCompatActivity(), BLEConnectionManager.B
                 ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@ExtendedLevelSelectorControl, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         // get the related complex state object
@@ -73,7 +73,7 @@ class ExtendedLevelSelectorControl : AppCompatActivity(), BLEConnectionManager.B
 
     override fun onPause() {
         super.onPause()
-
+        // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
             Log.d("M:ELSPage:onPause", "Extended Level Selector Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
@@ -86,7 +86,7 @@ class ExtendedLevelSelectorControl : AppCompatActivity(), BLEConnectionManager.B
         super.onResume()
         Log.d("M:ELSPage:onResume", "onResume executed in Extended Level Selector Control")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@ExtendedLevelSelectorControl, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
