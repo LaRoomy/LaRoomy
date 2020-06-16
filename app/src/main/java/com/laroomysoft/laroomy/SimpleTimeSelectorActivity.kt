@@ -58,7 +58,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             gradientAngle = 0                               // was 220 !!!!!!!!!!!
             maxLapCount = 1
             currentValue = currentHour
-            maxValue = 59
+            maxValue = 23
             centeredTextSize = 60f
             centeredText = getString(R.string.STS_Hours)
             valueChangedListener = object : CircularPickerContract.Behavior.ValueChangedListener{
@@ -150,7 +150,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         } else {
             "$hour : $minute"
         }
-        findViewById<TextView>(R.id.stsHeaderTextView).text = time
+        findViewById<TextView>(R.id.timeDisplayTextView).text = time
     }
 
     private fun generateExecutionString() : String {
