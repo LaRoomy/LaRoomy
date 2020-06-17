@@ -267,12 +267,12 @@ class LaRoomyDevicePresentationModel {
 
 class ComplexPropertyState {
     // shared state values (multi-purpose)
-    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)
-    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)
-    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??
-    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??
+    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)
+    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)
+    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)
+    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
     var enabledState = true// at this time only a placeholder (not implemented yet)
-    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector
+    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
 
     // single used values (only valid in specific complex states)
     var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
@@ -2009,6 +2009,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         data
                     )
 
+                    // elapse-time selector mission
+
+                    COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> retrieveTimeFrameSelectorData(
+                        propertyElement.propertyIndex,
+                        data
+                    )
+
                     // TODO: handle all complex types here!
 
                     else -> true
@@ -2182,6 +2189,46 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             return true
         }
+    }
+
+    private fun retrieveTimeFrameSelectorData(elementIndex: Int, data: String) : Boolean {
+        // check the transmission length first
+        if(data.length < 16){
+            return false
+        } else {
+            var onTimeHourVal = ""
+            var onTimeMinVal = ""
+            var offTimeHourVal = ""
+            var offTimeMinVal = ""
+
+            // data[6] is reserved and could be used for extra data
+
+            for(i in 7..8)
+                onTimeHourVal += data.elementAt(i)
+
+            for(i in 9..10)
+                onTimeMinVal += data.elementAt(i)
+
+            for(i in 11..12)
+                offTimeHourVal += data.elementAt(i)
+
+            for(i in 13..14)
+                offTimeMinVal += data.elementAt(i)
+
+
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = onTimeHourVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = onTimeMinVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = offTimeHourVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.commandValue = offTimeHourVal.toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.onOffState =
+                when(data.elementAt(15)){
+                    '1' -> true
+                    else -> false
+                }
+            return true
+        }
+
+
     }
 
     private fun startComplexStateDataLoop(){

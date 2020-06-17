@@ -31,6 +31,8 @@
     <string name="STS_TimePlaceholder">00 : 00</string>
 
     <string name="TFS_HeaderText">Time-Frame Selector</string>
+    <string name="TFS_From">From</string>
+    <string name="TFS_To">To</string>
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>

@@ -4,14 +4,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import android.widget.TimePicker
+import kotlinx.android.synthetic.main.device_property_list_element.*
 
-class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
     var mustReconnect = false
     var relatedElementID = -1
     var relatedGlobalElementIndex = -1
 
     lateinit var notificationTextView: TextView
+    lateinit var toTimePicker: TimePicker
+    lateinit var fromTimePicker: TimePicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,12 +39,22 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // save reference to UI elements
         this.notificationTextView = findViewById(R.id.tfsNotificationTextView)
+        this.toTimePicker = findViewById(R.id.toTimePicker)
+        this.fromTimePicker = findViewById(R.id.fromTimePicker)
 
+        // set the 24h format in the timePicker
+        this.toTimePicker.setIs24HourView(true)
+        this.fromTimePicker.setIs24HourView(true)
 
+        // set the initial time of the pickers from the complex-state-data
+        this.fromTimePicker.hour = timeFrameState.valueOne
+        this.fromTimePicker.minute = timeFrameState.valueTwo
+        this.toTimePicker.hour = timeFrameState.valueThree
+        this.toTimePicker.minute = timeFrameState.commandValue
 
-
-        // TODO: set the UI-state
-
+        // set the time-changed listeners
+        this.fromTimePicker.setOnTimeChangedListener(this)
+        this.toTimePicker.setOnTimeChangedListener(this)
     }
 
     override fun onBackPressed() {
@@ -79,15 +93,40 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         }
     }
 
+    override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        Log.d("M:CB:TimeChanged", "Time changed in TimeFrameSelector Activity." +
+                "\nTime-Type: ${if(view?.id == R.id.fromTimePicker) "On-Time" else "Off-Time"}" +
+                "New Time is: $hourOfDay : $minute")
+        ApplicationProperty.bluetoothConnectionManger.sendData(
+            this.generateExecutionString(view?.id ?: 0, hourOfDay, minute)
+        )
+    }
+
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
-        // TODO: set UI-state
+        this.fromTimePicker.hour = complexPropertyState.valueOne
+        this.fromTimePicker.minute = complexPropertyState.valueTwo
+        this.toTimePicker.hour = complexPropertyState.valueThree
+        this.toTimePicker.minute = complexPropertyState.commandValue
+    }
+
+    private fun generateExecutionString(ID: Int, hour: Int, minute: Int): String {
+        if ((ID == R.id.fromTimePicker) || (ID == R.id.toTimePicker)) {
+            val c =
+                if (ID == R.id.fromTimePicker) '1' else '2' // time-setter-index 1 or 2 to identify the on or off time
+            val reserved =
+                "00"                             // reserved at the time, maybe use it later
+
+            return "C${a8BitValueToString(this.relatedElementID)}$c${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(
+                minute
+            )}$reserved$"
+        }
+        return "error$"
     }
 
     private fun notifyUser(message: String, colorID: Int){
         notificationTextView.setTextColor(getColor(colorID))
         notificationTextView.text = message
     }
-
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
