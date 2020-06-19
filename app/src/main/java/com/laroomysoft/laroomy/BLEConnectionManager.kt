@@ -390,8 +390,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                                     // report object ready
                                     callback.onDeviceReadyForCommunication()
-
-                                    //sendData(authenticationString)          // does not work - delay???
                                 }
                             }
                         }
@@ -1886,6 +1884,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // TODO: set the device time at another point! this breaks the complex state loop!!!
 
             //this.setDeviceTime()
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                this.setDeviceTime()
+            }, 1000)
+
         }
     }
 
@@ -2072,7 +2075,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             this.complexStateLoopActive = false
                             this.currentStateRetrievingIndex = -1
 
-                            this.setDeviceTime()
+                            //this.setDeviceTime()
                         }
 
 
@@ -2257,7 +2260,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         else {
             // if there are no complex types, the retrieving-process is finished here, so set the device time, otherwise it must be done at the end of the complex-state-loop
-            this.setDeviceTime()
+            //this.setDeviceTime()
         }
     }
 
@@ -2292,7 +2295,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
         val min = calendar.get(Calendar.MINUTE)
         val sec = calendar.get(Calendar.SECOND)
-        val outString = "Sct&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
+        val outString = "ScT&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
         Log.d("M:setDeviceTime", "Sending current local time to the device. Output Data is: $outString")
         this.sendData(outString)
     }
