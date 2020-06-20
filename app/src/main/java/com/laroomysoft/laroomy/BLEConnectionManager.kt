@@ -411,7 +411,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             //Log.d("M:CB:CharChanged", "Characteristic changed. Value: ${characteristic?.value}")
 
             // get data
-            val dataAsString = characteristic?.getStringValue(0)
+            var dataAsString = characteristic?.getStringValue(0)
+
+            // format data
+            dataAsString = formatIncomingData(dataAsString ?: "")
 
             // log (string)
             Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $dataAsString")
@@ -2303,6 +2306,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     fun doComplexPropertyStateRequestForID(ID: Int) {
         val str = a8BitValueToString(ID)
         this.sendData("D$str$")
+    }
+
+    fun formatIncomingData(data: String) : String {
+
+        var dOut = ""
+
+        data.forEach {
+            if((it != '\r') && (it != '\n')){
+                dOut += it
+            }
+        }
+        return dOut
     }
 
     private fun stopAllPendingLoopsAndResetParameter(){
