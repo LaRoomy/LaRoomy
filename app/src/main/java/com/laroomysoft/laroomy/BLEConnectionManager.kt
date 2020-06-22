@@ -413,8 +413,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // get data
             var dataAsString = characteristic?.getStringValue(0)
 
-            // format data
-            dataAsString = formatIncomingData(dataAsString ?: "")
+//            // format data
+//            dataAsString = formatIncomingData(dataAsString ?: "")
 
             // log (string)
             Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $dataAsString")
@@ -530,7 +530,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-    val authenticationString = "xPsM0-33wSp_mmT$"
+    private val authenticationString = "xPsM0-33wSp_mmT$"
     val authenticationResponse = "Auth:rsp:true"
     private val propertyLoopEndIndication = "RSP:A:PEND$"
     private val groupLoopEndIndication = "RSP:E:PGEND$"
@@ -2308,17 +2308,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData("D$str$")
     }
 
-    fun formatIncomingData(data: String) : String {
-
-        var dOut = ""
-
-        data.forEach {
-            if((it != '\r') && (it != '\n')){
-                dOut += it
-            }
-        }
-        return dOut
-    }
+//    fun formatIncomingData(data: String) : String {
+//
+//        var dOut = ""
+//
+//        data.forEach {
+//            if((it != '\r') && (it != '\n')){
+//                dOut += it
+//            }
+//        }
+//        return dOut
+//    }
 
     private fun stopAllPendingLoopsAndResetParameter(){
 
