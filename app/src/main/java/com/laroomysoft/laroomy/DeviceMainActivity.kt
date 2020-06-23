@@ -54,11 +54,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this@DeviceMainActivity,
                 this)
 
+        // TODO: test!
+        this.devicePropertyListViewAdapter.setHasStableIds(true)
+
         // bind the elements to the recycler
         this.devicePropertyListRecyclerView =
             findViewById<RecyclerView>(R.id.devicePropertyListView)
                 .apply {
-                    //setHasFixedSize(true)
+                    //setHasFixedSize(true)// this is not possible since the group and property elements have a different height
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
                 }
@@ -508,6 +511,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         private val callingActivity: DeviceMainActivity
     ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
 
+
+
         class DPLViewHolder(
             val linearLayout: LinearLayout)
             : RecyclerView.ViewHolder(linearLayout) {
@@ -714,6 +719,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         override fun getItemCount(): Int {
             return devicePropertyAdapter.size
+        }
+
+
+        // TODO: test this implementation!!!
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
+
+        override fun getItemViewType(position: Int): Int {
+            return position
         }
     }
 }
