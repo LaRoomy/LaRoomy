@@ -24,5 +24,7 @@
     <color name="TFS_ReachedColor">#222222</color>
     <color name="goldAccentColor">#F5CD06</color>
     <color name="grayAccentColor">#777777</color>
+    <color name="blackBackgroundColor">#000000</color>
+    <color name="clickableTextColor">#00C1F1</color>
 
 </resources>

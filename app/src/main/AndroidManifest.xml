@@ -18,8 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".AppHelpActivity">
+
+        </activity>
         <activity android:name=".TimeFrameSelectorActivity">
-            
+
         </activity>
         <activity android:name=".AppSettingsActivity" />
         <activity android:name=".InformationActivity" />

@@ -97,9 +97,11 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     }
 
     fun onHelpImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
-        val openUrl = Intent(ACTION_VIEW)
-        openUrl.data = Uri.parse("https://www.laroomy.de")
-        startActivity(openUrl)
+//        val openUrl = Intent(ACTION_VIEW)
+//        openUrl.data = Uri.parse("https://www.laroomy.de")
+//        startActivity(openUrl)
+        val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
+        startActivity(intent)
     }
 
     fun onInfoImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){

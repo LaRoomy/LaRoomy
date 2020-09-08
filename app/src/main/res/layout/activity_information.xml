@@ -1,22 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.laroomysoft.laroomy.InformationActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/infoActivityHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blackBackgroundColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/infoActivityHeaderImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/laroomy_icon_sq64"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoActivityHeaderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/InfoActivity_HeaderText"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:textColor="@color/goldAccentColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityHeaderImageView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/infoActivityHeaderSeparatorView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/separatorColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoActivityHeaderLayout" />
+
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/infoActivityAppDescriptionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/info_activity_placeholder"
-        android:textStyle="bold"
-        android:textSize="34sp"
+        android:layout_marginTop="20dp"
+        android:text="@string/InfoActivity_AppDescription"
+        android:textSize="22sp"
+        android:textColor="@color/goldAccentColor"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoActivityHeaderSeparatorView" />
 
-        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/infoActivityAppVersionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:textColor="@color/goldAccentColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoActivityAppDescriptionTextView" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/infoActivityCopyrightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/InfoActivity_CopyrightLaroomySoft"
+        android:textSize="20sp"
+        android:textColor="@color/goldAccentColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoActivityAppVersionTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/infoActivityRightsReservedTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/InfoActivity_AllRightsReserved"
+        android:textSize="20sp"
+        android:textColor="@color/goldAccentColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoActivityCopyrightTextView" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoActivityMailToTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/clickableTextColor"
+            android:textSize="20sp"
+            android:text="@string/InfoActivity_MailTo"
+            android:onClick="onMailToLinkClick"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityRightsReservedTextView"
+            />
+
+        <!--
+        TODO:
+            - privacy policy!
+            - terms of service??
+            - imprint!
+        -->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
