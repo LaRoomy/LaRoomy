@@ -45,6 +45,19 @@
     <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">All rights reserved</string>
     <string name="InfoActivity_MailTo">info@laroomy.de</string>
+    <string name="InfoActivity_PrivacyPolicyHeader">Privacy Policy</string>
+    <string name="InfoActivity_PrivacyPolicy_Text">Laroomy-Soft(Hans Philipp Zimmermann) built the LaRoomy app as a Free app. This SERVICE is provided by Hans Philipp Zimmermann at no cost and is intended for use as is.This page is used to inform users regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service. If you choose to use my Service, then you agree to the collection and use of information in relation to this policy.</string>
+    <string name="InfoActivity_PP_InformationCollectionAndUse_Header">Information Collection and Use</string>
+    <string name="InfoActivity_PP_InformationCollectionAndUse_Text">The app does not collect any personal data. But the app does use third party services that may collect information used to identify you. Link to privacy policy of third party service providers used by the app:</string>
+    <string name="InfoActivity_PP_ThirdPartyServiceLink_one">Google Play Services</string>
+    <string name="InfoActivity_PP_LogDataHeader">Log Data</string>
+    <string name="InfoActivity_PP_LogDataText">I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your device Internet Protocol (“IP”) address, device name, operating system version, the configuration of the app when utilizing my Service, the time and date of your use of the Service, and other statistics.</string>
+    <string name="InfoActivity_PP_LinksToOtherSitesHeader">Links to Other Sites</string>
+    <string name="InfoActivity_PP_LinksToOtherSitesText">This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</string>
+    <string name="InfoActivity_PP_ChangesToThisPrivacyPolicyHeader">Changes to This Privacy Policy</string>
+    <string name="InfoActivity_PP_ChangesToThisPrivacyPolicyText">I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new Privacy Policy on this page. This policy is effective as of 2020&#8211;09&#8211;09</string>
+    <string name="InfoActivity_PP_ContactUsHeader">Contact Us</string>
+    <string name="InfoActivity_PP_ContactUsText">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at info@laroomy.de.</string>
 
 
     <!-- Image content descriptions -->

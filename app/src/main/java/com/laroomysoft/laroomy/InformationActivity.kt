@@ -34,4 +34,10 @@ class InformationActivity : AppCompatActivity() {
         openUrl.data = Uri.parse("mailto:info@laroomy.de")
         startActivity(openUrl)
     }
+
+    fun onGooglePlayServiceLinkClick(@Suppress("UNUSED_PARAMETER") view: View){
+        val openUrl = Intent(ACTION_VIEW)
+        openUrl.data = Uri.parse("https://policies.google.com/terms")
+        startActivity(openUrl)
+    }
 }
