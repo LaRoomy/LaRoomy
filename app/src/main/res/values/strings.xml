@@ -59,6 +59,13 @@
     <string name="InfoActivity_PP_ContactUsHeader">Contact Us</string>
     <string name="InfoActivity_PP_ContactUsText">If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at info@laroomy.de.</string>
 
+    <string name="SetupActivity_Header">Settings</string>
+    <string name="SetupActivity_AutoConnectElementText">Auto-Connect</string>
+    <string name="SetupActivity_AutoConnectHint">If auto-connect is set up, the app will try to connect to the last device on startup. If only one device is available, the app connects automatically to this device.</string>
+    <string name="SetupActivity_DeviceBindingElementText">Use Device-Binding</string>
+    <string name="SetupActivity_DeviceBindingHint">If device binding is switched on, only devices with the correct binding-code are able to connect to the device.</string>
+
+    <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
@@ -67,7 +74,7 @@
     <string name="DeviceInfoSubHeaderImageDescription">Image for the additional device info</string>
     <string name="DevicePropertyListElementImageDescription">Image for the appropriate device property</string>
     <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>
-    <string name="DeviceReConnectImageButtonDescription">ImageButton to reconnect the device</string>
+    <string name="DeviceReConnectImageButtonDescription">ImageButton to open the device-settings</string>
     <string name="BackImageButtonDescription">Button with the purpose to navigate back to the deviceMainActivity</string>
     <string name="InformationImageDescription">Button to open the info-activity</string>
     <string name="SettingsImageDescription">Button to open the main-settings-activity</string>

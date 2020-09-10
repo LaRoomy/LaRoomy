@@ -108,7 +108,7 @@
 
                 app:srcCompat="@drawable/nav_arrow_right" />
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/elementSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

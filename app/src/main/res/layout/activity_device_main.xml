@@ -23,6 +23,7 @@
             android:layout_margin="15dp"
             android:contentDescription="@string/DeviceTypeHeaderImageDescription"
             android:src="@drawable/laroomy_icon_sq64"
+            android:onClick="onReconnectDevice"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -73,15 +74,15 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/deviceReConnectButton"
+            android:id="@+id/deviceSettingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/DeviceReConnectImageButtonDescription"
-            android:onClick="onReconnectDeviceButtonClick"
+            android:onClick="onDeviceSettingsButtonClick"
 
-            android:src="@drawable/reload_turnright_white24"
+            android:src="@drawable/settings_white_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

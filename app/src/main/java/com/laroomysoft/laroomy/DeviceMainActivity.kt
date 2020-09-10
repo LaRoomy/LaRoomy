@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
@@ -237,7 +238,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onPropertyElementSwitchClick(
         index: Int,
         devicePropertyListContentInformation: DevicePropertyListContentInformation,
-        switch: Switch
+        switch: SwitchCompat
     ) {
         Log.d("M:CB:onPropSwitchClk", "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
                 "Type: ${devicePropertyListContentInformation.propertyType}\n" +
@@ -359,7 +360,22 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         finish()
     }
 
-    fun onReconnectDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+    fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+        // re-connect
+        // confirm device-properties???
+        // re-connect and re-new the device-properties???
+        //ApplicationProperty.bluetoothConnectionManger.close()
+        //ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+
+
+        // prevent the normal "onPause" execution
+        (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+        // navigate to the device settings activity..
+        val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun onReconnectDevice(@Suppress("UNUSED_PARAMETER")view: View){
         // re-connect
         // confirm device-properties???
         // re-connect and re-new the device-properties???
@@ -367,6 +383,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         ApplicationProperty.bluetoothConnectionManger.close()
         ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+
     }
 
 
@@ -474,7 +491,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
                 PROPERTY_TYPE_SWITCH -> {
                     val switch =
-                        linearLayout?.findViewById<Switch>(R.id.elementSwitch)
+                        linearLayout?.findViewById<SwitchCompat>(R.id.elementSwitch)
                     switch?.isChecked = (newState != 0)
                 }
                 PROPERTY_TYPE_LEVEL_SELECTOR -> {
@@ -622,7 +639,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                         PROPERTY_TYPE_SWITCH -> {
                             // get the switch
-                            val switch = holder.linearLayout.findViewById<Switch>(R.id.elementSwitch)
+                            val switch = holder.linearLayout.findViewById<SwitchCompat>(R.id.elementSwitch)
                             // show the switch
                             switch.visibility = View.VISIBLE
                             // set the onClick handler

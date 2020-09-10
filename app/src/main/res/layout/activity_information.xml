@@ -406,6 +406,7 @@
                 android:layout_marginTop="10dp"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
+                android:paddingBottom="50dp"
                 android:textAlignment="center"
                 android:textColor="@color/goldAccentColor"
                 android:lineSpacingExtra="4dp"

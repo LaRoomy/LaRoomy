@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Switch
+import androidx.appcompat.widget.SwitchCompat
 import java.util.*
 
 const val ERROR_MESSAGE = 0
@@ -208,7 +209,7 @@ interface OnItemClickListener {
 interface OnPropertyClickListener {
     //fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation)
     fun onPropertyElementButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
-    fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation, switch: Switch)
+    fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation, switch: SwitchCompat)
     fun onSeekBarPositionChange(index: Int, newValue: Int, changeType: Int)
     fun onNavigatableElementClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
 }
