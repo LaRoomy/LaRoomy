@@ -102,7 +102,21 @@ class ApplicationProperty : Application() {
         }
     }
 
+    fun saveBooleanData(value: Boolean, fileKeyID: Int, dataKeyID: Int){
+        val stringValue = when(value){
+            true -> "true"
+            else -> "false"
+        }
+        this.saveStringData(stringValue, fileKeyID, dataKeyID)
+    }
 
+    fun loadBooleanData(fileKeyID: Int, dataKeyID: Int): Boolean{
+        return when(this.loadSavedStringData(fileKeyID, dataKeyID)){
+            "true" -> true
+            "false" -> false
+            else -> false
+        }
+    }
 }
 
 fun resourceIdForImageId(imageID: Int): Int {

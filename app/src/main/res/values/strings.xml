@@ -64,6 +64,7 @@
     <string name="SetupActivity_AutoConnectHint">If auto-connect is set up, the app will try to connect to the last device on startup. If only one device is available, the app connects automatically to this device.</string>
     <string name="SetupActivity_DeviceBindingElementText">Use Device-Binding</string>
     <string name="SetupActivity_DeviceBindingHint">If device binding is switched on, only devices with the correct binding-code are able to connect to the device.</string>
+    <string name="SetupActivity_BindingCodeDescriptor">Binding-Code</string>
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
 
@@ -87,9 +88,12 @@
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData">fileKeyBluetoothManagerData</string>
+    <string name="FileKey_AppSettings">fileKeyApplicationSettingsData</string>
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
+    <string name="DataKey_UseDeviceBinding">useDeviceBindingValue</string>
+    <string name="DataKey_AutoConnect">autoConnectValue</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
@@ -101,4 +105,5 @@
     <string name="RGBPageColorSelectionInformation">Selected Color: </string>
     <string name="info_activity_placeholder">Info Activity</string>
     <string name="app_settings">App-Settings</string>
+    <string name="binding_code_placeholder">h5G+s-%gt</string>
 </resources>

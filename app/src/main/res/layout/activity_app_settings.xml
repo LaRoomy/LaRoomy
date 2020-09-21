@@ -123,4 +123,63 @@
         app:layout_constraintTop_toBottomOf="@id/setupActivityDeviceBindingContainer"
         />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/setupActivityBindingCodeContainer"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:maxWidth="400dp"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintTop_toBottomOf="@id/setupActivityDeviceBindingHintTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+
+        <!-- This container must be hidden if the device-binding is switched off! -->
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/setupActivityBindingCodeDescriptorTextView"
+            android:text="@string/SetupActivity_BindingCodeDescriptor"
+            android:textSize="22sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:id="@+id/setupActivityBindingCodeBox"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="30dp"
+            android:textSize="20sp"
+            android:inputType="textPassword"
+            android:text="@string/binding_code_placeholder"
+            android:textAlignment="textStart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/setupActivityBindingCodeDescriptorTextView"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/setupActivityBindingCodeVisibilityButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/eye_show"
+            android:background="@color/transparentViewColor"
+            android:onClick="onPasswordViewModeButtonClick"
+            app:layout_constraintBottom_toBottomOf="parent"
+
+            app:layout_constraintEnd_toEndOf="@id/setupActivityBindingCodeBox"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
