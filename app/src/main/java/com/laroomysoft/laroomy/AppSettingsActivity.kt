@@ -9,6 +9,7 @@ import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 
 class AppSettingsActivity : AppCompatActivity() {
@@ -30,12 +31,27 @@ class AppSettingsActivity : AppCompatActivity() {
                 (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_AutoConnect)
             this.isChecked = state
         }
-        this.useDeviceBindingSwitch = findViewById(R.id.setupActivityDeviceBindingSwitch)
+        this.useDeviceBindingSwitch = findViewById<SwitchCompat>(R.id.setupActivityDeviceBindingSwitch).apply{
+            val state =
+                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseDeviceBinding)
+            this.isChecked = state
+
+            // if the device binding is active, show the password-edit container
+            if(state){
+                findViewById<ConstraintLayout>(R.id.setupActivityBindingCodeContainer).visibility = View.VISIBLE
+            }
+        }
 
         // add on change listener to the password-box
         this.passwordBox.addTextChangedListener {
 
-            // TODO: save the password!
+            // TODO: test if the editable <> string conversion works!!!!!!!!!!!!
+
+            if(passwordBox.text.isNotEmpty()){
+                (applicationContext as ApplicationProperty).saveStringData(passwordBox.text.toString(), R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
+            } else {
+                (applicationContext as ApplicationProperty).deleteData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
+            }
         }
 
         // add the listener for the switches

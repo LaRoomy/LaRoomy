@@ -117,6 +117,20 @@ class ApplicationProperty : Application() {
             else -> false
         }
     }
+
+    fun deleteData(fileKeyID: Int, dataKeyID: Int) {
+        val sharedPref =
+            getSharedPreferences(
+                getString(fileKeyID),
+                Context.MODE_PRIVATE
+            )
+        with(sharedPref.edit()) {
+            remove(
+                getString(dataKeyID)
+            )
+            commit()
+        }
+    }
 }
 
 fun resourceIdForImageId(imageID: Int): Int {

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Switch
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import com.ramotion.fluidslider.FluidSlider
 
 class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
@@ -14,7 +15,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     var relatedGlobalElementIndex = -1
     var currentLevel = 0
 
-    lateinit var onOffSwitch: Switch
+    lateinit var onOffSwitch: SwitchCompat
     lateinit var fluidLevelSlider: FluidSlider
     lateinit var notificationTextView: TextView
 

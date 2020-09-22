@@ -130,6 +130,9 @@
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         android:maxWidth="400dp"
+
+        android:visibility="gone"
+
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintTop_toBottomOf="@id/setupActivityDeviceBindingHintTextView"
         app:layout_constraintStart_toStartOf="parent"

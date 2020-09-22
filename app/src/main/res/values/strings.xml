@@ -67,6 +67,8 @@
     <string name="SetupActivity_BindingCodeDescriptor">Binding-Code</string>
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
+    <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
+    <string name="DeviceSettingsActivity_UserInfo_Disconnected">Device Disconnected</string>
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
@@ -94,6 +96,7 @@
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
     <string name="DataKey_UseDeviceBinding">useDeviceBindingValue</string>
     <string name="DataKey_AutoConnect">autoConnectValue</string>
+    <string name="DataKey_BindingPasskey">bindingPasskey</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
