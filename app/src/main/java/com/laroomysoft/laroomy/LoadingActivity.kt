@@ -11,7 +11,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     private var isLastConnectedDevice = false
     private var connectionAttemptCounter = 0
-    //private var authenticationAttemtCounter = 0
+    //private var authenticationAttemptCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +86,18 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         //MainActivity.main.finish()
     }
 
+    override fun onBindingPasskeyRejected() {
+        super.onBindingPasskeyRejected()
+        // binding was rejected from the remote device due to an invalid passkey
+        setErrorText(getString(R.string.CA_BindingPasskeyRejected))
+        // stop connection process
+        ApplicationProperty.bluetoothConnectionManger.clear()
+        // navigate back with delay !?
+        Handler(Looper.getMainLooper()).postDelayed({
+            finish()
+        }, 4000)
+    }
+
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
 
@@ -111,7 +123,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onConnectionAttemptFailed(message)
         setErrorText(message)
         // navigate back with delay
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             // TODO: check if this works
             finish()
         },2000)

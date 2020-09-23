@@ -9,13 +9,9 @@ import android.bluetooth.le.ScanResult
 import android.os.*
 import android.util.Log
 import android.widget.SeekBar
-import androidx.annotation.RequiresApi
 import java.io.Serializable
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.time.hours
-import kotlin.time.minutes
 
 private const val MAX_CONNECTION_ATTEMPTS = 10
 
@@ -411,7 +407,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             //Log.d("M:CB:CharChanged", "Characteristic changed. Value: ${characteristic?.value}")
 
             // get data
-            var dataAsString = characteristic?.getStringValue(0)
+            val dataAsString = characteristic?.getStringValue(0)
 
 //            // format data
 //            dataAsString = formatIncomingData(dataAsString ?: "")
@@ -424,16 +420,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 Log.d("M:CB:CharChanged", "Data Received - Authentication Required")
 
-                if(dataAsString == authenticationResponse){
-                    Log.d("M:CB:CharChanged", "Data Received - Authentication successful - Device ID confirmed")
-                    authRequired = false
-                    authenticationSuccess = true
-                    // save the device address (but only if the authentication was successful)
-                    saveLastSuccessfulConnectedDeviceAddress(gatt?.device?.address ?: "")
-                    callback.onAuthenticationSuccessful()
+                when(dataAsString){
+                    authenticationResponse -> {
+                        Log.d("M:CB:CharChanged", "Data Received - Authentication successful - Device ID confirmed")
+                        authRequired = false
+                        authenticationSuccess = true
+                        // save the device address (but only if the authentication was successful)
+                        saveLastSuccessfulConnectedDeviceAddress(gatt?.device?.address ?: "")
+                        callback.onAuthenticationSuccessful()
+                    }
+                    authenticationResponseBindingPasskeyRequired -> {
+                        Log.d("M:CB:CharChanged", "Data Received - Authentication - Device ID confirmed - additional binding is required")
+                        Log.d("M:CB:CharChanged", "Data Received - Authentication - Send Binding information")
+                        isBindingRequired = true
+                        // send the passkey to proceed
+                        sendBindingRequest()
+                    }
+                    authenticationResponseBindingPasskeyInvalid -> {
+                        Log.e("M:CB:CharChanged", "Data Received - Authentication - Passkey rejected from device - PASSKEY INVALID")
+                        // raise event
+                        callback.onBindingPasskeyRejected()
+                    }
+                    else -> Log.d("M:CB:CharChanged", "!Warning: Authentication failed! Unexpected Authentication Token")
                 }
-                else
-                    Log.d("M:CB:CharChanged", "!Warning: Authentication failed!")
             }
             else {
                 var dataProcessed = checkDeviceNotificationEvent(dataAsString ?: "error")
@@ -532,6 +541,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     private val authenticationString = "xPsM0-33wSp_mmT$"
     val authenticationResponse = "Auth:rsp:true"
+    val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"
+    val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"
     private val propertyLoopEndIndication = "RSP:A:PEND$"
     private val groupLoopEndIndication = "RSP:E:PGEND$"
     private val complexDataStateTransmissionEntry = "PSC"
@@ -545,6 +556,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var isConnected:Boolean = false
         private set
     var authenticationSuccess = false
+        private set
+    var isBindingRequired = false
         private set
 
     private var authRequired = true
@@ -2308,6 +2321,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData("D$str$")
     }
 
+    fun sendBindingRequest(){
+        val passkey =
+            (applicationProperty.loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey))
+        this.sendData("r$passkey>$")
+    }
+
 //    fun formatIncomingData(data: String) : String {
 //
 //        var dOut = ""
@@ -2355,6 +2374,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onDataSent(data: String?){}
         fun onComponentError(message: String){}
         fun onAuthenticationSuccessful(){}
+        fun onBindingPasskeyRejected(){}
         fun onDeviceReadyForCommunication(){}
     }
 

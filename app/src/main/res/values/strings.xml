@@ -8,6 +8,7 @@
     <string name="CA_Connected">Connected</string>
     <string name="CA_Authenticate">Authenticate..</string>
     <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
+    <string name="CA_BindingPasskeyRejected">Wrong binding-passkey: connection rejected</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
@@ -63,12 +64,16 @@
     <string name="SetupActivity_AutoConnectElementText">Auto-Connect</string>
     <string name="SetupActivity_AutoConnectHint">If auto-connect is set up, the app will try to connect to the last device on startup. If only one device is available, the app connects automatically to this device.</string>
     <string name="SetupActivity_DeviceBindingElementText">Use Device-Binding</string>
-    <string name="SetupActivity_DeviceBindingHint">If device binding is switched on, only devices with the correct binding-code are able to connect to the device.</string>
+    <string name="SetupActivity_DeviceBindingHint">Device-Binding must be switched on to connect to remote devices which require a binding passkey. The entered passkey must match the key of the remote device.</string>
     <string name="SetupActivity_BindingCodeDescriptor">Binding-Code</string>
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Device Disconnected</string>
+    <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Enable Binding</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHint">If you enable device binding, the binding-code defined in the app-settings will be written to the remote Laroomy device. After that, a connection to the device will only be accepted if the correct binding-code is set up and the binding is activated in the app settings.</string>
+    <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Factory Reset</string>
+    <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>

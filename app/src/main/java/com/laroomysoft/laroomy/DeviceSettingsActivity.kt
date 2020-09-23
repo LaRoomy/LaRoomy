@@ -4,12 +4,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.widget.TextViewCompat
 
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var mustReconnect = false
     lateinit var userNotificationTextView: AppCompatTextView
+    lateinit var bindingSwitch: SwitchCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +23,22 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
         // get the necessary views
         userNotificationTextView = findViewById(R.id.deviceSettingsActivityUserNotificationTextView)
+        bindingSwitch = findViewById(R.id.deviceSettingsActivityBindingSwitch)
+
+        // set the initial settings
+        bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManger.isBindingRequired
 
         // set the connection-state info
         when(ApplicationProperty.bluetoothConnectionManger.isConnected){
             true -> notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
             else -> notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
+        }
+
+        // set up event-handler for controls
+        bindingSwitch.setOnCheckedChangeListener { _, isChecked ->
+
+            // TODO: create device binding + transmit binding code!
+
         }
     }
 
