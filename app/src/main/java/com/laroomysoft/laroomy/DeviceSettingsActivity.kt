@@ -1,8 +1,11 @@
 package com.laroomysoft.laroomy
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.widget.TextViewCompat
@@ -37,7 +40,21 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         // set up event-handler for controls
         bindingSwitch.setOnCheckedChangeListener { _, isChecked ->
 
-            // TODO: create device binding + transmit binding code!
+            // create/release device binding
+
+            when(isChecked){
+                true -> {
+                    // enable the device binding
+                    val passkey =
+                        (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
+
+                    ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
+                }
+                else -> {
+                    // release the device binding
+                    ApplicationProperty.bluetoothConnectionManger.sendData("SrB>$")
+                }
+            }
 
         }
     }
@@ -79,6 +96,27 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private fun notifyUser(message: String, colorID: Int){
         userNotificationTextView.setTextColor(getColor(colorID))
         userNotificationTextView.text = message
+    }
+
+    fun onFactoryResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+        factoryResetAlertDialog()
+    }
+
+    private fun factoryResetAlertDialog(){
+        val dialog = AlertDialog.Builder(this)
+        dialog.setMessage(R.string.DeviceSettingsActivity_FactoryResetConfirmationMessage)
+        dialog.setTitle(R.string.DeviceSettingsActivity_FactoryResetButtonDescriptorText)
+        dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+            // send factory reset command
+            ApplicationProperty.bluetoothConnectionManger.sendData("SfR=$")
+            dialogInterface.dismiss()
+        }
+        dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
+            // cancel action
+            dialogInterface.dismiss()
+        }
+        dialog.create()
+        dialog.show()
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

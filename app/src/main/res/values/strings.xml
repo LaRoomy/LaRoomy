@@ -38,6 +38,8 @@
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>
+    <string name="GeneralString_OK">OK</string>
+    <string name="GeneralString_Cancel">Cancel</string>
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamic Remote Control</string>
@@ -74,6 +76,7 @@
     <string name="DeviceSettingsActivity_BindingPurposeHint">If you enable device binding, the binding-code defined in the app-settings will be written to the remote Laroomy device. After that, a connection to the device will only be accepted if the correct binding-code is set up and the binding is activated in the app settings.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Factory Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
+    <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">The remote device will be restored to the default configuration. Are you sure?</string>
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>

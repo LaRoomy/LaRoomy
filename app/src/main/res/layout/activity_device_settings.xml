@@ -131,6 +131,7 @@
                 android:text="@string/DeviceSettingsActivity_FactoryResetButtonText"
                 android:textSize="20sp"
                 android:layout_marginEnd="20dp"
+                android:onClick="onFactoryResetButtonClick"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
