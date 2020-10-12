@@ -406,7 +406,7 @@
                 android:layout_marginTop="10dp"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:paddingBottom="50dp"
+                android:paddingBottom="30dp"
                 android:textAlignment="center"
                 android:textColor="@color/goldAccentColor"
                 android:lineSpacingExtra="4dp"
@@ -418,6 +418,194 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/infoActivityNinthSeparator"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityPrivacyPolicyContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/infoActivityTenthSeparator"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityNinthSeparator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/infoActivityTermsOfServiceContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityTenthSeparator"
+            >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceHeaderTextView"
+                android:textSize="22sp"
+                android:text="@string/InfoActivity_TS_HeaderText"
+                android:layout_marginTop="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/goldAccentColor"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceContentTextView"
+                android:textSize="18sp"
+                android:text="@string/InfoActivity_TS_FirstChapter"
+                android:layout_marginTop="10dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:textAlignment="center"
+                android:textColor="@color/goldAccentColor"
+                android:lineSpacingExtra="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceHeaderTextView"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/infoActivityGooglePlayServicesLinkNo2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/clickableTextColor"
+                android:textSize="18sp"
+                android:text="@string/InfoActivity_PP_ThirdPartyServiceLink_one"
+                android:onClick="onGooglePlayServiceLinkClick"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceContentTextView"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceContent2TextView"
+                android:textSize="18sp"
+                android:text="@string/InfoActivity_TS_SecondChapter"
+                android:layout_marginTop="10dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:textAlignment="center"
+                android:textColor="@color/goldAccentColor"
+                android:lineSpacingExtra="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityGooglePlayServicesLinkNo2"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:id="@+id/infoActivityEleventhSeparator"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:background="@color/separatorColor"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceContent2TextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceChangesHeaderTextView"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="@string/InfoActivity_TS_ChangesToThisTermsHeaderText"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/goldAccentColor"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityEleventhSeparator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceChangesContentTextView"
+                android:textSize="18sp"
+                android:text="@string/InfoActivity_TS_ChangesToThisTermsContentText"
+                android:layout_marginTop="10dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:textAlignment="center"
+                android:textColor="@color/goldAccentColor"
+                android:lineSpacingExtra="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceChangesHeaderTextView"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:id="@+id/infoActivityTwelfthSeparator"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:background="@color/separatorColor"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceChangesContentTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceContactHeaderTextView"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="@string/InfoActivity_TS_ContactHeaderText"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/goldAccentColor"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTwelfthSeparator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoActivityTermsOfServiceContactContentTextView"
+                android:textSize="18sp"
+                android:text="@string/InfoActivity_TS_ContactContentText"
+                android:layout_marginTop="10dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="50dp"
+                android:textAlignment="center"
+                android:textColor="@color/goldAccentColor"
+                android:lineSpacingExtra="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceContactHeaderTextView"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <!--
         TODO:
             - privacy policy!
