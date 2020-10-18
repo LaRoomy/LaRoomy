@@ -14,6 +14,6 @@ class AppHelpActivity : AppCompatActivity() {
 
         this.helpWebView = findViewById(R.id.helpWebView)
         // TODO: change the url to the help-page of the laroomy-website
-        this.helpWebView.loadUrl("https://wwww.laroomy.de")
+        this.helpWebView.loadUrl("https://www.laroomy.de")
     }
 }

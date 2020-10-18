@@ -94,8 +94,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     }
 
     private fun notifyUser(message: String, colorID: Int){
-        userNotificationTextView.setTextColor(getColor(colorID))
-        userNotificationTextView.text = message
+        runOnUiThread {
+            userNotificationTextView.setTextColor(getColor(colorID))
+            userNotificationTextView.text = message
+        }
     }
 
     fun onFactoryResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View){

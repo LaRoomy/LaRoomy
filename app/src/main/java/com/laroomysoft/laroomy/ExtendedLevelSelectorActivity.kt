@@ -45,7 +45,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // get the uiElements and set the initial values
         this.onOffSwitch = findViewById(R.id.elsSwitch)
         this.onOffSwitch.setOnClickListener{
-            Log.d("M:ELS:onOffSwitchClick", "On/Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
+            Log.d("M:ELS:onOffSwitchClick", "On/Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}")
             onOffSwitchClicked()
         }
         this.onOffSwitch.isChecked = exLevelState.onOffState
