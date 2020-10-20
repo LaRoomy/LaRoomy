@@ -1,15 +1,14 @@
 package com.laroomysoft.laroomy
 
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -42,7 +41,41 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
                     setHasFixedSize(true)
                     layoutManager = availableDevicesViewManager
                     adapter = availableDevicesViewAdapter
+                }
+
+        // schedule the auto-connect process if required
+        if ((applicationContext as ApplicationProperty).loadBooleanData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_AutoConnect
+            )
+        ) {
+            // check if there are more than one bonded device
+            when (this.availableDevices.size) {
+                0 -> {
+                    // do nothing
+                }
+                1 -> {
+                    // there is only one available device -> connect to it!
+                    Handler().postDelayed({
+                    val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+                    intent.putExtra("BondedDeviceIndex", 0)
+                    startActivity(intent)
+                    }, 1000)
+                }
+                else -> {
+                    // try to connect to the last successful connected device
+                    if (ApplicationProperty.bluetoothConnectionManger.isLastAddressValid) {
+                        Handler().postDelayed({
+                            // move forward with delay...!
+                            val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+                            intent.putExtra("BondedDeviceIndex", -2)// -2 means: connect to the last device
+                            startActivity(intent)
+
+                        }, 1000)
+                    }
+                }
             }
+        }
     }
 
 //    override fun onStart() {

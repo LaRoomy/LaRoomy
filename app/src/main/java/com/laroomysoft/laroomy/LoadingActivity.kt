@@ -20,21 +20,45 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@LoadingActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
-        val index = this.intent.getIntExtra("BondedDeviceIndex", -1)
-        if(index != -1){
-
-            // TODO: make this in the property activity !!!!
-
-            val adr =
-                ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
-
-            if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
-                isLastConnectedDevice = true
+        when(val index = this.intent.getIntExtra("BondedDeviceIndex", -1)){
+            -1 -> {
+                // error state
             }
+            -2 -> {
+                // connect to last device
+                isLastConnectedDevice = true
+                ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                setProgressText(getString(R.string.CA_Connecting))
+            }
+            else -> {
+                // connect to device from list a index
+                val adr =
+                    ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
 
-            ApplicationProperty.bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
-            setProgressText(getString(R.string.CA_Connecting))
+                if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
+                    isLastConnectedDevice = true
+                }
+
+                ApplicationProperty.bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
+                setProgressText(getString(R.string.CA_Connecting))
+            }
         }
+
+
+//        if(index != -1){
+//
+//            // TODO: make this in the property activity !!!!
+//
+//            val adr =
+//                ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
+//
+//            if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
+//                isLastConnectedDevice = true
+//            }
+//
+//            ApplicationProperty.bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
+//            setProgressText(getString(R.string.CA_Connecting))
+//        }
     }
 
     override fun onBackPressed() {

@@ -603,6 +603,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val isUIDataReady: Boolean
     get() = this.dataReadyToShow
 
+    val isLastAddressValid: Boolean
+    get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
+
+
     private val requestEnableBT: Int = 13
 
     private var propertyDetailChangedOnConfirmation = false
