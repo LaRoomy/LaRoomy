@@ -19,6 +19,6 @@ class AppHelpActivity : AppCompatActivity() {
         this.helpWebView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 
         // TODO: change the url to the help-page of the laroomy-website
-        this.helpWebView.loadUrl("https://www.laroomy.de")
+        this.helpWebView.loadUrl("https://laroomy.de")
     }
 }

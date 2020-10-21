@@ -18,6 +18,7 @@ class AppSettingsActivity : AppCompatActivity() {
     lateinit var passwordViewModeButton: AppCompatImageButton
     lateinit var useDeviceBindingSwitch: SwitchCompat
     lateinit var autoConnectSwitch: SwitchCompat
+    lateinit var passwordContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +27,8 @@ class AppSettingsActivity : AppCompatActivity() {
         // get the views
         this.passwordBox = findViewById(R.id.setupActivityBindingCodeBox)
         this.passwordViewModeButton = findViewById(R.id.setupActivityBindingCodeVisibilityButton)
+        this.passwordContainer = findViewById(R.id.setupActivityBindingCodeContainer)
+
         this.autoConnectSwitch = findViewById<SwitchCompat>(R.id.setupActivityAutoConnectSwitch).apply{
             val state =
                 (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_AutoConnect)
@@ -38,7 +41,7 @@ class AppSettingsActivity : AppCompatActivity() {
 
             // if the device binding is active, show the password-edit container
             if(state){
-                findViewById<ConstraintLayout>(R.id.setupActivityBindingCodeContainer).visibility = View.VISIBLE
+                passwordContainer.visibility = View.VISIBLE
             }
         }
 
@@ -62,6 +65,11 @@ class AppSettingsActivity : AppCompatActivity() {
         this.useDeviceBindingSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_UseDeviceBinding)
+
+            when(b){
+                true -> passwordContainer.visibility = View.VISIBLE
+                else -> passwordContainer.visibility = View.GONE
+            }
         }
     }
 

@@ -158,7 +158,7 @@
                 android:inputType="textPassword"
                 android:text="@string/binding_code_placeholder"
                 android:textAlignment="textStart"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityBindingCodeDescriptorTextView"
