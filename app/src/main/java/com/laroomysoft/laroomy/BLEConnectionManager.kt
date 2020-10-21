@@ -656,12 +656,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun getLastConnectedDeviceAddress() : String {
-//        val sharedPref = callingActivity.getSharedPreferences(
-//            callingActivity.getString(R.string.FileKey_BLEManagerData),
-//            Context.MODE_PRIVATE)
-//        val address = sharedPref.getString(
-//            callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
-//            "not found")
 
         val address =
             this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
@@ -763,7 +757,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.currentDevice = this.bondedList?.elementAt(index)
     }
 
-    val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
+    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
         this.bleAdapter?.bondedDevices
     }
 
@@ -771,8 +765,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     get() {
         field.clear()
         this.bleAdapter?.bondedDevices?.forEach {
-            //if(it.uuids.elementAt(0).equals(this.serviceUUID) && (it.name.startsWith("LaRoomy")))
-            if(it.name.startsWith("Laroomy"))
+            // It is not possible to get the uuids from the device here
+            // -> so the name must be the criteria to identify a laroomy device!
+            if(it.name.startsWith("Laroomy") || it.name.contains("LRY", false))
             {
                 val device = LaRoomyDevicePresentationModel()
                 device.name = it.name
@@ -822,25 +817,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun saveLastSuccessfulConnectedDeviceAddress(address: String){
-
         Log.d("M:SaveAddress", "Saving address of successful connected device - address: $address")
-
         this.applicationProperty.saveStringData(address, R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
-
-//        if(address.isNotEmpty()) {
-//            val sharedPref =
-//                this.callingActivity.getSharedPreferences(
-//                    this.callingActivity.getString(R.string.FileKey_BLEManagerData),
-//                    Context.MODE_PRIVATE
-//                )
-//            with(sharedPref.edit()) {
-//                putString(
-//                    callingActivity.getString(R.string.DataKey_LastSuccessfulConnectedDeviceAddress),
-//                    address
-//                )
-//                commit()
-//            }
-//        }
     }
 
     fun startDevicePropertyListing(){

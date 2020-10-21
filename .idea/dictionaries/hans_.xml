@@ -3,6 +3,7 @@
     <words>
       <w>croller</w>
       <w>helpcircle</w>
+      <w>laroomydevicetype</w>
       <w>laroomysoft</w>
       <w>navigatable</w>
       <w>nosensor</w>
@@ -12,6 +13,7 @@
       <w>toright</w>
       <w>turnleft</w>
       <w>turnright</w>
+      <w>uuids</w>
       <w>zimmermann</w>
     </words>
   </dictionary>
