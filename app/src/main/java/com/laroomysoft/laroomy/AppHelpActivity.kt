@@ -1,8 +1,10 @@
 package com.laroomysoft.laroomy
 
 import android.os.Bundle
+import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 
 class AppHelpActivity : AppCompatActivity() {
@@ -14,6 +16,16 @@ class AppHelpActivity : AppCompatActivity() {
         setContentView(R.layout.activity_app_help)
 
         this.helpWebView = findViewById(R.id.helpWebView)
+
+        // set web-view client
+        this.helpWebView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                return false
+            }
+        }
 
         // set cache mode
         this.helpWebView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK

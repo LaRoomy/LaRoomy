@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.TextView
 
 class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
@@ -23,6 +24,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         when(val index = this.intent.getIntExtra("BondedDeviceIndex", -1)){
             -1 -> {
                 // error state
+                Log.e("M:LoadingAct::onCreate", "The given DeviceListIndex is -ErrorState- (-1)")
+
+                // TODO: Notify user? Navigate back? With delay?
+
             }
             -2 -> {
                 // connect to last device
@@ -31,7 +36,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 setProgressText(getString(R.string.CA_Connecting))
             }
             else -> {
-                // connect to device from list a index
+                // connect to device from list at index
                 val adr =
                     ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
 
@@ -124,9 +129,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-
+        Log.d("M:CB:ConStateChange", "Connection State changed in Loading Activity: new State: $state")
         if(connectionAttemptCounter <= 4) {
             if (!state) {
+                Log.e("M:CB:ConStateChange", "Disconnected in Loading Activity - try to reconnect - Attempt-Counter is: $connectionAttemptCounter")
                 // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
                 connectionAttemptCounter++
                 // clear the bluetoothManager
@@ -145,6 +151,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+        Log.e("M:CB:ConAttemptFail", "Error - Connection Failed in Loading Activity")
         setErrorText(message)
         // navigate back with delay
         Handler(Looper.getMainLooper()).postDelayed({
@@ -165,12 +172,15 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
                 // check the authentication with delay an try again if it is false
                 Handler(Looper.getMainLooper()).postDelayed({
+
+                    // TODO: maybe check here if the device is disconnected and try to reconnect
+
                     if(!ApplicationProperty.bluetoothConnectionManger.authenticationSuccess){
                         //authenticationAttemptCounter++
                         ApplicationProperty.bluetoothConnectionManger.authenticate()
                         //sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
                     }
-                },1000)
+                },1500)
                 
                 // notify User:
                 setProgressText(getString(R.string.CA_Authenticate))
