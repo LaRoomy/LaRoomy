@@ -305,6 +305,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     private fun notifyUser(message: String, colorID: Int){
+
+        // TODO: execute in ui-thread!!!
+
         val textView = findViewById<TextView>(R.id.rgbUserNotificationTextView)
         textView.text = message
         textView.setTextColor(getColor(colorID))
