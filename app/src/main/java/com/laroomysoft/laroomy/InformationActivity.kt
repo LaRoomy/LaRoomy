@@ -19,7 +19,7 @@ class InformationActivity : AppCompatActivity() {
         val pInfo =
             packageManager.getPackageInfo(packageName, 0)
 
-        val versionString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+        @Suppress("DEPRECATION") val versionString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             "${getString(R.string.InfoActivity_AppVersionEntry)}${pInfo.longVersionCode}"
         } else {
             "${getString(R.string.InfoActivity_AppVersionEntry)}${pInfo.versionCode}"

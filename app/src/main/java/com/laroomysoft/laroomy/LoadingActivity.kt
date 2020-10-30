@@ -166,7 +166,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         runOnUiThread {
             setProgressText(getString(R.string.CA_Connected))
             // send authentication request
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 ApplicationProperty.bluetoothConnectionManger.authenticate()
                 //sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
 

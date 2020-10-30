@@ -540,6 +540,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     private val authenticationString = "xPsM0-33wSp_mmT$"
+    private val testCommand = "vXtest385_26$"
     val authenticationResponse = "Auth:rsp:true"
     val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"
     val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"
@@ -558,6 +559,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var authenticationSuccess = false
         private set
     var isBindingRequired = false
+        private set
+
+    var connectionTestSucceeded = false
         private set
 
     private var authRequired = true
@@ -631,6 +635,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.authRequired = true
         this.propertyUpToDate = false
         this.authenticationSuccess = false
+        this.connectionTestSucceeded = false
         this.uIAdapterList.clear()
     }
 
@@ -733,7 +738,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun checkBondingStateWithDelay(){
         if(this.connectionAttemptCounter < MAX_CONNECTION_ATTEMPTS) {
 
-            Handler().postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 // check if device is bonded now
                 if ((this.currentDevice?.bondState == BluetoothDevice.BOND_NONE)
                     || (this.currentDevice?.bondState == BluetoothDevice.BOND_BONDING)
@@ -1549,36 +1554,95 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // log:
         Log.d("M:CheckNotiEvent", "Check received string for notification")
         // check:
-        if(data.startsWith(propertyChangedNotificationEntry)){
-            this.updateProperty(data)
-            dataProcessed = true
-            Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
+        when {
+            data.startsWith(propertyChangedNotificationEntry) -> {
+                this.updateProperty(data)
+                dataProcessed = true
+                Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
+            }
+
+            data.startsWith(propertyGroupChangedNotificationEntry) -> {
+                this.updatePropertyGroup(data)
+                dataProcessed = true
+                Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
+            }
+            data.startsWith(this.complexDataStateTransmissionEntry) -> {
+                Log.d(
+                    "M:CheckNotiEvent",
+                    "Complex-Property-State data received -> try to resolve it!"
+                )
+                this.resolveComplexStateData(data)
+                dataProcessed = true
+            }
+            data.startsWith(this.simpleDataStateTransmissionEntry) -> {
+                Log.d(
+                    "M:CheckNotiEvent",
+                    "Simple-Property-State data received -> try to resolve it!"
+                )
+                this.resolveSimpleStateData(data)
+                dataProcessed = true
+            }
+            data.startsWith(this.deviceHeaderStartEntry) -> {
+                Log.d(
+                    "M:CheckNotiEvent",
+                    "DeviceHeader start notification detected -> start recording"
+                )
+                this.startDeviceHeaderRecording(data)
+                dataProcessed = true
+            }
+            data == this.deviceHeaderCloseMessage -> {
+                Log.d(
+                    "M:CheckNotiEvent",
+                    "DeviceHeader end notification detected -> reset parameter and trigger event"
+                )
+                this.endDeviceHeaderRecording()
+                dataProcessed = true
+            }
+            data == this.testCommand -> {
+                Log.d("M:CheckNotiEvent", "Test command received.")
+                this.connectionTestSucceeded = true
+                this.callback.onConnectionTestSuccess()
+                dataProcessed = true
+            }
         }
-        else if(data.startsWith(propertyGroupChangedNotificationEntry)){
-            this.updatePropertyGroup(data)
-            dataProcessed = true
-            Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
-        }
-        else if(data.startsWith(this.complexDataStateTransmissionEntry)){
-            Log.d("M:CheckNotiEvent", "Complex-Property-State data received -> try to resolve it!")
-            this.resolveComplexStateData(data)
-            dataProcessed = true
-        }
-        else if(data.startsWith(this.simpleDataStateTransmissionEntry)){
-            Log.d("M:CheckNotiEvent", "Simple-Property-State data received -> try to resolve it!")
-            this.resolveSimpleStateData(data)
-            dataProcessed = true
-        }
-        else if(data.startsWith(this.deviceHeaderStartEntry)){
-            Log.d("M:CheckNotiEvent", "DeviceHeader start notification detected -> start recording")
-            this.startDeviceHeaderRecording(data)
-            dataProcessed = true
-        }
-        else if(data == this.deviceHeaderCloseMessage){
-            Log.d("M:CheckNotiEvent", "DeviceHeader end notification detected -> reset parameter and trigger event")
-            this.endDeviceHeaderRecording()
-            dataProcessed = true
-        }
+
+//        if(data.startsWith(propertyChangedNotificationEntry)){
+//            this.updateProperty(data)
+//            dataProcessed = true
+//            Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
+//        }
+//        else if(data.startsWith(propertyGroupChangedNotificationEntry)){
+//            this.updatePropertyGroup(data)
+//            dataProcessed = true
+//            Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
+//        }
+//        else if(data.startsWith(this.complexDataStateTransmissionEntry)){
+//            Log.d("M:CheckNotiEvent", "Complex-Property-State data received -> try to resolve it!")
+//            this.resolveComplexStateData(data)
+//            dataProcessed = true
+//        }
+//        else if(data.startsWith(this.simpleDataStateTransmissionEntry)){
+//            Log.d("M:CheckNotiEvent", "Simple-Property-State data received -> try to resolve it!")
+//            this.resolveSimpleStateData(data)
+//            dataProcessed = true
+//        }
+//        else if(data.startsWith(this.deviceHeaderStartEntry)){
+//            Log.d("M:CheckNotiEvent", "DeviceHeader start notification detected -> start recording")
+//            this.startDeviceHeaderRecording(data)
+//            dataProcessed = true
+//        }
+//        else if(data == this.deviceHeaderCloseMessage){
+//            Log.d("M:CheckNotiEvent", "DeviceHeader end notification detected -> reset parameter and trigger event")
+//            this.endDeviceHeaderRecording()
+//            dataProcessed = true
+//        }
+//        else if(data == this.testCommand){
+//            Log.d("M:CheckNotiEvent", "Test command received.")
+//            this.connectionTestSucceeded = true
+//            this.callback.onConnectionTestSuccess()
+//            dataProcessed = true
+//        }
+
         return dataProcessed
     }
 
@@ -2309,6 +2373,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData("r$passkey>$")
     }
 
+    fun testConnection(){
+        // reset test indicator and send test command
+        this.connectionTestSucceeded = false
+        this.sendData(this.testCommand)
+    }
+
+    fun testConnection(delayTimeMs: Long){
+        Handler(Looper.getMainLooper()).postDelayed({
+            this.testConnection()
+        }, delayTimeMs)
+    }
+
 //    fun formatIncomingData(data: String) : String {
 //
 //        var dOut = ""
@@ -2358,6 +2434,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onAuthenticationSuccessful(){}
         fun onBindingPasskeyRejected(){}
         fun onDeviceReadyForCommunication(){}
+        fun onConnectionTestSuccess(){}
     }
 
     interface PropertyCallback: Serializable {

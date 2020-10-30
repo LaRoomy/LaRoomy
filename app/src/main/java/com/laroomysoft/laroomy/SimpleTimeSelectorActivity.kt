@@ -1,22 +1,20 @@
 package com.laroomysoft.laroomy
 
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
-import com.agilie.circularpicker.presenter.CircularPickerContract
-import com.agilie.circularpicker.ui.view.CircularPickerView
-import com.agilie.circularpicker.ui.view.PickerPagerTransformer
-import kotlinx.android.synthetic.main.activity_simple_time_selector.*
+import android.widget.TimePicker
+import androidx.appcompat.app.AppCompatActivity
 
-class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var mustReconnect = false
     private var currentHour = 0
     private var currentMinute = 0
+
+    lateinit var simpleTimePicker: TimePicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,55 +35,18 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // set the displayed time to the current device setting
         this.currentHour = timeSelectorState.valueOne
         this.currentMinute = timeSelectorState.valueTwo
-        this.updateTimeDisplay(this.currentHour, this.currentMinute)
+
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
-        // config time selector
-        view_pager.apply {
-            clipChildren = false
-            setPageTransformer(false, PickerPagerTransformer(context, 300))
-        }
-        // add the Picker to the pager
-        view_pager.onAddView(CircularPickerView(this@SimpleTimeSelectorActivity).apply {
-
-            colors = (intArrayOf(
-                Color.parseColor("#00EDE9"),
-                Color.parseColor("#0087D9"),
-                Color.parseColor("#8A1CC3")))
-            gradientAngle = 0                               // was 220 !!!!!!!!!!!
-            maxLapCount = 1
-            currentValue = currentHour
-            maxValue = 23
-            centeredTextSize = 60f
-            centeredText = getString(R.string.STS_Hours)
-            valueChangedListener = object : CircularPickerContract.Behavior.ValueChangedListener{
-                override fun onValueChanged(value: Int) {
-                    onHourValueChanged(value)
-                }
-            }
-        })
-        view_pager.onAddView(CircularPickerView(this@SimpleTimeSelectorActivity).apply {
-
-            colors = (intArrayOf(
-                Color.parseColor("#FF8D00"),
-                Color.parseColor("#FF0058"),
-                Color.parseColor("#920084")))
-            gradientAngle = 0                               // was 220 !!!!!!!!!!!!
-            maxLapCount = 1
-            currentValue = currentMinute
-            maxValue = 59
-            centeredTextSize = 60f
-            centeredText = getString(R.string.STS_Minutes)
-            valueChangedListener = object : CircularPickerContract.Behavior.ValueChangedListener{
-                override fun onValueChanged(value: Int) {
-                    onMinuteValueChanged(value)
-                }
-            }
-        })
-
+        // config timeSelector
+        this.simpleTimePicker = findViewById(R.id.simpleTimePicker)
+        this.simpleTimePicker.setIs24HourView(true)
+        this.simpleTimePicker.hour = timeSelectorState.valueOne
+        this.simpleTimePicker.minute = timeSelectorState.valueTwo
+        this.simpleTimePicker.setOnTimeChangedListener(this)
     }
 
     override fun onPause() {
@@ -123,15 +84,28 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         }
     }
 
+    override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        Log.d("M:CB:TimeChanged", "Time changed in SimpleTimeSelector Activity." +
+                "Selected Time is: $hourOfDay : $minute")
+
+        this.currentHour = hourOfDay
+        this.currentMinute = minute
+
+        ApplicationProperty.bluetoothConnectionManger.sendData(
+            this.generateExecutionString()
+        )
+    }
+
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
+        // NOTE: do not use this method before the view is retrieved in onCreate
+
+        // TODO: check if this works (send property-changed notification from device)
+
         this.currentHour = complexPropertyState.valueOne
         this.currentMinute = complexPropertyState.valueTwo
-        updateTimeDisplay(complexPropertyState.valueOne, complexPropertyState.valueTwo)
 
-        // update the time selector
-        // TODO: check if this works!!!
-        view_pager.getView(0).currentValue = this.currentHour
-        view_pager.getView(1).currentValue = this.currentMinute
+        this.simpleTimePicker.hour = complexPropertyState.valueOne
+        this.simpleTimePicker.minute = complexPropertyState.valueTwo
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -139,18 +113,6 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         val userNotificationTextView = findViewById<TextView>(R.id.stsUserNotificationTextView)
         userNotificationTextView.setTextColor(getColor(colorID))
         userNotificationTextView.text = message
-    }
-
-    private fun updateTimeDisplay(hour: Int, minute: Int){
-
-        val time: String = if((hour < 10) && (minute > 9)){
-            "0$hour : $minute"
-        } else if((hour > 9) && (minute < 10)){
-            "$hour : 0$minute"
-        } else {
-            "$hour : $minute"
-        }
-        findViewById<TextView>(R.id.timeDisplayTextView).text = time
     }
 
     private fun generateExecutionString() : String {
@@ -161,36 +123,6 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 a8BitValueAsTwoCharString(currentHour) +
                 a8BitValueAsTwoCharString(currentMinute) +
                 "00$"
-    }
-
-    fun onHourValueChanged(value: Int){
-        Log.d("M:STSPage:HourChanged", "Hour value changed in SimpleTimeSelector Activity. New value is: $value")
-
-        //temp:
-        //notifyUser("Hour value changed: $value", R.color.normalTextColor)
-
-        // update UI
-        this.currentHour = value
-        this.updateTimeDisplay(value, this.currentMinute)
-        // update device
-        ApplicationProperty.bluetoothConnectionManger.sendData(
-            this.generateExecutionString()
-        )
-    }
-
-    fun onMinuteValueChanged(value: Int){
-        Log.d("M:STSPage:MinuteChanged", "Minute value changed in SimpleTimeSelector Activity. New value is: $value")
-
-        //temp:
-        //notifyUser("Minute value changed: $value", R.color.normalTextColor)
-
-        // update UI
-        this.currentMinute = value
-        this.updateTimeDisplay(this.currentHour, value)
-        // update device
-        ApplicationProperty.bluetoothConnectionManger.sendData(
-            this.generateExecutionString()
-        )
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

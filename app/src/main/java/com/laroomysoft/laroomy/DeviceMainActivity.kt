@@ -423,6 +423,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.setUIConnectionStatus(state)
         // stop the loading circle and set the info-header
         if(state) {
+            // send a test command
+            ApplicationProperty.bluetoothConnectionManger.testConnection(200)// TODO: this must be tested
+            // stop spinner and set info header
             runOnUiThread {
                 this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
                 this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))

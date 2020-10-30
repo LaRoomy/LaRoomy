@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.OnColorChangedListener
@@ -20,8 +21,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private lateinit var colorPickerView: ColorPickerView
     private lateinit var lightnessSliderView: LightnessSlider
-    private lateinit var onOffSwitch: Switch
-    private lateinit var transitionSwitch: Switch
+    private lateinit var onOffSwitch: SwitchCompat
+    private lateinit var transitionSwitch: SwitchCompat
     private lateinit var programSpeedSeekBar: SeekBar
 
     private var mustReconnect = false
@@ -306,11 +307,11 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private fun notifyUser(message: String, colorID: Int){
 
-        // TODO: execute in ui-thread!!!
-
-        val textView = findViewById<TextView>(R.id.rgbUserNotificationTextView)
-        textView.text = message
-        textView.setTextColor(getColor(colorID))
+        runOnUiThread {
+            val textView = findViewById<TextView>(R.id.rgbUserNotificationTextView)
+            textView.text = message
+            textView.setTextColor(getColor(colorID))
+        }
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(colorState: ComplexPropertyState){
@@ -397,9 +398,13 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         super.onConnectionStateChanged(state)
         Log.d("M:RGBPage:ConStateChge", "Connection state changed in RGB Activity. New Connection state is: $state")
         if(state){
+            // test the connection
+            ApplicationProperty.bluetoothConnectionManger.testConnection(200)// TODO: this must be tested
+            // set UI-State
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
             showDualContainer(true)
         } else {
+            // set UI-State
             notifyUser(getString(R.string.GeneralMessage_connectionSuspended), R.color.disconnectedTextColor)
             showDualContainer(false)
         }
