@@ -95,7 +95,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             else -> true
         }
         onOffSwitch.setOnClickListener{
-            Log.d("M:RGB:OnOffSwitchClick", "On / Off Switch was clicked. New state is: ${(it as Switch).isChecked}")
+            Log.d("M:RGB:OnOffSwitchClick", "On / Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}")
             onMainOnOffSwitchClick(it)
         }
 
@@ -103,7 +103,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         transitionSwitch = findViewById(R.id.transitionTypeSwitch)
         transitionSwitch.isChecked = !colorState.hardTransitionFlag
         transitionSwitch.setOnClickListener{
-            Log.d("M:RGB:transSwitchClick", "Transition Switch was clicked. New state is: ${(it as Switch).isChecked}")
+            Log.d("M:RGB:transSwitchClick", "Transition Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}")
             onTransitionTypeSwitchClicked(it)
         }
     }
@@ -270,7 +270,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private fun onMainOnOffSwitchClick(view: View){
 
-        val state = (view as Switch).isChecked
+        val state = (view as SwitchCompat).isChecked
 
         runOnUiThread {
 
@@ -298,7 +298,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     private fun onTransitionTypeSwitchClicked(view: View){
-        val type = when((view as Switch).isChecked){
+        val type = when((view as SwitchCompat).isChecked){
             true -> 201 // soft transition
             else -> 200 // hard transition
         }
@@ -359,7 +359,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         this.currentColor = selectedColor
 
-        if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
+        if(findViewById<SwitchCompat>(R.id.rgbSwitch).isChecked) {
 
             val r = Color.red(selectedColor)
             val g = Color.green(selectedColor)
@@ -379,7 +379,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         this.currentColor = selectedColor
 
-        if(findViewById<Switch>(R.id.rgbSwitch).isChecked) {
+        if(findViewById<SwitchCompat>(R.id.rgbSwitch).isChecked) {
 
             val r = Color.red(selectedColor)
             val g = Color.green(selectedColor)

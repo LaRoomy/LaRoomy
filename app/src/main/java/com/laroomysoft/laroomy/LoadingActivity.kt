@@ -184,7 +184,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 
                 // notify User:
                 setProgressText(getString(R.string.CA_Authenticate))
-            }, 1500)
+            }, 1200)
         }
     }
 
