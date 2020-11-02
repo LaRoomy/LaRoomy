@@ -106,8 +106,10 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     }
 
     private fun notifyUser(message: String, colorID: Int){
-        notificationTextView.setTextColor(getColor(colorID))
-        notificationTextView.text = message
+        runOnUiThread {
+            notificationTextView.setTextColor(getColor(colorID))
+            notificationTextView.text = message
+        }
     }
 
     private fun onOffSwitchClicked(){

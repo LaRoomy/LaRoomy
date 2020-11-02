@@ -181,6 +181,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // check if this is a call on creation or resume:
             if (this.activityWasSuspended) {
+
+                // realign objects
+                //ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
+                //ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+
                 // try to reconnect
                 ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
                 this.activityWasSuspended = false
