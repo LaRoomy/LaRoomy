@@ -85,6 +85,9 @@
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">The remote device will be restored to the default configuration. Are you sure?</string>
 
+    <string name="AppHelpActivityHeaderText">Help-Topics</string>
+    <string name="AppHelpActivityGotoBluetoothButtonText">Goto Bluetooth Settings</string>
+
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>

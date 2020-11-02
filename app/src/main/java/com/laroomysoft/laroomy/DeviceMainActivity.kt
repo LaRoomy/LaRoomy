@@ -1,5 +1,6 @@
 package com.laroomysoft.laroomy
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
@@ -55,7 +56,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this@DeviceMainActivity,
                 this)
 
-        // TODO: test!
         this.devicePropertyListViewAdapter.setHasStableIds(true)
 
         // bind the elements to the recycler
@@ -72,6 +72,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onPause()
         // only suspend the connection if the user left this application
         if(!(this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution) {
+
+            Log.d("M:CB:onPause", "onPause executed in DeviceMainActivity - User left the app or navigated back - suspend connection")
 
             // TODO: suspend connection (maybe delayed in background???)
 
@@ -550,6 +552,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return DPLViewHolder(linearLayout)
         }
 
+        @SuppressLint("CutPasteId")
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
 
             val elementToRender = devicePropertyAdapter.elementAt(position)

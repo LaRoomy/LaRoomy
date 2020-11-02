@@ -86,6 +86,10 @@
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">Das Gerät wird auf Werkseinstellungen zurückgesetzt. Sind Sie sicher?</string>
 
+    <string name="AppHelpActivityHeaderText">Hilfe-Themen</string>
+    <string name="AppHelpActivityGotoBluetoothButtonText">Bluetooth-Einstellungen öffnen</string>
+
+
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
