@@ -328,14 +328,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             when(newState){
                 BluetoothProfile.STATE_CONNECTED -> {
 
-                    //currentDevice = gatt?.device ??????
-
                     isConnected = true
 
                     Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
                     callback.onConnectionStateChanged(true)
-                    Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
-                    gatt?.discoverServices()// start to discover the services of the device
+
+                    if(!isResumeConnectionAttempt) {
+                        Log.d("M:CB:ConStateChanged", "This is no resume action, so discover services")
+                        Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
+                        gatt?.discoverServices()// start to discover the services of the device
+                    } else {
+                        isResumeConnectionAttempt = false
+                        suspendedDeviceAddress = ""
+                        Log.d("M:CB:ConStateChanged", "This is a resume action -> DO NOT DISCOVER SERVICES!")
+                    }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
 
@@ -560,8 +566,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         private set
     var isBindingRequired = false
         private set
-
     var connectionTestSucceeded = false
+        private set
+    var connectionSuspended = false
         private set
 
     private var authRequired = true
@@ -573,10 +580,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var propertyNameResolveSingleAction = false
     private var propertyGroupNameResolveSingleAction = false
     private var singleRetrievingAction = false
+    private var isResumeConnectionAttempt = false
     private var propertyUpToDate = false
     private var dataReadyToShow = false
     private var complexStateLoopActive = false
     private var deviceHeaderRecordingActive = false
+    private var suspendedDeviceAddress = ""
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
     private var currentGroupResolveID = -1 // initialize with invalid marker
@@ -636,6 +645,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.propertyUpToDate = false
         this.authenticationSuccess = false
         this.connectionTestSucceeded = false
+        this.connectionSuspended = false
+        this.isResumeConnectionAttempt = false
+        this.suspendedDeviceAddress = ""
         this.uIAdapterList.clear()
     }
 
@@ -811,6 +823,28 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
         this.isConnected = false
+    }
+
+    fun suspendConnection(){
+        Log.d("M:Bmngr:suspendC", "BluetoothManager: suspendConnection invoked")
+        this.isResumeConnectionAttempt = false
+        this.connectionSuspended = true
+        this.suspendedDeviceAddress = this.currentDevice?.address ?: ""
+        this.close()
+    }
+
+    fun resumeConnection(){
+        Log.d("M:Bmngr:resumeC", "BluetoothManager: resumeConnection invoked")
+        this.connectionSuspended = false
+        this.isResumeConnectionAttempt = true
+
+        if(this.suspendedDeviceAddress.isNotEmpty()){
+            Log.d("M:Bmngr:resumeC", "BluetoothManager: resumeConnection: Internal Device Address: ${this.suspendedDeviceAddress}")
+            this.connectToRemoteDevice(this.suspendedDeviceAddress)
+        } else {
+            Log.e("M:Bmngr:resumeC", "BluetoothManager: Internal Device Address invalid- trying to connect to saved address")
+            this.connectToLastSuccessfulConnectedDevice()
+        }
     }
 
     private fun laRoomyDeviceTypeFromName(name: String): Int {

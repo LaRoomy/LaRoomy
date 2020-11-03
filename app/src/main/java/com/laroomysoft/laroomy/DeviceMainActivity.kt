@@ -76,8 +76,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             Log.d("M:CB:onPause", "onPause executed in DeviceMainActivity - User left the app or navigated back - suspend connection")
 
             // TODO: suspend connection (maybe delayed in background???)
+            //ApplicationProperty.bluetoothConnectionManger.close()
 
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManger.suspendConnection()
+
             setUIConnectionStatus(false)
             setDeviceInfoHeader(29, getString(R.string.DMA_DeviceConnectionSuspended))
 
@@ -90,15 +92,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onBackPressed() {
         super.onBackPressed()
-
-        //ApplicationProperty.bluetoothConnectionManger.uIAdapterList.clear()
-
-
-        // TODO: finish activity NO!
-
-        // TODO: at this point, this is the only existing activity in the app-lifecycle, so:
-        // if the user presses back, he leaves the app, so onPause must be called???
-
+        // the loading activity is terminated, so the start(main)-Activity will be invoked
         ApplicationProperty.bluetoothConnectionManger.clear()
         finish()
     }
@@ -187,7 +181,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 //ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
                 // try to reconnect
-                ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                ApplicationProperty.bluetoothConnectionManger.resumeConnection()
+
+
+                //ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+
+
                 this.activityWasSuspended = false
             } else {
                 // must be the creation process -> start property listing
