@@ -6,8 +6,6 @@ import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -628,6 +626,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
                         resourceIdForImageId(elementToRender.imageID))
 
+                    // TODO: hide the image-view if the imageID is not set???
+
 
                     // set the appropriate elements for the type of the property:
                     when(elementToRender.propertyType){
@@ -700,6 +700,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             levelIndication.setTextColor(percentageLevelPropertyGenerator.colorID)
                         }
                         PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
+
+                            // TODO: integrate textcolor???
+
                             // show the textView
                             val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                             textView.visibility = View.VISIBLE

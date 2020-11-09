@@ -1992,23 +1992,88 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun checkSingleAction(data: String) :Boolean {
 
         if(this.singleRetrievingAction){
-            Log.d("M:CheckSingleAcion", "single-action-retrieving is active look for a transmission to record")
+            Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
 
-            if(data.startsWith("IPR")){
-                // its a property request response
-                // TODO: handle single property response
-            }
-            else if(data.startsWith("IGP")){
-                // its a group request response
-                // TODO: handle single group response
-            }
-            else if(data.startsWith("PD:S")){
-                // its a property description request
-                // TODO: listen for next reception
-            }
-            else if(data.startsWith("GI:S")){
-                // its a group detail request
-                // TODO: listen for next reception
+            when {
+                data.startsWith("IPR") -> {
+                    // its a  single property request response
+
+                    // initialize the property element from string
+                    val updatedLaRoomyDeviceProperty = LaRoomyDeviceProperty()
+                    updatedLaRoomyDeviceProperty.fromString(data)
+                    var updateIndex = -1
+
+                    // search the property ID in the list and replace it
+                    this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                        if(laRoomyDeviceProperty.propertyID == updatedLaRoomyDeviceProperty.propertyID){
+                            this.laRoomyDevicePropertyList[index] = updatedLaRoomyDeviceProperty
+                            return@forEachIndexed
+                        }
+                    }
+
+                    // TODO: check this!
+
+                    // search the appropriate element in the UI-Adapter-List and save the index
+                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                        if(devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID){
+                            updateIndex = index
+                            return@forEachIndexed
+                        }
+                    }
+
+                    // get the element from the UI-Adapter list and update all possible data
+                    val updateDevicePropertyListContentInformation = uIAdapterList.elementAt(updateIndex)
+                    updateDevicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
+                    updateDevicePropertyListContentInformation.canNavigateForward = updatedLaRoomyDeviceProperty.needNavigation()
+                    updateDevicePropertyListContentInformation.propertyType = updatedLaRoomyDeviceProperty.propertyType
+                    updateDevicePropertyListContentInformation.imageID = updatedLaRoomyDeviceProperty.imageID
+                    updateDevicePropertyListContentInformation.isGroupMember = updatedLaRoomyDeviceProperty.isGroupMember
+
+                    // replace the element in the UI-Adapter
+                    this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
+
+
+                    // TODO: check if the UI Adapter will update automatically if the array changes!!!!
+
+
+                    // mark the single action as processed
+                    this.singleRetrievingAction = false
+                }
+                data.startsWith("IGP") -> {
+                    // its a group request response
+                    // TODO: handle single group response
+
+                    this.singleRetrievingAction = false
+                }
+                data.startsWith("PD:S") -> {
+                    // its a property description request
+
+                    // look for the property id to record!!!!!!!!
+
+                    // TODO: listen for next reception
+
+                    //this.singleRetrievingAction = false
+                }
+                data.startsWith("GI:S") -> {
+                    // its a group detail request response
+
+                    // look for the group id to record!!!!!!!!!!!!
+
+                    // TODO: listen for next reception
+
+                    //this.singleRetrievingAction = false
+                }
+                data.startsWith("PD:E") -> {
+
+                    this.singleRetrievingAction = false
+                }
+                data.startsWith("GI:E") -> {
+
+                    this.singleRetrievingAction = false
+                }
+                else -> {
+                    // must be the data between the init and close notifications ???
+                }
             }
 
             return false
