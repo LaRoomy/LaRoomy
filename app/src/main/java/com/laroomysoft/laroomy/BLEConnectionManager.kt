@@ -2021,21 +2021,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
 
-                    // get the element from the UI-Adapter list and update all possible data
-                    val updateDevicePropertyListContentInformation = uIAdapterList.elementAt(updateIndex)
-                    updateDevicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
-                    updateDevicePropertyListContentInformation.canNavigateForward = updatedLaRoomyDeviceProperty.needNavigation()
-                    updateDevicePropertyListContentInformation.propertyType = updatedLaRoomyDeviceProperty.propertyType
-                    updateDevicePropertyListContentInformation.imageID = updatedLaRoomyDeviceProperty.imageID
-                    updateDevicePropertyListContentInformation.isGroupMember = updatedLaRoomyDeviceProperty.isGroupMember
+                    if(updateIndex != -1) {
+                        // get the element from the UI-Adapter list and update all possible data
+                        val updateDevicePropertyListContentInformation =
+                            uIAdapterList.elementAt(updateIndex)
+                        updateDevicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
+                        updateDevicePropertyListContentInformation.canNavigateForward =
+                            updatedLaRoomyDeviceProperty.needNavigation()
+                        updateDevicePropertyListContentInformation.propertyType =
+                            updatedLaRoomyDeviceProperty.propertyType
+                        updateDevicePropertyListContentInformation.imageID =
+                            updatedLaRoomyDeviceProperty.imageID
+                        updateDevicePropertyListContentInformation.isGroupMember =
+                            updatedLaRoomyDeviceProperty.isGroupMember
 
-                    // replace the element in the UI-Adapter
-                    this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
+                        // replace the element in the UI-Adapter
+                        this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
 
 
-                    // TODO: check if the UI Adapter will update automatically if the array changes!!!!
+                        // TODO: check if the UI Adapter will update automatically if the array changes!!!!
 
-
+                    }
                     // mark the single action as processed
                     this.singleRetrievingAction = false
                 }
