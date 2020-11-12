@@ -2010,29 +2010,52 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 updatedLaRoomyDeviceProperty.fromString(data)
                 var updateIndex = -1
 
-                // search the property ID in the list and replace it
+                // search the property ID in the list
                 this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
                     if(laRoomyDeviceProperty.propertyID == updatedLaRoomyDeviceProperty.propertyID){
-                        this.laRoomyDevicePropertyList[index] = updatedLaRoomyDeviceProperty
-                        return@forEachIndexed
-                    }
-                }
-
-                // TODO: check this!
-
-                // search the appropriate element in the UI-Adapter-List and save the index
-                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if(devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID){
                         updateIndex = index
                         return@forEachIndexed
                     }
                 }
 
+                // replace the origin
+                if(updateIndex != -1) {
+                    // get the original property entry
+                    val laroomyDeviceProperty =
+                        this.laRoomyDevicePropertyList.elementAt(updateIndex)
+
+                    // check for invalidation
+                    if(laroomyDeviceProperty.propertyIndex != updatedLaRoomyDeviceProperty.propertyIndex){
+                        // this can only occur if the complete property changed -> launch invalidated event
+                        this.propertyCallback.onCompletePropertyInvalidated()
+                        return true
+                    }
+                    // set the possible new values
+                    laroomyDeviceProperty.imageID = updatedLaRoomyDeviceProperty.imageID
+                    laroomyDeviceProperty.propertyType = updatedLaRoomyDeviceProperty.propertyType
+                    laroomyDeviceProperty.groupID = updatedLaRoomyDeviceProperty.groupID
+
+                    // override the existing entry (reset)
+                    this.laRoomyDevicePropertyList[updateIndex] = laroomyDeviceProperty
+                }
+                updateIndex = -1
+
+                // TODO: check this!
+
+                // search the appropriate element in the UI-Adapter-List and save the index
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if((devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID)
+                        && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
+                        updateIndex = index
+                        return@forEachIndexed
+                    }
+                }
+
+                // replace the origin
                 if(updateIndex != -1) {
                     // get the element from the UI-Adapter list and update all possible data
                     val updateDevicePropertyListContentInformation =
                         uIAdapterList.elementAt(updateIndex)
-                    updateDevicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
                     updateDevicePropertyListContentInformation.canNavigateForward =
                         updatedLaRoomyDeviceProperty.needNavigation()
                     updateDevicePropertyListContentInformation.propertyType =
@@ -2078,6 +2101,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     if(this.currentPropertyResolveID != -1){
                         // must be the name for the property
+                        // search the element in the property-list
                         this.laRoomyDevicePropertyList.forEach {
                             if(it.propertyID == this.currentPropertyResolveID){
                                 // TODO: check if the element in the list will be updated or just a copy
@@ -2085,8 +2109,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 return@forEach
                             }
                         }
+                        // find the element in the UI-Adapter
                         this.uIAdapterList.forEach {
-                            if(it.elementType == PROPERTY_ELEMENT && it.elementID == this.currentPropertyResolveID){
+                            if((it.elementType == PROPERTY_ELEMENT) && (it.elementID == this.currentPropertyResolveID)){
                                 // TODO: check if the element in the list will be updated or just a copy
                                 it.elementText = data
                                 return@forEach
@@ -2102,7 +2127,63 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(this.singleGroupRetrievingAction){
             if(data.startsWith("IPG")){
                 // its a group request response
-                // TODO: handle single group response
+
+                val updatedGroup = LaRoomyDevicePropertyGroup()
+                updatedGroup.fromString(data)
+
+                var updateIndex = -1
+
+                // search the element in the groupList
+                this.laRoomyPropertyGroupList.forEachIndexed { index, laroomyDevicePropertyGroup ->
+                    if(laroomyDevicePropertyGroup.groupID == updatedGroup.groupID){
+                        updateIndex = index
+                        return@forEachIndexed
+                    }
+                }
+
+                // replace the origin
+                if(updateIndex != -1) {
+                    // get to original element
+                    val propGroup =
+                        laRoomyPropertyGroupList.elementAt(updateIndex)
+
+                    // check for invalidation
+                    if(propGroup.groupIndex != updatedGroup.groupIndex){
+                        this.propertyCallback.onCompletePropertyInvalidated()
+                        return true
+                    }
+                    // set possible values
+                    propGroup.imageID = updatedGroup.imageID
+                    propGroup.memberCount = updatedGroup.memberCount
+
+                    // override the existing entry (reset)
+                    this.laRoomyPropertyGroupList[updateIndex] = propGroup
+                }
+                updateIndex = -1
+
+                // update the UI-Adapter
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if((devicePropertyListContentInformation.elementType == GROUP_ELEMENT)
+                    && (devicePropertyListContentInformation.elementID == updatedGroup.groupID)){
+                        updateIndex = index
+                        return@forEachIndexed
+                    }
+                }
+
+                // replace the origin
+                if(updateIndex != -1){
+                    // get the original element
+                    val originElement =
+                        uIAdapterList.elementAt(updateIndex)
+
+                    // set new possible values
+                    originElement.imageID = updatedGroup.imageID
+
+                    // replace the original in the UI-Adapter
+                    this.uIAdapterList[updateIndex] = originElement
+
+                    // TODO: check if the UI Adapter will update automatically if the array changes!!!!
+                }
 
                 this.singleGroupRetrievingAction = false
                 return true
@@ -2128,18 +2209,30 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                }
                else -> {
                    // must be the new group detail
-                   // return true (if processed)
-
                    if(this.currentGroupResolveID != -1){
-                       if(data.startsWith("mI%")){
+                       return if(data.startsWith("mI%")){
                            // must be the member ID transmission part
                            // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
-                           return true
-                       }
-                       else {
+                           //this.propertyCallback.onCompletePropertyInvalidated()
+                           true
+                       } else {
                            // must be the name for the group
-
-                           return true
+                           // search the element in the groupList
+                           this.laRoomyPropertyGroupList.forEach {
+                               if(it.groupID == this.currentGroupResolveID){
+                                   it.groupName = data
+                                   return@forEach
+                               }
+                           }
+                           // find the element in the UI-Adapter
+                           this.uIAdapterList.forEach {
+                               if((it.elementID == this.currentGroupResolveID) && (it.elementType == GROUP_ELEMENT)){
+                                   it.elementText = data
+                                   // TODO: check if the element in the list will be updated or just a copy
+                                   return@forEach
+                               }
+                           }
+                           true
                        }
                    }
                }
