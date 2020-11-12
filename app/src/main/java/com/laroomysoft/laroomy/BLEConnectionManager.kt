@@ -579,7 +579,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var propertyConfirmationModeActive = false
     private var propertyNameResolveSingleAction = false
     private var propertyGroupNameResolveSingleAction = false
-    private var singleRetrievingAction = false
+    private var singlePropertyRetrievingAction = false
+    private var singlePropertyDetailRetrievingAction = false
+    private var singleGroupRetrievingAction = false
+    private var singleGroupDetailRetrievingAction = false
     private var isResumeConnectionAttempt = false
     private var propertyUpToDate = false
     private var dataReadyToShow = false
@@ -649,6 +652,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
         this.uIAdapterList.clear()
+        this.singlePropertyRetrievingAction = false
+        this.singleGroupRetrievingAction = false
+        this.singlePropertyDetailRetrievingAction = false
+        this.singleGroupDetailRetrievingAction = false
+        this.currentPropertyResolveID = -1
+        this.currentGroupResolveID = -1
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -1798,7 +1807,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         Log.d("M:SendRequest", "SendSinglePropertyRequest: Invoked")
         if(this.isConnected) {
             // set marker
-            this.singleRetrievingAction = true
+            this.singlePropertyRetrievingAction = true
             // build string
             val data =
                 when {
@@ -1815,7 +1824,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         Log.d("M:SendRequest", "SendSinglePropertyGroupRequest: Invoked")
         if(this.isConnected) {
             // set marker
-            this.singleRetrievingAction = true
+            this.singleGroupRetrievingAction = true
             // build string
             val data =
                 when {
@@ -1832,7 +1841,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         Log.d("M:SendRequest", "SendSinglePropertyResolveRequest: Invoked")
         if(this.isConnected) {
             // set marker
-            this.singleRetrievingAction = true
+            this.singlePropertyDetailRetrievingAction = true
             // get language identification
             val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
                 "de" -> 1
@@ -1854,7 +1863,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         Log.d("M:SendRequest", "SendSingleGroupDetailRequest: Invoked")
         if(this.isConnected) {
             // set marker
-            this.singleRetrievingAction = true
+            this.singleGroupDetailRetrievingAction = true
             // get language identification
             val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
                 "de" -> 1
@@ -1990,101 +1999,153 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
     private fun checkSingleAction(data: String) :Boolean {
+        Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
 
-        if(this.singleRetrievingAction){
-            Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
+        if(this.singlePropertyRetrievingAction) {
+            if (data.startsWith("IPR")) {
+                // its a  single property request response
 
-            when {
-                data.startsWith("IPR") -> {
-                    // its a  single property request response
+                // initialize the property element from string
+                val updatedLaRoomyDeviceProperty = LaRoomyDeviceProperty()
+                updatedLaRoomyDeviceProperty.fromString(data)
+                var updateIndex = -1
 
-                    // initialize the property element from string
-                    val updatedLaRoomyDeviceProperty = LaRoomyDeviceProperty()
-                    updatedLaRoomyDeviceProperty.fromString(data)
-                    var updateIndex = -1
-
-                    // search the property ID in the list and replace it
-                    this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-                        if(laRoomyDeviceProperty.propertyID == updatedLaRoomyDeviceProperty.propertyID){
-                            this.laRoomyDevicePropertyList[index] = updatedLaRoomyDeviceProperty
-                            return@forEachIndexed
-                        }
+                // search the property ID in the list and replace it
+                this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                    if(laRoomyDeviceProperty.propertyID == updatedLaRoomyDeviceProperty.propertyID){
+                        this.laRoomyDevicePropertyList[index] = updatedLaRoomyDeviceProperty
+                        return@forEachIndexed
                     }
-
-                    // TODO: check this!
-
-                    // search the appropriate element in the UI-Adapter-List and save the index
-                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                        if(devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID){
-                            updateIndex = index
-                            return@forEachIndexed
-                        }
-                    }
-
-                    if(updateIndex != -1) {
-                        // get the element from the UI-Adapter list and update all possible data
-                        val updateDevicePropertyListContentInformation =
-                            uIAdapterList.elementAt(updateIndex)
-                        updateDevicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
-                        updateDevicePropertyListContentInformation.canNavigateForward =
-                            updatedLaRoomyDeviceProperty.needNavigation()
-                        updateDevicePropertyListContentInformation.propertyType =
-                            updatedLaRoomyDeviceProperty.propertyType
-                        updateDevicePropertyListContentInformation.imageID =
-                            updatedLaRoomyDeviceProperty.imageID
-                        updateDevicePropertyListContentInformation.isGroupMember =
-                            updatedLaRoomyDeviceProperty.isGroupMember
-
-                        // replace the element in the UI-Adapter
-                        this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
-
-
-                        // TODO: check if the UI Adapter will update automatically if the array changes!!!!
-
-                    }
-                    // mark the single action as processed
-                    this.singleRetrievingAction = false
                 }
-                data.startsWith("IGP") -> {
-                    // its a group request response
-                    // TODO: handle single group response
 
-                    this.singleRetrievingAction = false
+                // TODO: check this!
+
+                // search the appropriate element in the UI-Adapter-List and save the index
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if(devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID){
+                        updateIndex = index
+                        return@forEachIndexed
+                    }
                 }
+
+                if(updateIndex != -1) {
+                    // get the element from the UI-Adapter list and update all possible data
+                    val updateDevicePropertyListContentInformation =
+                        uIAdapterList.elementAt(updateIndex)
+                    updateDevicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
+                    updateDevicePropertyListContentInformation.canNavigateForward =
+                        updatedLaRoomyDeviceProperty.needNavigation()
+                    updateDevicePropertyListContentInformation.propertyType =
+                        updatedLaRoomyDeviceProperty.propertyType
+                    updateDevicePropertyListContentInformation.imageID =
+                        updatedLaRoomyDeviceProperty.imageID
+                    updateDevicePropertyListContentInformation.isGroupMember =
+                        updatedLaRoomyDeviceProperty.isGroupMember
+
+                    // replace the element in the UI-Adapter
+                    this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
+
+
+                    // TODO: check if the UI Adapter will update automatically if the array changes!!!!
+
+                }
+                // mark the single action as processed
+                this.singlePropertyRetrievingAction = false
+                return true
+            }
+        }
+
+        if(this.singlePropertyDetailRetrievingAction){
+            when{
                 data.startsWith("PD:S") -> {
-                    // its a property description request
-
-                    // look for the property id to record!!!!!!!!
-
-                    // TODO: listen for next reception
-
-                    //this.singleRetrievingAction = false
-                }
-                data.startsWith("GI:S") -> {
-                    // its a group detail request response
-
-                    // look for the group id to record!!!!!!!!!!!!
-
-                    // TODO: listen for next reception
-
-                    //this.singleRetrievingAction = false
+                    // its a property description request -> look for the property id to record
+                    val id = this.propertyIDFromStartEntry(data)
+                    if(id != -1){
+                        this.currentPropertyResolveID = id
+                    }
+                    // TODO: if the id is invalid -> reset parameter???
+                    return true
                 }
                 data.startsWith("PD:E") -> {
-
-                    this.singleRetrievingAction = false
-                }
-                data.startsWith("GI:E") -> {
-
-                    this.singleRetrievingAction = false
+                    // end of transmission, set marker to false and erase the ID
+                    this.currentPropertyResolveID = -1
+                    this.singlePropertyDetailRetrievingAction = false
+                    return true
                 }
                 else -> {
-                    // must be the data between the init and close notifications ???
+                    // must be the new detail description (TODO: what if not?????)
+                    // return true (if processed)
+
+                    if(this.currentPropertyResolveID != -1){
+                        // must be the name for the property
+                        this.laRoomyDevicePropertyList.forEach {
+                            if(it.propertyID == this.currentPropertyResolveID){
+                                // TODO: check if the element in the list will be updated or just a copy
+                                it.propertyDescriptor = data
+                                return@forEach
+                            }
+                        }
+                        this.uIAdapterList.forEach {
+                            if(it.elementType == PROPERTY_ELEMENT && it.elementID == this.currentPropertyResolveID){
+                                // TODO: check if the element in the list will be updated or just a copy
+                                it.elementText = data
+                                return@forEach
+                            }
+                        }
+                        // TODO: check if the UI Adapter will update automatically if the array changes!!!!
+                        return true
+                    }
                 }
             }
-
-            return false
         }
-        else return false
+
+        if(this.singleGroupRetrievingAction){
+            if(data.startsWith("IPG")){
+                // its a group request response
+                // TODO: handle single group response
+
+                this.singleGroupRetrievingAction = false
+                return true
+            }
+        }
+
+        if(this.singleGroupDetailRetrievingAction){
+           when{
+               data.startsWith("GI:S") -> {
+                   // its a group detail request response start entry -> look for the group id to record
+                   val id = this.groupIDFromStartEntry(data)
+                   if(id != -1){
+                       this.currentGroupResolveID = id
+                   }
+                   // TODO: if the id is invalid -> reset parameter???
+                   return true
+               }
+               data.startsWith("GI:E") -> {
+                   // end of transmission, set marker to false and erase the ID
+                   this.currentGroupResolveID = -1
+                   this.singleGroupDetailRetrievingAction = false
+                   return true
+               }
+               else -> {
+                   // must be the new group detail
+                   // return true (if processed)
+
+                   if(this.currentGroupResolveID != -1){
+                       if(data.startsWith("mI%")){
+                           // must be the member ID transmission part
+                           // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
+                           return true
+                       }
+                       else {
+                           // must be the name for the group
+
+                           return true
+                       }
+                   }
+               }
+           }
+        }
+        return false
     }
 
     private fun setPropertyStateForId(propertyID: Int, propertyState: Int, enabled: Boolean){
@@ -2435,6 +2496,48 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val value = a8BitValueToString(ID)
         val requestString = "D$value$"
         this.sendData(requestString)
+    }
+
+    private fun groupIDFromStartEntry(data: String) : Int {
+        var groupID = ""
+
+        data.forEachIndexed { index, c ->
+            when (index) {
+                0 -> if (c != 'G')return -1
+                1 -> if (c != 'I')return -1
+                2 -> if (c != ':')return -1
+                3 -> if (c != 'S')return -1
+                4 -> groupID += c
+                5 -> groupID += c
+                6 -> groupID += c
+            }
+        }
+        // convert group ID to Int and check the value
+        val id =
+            groupID.toInt()
+
+        return if(id < 256 && id > -1) { id } else -1
+    }
+
+    private fun propertyIDFromStartEntry(data: String) : Int {
+        var propertyID = ""
+
+        data.forEachIndexed { index, c ->
+            when (index) {
+                0 -> if (c != 'P') return -1
+                1 -> if (c != 'D') return -1
+                2 -> if (c != ':') return -1
+                3 -> if (c != 'S') return -1
+                4 -> propertyID += c
+                5 -> propertyID += c
+                6 -> propertyID += c
+            }
+        }
+        // convert property ID to Int and check the value
+        val id =
+            propertyID.toInt()
+
+        return if (id < 256 && id > -1) { id } else -1
     }
 
     private fun encodeGermanString(string: String) : String {
