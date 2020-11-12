@@ -2069,6 +2069,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
 
 
+                    this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
+
                     // TODO: check if the UI Adapter will update automatically if the array changes!!!!
 
                 }
@@ -2099,6 +2101,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // must be the new detail description (TODO: what if not?????)
                     // return true (if processed)
 
+                    var updateIndex = -1
+
                     if(this.currentPropertyResolveID != -1){
                         // must be the name for the property
                         // search the element in the property-list
@@ -2114,9 +2118,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             if((it.elementType == PROPERTY_ELEMENT) && (it.elementID == this.currentPropertyResolveID)){
                                 // TODO: check if the element in the list will be updated or just a copy
                                 it.elementText = data
+                                updateIndex = it.globalIndex
                                 return@forEach
                             }
                         }
+
+                        this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
+
                         // TODO: check if the UI Adapter will update automatically if the array changes!!!!
                         return true
                     }
@@ -2746,6 +2754,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onCompletePropertyInvalidated(){}
         fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
         fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
+        fun onUIAdaptableArrayItemChanged(index: Int){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData){}

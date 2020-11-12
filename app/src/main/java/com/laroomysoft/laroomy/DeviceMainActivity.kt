@@ -527,6 +527,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.setDeviceInfoHeader(deviceHeaderData.imageID, deviceHeaderData.message)
     }
 
+    override fun onUIAdaptableArrayItemChanged(index: Int) {
+        super.onUIAdaptableArrayItemChanged(index)
+
+        runOnUiThread {
+            devicePropertyListViewAdapter.notifyItemChanged(index)
+        }
+    }
+
     // device property list adapter:
     class DevicePropertyListAdapter(
         private val devicePropertyAdapter: ArrayList<DevicePropertyListContentInformation>,
