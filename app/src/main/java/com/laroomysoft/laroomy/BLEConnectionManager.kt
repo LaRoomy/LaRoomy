@@ -108,7 +108,7 @@ class LaRoomyDeviceProperty{
                 if(grID.isNotEmpty()){
                     this.groupID = grID.toInt()
                     this.isGroupMember = true
-                    Log.d("M:DevProp:fromString", "isGroupMember: $isGroupMember / GroupID: $groupID")
+                    Log.d("M:DevProp:fromString", "isGroupMember: $isGroupMember -- GroupID: $groupID")
                 }
             }
             Log.d(
@@ -958,8 +958,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.currentPropertyResolveIndex = 0
 
                 val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                    "de" -> 1
-                    else -> 0
+                    "Deutsch" -> '1'
+                    else -> '0'
                 }
                 var id = this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyID
                 var hundred = 0
@@ -1125,8 +1125,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             val languageIdentificationChar =
                 when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
-                    "Deutsch" -> 1
-                    else -> 0
+                    "Deutsch" -> '1'
+                    else -> '0'
                 }
             var id =
                 this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyID
@@ -1411,8 +1411,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             val languageIdentificationChar =
                 when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
-                    "de" -> 1
-                    else -> 0
+                    "Deutsch" -> '1'
+                    else -> '0'
                 }
             var id =
                 this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupID
@@ -2001,6 +2001,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun checkSingleAction(data: String) :Boolean {
         Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
 
+        // TODO: add more logs!
+
+        // TODO: if the retrieving loop is active, this should not be executed
+
         if(this.singlePropertyRetrievingAction) {
             if (data.startsWith("IPR")) {
                 // its a  single property request response
@@ -2040,8 +2044,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 updateIndex = -1
 
-                // TODO: check this!
-
                 // search the appropriate element in the UI-Adapter-List and save the index
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                     if((devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID)
@@ -2067,12 +2069,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     // replace the element in the UI-Adapter
                     this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
-
-
                     this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-
-                    // TODO: check if the UI Adapter will update automatically if the array changes!!!!
-
                 }
                 // mark the single action as processed
                 this.singlePropertyRetrievingAction = false
@@ -2098,9 +2095,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     return true
                 }
                 else -> {
-                    // must be the new detail description (TODO: what if not?????)
-                    // return true (if processed)
-
                     var updateIndex = -1
 
                     if(this.currentPropertyResolveID != -1){
@@ -2108,7 +2102,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // search the element in the property-list
                         this.laRoomyDevicePropertyList.forEach {
                             if(it.propertyID == this.currentPropertyResolveID){
-                                // TODO: check if the element in the list will be updated or just a copy
                                 it.propertyDescriptor = data
                                 return@forEach
                             }
@@ -2116,16 +2109,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // find the element in the UI-Adapter
                         this.uIAdapterList.forEach {
                             if((it.elementType == PROPERTY_ELEMENT) && (it.elementID == this.currentPropertyResolveID)){
-                                // TODO: check if the element in the list will be updated or just a copy
                                 it.elementText = data
                                 updateIndex = it.globalIndex
                                 return@forEach
                             }
                         }
-
                         this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-
-                        // TODO: check if the UI Adapter will update automatically if the array changes!!!!
                         return true
                     }
                 }
@@ -2190,9 +2179,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // replace the original in the UI-Adapter
                     this.uIAdapterList[updateIndex] = originElement
 
-                    // TODO: check if the UI Adapter will update automatically if the array changes!!!!
+                    this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
                 }
-
                 this.singleGroupRetrievingAction = false
                 return true
             }
@@ -2232,14 +2220,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                    return@forEach
                                }
                            }
+                           var updateIndex = -1
+
                            // find the element in the UI-Adapter
                            this.uIAdapterList.forEach {
                                if((it.elementID == this.currentGroupResolveID) && (it.elementType == GROUP_ELEMENT)){
                                    it.elementText = data
-                                   // TODO: check if the element in the list will be updated or just a copy
+                                   updateIndex = it.globalIndex
                                    return@forEach
                                }
                            }
+                           this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
+                           // return true:
                            true
                        }
                    }
