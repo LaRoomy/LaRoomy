@@ -32,6 +32,8 @@
     <string name="STS_Seconds">Sekunden</string>
     <string name="STS_TimePlaceholder">00 : 00</string>
 
+    <string name="NavCon_HeaderText">Navigator</string>
+
     <string name="TFS_HeaderText">Zeit-Fenster wählen</string>
     <string name="TFS_From">Von</string>
     <string name="TFS_To">Bis</string>
@@ -87,7 +89,14 @@
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">Das Gerät wird auf Werkseinstellungen zurückgesetzt. Sind Sie sicher?</string>
 
     <string name="AppHelpActivityHeaderText">Hilfe-Themen</string>
+    <string name="AppHelpTopic_ConnectDevice">Neues Gerät verbinden</string>
     <string name="AppHelpActivityGotoBluetoothButtonText">Bluetooth-Einstellungen öffnen</string>
+    <string name="AppHelpActivity_Topic_ConnectDevice_Explanation">Um das Gerät verwenden zu können muss es vorher gekoppelt werden.</string>
+    <string name="AppHelpActivity_Topic_ConnectDevice_P1">1. Stellen Sie sicher dass das Gerät erreichbar ist. Verringern Sie gegebenenfalls den Abstand zum Gerät</string>
+    <string name="AppHelpActivity_Topic_ConnectDevice_P2">2. Öffnen Sie die Bluetooth-Einstellungen und suchen Sie nach Geräten.</string>
+    <string name="AppHelpActivity_Topic_ConnectDevice_P3">3. Wenn das gewünschte Gerät gefunden wurde, klicken Sie darauf um es mit dem System zu koppeln. Sie werden möglicherweise nach einem Passwort gefragt, probieren Sie etwas wie 000000 oder 123456.</string>
+    <string name="AppHelpActivity_Topic_ConnectDevice_P4">4. Nachdem das Gerät erfolgreich gekoppelt ist, öffnen Sie die Laroomy App. Das Gerät sollte nun angezeigt werden.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding">Geräte-Bindung</string>
 
 
     <!-- Image content descriptions -->

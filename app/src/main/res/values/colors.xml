@@ -26,5 +26,7 @@
     <color name="grayAccentColor">#777777</color>
     <color name="blackBackgroundColor">#000000</color>
     <color name="clickableTextColor">#00C1F1</color>
+    <color name="helpTopicBackground">#444444</color>
+    <color name="navigatorButtonBackground">#ffaa00</color>
 
 </resources>

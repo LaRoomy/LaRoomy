@@ -154,6 +154,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
+    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onDeviceHeaderChanged(deviceHeaderData)
+
+        notifyUser(deviceHeaderData.message, R.color.InfoColor)
+    }
+
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState

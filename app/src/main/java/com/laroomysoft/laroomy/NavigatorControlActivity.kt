@@ -2,57 +2,38 @@ package com.laroomysoft.laroomy
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.TextView
-import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 
-class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
+class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var mustReconnect = false
-    private var currentHour = 0
-    private var currentMinute = 0
-
-    lateinit var simpleTimePicker: TimePicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_simple_time_selector)
+        setContentView(R.layout.activity_navigator_control)
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
-        // set the header-text to the property Name
-        findViewById<TextView>(R.id.stsHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
-
-        // get the complex state data for the time selector
-        val timeSelectorState =
+        // get the complex state data for the navigator
+        val navigatorState =
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
-        // set the displayed time to the current device setting
-        this.currentHour = timeSelectorState.valueOne
-        this.currentMinute = timeSelectorState.valueTwo
-
-
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@NavigatorControlActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
-        // config timeSelector
-        this.simpleTimePicker = findViewById(R.id.simpleTimePicker)
-        this.simpleTimePicker.setIs24HourView(true)
-        this.simpleTimePicker.hour = timeSelectorState.valueOne
-        this.simpleTimePicker.minute = timeSelectorState.valueTwo
-        this.simpleTimePicker.setOnTimeChangedListener(this)
     }
 
     override fun onPause() {
         super.onPause()
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:STSPage:onPause", "Simple Time Selector Activity: The user closes the app -> suspend connection")
+            Log.d("M:NavCon:onPause", "Navigator Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManger.close()
@@ -71,63 +52,36 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:STSPage:onResume", "onResume executed in Simple Time Selector Control")
+        Log.d("M:NavCon:onResume", "onResume executed in Navigator Control Activity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@NavigatorControlActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:STSPage:onResume", "The connection was suspended -> try to reconnect")
+            Log.d("M:NavCon:onResume", "The connection was suspended -> try to reconnect")
             ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
 
-    override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        Log.d("M:CB:TimeChanged", "Time changed in SimpleTimeSelector Activity." +
-                "Selected Time is: $hourOfDay : $minute")
-
-        this.currentHour = hourOfDay
-        this.currentMinute = minute
-
-        ApplicationProperty.bluetoothConnectionManger.sendData(
-            this.generateExecutionString()
-        )
-    }
-
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
+    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         // NOTE: do not use this method before the view is retrieved in onCreate
 
-        // TODO: check if this works (send property-changed notification from device)
+        // TODO:
 
-        this.currentHour = complexPropertyState.valueOne
-        this.currentMinute = complexPropertyState.valueTwo
-
-        this.simpleTimePicker.hour = complexPropertyState.valueOne
-        this.simpleTimePicker.minute = complexPropertyState.valueTwo
     }
 
     private fun notifyUser(message: String, colorID: Int){
 
-        val userNotificationTextView = findViewById<TextView>(R.id.stsUserNotificationTextView)
+        val userNotificationTextView = findViewById<TextView>(R.id.navConUserNotificationTextView)
         userNotificationTextView.setTextColor(getColor(colorID))
         userNotificationTextView.text = message
     }
 
-    private fun generateExecutionString() : String {
-        return "C${a8BitValueToString(relatedElementID)}" +
-                "${ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
-                    relatedGlobalElementIndex
-                ).complexPropertyState.timeSetterIndex}" +
-                a8BitValueAsTwoCharString(currentHour) +
-                a8BitValueAsTwoCharString(currentMinute) +
-                "00$"
-    }
-
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:STSPage:ConStateChge", "Connection state changed in SimpleTimeSelector Activity. New Connection state is: $state")
+        Log.d("M:NavCon:ConStateChge", "Connection state changed in Navigator Control Activity. New Connection state is: $state")
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -135,10 +89,8 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         }
     }
 
-    override fun onConnectionAttemptFailed(message: String) {
-        super.onConnectionAttemptFailed(message)
-        Log.e("M:STSPage:onConnFailed", "Connection Attempt failed in Simple Time Selector Activity")
-        notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
+    fun onNavigateButtonClick(view: View){
+
     }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
@@ -158,7 +110,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:STSPage:ComplexPCg", "Simple Time Selector Activity - Complex Property changed - Update the UI")
+            Log.d("M:CB:NavCon:ComplexPCg", "Navigator Control Activity - Complex Property changed - Update the UI")
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }
@@ -168,4 +120,5 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
+
 }
