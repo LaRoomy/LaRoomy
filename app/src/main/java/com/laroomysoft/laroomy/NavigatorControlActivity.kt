@@ -1,17 +1,21 @@
 package com.laroomysoft.laroomy
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 
-class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, View.OnTouchListener {
 
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var mustReconnect = false
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigator_control)
@@ -21,6 +25,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // get the complex state data for the navigator
+        // TODO: currently there is no state data, remove this later!
         val navigatorState =
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
@@ -28,6 +33,11 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@NavigatorControlActivity, this)
         ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
+        findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).setOnTouchListener(this)
+        findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).setOnTouchListener(this)
+        findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).setOnTouchListener(this)
+        findViewById<AppCompatImageButton>(R.id.navConNavigateUpButton).setOnTouchListener(this)
+        findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).setOnTouchListener(this)
     }
 
     override fun onPause() {
@@ -65,11 +75,44 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         }
     }
 
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when(event?.action){
+            MotionEvent.ACTION_CANCEL -> {
+                executeButtonCommand(v?.id, false)
+            }
+            MotionEvent.ACTION_DOWN -> {
+                executeButtonCommand(v?.id, false)
+            }
+            MotionEvent.ACTION_UP -> {
+                executeButtonCommand(v?.id, true)
+                v?.performClick()
+            }
+            else -> {}
+        }
+        return true
+    }
+
+    private fun executeButtonCommand(Id: Int?, activate: Boolean){
+        val directionChar = when(Id){
+            R.id.navConNavigateUpButton -> '1'
+            R.id.navConNavigateRightButton -> '2'
+            R.id.navConNavigateDownButton -> '3'
+            R.id.navConNavigateLeftButton -> '4'
+            R.id.navConNavigateMiddleButton -> '5'
+            else -> "0"// zero has no function (error command)
+        }
+        val touchDownType = when(activate){
+            true -> '1'
+            else -> '2'
+        }
+        val executionString = "C${a8BitValueToString(relatedElementID)}$directionChar$touchDownType$"
+        ApplicationProperty.bluetoothConnectionManger.sendData(executionString)
+    }
+
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         // NOTE: do not use this method before the view is retrieved in onCreate
 
-        // TODO:
-
+        // TODO: this property has no state, if there is none added -> remove this method later
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -89,9 +132,19 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         }
     }
 
-    fun onNavigateButtonClick(view: View){
-
-    }
+//    fun onNavigateButtonClick(view: View){
+//
+//        val directionChar = when(view.id){
+//            R.id.navConNavigateUpButton -> '1'
+//            R.id.navConNavigateRightButton -> '2'
+//            R.id.navConNavigateDownButton -> '3'
+//            R.id.navConNavigateLeftButton -> '4'
+//            R.id.navConNavigateMiddleButton -> '5'
+//            else -> "0"// zero has no function (error command)
+//        }
+//        val executionString = "C${a8BitValueToString(relatedElementID)}$directionChar$"
+//        ApplicationProperty.bluetoothConnectionManger.sendData(executionString)
+//    }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
         super.onDeviceHeaderChanged(deviceHeaderData)
@@ -122,3 +175,4 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
 }
+

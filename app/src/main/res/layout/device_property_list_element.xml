@@ -106,7 +106,7 @@
                 android:visibility="gone"
 
 
-                app:srcCompat="@drawable/nav_arrow_right" />
+                app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/elementSwitch"
