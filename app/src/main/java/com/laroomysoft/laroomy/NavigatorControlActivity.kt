@@ -76,6 +76,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+
+        // TODO: what does the return value mean????!
+
         when(event?.action){
             MotionEvent.ACTION_CANCEL -> {
                 executeButtonCommand(v?.id, false)
