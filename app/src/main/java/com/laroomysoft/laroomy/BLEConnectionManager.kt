@@ -266,6 +266,8 @@ class ComplexPropertyState {
     var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)
     var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)
     var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)
+    var valueFour = -1     // general use                   // flag-value in simple Navigator
+    var valueFive = -1     // general use                   // flag value in simple Navigator
     var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
     var enabledState = true// at this time only a placeholder (not implemented yet)
     var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
@@ -2339,6 +2341,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyElement.propertyIndex,
                         data
                     )
+                    COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> retrieveSimpleNavigatorData(
+                        propertyElement.propertyIndex,
+                        data
+                    )
 
                     // TODO: handle all complex types here!
 
@@ -2551,8 +2557,40 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             return true
         }
+    }
 
-
+    private fun retrieveSimpleNavigatorData(elementIndex: Int, data: String): Boolean{
+        // check the transmission length first
+        if(data.length < 11){
+            return false
+        } else {
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne =
+                when(data.elementAt(6)){
+                    '1' -> 1
+                    else -> 0
+                }
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo =
+                when(data.elementAt(7)){
+                    '1' -> 1
+                    else -> 0
+                }
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree =
+                when (data.elementAt(8)){
+                    '1' -> 1
+                    else -> 0
+                }
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueFour =
+                when (data.elementAt(9)){
+                    '1' -> 1
+                    else -> 0
+                }
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueFive =
+                when(data.elementAt(10)){
+                    '1' -> 1
+                    else -> 0
+                }
+            return true
+        }
     }
 
     private fun startComplexStateDataLoop(){

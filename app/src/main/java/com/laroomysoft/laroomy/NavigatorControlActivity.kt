@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, View.OnTouchListener {
 
@@ -25,7 +26,6 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // get the complex state data for the navigator
-        // TODO: currently there is no state data, remove this later!
         val navigatorState =
             ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
@@ -38,6 +38,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).setOnTouchListener(this)
         findViewById<AppCompatImageButton>(R.id.navConNavigateUpButton).setOnTouchListener(this)
         findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).setOnTouchListener(this)
+
+        // set the view-state from the complex property state
+        this.setCurrentViewStateFromComplexPropertyState(navigatorState)
     }
 
     override fun onPause() {
@@ -113,9 +116,28 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
-        // NOTE: do not use this method before the view is retrieved in onCreate
+        var minHeightVal = 280
 
-        // TODO: this property has no state, if there is none added -> remove this method later
+        if(complexPropertyState.valueOne != 1){
+            findViewById<AppCompatImageButton>(R.id.navConNavigateUpButton).visibility = View.GONE
+            minHeightVal -= 70
+        }
+        if(complexPropertyState.valueTwo != 1){
+            findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility = View.GONE
+        }
+        if(complexPropertyState.valueThree != 1){
+            findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).visibility = View.GONE
+            minHeightVal -= 70
+        }
+        if(complexPropertyState.valueFour != 1){
+            findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility = View.GONE
+        }
+        if(complexPropertyState.valueFive != 1){
+            findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility = View.GONE
+        }
+        if(minHeightVal < 280){
+            findViewById<ConstraintLayout>(R.id.navConNavigatorContainer).minHeight = minHeightVal
+        }
     }
 
     private fun notifyUser(message: String, colorID: Int){

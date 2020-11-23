@@ -3,7 +3,6 @@ package com.laroomysoft.laroomy
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import android.widget.Switch
 import androidx.appcompat.widget.SwitchCompat
 import java.util.*
 
@@ -223,7 +222,18 @@ fun resourceIdForImageId(imageID: Int): Int {
         84 -> R.drawable.one_circle_white
         85 -> R.drawable.two_circle_white
         86 -> R.drawable.three_circle_white
+        87 -> R.drawable.arrow_up_white
+        88 -> R.drawable.arrow_right_white
+        89 -> R.drawable.arrow_down_white
+        90 -> R.drawable.arrow_left_white
+        91 -> R.drawable.arrow_up_blue
+        92 -> R.drawable.arrow_right_blue
+        93 -> R.drawable.arrow_down_blue
+        94 -> R.drawable.arrow_left_blue
+        95 -> R.drawable.tv_white
+        96 -> R.drawable.tv_white_blue
 
+        // TODO: implement all new image resources here...
 
         else -> R.drawable.image_error_state
     }
