@@ -552,8 +552,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val authenticationResponse = "Auth:rsp:true"
     val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"
     val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"
-    private val propertyLoopEndIndication = "RSP:A:PEND$"
-    private val groupLoopEndIndication = "RSP:E:PGEND$"
+    private val propertyLoopEndIndication = "RSP:A:PEND"
+    private val groupLoopEndIndication = "RSP:E:PGEND"
     private val complexDataStateTransmissionEntry = "PSC"
     private val simpleDataStateTransmissionEntry = "PSS"
     private val propertyChangedNotificationEntry = "DnPcx1="
@@ -2001,7 +2001,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
     private fun checkSingleAction(data: String) :Boolean {
-        Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
+
+
+        //Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
 
         // TODO: add more logs!
 
