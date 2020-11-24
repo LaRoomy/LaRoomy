@@ -232,6 +232,22 @@ fun resourceIdForImageId(imageID: Int): Int {
         94 -> R.drawable.arrow_left_blue
         95 -> R.drawable.tv_white
         96 -> R.drawable.tv_white_blue
+        97 -> R.drawable.arrow_up_down_blue_white
+        98 -> R.drawable.arrow_left_right_blue_white
+        99 -> R.drawable.hand_blue_white
+        100 -> R.drawable.info_white_blue
+        101 -> R.drawable.stop_sign
+        102 -> R.drawable.shield_power
+        103 -> R.drawable.shield_ok
+        104 -> R.drawable.shield_attention
+        105 -> R.drawable.lock_unlocked_blue_white
+        106 -> R.drawable.key_white
+        107 -> R.drawable.key_blue
+        108 -> R.drawable.face_id_white
+        109 -> R.drawable.undo_white
+        110 -> R.drawable.redo_white
+        111 -> R.drawable.flash_blue
+        112 -> R.drawable.flash_yellow
 
         // TODO: implement all new image resources here...
 
