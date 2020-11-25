@@ -19,6 +19,9 @@ const val LAROOMYDEVICETYPE_NONE = 0
 const val LAROOMYDEVICETYPE_XNG = 1
 const val LAROOMYDEVICETYPE_CTX = 2
 
+const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
+const val UPDATE_TYPE_DETAIL_DEFINITION = 2
+
 class LaRoomyDeviceProperty{
 
     var propertyIndex: Int = -1 // invalid marker == -1
@@ -289,6 +292,13 @@ class DeviceInfoHeaderData {
     }
 }
 
+class ElementUpdateInfo{
+    var elementID = -1
+    var elementIndex = -1
+    var elementType = -1
+    var updateType = -1
+}
+
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
 
@@ -457,7 +467,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 if(!dataProcessed) {
 
-                    dataProcessed = checkSingleAction(dataAsString ?: "error")
+//                    if(updateStackProcessActive) {
+//                        dataProcessed = checkSingleAction(dataAsString ?: "error")
+//                    }
+                    dataProcessed = processElementUpdateStack(dataAsString ?: "error")
 
                     if(!dataProcessed) {
                         // check if one of the property-retrieving-loops is active
@@ -597,6 +610,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var dataReadyToShow = false
     private var complexStateLoopActive = false
     private var deviceHeaderRecordingActive = false
+    private var updateStackProcessActive = false
     private var suspendedDeviceAddress = ""
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
@@ -615,6 +629,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
+    var elementUpdateList = ArrayList<ElementUpdateInfo>()
 
     var complexStatePropertyIDs = ArrayList<Int>()
 
@@ -661,10 +676,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
         this.uIAdapterList.clear()
+        this.elementUpdateList.clear()
         this.singlePropertyRetrievingAction = false
         this.singleGroupRetrievingAction = false
         this.singlePropertyDetailRetrievingAction = false
         this.singleGroupDetailRetrievingAction = false
+        this.updateStackProcessActive = false
         this.currentPropertyResolveID = -1
         this.currentGroupResolveID = -1
     }
@@ -1749,18 +1766,40 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             Log.d("M:updateProperty", "Recording of Property-Update String complete:\nUpdate: entireProperty = $entireProperty\nUpdate: entireDetail = $entireDetail\nUpdate: thisProperty = $thisProperty\nUpdate: thisPropertyDetail = $thisPropertyDetail")
 
             if(entireProperty){
+                // TODO: this must be checked
                 this.propertyCallback.onCompletePropertyInvalidated()
                 return
             }
             if(entireDetail){
+                // TODO: this must be checked
                 this.propertyNameResolveSingleAction = true
                 startRetrievingPropertyNames()
             }
             if(thisProperty){
-                this.sendSinglePropertyRequest(propIndex.toInt())
+                val updateInfo = ElementUpdateInfo()
+                updateInfo.elementID = propID.toInt()
+                updateInfo.elementIndex = propIndex.toInt()
+                updateInfo.elementType = PROPERTY_ELEMENT
+                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
+
+                this.elementUpdateList.add(updateInfo)
+
+                this.startUpdateStackProcessing()
+
+                //this.sendSinglePropertyRequest(propIndex.toInt())
             }
             if(thisPropertyDetail){
-                this.sendSinglePropertyResolveRequest(propID.toInt())
+                val updateInfo = ElementUpdateInfo()
+                updateInfo.elementID = propID.toInt()
+                updateInfo.elementIndex = propIndex.toInt()
+                updateInfo.elementType = PROPERTY_ELEMENT
+                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
+
+                this.elementUpdateList.add(updateInfo)
+
+                this.startUpdateStackProcessing()
+
+                //this.sendSinglePropertyResolveRequest(propID.toInt())
             }
 
         }
@@ -1793,18 +1832,40 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             Log.d("M:updatePropGroup", "Recording of Property Group Update String complete:\nUpdate: entirePropertyGroup = $entirePropertyGroup\nUpdate: entireGroupDetail = $entireGroupDetail\nUpdate: thisgroup = $thisGroup\nUpdate: thisGroupDetail = $thisGroupDetail")
 
             if(entirePropertyGroup){
+                // TODO: check if this works!
                 this.propertyCallback.onCompletePropertyInvalidated()
                 return
             }
             if(entireGroupDetail){
+                // TODO: check if this works!
                 this.propertyGroupNameResolveSingleAction = true
                 startDetailedGroupInfoLoop()
             }
             if(thisGroup){
-                this.sendSinglePropertyGroupRequest(groupIndex.toInt())
+                val updateInfo = ElementUpdateInfo()
+                updateInfo.elementID = groupID.toInt()
+                updateInfo.elementIndex = groupIndex.toInt()
+                updateInfo.elementType = GROUP_ELEMENT
+                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
+
+                this.elementUpdateList.add(updateInfo)
+
+                this.startUpdateStackProcessing()
+
+                //this.sendSinglePropertyGroupRequest(groupIndex.toInt())
             }
             if(thisGroupDetail){
-                this.sendSingleGroupDetailRequest(groupID.toInt())
+                val updateInfo = ElementUpdateInfo()
+                updateInfo.elementID = groupID.toInt()
+                updateInfo.elementIndex = groupIndex.toInt()
+                updateInfo.elementType = GROUP_ELEMENT
+                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
+
+                this.elementUpdateList.add(updateInfo)
+
+                this.startUpdateStackProcessing()
+
+                //this.sendSingleGroupDetailRequest(groupID.toInt())
             }
 
         }
@@ -2016,7 +2077,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: if the retrieving loop is active, this should not be executed
 
         if(this.singlePropertyRetrievingAction) {
+            Log.d("M:CheckSingleAction", "Single Property Request is active, look for an appropriate transmission")
             if (data.startsWith(propertyStringPrefix)) {
+                Log.d("M:CheckSingleAction", "Property-String-Prefix detected")
                 // its a  single property request response
 
                 // initialize the property element from string
@@ -2088,8 +2151,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singlePropertyDetailRetrievingAction){
+            Log.d("M:CheckSingleAction", "Single Property DETAIL Request is active, look for an appropriate transmission")
             when{
                 data.startsWith(propertyNameStartIndicator) -> {
+                    Log.d("M:CheckSingleAction", "Property-Name start indicator detected")
                     // its a property description request -> look for the property id to record
                     val id = this.propertyIDFromStartEntry(data)
                     if(id != -1){
@@ -2099,6 +2164,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     return true
                 }
                 data.startsWith(propertyNameEndIndicator) -> {
+                    Log.d("M:CheckSingleAction", "Property-Name end indicator detected")
                     // end of transmission, set marker to false and erase the ID
                     this.currentPropertyResolveID = -1
                     this.singlePropertyDetailRetrievingAction = false
@@ -2108,6 +2174,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     var updateIndex = -1
 
                     if(this.currentPropertyResolveID != -1){
+                        Log.d("M:CheckSingleAction", "Must be the property name. Data is: <$data>")
                         // must be the name for the property
                         // search the element in the property-list
                         this.laRoomyDevicePropertyList.forEach {
@@ -2132,7 +2199,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singleGroupRetrievingAction){
+            Log.d("M:CheckSingleAction", "Single Group Request is active, look for an appropriate transmission")
             if(data.startsWith(groupStringPrefix)){
+                Log.d("M:CheckSingleAction", "Group-Prefix detected")
                 // its a group request response
 
                 val updatedGroup = LaRoomyDevicePropertyGroup()
@@ -2197,8 +2266,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singleGroupDetailRetrievingAction){
+            Log.d("M:CheckSingleAction", "Single Group DETAIL Request is active, look for an appropriate transmission")
            when{
                data.startsWith(groupInfoStartIndicator) -> {
+                   Log.d("M:CheckSingleAction", "Group Info start indicator detected")
                    // its a group detail request response start entry -> look for the group id to record
                    val id = this.groupIDFromStartEntry(data)
                    if(id != -1){
@@ -2208,6 +2279,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                    return true
                }
                data.startsWith(groupInfoEndIndicator) -> {
+                   Log.d("M:CheckSingleAction", "Group Info end indicator detected")
                    // end of transmission, set marker to false and erase the ID
                    this.currentGroupResolveID = -1
                    this.singleGroupDetailRetrievingAction = false
@@ -2216,12 +2288,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                else -> {
                    // must be the new group detail
                    if(this.currentGroupResolveID != -1){
+                       Log.d("M:CheckSingleAction", "Must be Group-detail data. Data is <$data>")
                        return if(data.startsWith(groupMemberStringPrefix)){
+                           Log.d("M:CheckSingleAction", "Group-Member String Prefix detected")
                            // must be the member ID transmission part
                            // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
                            //this.propertyCallback.onCompletePropertyInvalidated()
                            true
                        } else {
+                           Log.d("M:CheckSingleAction", "Must be the Group-Name..")
                            // must be the name for the group
                            // search the element in the groupList
                            this.laRoomyPropertyGroupList.forEach {
@@ -2730,6 +2805,92 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         Handler(Looper.getMainLooper()).postDelayed({
             this.testConnection()
         }, delayTimeMs)
+    }
+
+    private fun startUpdateStackProcessing(){
+        if(this.elementUpdateList.isNotEmpty()) {
+            if(!this.updateStackProcessActive) {
+
+                Log.d("M:startUSP", "Update stack processing started..")
+                this.updateStackProcessActive = true
+
+                val updateElement = this.elementUpdateList.elementAt(0)
+
+                when (updateElement.elementType) {
+                    PROPERTY_ELEMENT -> {
+                        when (updateElement.updateType) {
+                            UPDATE_TYPE_ELEMENT_DEFINITION -> {
+                                sendSinglePropertyRequest(updateElement.elementIndex)
+                            }
+                            UPDATE_TYPE_DETAIL_DEFINITION -> {
+                                sendSinglePropertyResolveRequest(updateElement.elementID)
+                            }
+                        }
+                    }
+                    GROUP_ELEMENT -> {
+                        when (updateElement.updateType) {
+                            UPDATE_TYPE_ELEMENT_DEFINITION -> {
+                                sendSinglePropertyGroupRequest(updateElement.elementIndex)
+                            }
+                            UPDATE_TYPE_DETAIL_DEFINITION -> {
+                                sendSingleGroupDetailRequest(updateElement.elementID)
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            this.updateStackProcessActive = false
+        }
+    }
+
+    private fun processElementUpdateStack(data: String): Boolean {
+        return if(this.updateStackProcessActive) {
+            Log.d("M:USP", "ProcessElementUpdateStack invoked. Check transmission..")
+            val processed = this.checkSingleAction(data)
+            // check if the first element was processed
+            if (processed) {
+                Log.d("M:USP", "ProcessElementUpdateStack - Element processed - remove the last and look for other elements in the array")
+                // remove the element
+                this.elementUpdateList.removeAt(0)
+                // check if there are elements left in the array
+                if(this.elementUpdateList.isNotEmpty()){
+
+                    val updateElement = this.elementUpdateList.elementAt(0)
+
+                    Log.d("M:USP", "ProcessElementUpdateStack - Request next element: ID: ${updateElement.elementID} Index: ${updateElement.elementIndex}")
+
+                    when (updateElement.elementType) {
+                        PROPERTY_ELEMENT -> {
+                            when (updateElement.updateType) {
+                                UPDATE_TYPE_ELEMENT_DEFINITION -> {
+                                    sendSinglePropertyRequest(updateElement.elementIndex)
+                                }
+                                UPDATE_TYPE_DETAIL_DEFINITION -> {
+                                    sendSinglePropertyResolveRequest(updateElement.elementID)
+                                }
+                            }
+                        }
+                        GROUP_ELEMENT -> {
+                            when (updateElement.updateType) {
+                                UPDATE_TYPE_ELEMENT_DEFINITION -> {
+                                    sendSinglePropertyGroupRequest(updateElement.elementIndex)
+                                }
+                                UPDATE_TYPE_DETAIL_DEFINITION -> {
+                                    sendSingleGroupDetailRequest(updateElement.elementID)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    this.updateStackProcessActive = false
+                }
+            }
+            processed
+        } else {
+            false
+        }
+
     }
 
 //    fun formatIncomingData(data: String) : String {
