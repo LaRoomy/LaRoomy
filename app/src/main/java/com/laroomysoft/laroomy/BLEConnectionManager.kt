@@ -547,19 +547,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-    private val authenticationString = "xPsM0-33wSp_mmT$"
-    private val testCommand = "vXtest385_26$"
-    val authenticationResponse = "Auth:rsp:true"
-    val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"
-    val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"
-    private val propertyLoopEndIndication = "RSP:A:PEND"
-    private val groupLoopEndIndication = "RSP:E:PGEND"
+    private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
+    private val testCommand = "vXtest385_26$"// outgoing
+    val authenticationResponse = "Auth:rsp:true"// incoming
+    val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"// incoming
+    val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"// incoming
+    private val propertyLoopEndIndication = "RSP:A:PEND"// incoming
+    private val groupLoopEndIndication = "RSP:E:PGEND"// incoming
+    private val propertyStringPrefix = "IPR" // incoming -prefix
+    private val groupStringPrefix = "IPG"// incoming -prefix
+    private val groupMemberStringPrefix = "mI%"
+    private val propertyNameStartIndicator = "PD:S"// incoming -prefix
+    private val propertyNameEndIndicator = "PD:E"// incoming
+    private val groupInfoStartIndicator = "GI:S"//incoming -prefix
+    private val groupInfoEndIndicator = "GI:E"// incoming
     private val complexDataStateTransmissionEntry = "PSC"
     private val simpleDataStateTransmissionEntry = "PSS"
     private val propertyChangedNotificationEntry = "DnPcx1="
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
     private val deviceHeaderStartEntry = "DnDIHs7"
-    private val deviceHeaderCloseMessage = "DnDIHe+$"
+    private val deviceHeaderCloseMessage = "DnDIHe+"
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -1008,7 +1015,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     7 -> propertyState += c
                     8 -> propertyState += c
                     9 -> propertyState += c
-                    //7 -> if(c != '$') ...
                 }
             }
             // convert property ID to Int and check the value
@@ -1037,7 +1043,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         else {
             Log.d("M:resolvePropNames", "This must be the name string or a end indicator")
             // must be the name-string or the finalization-string
-            if(propertyName == "PD:E$"){
+            if(propertyName == propertyNameEndIndicator){
                 Log.d("M:resolvePropNames", "It's a finalization string: reset necessary parameter")
                 // it's a finalization string -> check for loop end
                 if(this.laRoomyDevicePropertyList.last().propertyID == currentPropertyResolveID){
@@ -1197,7 +1203,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             Log.d("M:AddPropGroup", "This could be a property-group-definition string - check this!")
 
             // check start-character to identify the group-string
-            if(group.startsWith("IPG", false)){
+            if(group.startsWith(groupStringPrefix, false)){
                 // log:
                 Log.d("M:AddPropGroup", "It is a group string - add to collection")
                 // add group to collection
@@ -1312,7 +1318,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         else {
             Log.d("M:resolveGroupInfo", "This must be the group-info or a end indicator")
             // must be the name-string or the finalization-string
-            if(groupInfoData == "GI:E$"){
+            if(groupInfoData == groupInfoEndIndicator){
                 Log.d("M:resolveGroupInfo", "It's a finalization string: reset necessary parameter")
                 // it's a finalization string -> check for loop end
                 if(this.laRoomyPropertyGroupList.last().groupID == currentGroupResolveID){
@@ -1363,7 +1369,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 Log.d("M:resolveGroupInfo", "This must be the data for the group with ID: $currentGroupResolveID")
                 // must be group data:
                 // check the type of data:
-                if(groupInfoData.startsWith("mI%", false)){
+                if(groupInfoData.startsWith(groupMemberStringPrefix, false)){
                     // log
                     Log.d("M:resolveGroupInfo", "This must be the member IDs for the group with ID: $currentGroupResolveID")
                     // this was the member id identification, so set the member IDs
@@ -1846,7 +1852,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.singlePropertyDetailRetrievingAction = true
             // get language identification
             val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                "de" -> 1
+                "Deutsch" -> 1
                 else -> 0
             }
             // build string
@@ -1868,7 +1874,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.singleGroupDetailRetrievingAction = true
             // get language identification
             val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                "de" -> 1
+                "Deutsch" -> 1
                 else -> 0
             }
             // build string
@@ -2010,7 +2016,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: if the retrieving loop is active, this should not be executed
 
         if(this.singlePropertyRetrievingAction) {
-            if (data.startsWith("IPR")) {
+            if (data.startsWith(propertyStringPrefix)) {
                 // its a  single property request response
 
                 // initialize the property element from string
@@ -2083,7 +2089,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         if(this.singlePropertyDetailRetrievingAction){
             when{
-                data.startsWith("PD:S") -> {
+                data.startsWith(propertyNameStartIndicator) -> {
                     // its a property description request -> look for the property id to record
                     val id = this.propertyIDFromStartEntry(data)
                     if(id != -1){
@@ -2092,7 +2098,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // TODO: if the id is invalid -> reset parameter???
                     return true
                 }
-                data.startsWith("PD:E") -> {
+                data.startsWith(propertyNameEndIndicator) -> {
                     // end of transmission, set marker to false and erase the ID
                     this.currentPropertyResolveID = -1
                     this.singlePropertyDetailRetrievingAction = false
@@ -2126,7 +2132,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singleGroupRetrievingAction){
-            if(data.startsWith("IPG")){
+            if(data.startsWith(groupStringPrefix)){
                 // its a group request response
 
                 val updatedGroup = LaRoomyDevicePropertyGroup()
@@ -2192,7 +2198,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         if(this.singleGroupDetailRetrievingAction){
            when{
-               data.startsWith("GI:S") -> {
+               data.startsWith(groupInfoStartIndicator) -> {
                    // its a group detail request response start entry -> look for the group id to record
                    val id = this.groupIDFromStartEntry(data)
                    if(id != -1){
@@ -2201,7 +2207,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                    // TODO: if the id is invalid -> reset parameter???
                    return true
                }
-               data.startsWith("GI:E") -> {
+               data.startsWith(groupInfoEndIndicator) -> {
                    // end of transmission, set marker to false and erase the ID
                    this.currentGroupResolveID = -1
                    this.singleGroupDetailRetrievingAction = false
@@ -2210,7 +2216,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                else -> {
                    // must be the new group detail
                    if(this.currentGroupResolveID != -1){
-                       return if(data.startsWith("mI%")){
+                       return if(data.startsWith(groupMemberStringPrefix)){
                            // must be the member ID transmission part
                            // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
                            //this.propertyCallback.onCompletePropertyInvalidated()
@@ -2714,7 +2720,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData("r$passkey>$")
     }
 
-    fun testConnection(){
+    private fun testConnection(){
         // reset test indicator and send test command
         this.connectionTestSucceeded = false
         this.sendData(this.testCommand)
@@ -2762,7 +2768,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.propertyConfirmationModeActive = false
         this.groupDetailChangedOnConfirmation = false
         this.propertyDetailChangedOnConfirmation = false
-        this.propertyUpToDate = false // TODO: is the right???
+        this.propertyUpToDate = false // TODO: is this right???
     }
 
     // the callback definition for the event handling in the calling class
