@@ -87,10 +87,10 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
                 executeButtonCommand(v?.id, false)
             }
             MotionEvent.ACTION_DOWN -> {
-                executeButtonCommand(v?.id, false)
+                executeButtonCommand(v?.id, true)
             }
             MotionEvent.ACTION_UP -> {
-                executeButtonCommand(v?.id, true)
+                executeButtonCommand(v?.id, false)
                 v?.performClick()
             }
             else -> {}
@@ -142,9 +142,12 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
     private fun notifyUser(message: String, colorID: Int){
 
-        val userNotificationTextView = findViewById<TextView>(R.id.navConUserNotificationTextView)
-        userNotificationTextView.setTextColor(getColor(colorID))
-        userNotificationTextView.text = message
+        runOnUiThread {
+            val userNotificationTextView =
+                findViewById<TextView>(R.id.navConUserNotificationTextView)
+            userNotificationTextView.setTextColor(getColor(colorID))
+            userNotificationTextView.text = message
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -189,7 +192,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:NavCon:ComplexPCg", "Navigator Control Activity - Complex Property changed - Update the UI")
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            runOnUiThread {
+                this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            }
         }
     }
 

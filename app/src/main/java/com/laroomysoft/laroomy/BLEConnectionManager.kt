@@ -22,6 +22,11 @@ const val LAROOMYDEVICETYPE_CTX = 2
 const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
 const val UPDATE_TYPE_DETAIL_DEFINITION = 2
 
+const val SINGLEACTION_NOT_PROCESSED = 1
+const val SINGLEACTION_PARTIALLY_PROCESSED = 2
+const val SINGLEACTION_PROCESSING_COMPLETE = 3
+const val SINGLEACTION_PROCESSING_ERROR = 4
+
 class LaRoomyDeviceProperty{
 
     var propertyIndex: Int = -1 // invalid marker == -1
@@ -2023,7 +2028,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     Thread.sleep(100)
                 }
-            }
+            }   
             // now add the properties which are not part of a group
             this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
                 // only add the non-group properties
@@ -2067,7 +2072,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
 
-    private fun checkSingleAction(data: String) :Boolean {
+    private fun checkSingleAction(data: String) :Int {
 
 
         //Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
@@ -2105,7 +2110,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if(laroomyDeviceProperty.propertyIndex != updatedLaRoomyDeviceProperty.propertyIndex){
                         // this can only occur if the complete property changed -> launch invalidated event
                         this.propertyCallback.onCompletePropertyInvalidated()
-                        return true
+                        return SINGLEACTION_PROCESSING_ERROR
                     }
                     // set the possible new values
                     laroomyDeviceProperty.imageID = updatedLaRoomyDeviceProperty.imageID
@@ -2146,7 +2151,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 // mark the single action as processed
                 this.singlePropertyRetrievingAction = false
-                return true
+
+                return SINGLEACTION_PROCESSING_COMPLETE
             }
         }
 
@@ -2161,14 +2167,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         this.currentPropertyResolveID = id
                     }
                     // TODO: if the id is invalid -> reset parameter???
-                    return true
+                    return SINGLEACTION_PARTIALLY_PROCESSED
                 }
                 data.startsWith(propertyNameEndIndicator) -> {
                     Log.d("M:CheckSingleAction", "Property-Name end indicator detected")
                     // end of transmission, set marker to false and erase the ID
                     this.currentPropertyResolveID = -1
                     this.singlePropertyDetailRetrievingAction = false
-                    return true
+                    return SINGLEACTION_PROCESSING_COMPLETE
                 }
                 else -> {
                     var updateIndex = -1
@@ -2192,7 +2198,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             }
                         }
                         this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-                        return true
+                        return SINGLEACTION_PARTIALLY_PROCESSED
                     }
                 }
             }
@@ -2226,7 +2232,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // check for invalidation
                     if(propGroup.groupIndex != updatedGroup.groupIndex){
                         this.propertyCallback.onCompletePropertyInvalidated()
-                        return true
+                        return SINGLEACTION_PROCESSING_ERROR
                     }
                     // set possible values
                     propGroup.imageID = updatedGroup.imageID
@@ -2261,7 +2267,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
                 }
                 this.singleGroupRetrievingAction = false
-                return true
+                return SINGLEACTION_PROCESSING_COMPLETE
             }
         }
 
@@ -2276,14 +2282,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                        this.currentGroupResolveID = id
                    }
                    // TODO: if the id is invalid -> reset parameter???
-                   return true
+                   return SINGLEACTION_PARTIALLY_PROCESSED
                }
                data.startsWith(groupInfoEndIndicator) -> {
                    Log.d("M:CheckSingleAction", "Group Info end indicator detected")
                    // end of transmission, set marker to false and erase the ID
                    this.currentGroupResolveID = -1
                    this.singleGroupDetailRetrievingAction = false
-                   return true
+                   return SINGLEACTION_PROCESSING_COMPLETE
                }
                else -> {
                    // must be the new group detail
@@ -2294,7 +2300,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                            // must be the member ID transmission part
                            // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
                            //this.propertyCallback.onCompletePropertyInvalidated()
-                           true
+                           SINGLEACTION_PARTIALLY_PROCESSED
                        } else {
                            Log.d("M:CheckSingleAction", "Must be the Group-Name..")
                            // must be the name for the group
@@ -2317,13 +2323,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                            }
                            this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
                            // return true:
-                           true
+                           SINGLEACTION_PARTIALLY_PROCESSED
                        }
                    }
                }
            }
         }
-        return false
+        return SINGLEACTION_NOT_PROCESSED
     }
 
     private fun setPropertyStateForId(propertyID: Int, propertyState: Int, enabled: Boolean){
@@ -2847,10 +2853,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun processElementUpdateStack(data: String): Boolean {
         return if(this.updateStackProcessActive) {
             Log.d("M:USP", "ProcessElementUpdateStack invoked. Check transmission..")
-            val processed = this.checkSingleAction(data)
+
+            val singleAction = this.checkSingleAction(data)
+            val processed = singleAction != SINGLEACTION_NOT_PROCESSED
+
             // check if the first element was processed
-            if (processed) {
+            if (singleAction == SINGLEACTION_PROCESSING_COMPLETE) {
                 Log.d("M:USP", "ProcessElementUpdateStack - Element processed - remove the last and look for other elements in the array")
+
                 // remove the element
                 this.elementUpdateList.removeAt(0)
                 // check if there are elements left in the array
@@ -2883,6 +2893,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 } else {
+                    Log.d("M:USP", "ProcessElementUpdateStack - NO MORE ELEMENTS LEFT - Stop update process")
                     this.updateStackProcessActive = false
                 }
             }
