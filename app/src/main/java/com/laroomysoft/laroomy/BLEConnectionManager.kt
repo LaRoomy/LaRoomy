@@ -2028,7 +2028,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     Thread.sleep(100)
                 }
-            }   
+            }
             // now add the properties which are not part of a group
             this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
                 // only add the non-group properties
