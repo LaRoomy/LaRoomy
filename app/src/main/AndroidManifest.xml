@@ -19,10 +19,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NavigatorControlActivity"></activity>
+        <activity
+            android:name=".BarGraphActivity"
+            android:screenOrientation="nosensor"/>
+        <activity
+            android:name=".NavigatorControlActivity"
+            android:screenOrientation="nosensor" />
         <activity
             android:name=".DeviceSettingsActivity"
-            android:screenOrientation="nosensor"></activity>
+            android:screenOrientation="nosensor" />
         <activity android:name=".AppHelpActivity" />
         <activity
             android:name=".TimeFrameSelectorActivity"

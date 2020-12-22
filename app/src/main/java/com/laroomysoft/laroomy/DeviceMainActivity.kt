@@ -353,6 +353,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 startActivity(intent)
             }
+            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+                // navigate to the navigator page
+                val intent = Intent(this@DeviceMainActivity, BarGraphActivity::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                startActivity(intent)
+
+            }
             else -> {
                 // what to do here??
             }

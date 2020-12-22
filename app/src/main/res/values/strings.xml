@@ -37,6 +37,8 @@
     <string name="TFS_From">From</string>
     <string name="TFS_To">To</string>
 
+    <string name="BGA_HeaderText">Bar Graph View</string>
+
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>

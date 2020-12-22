@@ -38,6 +38,9 @@
     <string name="TFS_From">Von</string>
     <string name="TFS_To">Bis</string>
 
+    <string name="BGA_HeaderText">Balkendiagramm Anzeige</string>
+
+
     <string name="GeneralMessage_reconnected">Verbindung wiederhergestellt</string>
     <string name="GeneralMessage_connectionSuspended">Verbindung unterbrochen</string>
     <string name="GeneralMessage_connectingFailed">Verbindung fehlgeschlagen:</string>
