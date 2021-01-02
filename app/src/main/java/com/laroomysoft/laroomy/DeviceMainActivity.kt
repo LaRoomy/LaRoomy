@@ -135,9 +135,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
                 }
             }
+
             // reset the parameter
             restoreIndex = -1
             (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
+
             // realign the context objects to the bluetoothManager
             ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
             ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
@@ -152,9 +154,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             if((this.applicationContext as ApplicationProperty).uiAdapterChanged){
                 (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
 
-                // TODO: update data in a loop!
+                // TODO: update data in a loop!?
 
             }
+
+            // notify the device that the user navigated back to the device main page
+            ApplicationProperty.bluetoothConnectionManger.notifyBackNavigationToDeviceMainPage()
 
             // TODO: detect state-changes and update the property-list-items
 

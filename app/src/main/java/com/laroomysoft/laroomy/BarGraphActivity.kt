@@ -1,11 +1,13 @@
 package com.laroomysoft.laroomy
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import com.mdgiitr.suyash.graphkit.BarGraph
+import com.mdgiitr.suyash.graphkit.DataPoint
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -15,6 +17,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     lateinit var barGraph: BarGraph
     lateinit var notificationTextView: AppCompatTextView
+    private var barGraphPoints = ArrayList<DataPoint>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +42,15 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.barGraph = findViewById(R.id.bgdBarGraphView)
 
         // TODO: set the data!
+
+        for(i in 0 .. ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne){
+
+            // TODO: change colors!
+
+            val p = DataPoint("- $i -", 0F, Color.parseColor("#FFFFFF"))
+            this.barGraphPoints.add(p)
+        }
+        this.barGraph.setPoints(this.barGraphPoints)
 
 
     }
@@ -77,16 +89,30 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             Log.d("M:BGD:onResume", "The connection was suspended -> try to reconnect")
             ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
+        } else {
+            // notify the device that multi-complex property was invoked
+            ApplicationProperty.bluetoothConnectionManger.notifyMultiComplexPropertyPageInvoked(this.relatedElementID)
         }
+
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
 
         // TODO: set data!
 
+        this.barGraphPoints.clear()
+
+        for(i in 0 .. complexPropertyState.valueOne){
+
+            // TODO: change colors!
+
+            val p = DataPoint("- $i -", 0F, Color.parseColor("#FFFFFF"))
+            this.barGraphPoints.add(p)
+        }
+        this.barGraph.setPoints(this.barGraphPoints)
     }
 
-    fun notifyUser(message: String, colorID: Int){
+    private fun notifyUser(message: String, colorID: Int){
         runOnUiThread {
             notificationTextView.setTextColor(getColor(colorID))
             notificationTextView.text = message
@@ -136,5 +162,24 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
+    }
+
+    override fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData) {
+        super.onMultiComplexPropertyDataUpdated(data)
+        // set the bar-graph info
+
+        val oldPoint = this.barGraphPoints.elementAt(data.dataIndex)
+
+        val newName = when(data.isName){
+            true -> data.dataName
+            else -> oldPoint.name
+        }
+        val newValue = when(data.isName){
+            true -> oldPoint.data
+            else -> data.dataValue
+        }
+        val newPoint = DataPoint(newName, newValue.toFloat(), oldPoint.color)
+        this.barGraphPoints[data.dataIndex] = newPoint
+        this.barGraph.setPoints(this.barGraphPoints)
     }
 }

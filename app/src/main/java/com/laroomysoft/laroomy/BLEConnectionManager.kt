@@ -304,6 +304,13 @@ class ElementUpdateInfo{
     var updateType = -1
 }
 
+class MultiComplexPropertyData{
+    var dataIndex = -1
+    var dataName = ""
+    var dataValue = -1
+    var isName = false
+}
+
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
 
@@ -358,6 +365,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         isResumeConnectionAttempt = false
                         suspendedDeviceAddress = ""
                         Log.d("M:CB:ConStateChanged", "This is a resume action -> DO NOT DISCOVER SERVICES!")
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // TODO: test if this works
+                            sendData(deviceReconnectedNotification)
+                        }, 300)
                     }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
@@ -585,6 +597,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
     private val deviceHeaderStartEntry = "DnDIHs7"
     private val deviceHeaderCloseMessage = "DnDIHe+"
+    private val deviceReconnectedNotification = "yDnRcon=t$"
+    private val navigatedToDeviceMainPageNotification = "yDnNavM=5$"
+    private val multiComplexPropertyPageInvokedStartEntry = "yDnMCIv-X"
+    private val multiComplexPropertyNameSetterEntry = "MCN&"
+    private val multiComplexPropertyDataSetterEntry = "MCD&"
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -616,12 +633,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var complexStateLoopActive = false
     private var deviceHeaderRecordingActive = false
     private var updateStackProcessActive = false
+    private var multiComplexPropertyPageOpen = false
     private var suspendedDeviceAddress = ""
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
     private var currentGroupResolveID = -1 // initialize with invalid marker
     private var currentGroupResolveIndex = -1 // initialize with invalid marker
     private var currentStateRetrievingIndex = -1 // initialize with invalid marker
+    private var multiComplexPageID = -1 // initialize with invalid marker
+    private var multiComplexTypeID = -1 // initialize with invalid marker
     private lateinit var activityContext: Context
     //private lateinit var callingActivity: Activity
     private lateinit var callback: BleEventCallback
@@ -687,8 +707,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.singlePropertyDetailRetrievingAction = false
         this.singleGroupDetailRetrievingAction = false
         this.updateStackProcessActive = false
+        this.multiComplexPropertyPageOpen = false
         this.currentPropertyResolveID = -1
         this.currentGroupResolveID = -1
+        this.multiComplexPageID = -1
+        this.multiComplexTypeID = -1
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -1647,6 +1670,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.resolveComplexStateData(data)
                 dataProcessed = true
             }
+            data.startsWith(this.multiComplexPropertyNameSetterEntry) -> {
+                Log.d(
+                    "M:CheckNotiEvent",
+                    "Multi-Complex-Property Name-Data received -> try to resolve it!"
+                )
+                this.resolveMultiComplexStateData(data, true)
+                dataProcessed = true
+            }
+            data.startsWith(this.multiComplexPropertyDataSetterEntry) -> {
+                Log.d(
+                    "M:CheckNotiEvent",
+                    "Multi-Complex-Property Value-Data received -> try to resolve it!"
+                )
+                this.resolveMultiComplexStateData(data, false)
+                dataProcessed = true
+            }
             data.startsWith(this.simpleDataStateTransmissionEntry) -> {
                 Log.d(
                     "M:CheckNotiEvent",
@@ -2434,6 +2473,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyElement.propertyIndex,
                         data
                     )
+                    COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> retrieveBarGraphDisplayData(
+                        propertyElement.propertyIndex,
+                        data
+                    )
 
                     // TODO: handle all complex types here!
 
@@ -2477,8 +2520,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         )
                         this.currentStateRetrievingIndex++
 
-
-
                         // test:
                         if (this.currentStateRetrievingIndex == this.complexStatePropertyIDs.size){
 
@@ -2494,8 +2535,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             //this.setDeviceTime()
                         }
 
-
-
                     } else {
                         Log.d(
                             "M:resolveComplexSData",
@@ -2509,6 +2548,67 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 Log.e("M:resolveComplexSData", "Property-ID invalid ID: $propertyID")
             }
         }
+    }
+
+    private fun resolveMultiComplexStateData(data: String, isName: Boolean){
+
+        Log.d(
+            "M:RslveMultiCmplx",
+            "ResolveMultiComplexStateData invoked - isName = $isName / data = $data"
+        )
+
+        if(this.multiComplexPropertyPageOpen){
+            val dataIndex = data.elementAt(4).toInt()
+            var name = ""
+
+            if(isName){
+                data.forEachIndexed { index, c ->
+                    if(index > 4){
+                        name += c
+                    }
+                }
+
+                val mcd = MultiComplexPropertyData()
+                mcd.isName = true
+                mcd.dataName = name
+                mcd.dataIndex = dataIndex
+
+                // trigger event
+                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
+            } else {
+                this.resolveSpecificMultiComplexStateData(data, dataIndex)
+            }
+        } else {
+            // send error notification ?!
+            Log.e(
+                "M:RslveMultiCmplx",
+                "ResolveMultiComplexStateData error: multi-complex page not open!"
+            )
+        }
+    }
+
+    private fun resolveSpecificMultiComplexStateData(data: String, dataIndex: Int){
+
+        when(this.multiComplexTypeID){
+            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
+                var stringData = ""
+                stringData += data.elementAt(5)
+                stringData += data.elementAt(6)
+                stringData += data.elementAt(7)
+
+                val mcd = MultiComplexPropertyData()
+                mcd.dataIndex = dataIndex
+                mcd.dataValue = stringData.toInt()
+                mcd.isName = false
+
+                // trigger event
+                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
+            }
+            else -> {
+                // send error?
+            }
+        }
+
     }
 
     fun propertyTypeFromID(ID: Int) : Int {
@@ -2680,6 +2780,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             return true
         }
+    }
+
+    private fun retrieveBarGraphDisplayData(elementIndex: Int, data: String): Boolean{
+        // check the transmission length first
+        if(data.length < 8){
+            return false
+        } else {
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toInt()
+        }
+        return true
     }
 
     private fun startComplexStateDataLoop(){
@@ -2904,6 +3014,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     }
 
+    fun notifyBackNavigationToDeviceMainPage() {
+        this.multiComplexPageID = -1
+        this.multiComplexPropertyPageOpen = false
+        sendData(this.navigatedToDeviceMainPageNotification)
+    }
+
+    fun notifyMultiComplexPropertyPageInvoked(propertyID: Int) {
+        this.multiComplexPageID = propertyID
+        this.multiComplexPropertyPageOpen = true
+        this.multiComplexTypeID = this.propertyTypeFromID(propertyID)
+
+        Log.d(
+            "M:NotifyMCPPI",
+            "Multi-Complex-Property-Page invoked notification send for property-ID: ${this.multiComplexPageID} and type-ID: ${this.multiComplexTypeID}"
+        )
+
+        sendData("${this.multiComplexPropertyPageInvokedStartEntry}${a8BitValueToString(propertyID)}$")
+    }
+
 //    fun formatIncomingData(data: String) : String {
 //
 //        var dOut = ""
@@ -2968,5 +3097,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData){}
+        fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
     }
 }
