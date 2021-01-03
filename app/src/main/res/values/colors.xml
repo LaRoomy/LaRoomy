@@ -29,4 +29,7 @@
     <color name="helpTopicBackground">#444444</color>
     <color name="navigatorButtonBackground">#ffaa00</color>
 
+
+    <color name="GraphColor_1">#FD44FF</color>
+
 </resources>

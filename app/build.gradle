@@ -49,5 +49,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1"
     implementation 'com.ramotion.fluidslider:fluid-slider:0.3.1'
-    implementation 'com.mdgiitr.suyash:graphkit:0.9.0'
+    //implementation 'com.mdgiitr.suyash:graphkit:0.9.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }

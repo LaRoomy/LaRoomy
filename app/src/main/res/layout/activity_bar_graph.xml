@@ -45,11 +45,24 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--
         <com.mdgiitr.suyash.graphkit.BarGraph
             android:id="@+id/bgdBarGraphView"
             android:layout_width="match_parent"
-            android:layout_height="700dp"
+            android:layout_height="300dp"
+            android:layout_margin="10dp"
             app:label_text_size="25"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer"
+            />
+-->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bgdBarGraphView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxHeight="500dp"
+            android:maxWidth="500dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer"

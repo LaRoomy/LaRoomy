@@ -2558,7 +2558,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         )
 
         if(this.multiComplexPropertyPageOpen){
-            val dataIndex = data.elementAt(4).toInt()
+            val dataIndex = data.elementAt(4).toString().toInt()
             var name = ""
 
             if(isName){
@@ -2784,10 +2784,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun retrieveBarGraphDisplayData(elementIndex: Int, data: String): Boolean{
         // check the transmission length first
-        if(data.length < 8){
+        if(data.length < 7){
             return false
         } else {
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toInt()
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toString().toInt()
         }
         return true
     }

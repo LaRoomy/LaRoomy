@@ -1,13 +1,20 @@
 package com.laroomysoft.laroomy
 
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
-import com.mdgiitr.suyash.graphkit.BarGraph
-import com.mdgiitr.suyash.graphkit.DataPoint
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.utils.ColorTemplate
+
+class BarGraphData(var bValue: Float, var bName: String){
+//    var bValue = 0F
+//    var bName = ""
+}
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -15,9 +22,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     var relatedElementID = -1
     var relatedGlobalElementIndex = -1
 
-    lateinit var barGraph: BarGraph
+    lateinit var barGraph: BarChart
     lateinit var notificationTextView: AppCompatTextView
-    private var barGraphPoints = ArrayList<DataPoint>()
+
+    private var barDataList = ArrayList<BarGraphData>()
+
+    //private var barGraphPoints = ArrayList<DataPoint>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,10 +57,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
             // TODO: change colors!
 
-            val p = DataPoint("- $i -", 0F, Color.parseColor("#FFFFFF"))
-            this.barGraphPoints.add(p)
+            val bData = BarGraphData(2.0F, "Bar $i")
+            this.barDataList.add(bData)
         }
-        this.barGraph.setPoints(this.barGraphPoints)
+//        this.barGraph.setPoints(this.barGraphPoints)
+
+//        val bData = BarData(arrayListOf(this.getXAxisValues(), this.getDataSet()))
+//        this.barGraph.data = bData
 
 
     }
@@ -60,8 +73,11 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onBackPressed()
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+
+        // for a BarGraph this is not necessary ?!
+        //(this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+        //(this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+
         // close activity
         finish()
     }
@@ -96,20 +112,51 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     }
 
+    private fun getXAxisValues(): ArrayList<String> {
+        val list = ArrayList<String>()
+
+        for(i in 0 .. this.barDataList.size){
+
+
+
+            list.add(barDataList.elementAt(i).bName)
+        }
+        return list
+    }
+
+    private fun getDataSet() : BarDataSet {
+        //val list = ArrayList<BarDataSet>()
+
+        val barEntries = ArrayList<BarEntry>()
+
+        for(i in 0 .. this.barDataList.size){
+            val bEntry = BarEntry(barDataList.elementAt(i).bValue, i.toFloat())
+            barEntries.add(bEntry)
+        }
+
+        val barDataSet = BarDataSet(barEntries, "Values")
+        barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+
+        //list.add(barDataSet)
+
+        //return list
+        return barDataSet
+    }
+
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
 
         // TODO: set data!
 
-        this.barGraphPoints.clear()
-
-        for(i in 0 .. complexPropertyState.valueOne){
-
-            // TODO: change colors!
-
-            val p = DataPoint("- $i -", 0F, Color.parseColor("#FFFFFF"))
-            this.barGraphPoints.add(p)
-        }
-        this.barGraph.setPoints(this.barGraphPoints)
+//        this.barGraphPoints.clear()
+//
+//        for(i in 0 .. complexPropertyState.valueOne){
+//
+//            // TODO: change colors!
+//
+//            val p = DataPoint("- $i -", 0F, Color.parseColor("#FFFFFF"))
+//            this.barGraphPoints.add(p)
+//        }
+//        this.barGraph.setPoints(this.barGraphPoints)
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -168,6 +215,21 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onMultiComplexPropertyDataUpdated(data)
         // set the bar-graph info
 
+        // temp!!!!!
+//        this.barGraphPoints.clear()
+//
+//
+//        for(i in 0 .. ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne){
+//
+//            // TODO: change colors!
+//
+//            val p = DataPoint("!! $i !!", 100F, getColor(R.color.GraphColor_1))
+//            this.barGraphPoints.add(p)
+//        }
+//        this.barGraph.setPoints(this.barGraphPoints)
+
+
+/*
         val oldPoint = this.barGraphPoints.elementAt(data.dataIndex)
 
         val newName = when(data.isName){
@@ -181,5 +243,8 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         val newPoint = DataPoint(newName, newValue.toFloat(), oldPoint.color)
         this.barGraphPoints[data.dataIndex] = newPoint
         this.barGraph.setPoints(this.barGraphPoints)
+
+        Log.d("M:MCPDU", "MultiComplexDataUpdated: Name: ${newPoint.name} Data: ${newPoint.data}")
+*/
     }
 }
