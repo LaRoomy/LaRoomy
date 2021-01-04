@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -25,7 +27,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     lateinit var notificationTextView: AppCompatTextView
 
     private var barDataList = ArrayList<BarGraphData>()
-    private var maxBarIndex = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne
+    private var maxBarIndex = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +50,9 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // get the bar-graph-view and set the initial data
         this.barGraph = findViewById(R.id.bgdBarGraphView)
+
+        // get the maximum bar count (zero-based!)
+        this.maxBarIndex = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne
 
         // create and set the bar-graph data
         this.setCurrentViewStateFromComplexPropertyState(
@@ -97,7 +102,10 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         }
     }
 
-    private fun initOrAdaptBarGraphDataHolder(newSize: Int){
+    private fun initOrAdaptBarGraphDataHolder(nSize: Int){
+
+        val newSize = nSize - 1// TODO CHECK!
+
 
         if(this.barDataList.isEmpty()){
             // initialize the barGraphData holder
@@ -141,12 +149,18 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // set XAxis labels
         val formatter = CxAxisFormatter(stringList)
+        this.barGraph.xAxis.granularity = 1F
         this.barGraph.xAxis.valueFormatter = formatter
+        this.barGraph.xAxis.position = XAxis.XAxisPosition.BOTTOM
 
-        val barDataSet = BarDataSet(entryList, "BarDataSet")
+        // TODO: DESCRIPTION LABEL !!!!!
+
+        val barDataSet = BarDataSet(entryList, ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementText)
         barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
 
         val data = BarData(barDataSet)
+        data.barWidth = 0.9F
+
         this.barGraph.data = data
         this.barGraph.setFitBars(true)
         this.barGraph.invalidate()
@@ -221,7 +235,19 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onMultiComplexPropertyDataUpdated(data)
         // if the index is in range replace the element and update the graph
         if(data.dataIndex < this.maxBarIndex){
-            val barGraphData = BarGraphData(data.dataValue.toFloat(), data.dataName)
+
+            val newName: String
+            val newValue: Float
+
+            if(data.isName){
+                newName = data.dataName
+                newValue = barDataList.elementAt(data.dataIndex).bValue
+            } else {
+                newName = barDataList.elementAt(data.dataIndex).bName
+                newValue = data.dataValue.toFloat()
+            }
+
+            val barGraphData = BarGraphData(newValue, newName)
             this.barDataList[data.dataIndex] = barGraphData
             this.refreshBarGraph()
         }

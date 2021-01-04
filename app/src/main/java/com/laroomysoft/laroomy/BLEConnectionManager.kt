@@ -3014,6 +3014,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     }
 
+    fun isMultiComplexProperty(propertyID: Int) : Boolean{
+
+        return when(this.propertyTypeFromID(propertyID)){
+            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> true
+            // MARK: add all multicomplex properties here
+            else -> false
+        }
+    }
+
     fun notifyBackNavigationToDeviceMainPage() {
         this.multiComplexPageID = -1
         this.multiComplexPropertyPageOpen = false

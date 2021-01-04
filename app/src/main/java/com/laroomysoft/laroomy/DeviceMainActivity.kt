@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -111,10 +113,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                 (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = false
 
-                ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
-                    (this.applicationContext as ApplicationProperty).complexUpdateID
-                )
-                (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+                if(ApplicationProperty.bluetoothConnectionManger.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateID)){
+                    // delay the complex state update
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                                (this.applicationContext as ApplicationProperty).complexUpdateID
+                            )
+                            (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+                        },
+                        500)
+                } else {
+                    // this is not a multicomplex property, do the complex state update immediately
+                    ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                        (this.applicationContext as ApplicationProperty).complexUpdateID
+                    )
+                    (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+                }
             }
 
             // set property-item to normal background
