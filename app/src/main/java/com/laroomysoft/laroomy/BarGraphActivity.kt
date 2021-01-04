@@ -6,15 +6,14 @@ import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 
-class BarGraphData(var bValue: Float, var bName: String){
-//    var bValue = 0F
-//    var bName = ""
-}
+class BarGraphData(var bValue: Float, var bName: String)
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -26,8 +25,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     lateinit var notificationTextView: AppCompatTextView
 
     private var barDataList = ArrayList<BarGraphData>()
-
-    //private var barGraphPoints = ArrayList<DataPoint>()
+    private var maxBarIndex = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,21 +49,10 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // get the bar-graph-view and set the initial data
         this.barGraph = findViewById(R.id.bgdBarGraphView)
 
-        // TODO: set the data!
-
-        for(i in 0 .. ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne){
-
-            // TODO: change colors!
-
-            val bData = BarGraphData(2.0F, "Bar $i")
-            this.barDataList.add(bData)
-        }
-//        this.barGraph.setPoints(this.barGraphPoints)
-
-//        val bData = BarData(arrayListOf(this.getXAxisValues(), this.getDataSet()))
-//        this.barGraph.data = bData
-
-
+        // create and set the bar-graph data
+        this.setCurrentViewStateFromComplexPropertyState(
+            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
     }
 
     override fun onBackPressed() {
@@ -74,9 +61,8 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
 
-        // for a BarGraph this is not necessary ?!
-        //(this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        //(this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
 
         // close activity
         finish()
@@ -109,60 +95,80 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             // notify the device that multi-complex property was invoked
             ApplicationProperty.bluetoothConnectionManger.notifyMultiComplexPropertyPageInvoked(this.relatedElementID)
         }
-
     }
 
-    private fun getXAxisValues(): ArrayList<String> {
-        val list = ArrayList<String>()
+    private fun initOrAdaptBarGraphDataHolder(newSize: Int){
 
-        for(i in 0 .. this.barDataList.size){
+        if(this.barDataList.isEmpty()){
+            // initialize the barGraphData holder
+            for (i in 0..newSize) {
+                val bData = BarGraphData(0F, "Bar $i")
+                this.barDataList.add(bData)
+            }
+        } else {
+            // the holder is not empty, check if size has changed, if not -> do nothing
+            if(this.barDataList.size != newSize){
+                // temporarily save the old parameter
+                val oldSize = this.barDataList.size
+                val oldList = this.barDataList
+                // clear the old data
+                this.barDataList.clear()
+                // re-init the data
+                this.maxBarIndex = newSize
+                    // if the new size is larger than the old -> set placeholder data
+                    // if the new size is lower -> discard the remaining data
+                for(i in 0 .. newSize){
+                    if(i < oldSize)
+                        this.barDataList.add(oldList.elementAt(i))
+                    else
+                        this.barDataList.add(BarGraphData(0F, "Bar $i"))
 
-
-
-            list.add(barDataList.elementAt(i).bName)
+                }
+            }
         }
-        return list
     }
 
-    private fun getDataSet() : BarDataSet {
-        //val list = ArrayList<BarDataSet>()
+    private fun refreshBarGraph(){
+        // create temporary value holder
+        val stringList = ArrayList<String>()
+        val entryList = ArrayList<BarEntry>()
 
-        val barEntries = ArrayList<BarEntry>()
-
-        for(i in 0 .. this.barDataList.size){
-            val bEntry = BarEntry(barDataList.elementAt(i).bValue, i.toFloat())
-            barEntries.add(bEntry)
+        // convert barDataList to processable data for the barChart
+        barDataList.forEachIndexed { index, barGraphData ->
+            stringList.add(barGraphData.bName)
+            entryList.add(BarEntry(index.toFloat(), barGraphData.bValue))
         }
 
-        val barDataSet = BarDataSet(barEntries, "Values")
+        // set XAxis labels
+        val formatter = CxAxisFormatter(stringList)
+        this.barGraph.xAxis.valueFormatter = formatter
+
+        val barDataSet = BarDataSet(entryList, "BarDataSet")
         barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
 
-        //list.add(barDataSet)
-
-        //return list
-        return barDataSet
+        val data = BarData(barDataSet)
+        this.barGraph.data = data
+        this.barGraph.setFitBars(true)
+        this.barGraph.invalidate()
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
-
-        // TODO: set data!
-
-//        this.barGraphPoints.clear()
-//
-//        for(i in 0 .. complexPropertyState.valueOne){
-//
-//            // TODO: change colors!
-//
-//            val p = DataPoint("- $i -", 0F, Color.parseColor("#FFFFFF"))
-//            this.barGraphPoints.add(p)
-//        }
-//        this.barGraph.setPoints(this.barGraphPoints)
+        // update the bar-graph
+        this.initOrAdaptBarGraphDataHolder(complexPropertyState.valueOne)
+        this.refreshBarGraph()
     }
 
     private fun notifyUser(message: String, colorID: Int){
         runOnUiThread {
             notificationTextView.setTextColor(getColor(colorID))
             notificationTextView.text = message
+        }
+    }
+
+    class CxAxisFormatter(var labelList: ArrayList<String>) : IAxisValueFormatter {
+
+        override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+            return labelList.elementAt(value.toInt())
         }
     }
 
@@ -213,38 +219,11 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     override fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData) {
         super.onMultiComplexPropertyDataUpdated(data)
-        // set the bar-graph info
-
-        // temp!!!!!
-//        this.barGraphPoints.clear()
-//
-//
-//        for(i in 0 .. ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne){
-//
-//            // TODO: change colors!
-//
-//            val p = DataPoint("!! $i !!", 100F, getColor(R.color.GraphColor_1))
-//            this.barGraphPoints.add(p)
-//        }
-//        this.barGraph.setPoints(this.barGraphPoints)
-
-
-/*
-        val oldPoint = this.barGraphPoints.elementAt(data.dataIndex)
-
-        val newName = when(data.isName){
-            true -> data.dataName
-            else -> oldPoint.name
+        // if the index is in range replace the element and update the graph
+        if(data.dataIndex < this.maxBarIndex){
+            val barGraphData = BarGraphData(data.dataValue.toFloat(), data.dataName)
+            this.barDataList[data.dataIndex] = barGraphData
+            this.refreshBarGraph()
         }
-        val newValue = when(data.isName){
-            true -> oldPoint.data
-            else -> data.dataValue
-        }
-        val newPoint = DataPoint(newName, newValue.toFloat(), oldPoint.color)
-        this.barGraphPoints[data.dataIndex] = newPoint
-        this.barGraph.setPoints(this.barGraphPoints)
-
-        Log.d("M:MCPDU", "MultiComplexDataUpdated: Name: ${newPoint.name} Data: ${newPoint.data}")
-*/
     }
 }
