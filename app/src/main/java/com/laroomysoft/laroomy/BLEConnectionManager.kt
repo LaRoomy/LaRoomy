@@ -2592,9 +2592,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         when(this.multiComplexTypeID){
             COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
                 var stringData = ""
-                stringData += data.elementAt(5)
-                stringData += data.elementAt(6)
-                stringData += data.elementAt(7)
+//                stringData += data.elementAt(5)
+//                stringData += data.elementAt(6)
+//                stringData += data.elementAt(7)
+
+                for(i in 5 until (data.length - 1)){
+                    stringData += data.elementAt(i)
+                }
 
                 val mcd = MultiComplexPropertyData()
                 mcd.dataIndex = dataIndex
