@@ -10,6 +10,7 @@ import android.os.*
 import android.util.Log
 import android.widget.SeekBar
 import java.io.Serializable
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -2596,8 +2597,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //                stringData += data.elementAt(6)
 //                stringData += data.elementAt(7)
 
-                for(i in 5 until (data.length - 1)){
-                    stringData += data.elementAt(i)
+//                try {
+//                    for (i in 5 until data.length) {
+//                        stringData += data.elementAt(i)
+//                    }
+//                }
+//                catch(e: IndexOutOfBoundsException){
+//                    Log.e("M:resolveSMCSD", "Exception in \"resolveSpecificMultiComplexStateData\" Message: ${e.localizedMessage}")
+//                    return
+//                }
+
+                data.forEachIndexed { index, c ->
+                    if(index > 4){
+                        stringData += c
+                    }
                 }
 
                 val mcd = MultiComplexPropertyData()
@@ -2615,7 +2628,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     }
 
-    fun propertyTypeFromID(ID: Int) : Int {
+    private fun propertyTypeFromID(ID: Int) : Int {
         this.laRoomyDevicePropertyList.forEach {
             if(ID == it.propertyID){
                 return it.propertyType

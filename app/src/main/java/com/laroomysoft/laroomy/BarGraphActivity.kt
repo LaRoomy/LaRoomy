@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
+import java.lang.Exception
 
 class BarGraphData(var bValue: Float, var bName: String)
 
@@ -50,6 +51,10 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // get the bar-graph-view and set the initial data
         this.barGraph = findViewById(R.id.bgdBarGraphView)
+        //this.barGraph.description.textColor = getColor(R.color.normalTextColor)
+        this.barGraph.description.text = ""
+        this.barGraph.xAxis.textColor = getColor(R.color.normalTextColor)
+
 
         // get the maximum bar count (zero-based!)
         this.maxBarIndex = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne
@@ -153,18 +158,64 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.barGraph.xAxis.valueFormatter = formatter
         this.barGraph.xAxis.position = XAxis.XAxisPosition.BOTTOM
 
-        // TODO: DESCRIPTION LABEL !!!!!
-
-        val barDataSet = BarDataSet(entryList, ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementText)
-        barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+        val barDataSet = BarDataSet(entryList, "")//ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementText)
+        barDataSet.colors = ColorTemplate.LIBERTY_COLORS.toList()
 
         val data = BarData(barDataSet)
         data.barWidth = 0.9F
 
+//        if(this.barGraph.data.dataSetCount == 0 || this.barGraph.data.entryCount < this.barDataList.size){
+//
+//            Log.e("M:refreshBG", "Refreshing barGraph failed. Format error.  DataSetCount: ${this.barGraph.data.dataSetCount} EntryCount: ${this.barGraph.data.entryCount}")
+//        }
+
         this.barGraph.data = data
         this.barGraph.setFitBars(true)
-        this.barGraph.invalidate()
+
+
+
+//        if(this.barGraph.data.dataSetCount == 0 || this.barGraph.data.entryCount < this.barDataList.size){
+//
+//            Log.e("M:refreshBG", "Refreshing barGraph failed. Format error.  DataSetCount: ${this.barGraph.data.dataSetCount} EntryCount: ${this.barGraph.data.entryCount}")
+//        }
+
+
+        //this.barGraph.notifyDataSetChanged()
+
+        //this.barGraph.invalidate()
+        
+        this.barGraph.postInvalidateDelayed(50)
+
+//        try {
+//            this.barGraph.invalidate()
+//        } catch (e: Exception){
+//            Log.e("M:refreshBG", "Refreshing barGraph failed. Message: ${e.localizedMessage}")
+//            return
+//        }
     }
+
+//    private fun updateBarValue(atIndex: Int, value: Float){
+//
+//        // create temporary value holder
+//        val stringList = ArrayList<String>()
+//        val entryList = ArrayList<BarEntry>()
+//
+//        // convert barDataList to processable data for the barChart
+//        barDataList.forEachIndexed { index, barGraphData ->
+//            stringList.add(barGraphData.bName)
+//            entryList.add(BarEntry(index.toFloat(), barGraphData.bValue))
+//        }
+//
+//        val barDataSet = BarDataSet(entryList, ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementText)
+//        barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+//
+//        val data = BarData(barDataSet)
+//        data.barWidth = 0.9F
+//
+//        this.barGraph.data = data
+//
+//        this.barGraph.invalidate()
+//    }
 
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
         // update the bar-graph
@@ -249,7 +300,11 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
             val barGraphData = BarGraphData(newValue, newName)
             this.barDataList[data.dataIndex] = barGraphData
-            this.refreshBarGraph()
+
+//            if(!data.isName)
+//                this.updateBarValue(data.dataIndex, data.dataValue.toFloat())
+//            else
+                this.refreshBarGraph()
         }
     }
 }
