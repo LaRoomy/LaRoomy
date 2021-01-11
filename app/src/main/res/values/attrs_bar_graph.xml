@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BarGraph">
+        <attr name="barTextColor" format="integer"/>
+        <attr name="barGraphOutlineColor" format="integer"/>
+        <attr name="barTextSize" format="dimension"/>
+        <attr name="barDescriptionGap" format="dimension"/>
+        <attr name="scaleSectionWidth" format="dimension"/>
+        <attr name="extraTopPadding" format="dimension"/>
+        <attr name="scaleTextSize" format="dimension"/>
+        <attr name="fixedMaximumValue" format="integer"/>
+    </declare-styleable>
+</resources>

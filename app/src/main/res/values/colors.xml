@@ -9,6 +9,7 @@
     <color name="WarningColor">#FFFF00</color>
     <color name="InfoColor">#FFFFFF</color>
     <color name="normalTextColor">#FFFFFF</color>
+    <color name="normalOutlineColor">#FFFFFF</color>
     <color name="selectedTextColor">#F5CD06</color>
     <color name="expectedBackground">#222222</color>
     <color name="separatorColor">#777777</color>
@@ -30,6 +31,16 @@
     <color name="navigatorButtonBackground">#ffaa00</color>
 
 
-    <color name="GraphColor_1">#FD44FF</color>
+    <!-- barGraph colors -->
+    <color name="barGraphGridLineColor">#FFFFFFFF</color>
+    <color name="decent_bar_0_color">#FF7BC7CC</color>
+    <color name="decent_bar_1_color">#FF7BB7CC</color>
+    <color name="decent_bar_2_color">#FF7BA7CC</color>
+    <color name="decent_bar_3_color">#FF7B94CC</color>
+    <color name="decent_bar_4_color">#FF7B84CC</color>
+    <color name="decent_bar_5_color">#FF7B94CC</color>
+    <color name="decent_bar_6_color">#FF7BA7CC</color>
+    <color name="decent_bar_7_color">#FF7BB7CC</color>
+    <color name="decent_bar_8_color">#FF7BC7CC</color>
 
 </resources>

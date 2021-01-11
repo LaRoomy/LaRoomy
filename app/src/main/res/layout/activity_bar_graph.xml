@@ -1,74 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:context=".BarGraphActivity">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+        android:id="@+id/bgdHeaderContainer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="700dp">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/bgdHeaderContainer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/bgdHeaderTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:text="@string/BGA_HeaderText"
-                android:layout_marginTop="20dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
-
-            <View
-                android:id="@+id/bgdHeaderSeparator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="5dp"
-                android:background="@color/separatorColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bgdHeaderTextView" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/bgdBarGraphView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
-            android:minHeight="400dp"
-            android:maxHeight="500dp"
-            android:maxWidth="500dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer"
-            />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/bgdHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/bgdActivityNotificationTextView"
-            android:textSize="18sp"
             android:layout_marginTop="20dp"
-            app:layout_constraintTop_toBottomOf="@id/bgdBarGraphView"
+            android:text="@string/BGA_HeaderText"
+            android:textSize="20sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/bgdHeaderSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="5dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bgdHeaderTextView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+
+    <!--
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/bgdBarGraphView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:minHeight="400dp"
+                android:maxHeight="500dp"
+                android:maxWidth="500dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer"
+                />
+    -->
+    <com.laroomysoft.laroomy.BarGraph
+        android:id="@+id/bgdBarGraphView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="20dp"
+        app:barTextSize="16sp"
+        app:scaleTextSize="10sp"
+        app:barDescriptionGap="22dp"
+        app:barTextColor="@color/normalTextColor"
+        app:barGraphOutlineColor="@color/normalOutlineColor"
+        app:scaleSectionWidth="40dp"
+        app:extraTopPadding="20dp"
+        app:layout_constraintBottom_toTopOf="@id/bgdActivityNotificationTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/bgdActivityNotificationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxHeight="100dp"
+        android:layout_marginTop="20dp"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

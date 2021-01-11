@@ -272,9 +272,9 @@ class LaRoomyDevicePresentationModel {
 
 class ComplexPropertyState {
     // shared state values (multi-purpose)
-    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)
-    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)
-    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)
+    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)        // (number of bars in bar-graph activity)
+    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)      // (use value as bar-descriptor in bar-graph activity)
+    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)       // (fixed maximum value in bar-graph activity)
     var valueFour = -1     // general use                   // flag-value in simple Navigator
     var valueFive = -1     // general use                   // flag value in simple Navigator
     var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
@@ -2804,7 +2804,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(data.length < 7){
             return false
         } else {
+            // at index 6 -> number of bars
             this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toString().toInt()
+            // at index 7 -> show value as bar-descriptor
+            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = data.elementAt(7).toString().toInt()
+            // at index 8 until string-end -> fixed maximum value
+            if(data.length > 8){
+                var fixedMaxVal = ""
+
+                data.forEachIndexed { index, c ->
+                    if(index > 7){
+                        fixedMaxVal += c
+                    }
+                }
+                this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = fixedMaxVal.toInt()
+            }
         }
         return true
     }

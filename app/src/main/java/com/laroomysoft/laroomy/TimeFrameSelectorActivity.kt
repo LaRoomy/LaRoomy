@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import android.widget.TimePicker
-import kotlinx.android.synthetic.main.device_property_list_element.*
 
 class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
