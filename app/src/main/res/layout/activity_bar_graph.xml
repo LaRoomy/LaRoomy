@@ -41,20 +41,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!--
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/bgdBarGraphView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:minHeight="400dp"
-                android:maxHeight="500dp"
-                android:maxWidth="500dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer"
-                />
-    -->
     <com.laroomysoft.laroomy.BarGraph
         android:id="@+id/bgdBarGraphView"
         android:layout_width="match_parent"

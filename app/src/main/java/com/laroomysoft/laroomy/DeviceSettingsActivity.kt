@@ -8,7 +8,6 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.widget.TextViewCompat
 
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -48,11 +47,13 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     val passkey =
                         (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
 
-                    ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
+                    //ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
+                    ApplicationProperty.bluetoothConnectionManger.enableDeviceBinding(passkey)
                 }
                 else -> {
                     // release the device binding
-                    ApplicationProperty.bluetoothConnectionManger.sendData("SrB>$")
+                    //ApplicationProperty.bluetoothConnectionManger.sendData("SrB>$")
+                    ApplicationProperty.bluetoothConnectionManger.releaseDeviceBinding()
                 }
             }
 

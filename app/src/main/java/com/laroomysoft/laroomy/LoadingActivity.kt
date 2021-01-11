@@ -87,9 +87,11 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
 
     private fun setMessageText(colorID: Int, text: String){
-        val notificationTextView = findViewById<TextView>(R.id.LA_progressTextView)
-        notificationTextView.setTextColor(getColor(colorID))
-        notificationTextView.text = text
+        runOnUiThread {
+            val notificationTextView = findViewById<TextView>(R.id.LA_progressTextView)
+            notificationTextView.setTextColor(getColor(colorID))
+            notificationTextView.text = text
+        }
     }
 
     // Interface methods:

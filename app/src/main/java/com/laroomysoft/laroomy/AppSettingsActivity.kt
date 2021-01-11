@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -55,6 +56,15 @@ class AppSettingsActivity : AppCompatActivity() {
             } else {
                 (applicationContext as ApplicationProperty).deleteData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
             }
+        }
+
+        // set the saved password (if there is one)
+        val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
+        if(pw.isNotEmpty()){
+            //this.passwordBox.text =
+
+            //TODO: set the password
+            // TODO: if binding is required and is not activated in app-settings, the authentication process must be interrupted with an error message
         }
 
         // add the listener for the switches

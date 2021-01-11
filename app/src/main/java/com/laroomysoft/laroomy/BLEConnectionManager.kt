@@ -603,6 +603,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val multiComplexPropertyPageInvokedStartEntry = "yDnMCIv-X"
     private val multiComplexPropertyNameSetterEntry = "MCN&"
     private val multiComplexPropertyDataSetterEntry = "MCD&"
+    private val enableBindingSetterCommandEntry = "SeB:"
+    private val releaseDeviceBindingCommand = "SrB>$"
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -3071,6 +3073,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         )
 
         sendData("${this.multiComplexPropertyPageInvokedStartEntry}${a8BitValueToString(propertyID)}$")
+    }
+
+    fun enableDeviceBinding(passKey: String){
+        this.sendData("$enableBindingSetterCommandEntry$passKey$")
+    }
+
+    fun releaseDeviceBinding(){
+        this.sendData(releaseDeviceBindingCommand)
+        this.isBindingRequired = false
     }
 
 //    fun formatIncomingData(data: String) : String {

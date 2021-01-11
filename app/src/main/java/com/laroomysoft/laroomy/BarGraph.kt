@@ -313,7 +313,7 @@ class BarGraph : View {
 
                     this?.drawRect(left, top, right, bottom, barPaint)// bar
                     this?.drawRect(left, top, right, bottom, barOutlinePaint)// bar outline
-                    this?.drawText(barGraphData.barText, xMiddle, bottom + ((barDescriptionGap / 3)*2), barTextPaint)// bar text
+                    this?.drawText(barGraphData.barText, xMiddle, bottom + ((barDescriptionGap / 3)*2) + (resources.displayMetrics.density * 2), barTextPaint)// bar text
                 }
 
                 // draw the axis-lines
