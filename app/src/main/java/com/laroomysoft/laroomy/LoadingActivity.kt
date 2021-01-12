@@ -11,6 +11,7 @@ import android.widget.TextView
 class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var isLastConnectedDevice = false
+    private var blockAllFurtherProcessing = false
     private var connectionAttemptCounter = 0
     //private var authenticationAttemptCounter = 0
 
@@ -48,22 +49,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 setProgressText(getString(R.string.CA_Connecting))
             }
         }
-
-
-//        if(index != -1){
-//
-//            // TODO: make this in the property activity !!!!
-//
-//            val adr =
-//                ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
-//
-//            if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
-//                isLastConnectedDevice = true
-//            }
-//
-//            ApplicationProperty.bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
-//            setProgressText(getString(R.string.CA_Connecting))
-//        }
     }
 
     override fun onBackPressed() {
@@ -97,24 +82,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     // Interface methods:
     override fun onAuthenticationSuccessful() {
         super.onAuthenticationSuccessful()
-/*
-
-        this.runOnUiThread {
-            this.setMessageText(R.color.InfoColor, getString(R.string.CA_AuthSuccess))
-        }
-*/
-
         // navigate to the next activity and retrieve the properties there:
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
-
-        //intent.flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK
-
         startActivity(intent)
         // finish this activity
         finish()
-        // and finish first activity ??
-        //MainActivity.main.finish()
     }
 
     override fun onBindingPasskeyRejected() {
@@ -132,22 +105,27 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
         Log.d("M:CB:ConStateChange", "Connection State changed in Loading Activity: new State: $state")
-        if(connectionAttemptCounter <= 4) {
-            if (!state) {
-                Log.e("M:CB:ConStateChange", "Disconnected in Loading Activity - try to reconnect - Attempt-Counter is: $connectionAttemptCounter")
-                // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
-                connectionAttemptCounter++
-                // clear the bluetoothManager
+        if(!blockAllFurtherProcessing) {
+            if (connectionAttemptCounter <= 4) {
+                if (!state) {
+                    Log.e(
+                        "M:CB:ConStateChange",
+                        "Disconnected in Loading Activity - try to reconnect - Attempt-Counter is: $connectionAttemptCounter"
+                    )
+                    // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
+                    connectionAttemptCounter++
+                    // clear the bluetoothManager
+                    ApplicationProperty.bluetoothConnectionManger.clear()
+                    // try to connect again with 1 sec delay
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                    }, 1000)
+                }
+            } else {
+                // all attempts to connect failed -> go back to start (main activity)
                 ApplicationProperty.bluetoothConnectionManger.clear()
-                // try to connect again with 1 sec delay
-                Handler(Looper.getMainLooper()).postDelayed({
-                    ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
-                }, 1000)
+                finish()
             }
-        } else {
-            // all attempts to connect failed -> go back to start (main activity)
-            ApplicationProperty.bluetoothConnectionManger.clear()
-            finish()
         }
     }
 
@@ -157,20 +135,25 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         setErrorText(message)
         // navigate back with delay
         Handler(Looper.getMainLooper()).postDelayed({
-            // TODO: check if this works
+
+            // TODO: check if this works!?
+
+            blockAllFurtherProcessing = true
+            ApplicationProperty.bluetoothConnectionManger.clear()
             finish()
-        },2000)
+
+        },4000)
     }
 
     override fun onDeviceReadyForCommunication() {
         super.onDeviceReadyForCommunication()
+        Log.e("M:CB:onDRFC", "Loading Activity - Device ready for communication reported")
         // device ready -> send authentication
         runOnUiThread {
             setProgressText(getString(R.string.CA_Connected))
             // send authentication request
             Handler(Looper.getMainLooper()).postDelayed({
                 ApplicationProperty.bluetoothConnectionManger.authenticate()
-                //sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
 
                 // check the authentication with delay an try again if it is false
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -178,9 +161,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     // TODO: maybe check here if the device is disconnected and try to reconnect
 
                     if(!ApplicationProperty.bluetoothConnectionManger.authenticationSuccess){
-                        //authenticationAttemptCounter++
                         ApplicationProperty.bluetoothConnectionManger.authenticate()
-                        //sendData(ApplicationProperty.bluetoothConnectionManger.authenticationString)
                     }
                 },1500)
                 

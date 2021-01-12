@@ -9,6 +9,7 @@
     <string name="CA_Authenticate">Authenticate..</string>
     <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
     <string name="CA_BindingPasskeyRejected">Wrong binding-passkey: connection rejected</string>
+    <string name="CA_BindingNotActivated">Binding required but not activated in App-Settings</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>

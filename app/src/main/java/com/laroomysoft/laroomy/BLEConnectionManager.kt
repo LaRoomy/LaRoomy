@@ -467,10 +467,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                     authenticationResponseBindingPasskeyRequired -> {
                         Log.d("M:CB:CharChanged", "Data Received - Authentication - Device ID confirmed - additional binding is required")
-                        Log.d("M:CB:CharChanged", "Data Received - Authentication - Send Binding information")
-                        isBindingRequired = true
-                        // send the passkey to proceed
-                        sendBindingRequest()
+
+                        // check if binding is activated in app-settings
+                        val isBindingActivated =
+                            (activityContext.applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseDeviceBinding)
+                        if(!isBindingActivated){
+                            Log.e(
+                                "M:CB:CharChanged",
+                                "Binding is not activated - Connection attempt must be rejected!"
+                            )
+                            callback.onConnectionAttemptFailed(activityContext.getString(R.string.CA_BindingNotActivated))
+                        } else {
+                            Log.d(
+                                "M:CB:CharChanged",
+                                "Data Received - Authentication - Send Binding information"
+                            )
+                            isBindingRequired = true
+                            // send the passkey to proceed
+                            sendBindingRequest()
+                        }
                     }
                     authenticationResponseBindingPasskeyInvalid -> {
                         Log.e("M:CB:CharChanged", "Data Received - Authentication - Passkey rejected from device - PASSKEY INVALID")
@@ -715,6 +730,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.currentGroupResolveID = -1
         this.multiComplexPageID = -1
         this.multiComplexTypeID = -1
+        this.isBindingRequired = false
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -3077,6 +3093,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun enableDeviceBinding(passKey: String){
         this.sendData("$enableBindingSetterCommandEntry$passKey$")
+        this.isBindingRequired = true
     }
 
     fun releaseDeviceBinding(){

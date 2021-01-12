@@ -61,10 +61,13 @@ class AppSettingsActivity : AppCompatActivity() {
         // set the saved password (if there is one)
         val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
         if(pw.isNotEmpty()){
-            //this.passwordBox.text =
+            this.passwordBox.setText(pw)
 
             //TODO: set the password
             // TODO: if binding is required and is not activated in app-settings, the authentication process must be interrupted with an error message
+            // TODO: set the parameter in bleConnectionManager, if the switch in deviceSettingsActivity is set on!
+        } else {
+            this.passwordBox.setText(R.string.binding_code_placeholder)
         }
 
         // add the listener for the switches
