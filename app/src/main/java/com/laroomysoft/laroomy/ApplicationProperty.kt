@@ -71,6 +71,14 @@ class ApplicationProperty : Application() {
         systemLanguage = Locale.getDefault().displayLanguage
     }
 
+    fun resetControlParameter(){
+        this.noConnectionKillOnPauseExecution = false
+        this.uiAdapterChanged = false
+        this.complexPropertyUpdateRequired = false
+        this.complexUpdateID = -1
+        this.navigatedFromPropertySubPage = false
+    }
+
     fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int) : String {
         Log.d("M:LoadSavedStringData", "Loading String-Data. FileKey: ${getString(fileKeyID)} / DataKey: ${getString(dataKeyID)}")
 

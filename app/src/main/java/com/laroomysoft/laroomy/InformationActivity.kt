@@ -16,17 +16,17 @@ class InformationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_information)
 
-        val pInfo =
-            packageManager.getPackageInfo(packageName, 0)
-
-        @Suppress("DEPRECATION") val versionString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            "${getString(R.string.InfoActivity_AppVersionEntry)}${pInfo.longVersionCode}"
-        } else {
-            "${getString(R.string.InfoActivity_AppVersionEntry)}${pInfo.versionCode}"
-        }
-
-        versionTextView = findViewById(R.id.infoActivityAppVersionTextView)
-        versionTextView.text = versionString
+//        val pInfo =
+//            packageManager.getPackageInfo(packageName, 0)
+//
+//        @Suppress("DEPRECATION") val versionString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+//            "${getString(R.string.InfoActivity_AppVersionEntry)} ${pInfo.longVersionCode}"
+//        } else {
+//            "${getString(R.string.InfoActivity_AppVersionEntry)} ${pInfo.versionCode}"
+//        }
+//
+//        versionTextView = findViewById(R.id.infoActivityAppVersionTextView)
+//        versionTextView.text = versionString
     }
 
     fun onMailToLinkClick(@Suppress("UNUSED_PARAMETER") view: View){

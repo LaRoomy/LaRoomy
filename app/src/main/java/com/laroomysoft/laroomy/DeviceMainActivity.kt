@@ -101,6 +101,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onResume()
         Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
 
+        // if the device was disconnected on a property sub-page, navigate back with delay
+        if(!ApplicationProperty.bluetoothConnectionManger.isConnected){
+            setUIConnectionStatus(false)
+            Handler(Looper.getMainLooper()).postDelayed({
+                (applicationContext as ApplicationProperty).resetControlParameter()
+                ApplicationProperty.bluetoothConnectionManger.clear()
+                finish()
+            }, 2000)
+        }
+
         // at first check if this callback will be invoked due to a back-navigation from a property sub-page
         // or if it was invoked on creation or a resume from outside of the application
         if((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
@@ -401,18 +411,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        // re-connect
-        // confirm device-properties???
-        // re-connect and re-new the device-properties???
-        //ApplicationProperty.bluetoothConnectionManger.close()
-        //ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
-
-
-        // prevent the normal "onPause" execution
-        (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-        // navigate to the device settings activity..
-        val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
-        startActivity(intent)
+        if(ApplicationProperty.bluetoothConnectionManger.isConnected) {
+            // prevent the normal "onPause" execution
+            (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+            // navigate to the device settings activity..
+            val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     fun onReconnectDevice(@Suppress("UNUSED_PARAMETER")view: View){
@@ -420,10 +425,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // confirm device-properties???
         // re-connect and re-new the device-properties???
 
-
-        ApplicationProperty.bluetoothConnectionManger.close()
-        ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
-
+        if(!ApplicationProperty.bluetoothConnectionManger.isConnected) {
+            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+        }
     }
 
 

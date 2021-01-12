@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LaRoomy</string>
+    <string name="app_version">App-Version 2.1.0</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Bitte wählen Sie Ihr Gerät:</string>
     <string name="MA_NoAvailableDevices">Keine Geräte gefunden. Bitte stellen Sie sicher dass das Gerät mit dem System gekoppelt ist.</string>
@@ -51,7 +52,7 @@
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamische Fernsteuerung</string>
     <string name="InfoActivity_AppVersionEntry">App-Version </string>
-    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2020 Laroomy-Soft</string>
+    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2021 Laroomy-Soft</string>
     <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">Alle Rechte vorbehalten</string>
     <string name="InfoActivity_MailTo">info@laroomy.de</string>

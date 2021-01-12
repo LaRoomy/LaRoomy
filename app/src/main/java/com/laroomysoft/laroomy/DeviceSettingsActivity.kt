@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 
@@ -14,6 +15,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private var mustReconnect = false
     lateinit var userNotificationTextView: AppCompatTextView
     lateinit var bindingSwitch: SwitchCompat
+    lateinit var factoryResetButton: AppCompatButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         // get the necessary views
         userNotificationTextView = findViewById(R.id.deviceSettingsActivityUserNotificationTextView)
         bindingSwitch = findViewById(R.id.deviceSettingsActivityBindingSwitch)
+        factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
 
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManger.isBindingRequired
@@ -101,6 +104,18 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
     }
 
+    private fun setUIElementsEnabledState(state: Boolean){
+        runOnUiThread{
+            if(state){
+                bindingSwitch.isEnabled = true
+                factoryResetButton.isEnabled = true
+            } else{
+                bindingSwitch.isEnabled = false
+                factoryResetButton.isEnabled = false
+            }
+        }
+    }
+
     fun onFactoryResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
         factoryResetAlertDialog()
     }
@@ -127,8 +142,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         Log.d("M:DSPPage:ConStateChge", "Connection state changed in Device Settings Activity. New Connection state is: $state")
         if(state){
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
+            setUIElementsEnabledState(state)
         } else {
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
+            setUIElementsEnabledState(state)
         }
     }
 
