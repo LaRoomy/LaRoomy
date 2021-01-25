@@ -957,6 +957,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(!this.propertyConfirmationModeActive) {
                     this.dataReadyToShow = false
                     this.laRoomyDevicePropertyList.clear()
+                    this.uIAdapterList.clear()
                 }
                 // start:
                 this.sendData("A000$")// request first index (0)
