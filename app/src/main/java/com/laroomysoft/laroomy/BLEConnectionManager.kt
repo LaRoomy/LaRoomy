@@ -620,6 +620,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val multiComplexPropertyDataSetterEntry = "MCD&"
     private val enableBindingSetterCommandEntry = "SeB:"
     private val releaseDeviceBindingCommand = "SrB>$"
+    private val propertyRetrievalCompleteNotifitcation = "yDnPRf-P!$"
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -2092,9 +2093,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             //this.setDeviceTime()
 
+            // notify finalization of the process
+            Handler(Looper.getMainLooper()).postDelayed({
+                this.sendData(propertyRetrievalCompleteNotifitcation)
+            }, 700)
+
+            // set time with delay
             Handler(Looper.getMainLooper()).postDelayed({
                 this.setDeviceTime()
-            }, 1000)
+            }, 1200)
 
         }
     }
