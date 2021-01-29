@@ -1670,111 +1670,80 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // log:
         Log.d("M:CheckNotiEvent", "Check received string for notification")
         // check:
-        when {
-            data.startsWith(propertyChangedNotificationEntry) -> {
-                this.updateProperty(data)
-                dataProcessed = true
-                Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
-            }
 
-            data.startsWith(propertyGroupChangedNotificationEntry) -> {
-                this.updatePropertyGroup(data)
-                dataProcessed = true
-                Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
-            }
-            data.startsWith(this.complexDataStateTransmissionEntry) -> {
-                Log.d(
-                    "M:CheckNotiEvent",
-                    "Complex-Property-State data received -> try to resolve it!"
-                )
-                this.resolveComplexStateData(data)
-                dataProcessed = true
-            }
-            data.startsWith(this.multiComplexPropertyNameSetterEntry) -> {
-                Log.d(
-                    "M:CheckNotiEvent",
-                    "Multi-Complex-Property Name-Data received -> try to resolve it!"
-                )
-                this.resolveMultiComplexStateData(data, true)
-                dataProcessed = true
-            }
-            data.startsWith(this.multiComplexPropertyDataSetterEntry) -> {
-                Log.d(
-                    "M:CheckNotiEvent",
-                    "Multi-Complex-Property Value-Data received -> try to resolve it!"
-                )
-                this.resolveMultiComplexStateData(data, false)
-                dataProcessed = true
-            }
-            data.startsWith(this.simpleDataStateTransmissionEntry) -> {
-                Log.d(
-                    "M:CheckNotiEvent",
-                    "Simple-Property-State data received -> try to resolve it!"
-                )
-                this.resolveSimpleStateData(data)
-                dataProcessed = true
-            }
-            data.startsWith(this.deviceHeaderStartEntry) -> {
-                Log.d(
-                    "M:CheckNotiEvent",
-                    "DeviceHeader start notification detected -> start recording"
-                )
-                this.startDeviceHeaderRecording(data)
-                dataProcessed = true
-            }
-            data == this.deviceHeaderCloseMessage -> {
-                Log.d(
-                    "M:CheckNotiEvent",
-                    "DeviceHeader end notification detected -> reset parameter and trigger event"
-                )
-                this.endDeviceHeaderRecording()
-                dataProcessed = true
-            }
-            data == this.testCommand -> {
-                Log.d("M:CheckNotiEvent", "Test command received.")
-                this.connectionTestSucceeded = true
-                this.callback.onConnectionTestSuccess()
-                dataProcessed = true
+        // only accept notifications if the property and group loops are not in progress
+        if(!this.propertyLoopActive && !this.groupLoopActive && !this.propertyNameResolveLoopActive && !this.groupInfoLoopActive) {
+            when {
+                data.startsWith(propertyChangedNotificationEntry) -> {
+                    this.updateProperty(data)
+                    dataProcessed = true
+                    Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
+                }
+
+                data.startsWith(propertyGroupChangedNotificationEntry) -> {
+                    this.updatePropertyGroup(data)
+                    dataProcessed = true
+                    Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
+                }
+                data.startsWith(this.complexDataStateTransmissionEntry) -> {
+                    Log.d(
+                        "M:CheckNotiEvent",
+                        "Complex-Property-State data received -> try to resolve it!"
+                    )
+                    this.resolveComplexStateData(data)
+                    dataProcessed = true
+                }
+                data.startsWith(this.multiComplexPropertyNameSetterEntry) -> {
+                    Log.d(
+                        "M:CheckNotiEvent",
+                        "Multi-Complex-Property Name-Data received -> try to resolve it!"
+                    )
+                    this.resolveMultiComplexStateData(data, true)
+                    dataProcessed = true
+                }
+                data.startsWith(this.multiComplexPropertyDataSetterEntry) -> {
+                    Log.d(
+                        "M:CheckNotiEvent",
+                        "Multi-Complex-Property Value-Data received -> try to resolve it!"
+                    )
+                    this.resolveMultiComplexStateData(data, false)
+                    dataProcessed = true
+                }
+                data.startsWith(this.simpleDataStateTransmissionEntry) -> {
+                    Log.d(
+                        "M:CheckNotiEvent",
+                        "Simple-Property-State data received -> try to resolve it!"
+                    )
+                    this.resolveSimpleStateData(data)
+                    dataProcessed = true
+                }
+                data.startsWith(this.deviceHeaderStartEntry) -> {
+                    Log.d(
+                        "M:CheckNotiEvent",
+                        "DeviceHeader start notification detected -> start recording"
+                    )
+                    this.startDeviceHeaderRecording(data)
+                    dataProcessed = true
+                }
+                data == this.deviceHeaderCloseMessage -> {
+                    Log.d(
+                        "M:CheckNotiEvent",
+                        "DeviceHeader end notification detected -> reset parameter and trigger event"
+                    )
+                    this.endDeviceHeaderRecording()
+                    dataProcessed = true
+                }
+                data == this.testCommand -> {
+                    Log.d("M:CheckNotiEvent", "Test command received.")
+                    this.connectionTestSucceeded = true
+                    this.callback.onConnectionTestSuccess()
+                    dataProcessed = true
+                }
             }
         }
-
-//        if(data.startsWith(propertyChangedNotificationEntry)){
-//            this.updateProperty(data)
-//            dataProcessed = true
-//            Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
-//        }
-//        else if(data.startsWith(propertyGroupChangedNotificationEntry)){
-//            this.updatePropertyGroup(data)
-//            dataProcessed = true
-//            Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
-//        }
-//        else if(data.startsWith(this.complexDataStateTransmissionEntry)){
-//            Log.d("M:CheckNotiEvent", "Complex-Property-State data received -> try to resolve it!")
-//            this.resolveComplexStateData(data)
-//            dataProcessed = true
-//        }
-//        else if(data.startsWith(this.simpleDataStateTransmissionEntry)){
-//            Log.d("M:CheckNotiEvent", "Simple-Property-State data received -> try to resolve it!")
-//            this.resolveSimpleStateData(data)
-//            dataProcessed = true
-//        }
-//        else if(data.startsWith(this.deviceHeaderStartEntry)){
-//            Log.d("M:CheckNotiEvent", "DeviceHeader start notification detected -> start recording")
-//            this.startDeviceHeaderRecording(data)
-//            dataProcessed = true
-//        }
-//        else if(data == this.deviceHeaderCloseMessage){
-//            Log.d("M:CheckNotiEvent", "DeviceHeader end notification detected -> reset parameter and trigger event")
-//            this.endDeviceHeaderRecording()
-//            dataProcessed = true
-//        }
-//        else if(data == this.testCommand){
-//            Log.d("M:CheckNotiEvent", "Test command received.")
-//            this.connectionTestSucceeded = true
-//            this.callback.onConnectionTestSuccess()
-//            dataProcessed = true
-//        }
-
+        else {
+            Log.e("M:CheckNotiEvent", "Invalid Device Notification - Notifications not accepted while retrieving loops are in progress")
+        }
         return dataProcessed
     }
 
