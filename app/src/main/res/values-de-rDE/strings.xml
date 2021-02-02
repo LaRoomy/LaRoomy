@@ -42,6 +42,10 @@
 
     <string name="BGA_HeaderText">Balkendiagramm Anzeige</string>
 
+    <string name="UnlockCtrl_HeaderText">Entsperren</string>
+    <string name="UnlockCtrl_ConditionText_Locked">Verriegelt</string>
+    <string name="UnlockCtrl_ConditionText_Unlocked">Entriegelt - Zum verriegeln Symbol berühren</string>
+
 
     <string name="GeneralMessage_reconnected">Verbindung wiederhergestellt</string>
     <string name="GeneralMessage_connectionSuspended">Verbindung unterbrochen</string>

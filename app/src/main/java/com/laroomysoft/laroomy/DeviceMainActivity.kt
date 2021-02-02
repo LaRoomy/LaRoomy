@@ -362,7 +362,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 startActivity(intent)
             }
-            COMPLEX_PROPERTY_TYPE_ID_TIME_ELAPSE_SELECTOR -> {
+            COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                 // navigate to the time selector page with the countdown-select-mode
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {

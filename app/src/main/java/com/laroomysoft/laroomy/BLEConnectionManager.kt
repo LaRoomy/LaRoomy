@@ -280,6 +280,7 @@ class ComplexPropertyState {
     var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
     var enabledState = true// at this time only a placeholder (not implemented yet)
     var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
+    var strValue = ""
 
     // single used values (only valid in specific complex states)
     var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)

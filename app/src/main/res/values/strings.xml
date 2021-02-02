@@ -41,6 +41,10 @@
 
     <string name="BGA_HeaderText">Bar Graph View</string>
 
+    <string name="UnlockCtrl_HeaderText">Unlock Control</string>
+    <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
+    <string name="UnlockCtrl_ConditionText_Unlocked">Unlocked - Tap Image to lock</string>
+
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>
