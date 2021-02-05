@@ -44,6 +44,10 @@
     <string name="UnlockCtrl_HeaderText">Unlock Control</string>
     <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
     <string name="UnlockCtrl_ConditionText_Unlocked">Unlocked - Tap Image to lock</string>
+    <string name="UnlockCtrl_PinEntryText">PIN:</string>
+    <string name="UnlockCtrl_ButtonText_Show">Show</string>
+    <string name="UnlockCtrl_ButtonText_Hide">Hide</string>
+
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
@@ -145,4 +149,5 @@
     <string name="info_activity_placeholder">Info Activity</string>
     <string name="app_settings">App-Settings</string>
     <string name="binding_code_placeholder">h5G+s%gt</string>
+    <string name="pinCodePlaceholder">*****</string>
 </resources>

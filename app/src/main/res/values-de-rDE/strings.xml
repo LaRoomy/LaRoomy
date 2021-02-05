@@ -45,6 +45,9 @@
     <string name="UnlockCtrl_HeaderText">Entsperren</string>
     <string name="UnlockCtrl_ConditionText_Locked">Verriegelt</string>
     <string name="UnlockCtrl_ConditionText_Unlocked">Entriegelt - Zum verriegeln Symbol berühren</string>
+    <string name="UnlockCtrl_PinEntryText">PIN:</string>
+    <string name="UnlockCtrl_ButtonText_Show">Anzeigen</string>
+    <string name="UnlockCtrl_ButtonText_Hide">Verbergen</string>
 
 
     <string name="GeneralMessage_reconnected">Verbindung wiederhergestellt</string>
@@ -147,4 +150,6 @@
     <string name="info_activity_placeholder">Info Activity</string>
     <string name="app_settings">App-Settings</string>
     <string name="binding_code_placeholder">h5G+s%gt</string>
+    <string name="pinCodePlaceholder">*****</string>
+
 </resources>

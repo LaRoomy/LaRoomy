@@ -363,7 +363,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
-                // navigate to the time selector page with the countdown-select-mode
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+                // navigate to the unlock control page
+                val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                startActivity(intent)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
                 // prevent the normal "onPause" execution
