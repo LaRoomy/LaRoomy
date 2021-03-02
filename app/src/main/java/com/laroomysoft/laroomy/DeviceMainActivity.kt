@@ -101,92 +101,91 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onResume()
         Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
 
-        // if the device was disconnected on a property sub-page, navigate back with delay
-        if(!ApplicationProperty.bluetoothConnectionManger.isConnected){
-            setUIConnectionStatus(false)
-            Handler(Looper.getMainLooper()).postDelayed({
-                (applicationContext as ApplicationProperty).resetControlParameter()
-                ApplicationProperty.bluetoothConnectionManger.clear()
-                finish()
-            }, 2000)
-        }
-
         // at first check if this callback will be invoked due to a back-navigation from a property sub-page
         // or if it was invoked on creation or a resume from outside of the application
-        if((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
+        if ((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
 
             // this is a back navigation from a property sub-page
 
-            // do a complex state- update if required...
-            if((this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired){
-                Log.d("M:onResume", "Complex-State-Update required for ID ${(this.applicationContext as ApplicationProperty).complexUpdateID}")
+            // if the device was disconnected on a property sub-page, navigate back with delay
+            if (!ApplicationProperty.bluetoothConnectionManger.isConnected) {
+                // set UI visual state
+                resetSelectedItemBackground()
+                setUIConnectionStatus(false)
 
-                (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = false
+                // schedule back-navigation
+                Handler(Looper.getMainLooper()).postDelayed({
+                    (applicationContext as ApplicationProperty).resetControlParameter()
+                    ApplicationProperty.bluetoothConnectionManger.clear()
+                    finish()
+                }, 2000)
 
-                if(ApplicationProperty.bluetoothConnectionManger.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateID)){
-                    // delay the complex state update
-                    Handler(Looper.getMainLooper()).postDelayed(
-                        {
-                            ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
-                                (this.applicationContext as ApplicationProperty).complexUpdateID
-                            )
-                            (this.applicationContext as ApplicationProperty).complexUpdateID = -1
-                        },
-                        500)
-                } else {
-                    // this is not a multicomplex property, do the complex state update immediately
-                    ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
-                        (this.applicationContext as ApplicationProperty).complexUpdateID
+            } else {
+                // do a complex state- update if required...
+                if ((this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired) {
+                    Log.d(
+                        "M:onResume",
+                        "Complex-State-Update required for ID ${(this.applicationContext as ApplicationProperty).complexUpdateID}"
                     )
-                    (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+
+                    (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired =
+                        false
+
+                    if (ApplicationProperty.bluetoothConnectionManger.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateID)) {
+                        // delay the complex state update
+                        Handler(Looper.getMainLooper()).postDelayed(
+                            {
+                                ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                                    (this.applicationContext as ApplicationProperty).complexUpdateID
+                                )
+                                (this.applicationContext as ApplicationProperty).complexUpdateID =
+                                    -1
+                            },
+                            500
+                        )
+                    } else {
+                        // this is not a multicomplex property, do the complex state update immediately
+                        ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                            (this.applicationContext as ApplicationProperty).complexUpdateID
+                        )
+                        (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+                    }
                 }
-            }
 
-            // set property-item to normal background
-            if(restoreIndex >= 0) {
-                // check if the property is part of a group and set the appropriate background-color
-                if(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(restoreIndex).isGroupMember) {
-                    // set group background
+                // set property-item to normal background
+                resetSelectedItemBackground()
 
-                    setItemBackgroundColor(restoreIndex, R.color.groupColor)
+                // reset the parameter
+                restoreIndex = -1
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                    false
 
-                    setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
-
-                } else {
-                    // set default background
-
-                    setItemBackgroundColor(restoreIndex, R.color.transparentViewColor)
-
-                    setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
-                }
-            }
-
-            // reset the parameter
-            restoreIndex = -1
-            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
-
-            // realign the context objects to the bluetoothManager
-            ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
-            ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
-
-            // update info-header and states
-            if(ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.valid) {
-                setDeviceInfoHeader(
-                    ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.imageID,
-                    ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.message
+                // realign the context objects to the bluetoothManager
+                ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(
+                    this@DeviceMainActivity,
+                    this
                 )
+                ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+
+                // update info-header and states
+                if (ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.valid) {
+                    setDeviceInfoHeader(
+                        ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.imageID,
+                        ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.message
+                    )
+                }
+                if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
+                    (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
+
+                    // TODO: update data in a loop!?
+
+                }
+
+                // notify the device that the user navigated back to the device main page
+                ApplicationProperty.bluetoothConnectionManger.notifyBackNavigationToDeviceMainPage()
+
+                // TODO: detect state-changes and update the property-list-items
             }
-            if((this.applicationContext as ApplicationProperty).uiAdapterChanged){
-                (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
-
-                // TODO: update data in a loop!?
-
-            }
-
-            // notify the device that the user navigated back to the device main page
-            ApplicationProperty.bluetoothConnectionManger.notifyBackNavigationToDeviceMainPage()
-
-            // TODO: detect state-changes and update the property-list-items
 
         } else {
             // creation or resume action:
@@ -403,6 +402,27 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // what to do here??
             }
         }
+    }
+
+    fun resetSelectedItemBackground(){
+        // reset the selected item background if necessary
+        if (restoreIndex >= 0) {
+            // check if the property is part of a group and set the appropriate background-color
+            if (ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
+                    restoreIndex
+                ).isGroupMember
+            ) {
+                // set group background
+                setItemBackgroundColor(restoreIndex, R.color.groupColor)
+                setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
+
+            } else {
+                // set default background
+                setItemBackgroundColor(restoreIndex, R.color.transparentViewColor)
+                setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
+            }
+        }
+
     }
 
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
