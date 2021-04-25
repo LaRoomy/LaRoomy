@@ -126,6 +126,14 @@ class ApplicationProperty : Application() {
         }
     }
 
+    fun loadBooleanData(fileKeyID: Int, dataKeyID: Int, defaultValue: Boolean): Boolean{
+        return when(this.loadSavedStringData(fileKeyID, dataKeyID)){
+            "true" -> true
+            "false" -> false
+            else -> defaultValue
+        }
+    }
+
     fun deleteData(fileKeyID: Int, dataKeyID: Int) {
         val sharedPref =
             getSharedPreferences(

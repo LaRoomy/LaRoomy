@@ -2,7 +2,6 @@ package com.laroomysoft.laroomy
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -17,8 +16,9 @@ class AppSettingsActivity : AppCompatActivity() {
 
     lateinit var passwordBox: EditText
     lateinit var passwordViewModeButton: AppCompatImageButton
-    lateinit var useDeviceBindingSwitch: SwitchCompat
+    lateinit var useCustomBindingKeySwitch: SwitchCompat
     lateinit var autoConnectSwitch: SwitchCompat
+    lateinit var listAllDevicesSwitch: SwitchCompat
     lateinit var passwordContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,15 +35,20 @@ class AppSettingsActivity : AppCompatActivity() {
                 (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_AutoConnect)
             this.isChecked = state
         }
-        this.useDeviceBindingSwitch = findViewById<SwitchCompat>(R.id.setupActivityDeviceBindingSwitch).apply{
+        this.useCustomBindingKeySwitch = findViewById<SwitchCompat>(R.id.setupActivityCustomBindingCodeSwitch).apply{
             val state =
-                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseDeviceBinding)
+                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
             this.isChecked = state
 
             // if the device binding is active, show the password-edit container
             if(state){
                 passwordContainer.visibility = View.VISIBLE
             }
+        }
+        this.listAllDevicesSwitch = findViewById<SwitchCompat>(R.id.setupActivityListAllDevicesSwitch).apply{
+            val state =
+                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_ListAllDevices)
+            this.isChecked = state
         }
 
         // add on change listener to the password-box
@@ -75,14 +80,18 @@ class AppSettingsActivity : AppCompatActivity() {
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_AutoConnect)
         }
-        this.useDeviceBindingSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+        this.useCustomBindingKeySwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
 
-            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_UseDeviceBinding)
+            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
 
             when(b){
                 true -> passwordContainer.visibility = View.VISIBLE
                 else -> passwordContainer.visibility = View.GONE
             }
+        }
+        this.listAllDevicesSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+
+            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_ListAllDevices)
         }
     }
 

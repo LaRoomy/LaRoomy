@@ -44,12 +44,13 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/setupActivityAutoConnectElementTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:text="@string/SetupActivity_AutoConnectElementText"
                 android:textSize="22sp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setupActivityAutoConnectSwitch"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -59,6 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/setupActivityAutoConnectElementTextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -66,42 +68,58 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/setupActivityAutoConnectHintTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_AutoConnectHint"
+            android:alpha="0.5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectContainer" />
 
+        <View
+            android:id="@+id/setupActivityFirstSeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectHintTextView"
+            />
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/setupActivityDeviceBindingContainer"
+            android:id="@+id/setupActivityCustomBindingCodeContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="15dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectHintTextView">
+            app:layout_constraintTop_toBottomOf="@id/setupActivityFirstSeparatorView">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/setupActivityDeviceBindingElementTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/setupActivityCustomBindingCodeElementTextView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:text="@string/SetupActivity_DeviceBindingElementText"
+                android:text="@string/SetupActivity_CustomBindingCodeElementText"
                 android:textSize="22sp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setupActivityCustomBindingCodeSwitch"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/setupActivityDeviceBindingSwitch"
+                android:id="@+id/setupActivityCustomBindingCodeSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
+                app:layout_constraintStart_toEndOf="@id/setupActivityCustomBindingCodeElementTextView"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -110,15 +128,16 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/setupActivityDeviceBindingHintTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:text="@string/SetupActivity_DeviceBindingHint"
+            android:text="@string/SetupActivity_CustomBindingCodeHint"
+            android:alpha="0.5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityDeviceBindingContainer" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityCustomBindingCodeContainer" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setupActivityBindingCodeContainer"
@@ -178,5 +197,136 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/setupActivitySecondSeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityBindingCodeContainer"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/setupActivityListAllDevicesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/setupActivitySecondSeparatorView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupActivityListAllDevicesElementTextView"
+                android:layout_marginStart="20dp"
+                android:textSize="22sp"
+                android:text="@string/SetupActivity_ListAllDevicesElementText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setupActivityListAllDevicesSwitch"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setupActivityListAllDevicesSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintStart_toEndOf="@id/setupActivityListAllDevicesElementTextView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/setupActivityListAllDevicesHintTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/SetupActivity_ListAllDevicesHint"
+            android:alpha="0.5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesContainer" />
+
+        <View
+            android:id="@+id/setupActivityThirdSeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesHintTextView"
+            />
+
+        <!-- Add all future switches here (re-adapt the view (border) )-->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:id="@+id/setupActivityUUIDManagerButton"
+            android:orientation="horizontal"
+            android:background="@color/setupActivityButtonNormalBackground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityThirdSeparatorView"
+            >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupActivityUUIDManagerButtonDescriptor"
+                android:textSize="20sp"
+                android:text="@string/SetupActivity_UUIDManagerButtonText"
+                android:layout_marginStart="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setupActivityUUIDManagerButtonImage"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/setupActivityUUIDManagerButtonImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/setupActivityUUIDManagerButtonDescriptor"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/setupActivityForthSeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityUUIDManagerButton"
+            />
+
+
+        <!-- add all future sub page navigation-buttons here -->
+
+
+
+        <!-- add all future normal buttons here -->
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

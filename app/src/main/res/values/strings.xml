@@ -87,15 +87,18 @@
     <string name="SetupActivity_Header">Settings</string>
     <string name="SetupActivity_AutoConnectElementText">Auto-Connect</string>
     <string name="SetupActivity_AutoConnectHint">If auto-connect is set up, the app will try to connect to the last device on startup. If only one device is available, the app connects automatically to this device.</string>
-    <string name="SetupActivity_DeviceBindingElementText">Use Device-Binding</string>
-    <string name="SetupActivity_DeviceBindingHint">Device-Binding must be switched on to connect to remote devices which require a binding passkey. The entered passkey must match the key of the remote device.</string>
+    <string name="SetupActivity_CustomBindingCodeElementText">Use custom binding key</string>
+    <string name="SetupActivity_CustomBindingCodeHint">By default a random generated binding-code is used. To use your own key, set it up here.</string>
     <string name="SetupActivity_BindingCodeDescriptor">Binding-Code</string>
+    <string name="SetupActivity_ListAllDevicesElementText">List all bluetooth devices</string>
+    <string name="SetupActivity_ListAllDevicesHint">If activated, the app will list all bonded Bluetooth- devices. By default, only devices corresponding to the LaRoomy naming conventions are listed.</string>
+    <string name="SetupActivity_UUIDManagerButtonText">Manage UUID-Profiles</string>
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Device Disconnected</string>
     <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Enable Binding</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHint">If you enable device binding, the binding-code defined in the app-settings will be written to the remote Laroomy device. After that, a connection to the device will only be accepted if the correct binding-code is set up and the binding is activated in the app settings.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHint">If you enable device binding, the binding-code defined in the app-settings will be written to the remote Laroomy device. After that, a connection to the device will only be accepted if the correct binding-code is set up.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Factory Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">The remote device will be restored to the default configuration. Are you sure?</string>
@@ -134,9 +137,10 @@
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
-    <string name="DataKey_UseDeviceBinding">useDeviceBindingValue</string>
+    <string name="DataKey_UseCustomBindingKey">useDeviceBindingValue</string>
     <string name="DataKey_AutoConnect">autoConnectValue</string>
     <string name="DataKey_BindingPasskey">bindingPasskey</string>
+    <string name="DataKey_ListAllDevices" translatable="false">listAllDevicesValue</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

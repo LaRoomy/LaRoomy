@@ -10,7 +10,6 @@ import android.os.*
 import android.util.Log
 import android.widget.SeekBar
 import java.io.Serializable
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -471,7 +470,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                         // check if binding is activated in app-settings
                         val isBindingActivated =
-                            (activityContext.applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseDeviceBinding)
+                            (activityContext.applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
                         if(!isBindingActivated){
                             Log.e(
                                 "M:CB:CharChanged",

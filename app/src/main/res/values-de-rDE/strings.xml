@@ -87,15 +87,21 @@
     <string name="SetupActivity_Header">Einstellungen</string>
     <string name="SetupActivity_AutoConnectElementText">Automatisch verbinden</string>
     <string name="SetupActivity_AutoConnectHint">Wenn diese Einstellung aktiviert ist, dann wird die App versuchen eine Verbindung zum letzten erfolgreich verbundenen Gerät herzustellen. Wenn nur ein Gerät verfügbar ist, dann wird dieses automatisch verbunden.</string>
-    <string name="SetupActivity_DeviceBindingElementText">Geräte Bindung verwenden</string>
-    <string name="SetupActivity_DeviceBindingHint">Die Geräte-Bindung muss aktiviert sein um eine Verbindung zu Geräten herzustellen die einen Bindungs-Code benötigen. Der Bindungs-Code muss dem des zu verbindenden Gerätes entsprechen.</string>
+    <string name="SetupActivity_CustomBindingCodeElementText">Benutzerdefinierten Bindungs-Key verwenden</string>
+    <string name="SetupActivity_CustomBindingCodeHint">Standardmäßig wird ein zufällig generierter Schlüssel verwendet. Dieser kann hier geändert werden.</string>
     <string name="SetupActivity_BindingCodeDescriptor">Bindungs-Code</string>
+    <string name="SetupActivity_ListAllDevicesElementText">Alle Bluetooth-Geräte auflisten</string>
+    <string name="SetupActivity_ListAllDevicesHint">Es werden alle mit dem System gekoppelten Geräte aufgelisted. Standardmäßig werden nur Geräte aufgelistet, die den LaRoomy Namenskonventionen entsprechen</string>
+    <string name="SetupActivity_UUIDManagerButtonText">UUID Profile verwalten</string>
+
+
+
 
     <string name="DeviceSettingsActivity_HeaderText">Gerät-Einstellungen</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Gerät verbunden</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Gerät getrennt</string>
     <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Gerätebindung aktivieren</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHint">Wenn Sie die Geräte-Bindung aktivieren, wird der in den App-Einstellungen definierte Bingungs-Code an das Gerät übermittelt. Eine Verbindung zu dem Gerät ist dann nur noch möglich wenn dieser Code in den App-Einstellungen gesetzt ist und die Verwendung der Geräte Bindung aktiviert ist.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHint">Wenn Sie die Geräte-Bindung aktivieren, wird der in den App-Einstellungen definierte Bingungs-Code an das Gerät übermittelt. Eine Verbindung zu dem Gerät ist dann nur noch möglich wenn dieser Code in den App-Einstellungen gesetzt ist.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Werkseinstellungen</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">Das Gerät wird auf Werkseinstellungen zurückgesetzt. Sind Sie sicher?</string>
@@ -135,9 +141,10 @@
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
-    <string name="DataKey_UseDeviceBinding">useDeviceBindingValue</string>
+    <string name="DataKey_UseCustomBindingKey">useDeviceBindingValue</string>
     <string name="DataKey_AutoConnect">autoConnectValue</string>
     <string name="DataKey_BindingPasskey">bindingPasskey</string>
+
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
