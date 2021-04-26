@@ -27,11 +27,11 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
         // get the complex state data for the navigator
         val navigatorState =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@NavigatorControlActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@NavigatorControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).setOnTouchListener(this)
         findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).setOnTouchListener(this)
@@ -49,7 +49,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             Log.d("M:NavCon:onPause", "Navigator Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -67,13 +67,13 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         super.onResume()
         Log.d("M:NavCon:onResume", "onResume executed in Navigator Control Activity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@NavigatorControlActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@NavigatorControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:NavCon:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -112,7 +112,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             else -> '2'
         }
         val executionString = "C${a8BitValueToString(relatedElementID)}$directionChar$touchDownType$"
-        ApplicationProperty.bluetoothConnectionManger.sendData(executionString)
+        ApplicationProperty.bluetoothConnectionManager.sendData(executionString)
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
@@ -188,7 +188,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:NavCon:ComplexPCg", "Navigator Control Activity - Complex Property changed - Update the UI")

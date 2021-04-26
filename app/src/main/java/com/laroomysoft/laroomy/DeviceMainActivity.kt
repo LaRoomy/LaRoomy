@@ -35,8 +35,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         setContentView(R.layout.activity_device_main)
 
         // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceMainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // init recycler view!!
         this.devicePropertyListLayoutManager = LinearLayoutManager(this)
@@ -51,7 +51,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // bind array to adapter
         this.devicePropertyListViewAdapter =
             DevicePropertyListAdapter(
-                ApplicationProperty.bluetoothConnectionManger.uIAdapterList,
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
                 this,
                 this@DeviceMainActivity,
                 this)
@@ -78,7 +78,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // TODO: suspend connection (maybe delayed in background???)
             //ApplicationProperty.bluetoothConnectionManger.close()
 
-            ApplicationProperty.bluetoothConnectionManger.suspendConnection()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
 
             setUIConnectionStatus(false)
             setDeviceInfoHeader(29, getString(R.string.DMA_DeviceConnectionSuspended))
@@ -93,7 +93,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onBackPressed() {
         super.onBackPressed()
         // the loading activity is terminated, so the start(main)-Activity will be invoked
-        ApplicationProperty.bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManager.clear()
         finish()
     }
 
@@ -108,7 +108,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // this is a back navigation from a property sub-page
 
             // if the device was disconnected on a property sub-page, navigate back with delay
-            if (!ApplicationProperty.bluetoothConnectionManger.isConnected) {
+            if (!ApplicationProperty.bluetoothConnectionManager.isConnected) {
                 // set UI visual state
                 resetSelectedItemBackground()
                 setUIConnectionStatus(false)
@@ -116,7 +116,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // schedule back-navigation
                 Handler(Looper.getMainLooper()).postDelayed({
                     (applicationContext as ApplicationProperty).resetControlParameter()
-                    ApplicationProperty.bluetoothConnectionManger.clear()
+                    ApplicationProperty.bluetoothConnectionManager.clear()
                     finish()
                 }, 2000)
 
@@ -131,11 +131,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired =
                         false
 
-                    if (ApplicationProperty.bluetoothConnectionManger.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateID)) {
+                    if (ApplicationProperty.bluetoothConnectionManager.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateID)) {
                         // delay the complex state update
                         Handler(Looper.getMainLooper()).postDelayed(
                             {
-                                ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                                ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForID(
                                     (this.applicationContext as ApplicationProperty).complexUpdateID
                                 )
                                 (this.applicationContext as ApplicationProperty).complexUpdateID =
@@ -145,7 +145,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         )
                     } else {
                         // this is not a multicomplex property, do the complex state update immediately
-                        ApplicationProperty.bluetoothConnectionManger.doComplexPropertyStateRequestForID(
+                        ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForID(
                             (this.applicationContext as ApplicationProperty).complexUpdateID
                         )
                         (this.applicationContext as ApplicationProperty).complexUpdateID = -1
@@ -161,17 +161,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     false
 
                 // realign the context objects to the bluetoothManager
-                ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(
+                ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(
                     this@DeviceMainActivity,
                     this
                 )
-                ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+                ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
                 // update info-header and states
-                if (ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.valid) {
+                if (ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.valid) {
                     setDeviceInfoHeader(
-                        ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.imageID,
-                        ApplicationProperty.bluetoothConnectionManger.deviceInfoHeaderData.message
+                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.imageID,
+                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.message
                     )
                 }
                 if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
@@ -182,7 +182,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
 
                 // notify the device that the user navigated back to the device main page
-                ApplicationProperty.bluetoothConnectionManger.notifyBackNavigationToDeviceMainPage()
+                ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
 
                 // TODO: detect state-changes and update the property-list-items
             }
@@ -192,10 +192,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // make sure to set the right Name for the device
             findViewById<TextView>(R.id.deviceTypeHeaderName).text =
-                ApplicationProperty.bluetoothConnectionManger.currentDevice?.name
+                ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
 
             // Update the connection status
-            setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManger.isConnected)
+            setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManager.isConnected)
 
             // show the loading circle
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
@@ -208,7 +208,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 //ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
                 // try to reconnect
-                ApplicationProperty.bluetoothConnectionManger.resumeConnection()
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
 
 
                 //ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
@@ -217,7 +217,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this.activityWasSuspended = false
             } else {
                 // must be the creation process -> start property listing
-                ApplicationProperty.bluetoothConnectionManger.startDevicePropertyListing()
+                ApplicationProperty.bluetoothConnectionManager.startDevicePropertyListing()
             }
 
             // how to confirm the device-properties
@@ -265,7 +265,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
                 "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
         // NOTE: the button has no state the execution command contains always "1"
-        ApplicationProperty.bluetoothConnectionManger.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}1$")
+        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}1$")
     }
 
     override fun onPropertyElementSwitchClick(
@@ -285,7 +285,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             true -> '1'
             else -> '0'
         }
-        ApplicationProperty.bluetoothConnectionManger.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}$c$")
+        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}$c$")
     }
 
     override fun onSeekBarPositionChange(
@@ -293,7 +293,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         newValue: Int,
         changeType: Int
     ) {
-        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(index)
+        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
 
         Log.d("M:CB:onSeekBarChange", "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
                 "Type: ${devicePropertyListContentInformation.propertyType}\n" +
@@ -312,7 +312,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             val bitValue =
                 percentTo8Bit(newValue)
 
-            ApplicationProperty.bluetoothConnectionManger.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}${a8BitValueToString(bitValue)}$")
+            ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}${a8BitValueToString(bitValue)}$")
         }
     }
 
@@ -408,7 +408,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // reset the selected item background if necessary
         if (restoreIndex >= 0) {
             // check if the property is part of a group and set the appropriate background-color
-            if (ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
+            if (ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                     restoreIndex
                 ).isGroupMember
             ) {
@@ -429,7 +429,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // finish the activity and navigate back to the start activity (MainActivity)
         // same procedure like onBackPressed!
 
-        ApplicationProperty.bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManager.clear()
 
         // start main activity to select a new device!!!
 
@@ -437,7 +437,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        if(ApplicationProperty.bluetoothConnectionManger.isConnected) {
+        if(ApplicationProperty.bluetoothConnectionManager.isConnected) {
             // prevent the normal "onPause" execution
             (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
             // navigate to the device settings activity..
@@ -451,9 +451,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // confirm device-properties???
         // re-connect and re-new the device-properties???
 
-        if(!ApplicationProperty.bluetoothConnectionManger.isConnected) {
-            ApplicationProperty.bluetoothConnectionManger.close()
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+        if(!ApplicationProperty.bluetoothConnectionManager.isConnected) {
+            ApplicationProperty.bluetoothConnectionManager.close()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
         }
     }
 
@@ -495,7 +495,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // stop the loading circle and set the info-header
         if(state) {
             // send a test command
-            ApplicationProperty.bluetoothConnectionManger.testConnection(200)// TODO: this must be tested
+            ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
             // stop spinner and set info header
             runOnUiThread {
                 this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
@@ -542,7 +542,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // maybe there is no need to call this???
                 // adapter.submitList(list) to proof
 
-            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.size - 1)
+            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - 1)
         }
     }
 
@@ -551,7 +551,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         runOnUiThread {
             val uIElement =
-                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                     UIAdapterElementIndex
                 )
 

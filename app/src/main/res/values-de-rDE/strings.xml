@@ -116,6 +116,14 @@
     <string name="AppHelpActivity_Topic_ConnectDevice_P4">4. Nachdem das Gerät erfolgreich gekoppelt ist, öffnen Sie die Laroomy App. Das Gerät sollte nun angezeigt werden.</string>
     <string name="AppHelpActivity_Topic_DeviceBinding">Geräte-Bindung</string>
 
+    <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
+    <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profil</string>
+    <string name="EditUUIDProfileActivityHeaderEditModeText">UUID Profil ändern</string>
+    <string name="EditUUIDProfileActivityHeaderNewModeText">Neues UUID Profil anlegen</string>
+    <string name="EditUUIDProfileActivityModeError">Modus-Fehler</string>
+
+
+
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>

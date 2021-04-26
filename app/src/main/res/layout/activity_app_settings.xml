@@ -278,6 +278,7 @@
             android:layout_height="wrap_content"
             android:minHeight="60dp"
             android:id="@+id/setupActivityUUIDManagerButton"
+            android:onClick="onManageUUIDProfilesButtonClick"
             android:orientation="horizontal"
             android:background="@color/setupActivityButtonNormalBackground"
             app:layout_constraintStart_toStartOf="parent"

@@ -30,11 +30,11 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // set the header-text to the property Name
         findViewById<TextView>(R.id.bgdHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@BarGraphActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@BarGraphActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the notification text-view
         this.notificationTextView = findViewById(R.id.bgdActivityNotificationTextView)
@@ -43,11 +43,11 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.barGraph = findViewById(R.id.bgdBarGraphView)
 
         // get the maximum bar count (zero-based!)
-        this.maxBarIndex = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne - 1
+        this.maxBarIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne - 1
 
         // create and set the bar-graph data
         this.setCurrentViewStateFromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
         )
     }
 
@@ -71,7 +71,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             Log.d("M:BGD:onPause", "Bar Graph Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -79,17 +79,17 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onResume()
         Log.d("M:BGD:onResume", "onResume executed in Bar-Graph Activity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@BarGraphActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@BarGraphActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:BGD:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         } else {
             // notify the device that multi-complex property was invoked
-            ApplicationProperty.bluetoothConnectionManger.notifyMultiComplexPropertyPageInvoked(this.relatedElementID)
+            ApplicationProperty.bluetoothConnectionManager.notifyMultiComplexPropertyPageInvoked(this.relatedElementID)
         }
     }
 
@@ -180,7 +180,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:BGD:ComplexPCg", "BarGraph Activity - Complex Property changed - Update the UI")

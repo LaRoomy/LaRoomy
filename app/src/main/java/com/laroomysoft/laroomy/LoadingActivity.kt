@@ -19,8 +19,8 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@LoadingActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@LoadingActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         when(val index = this.intent.getIntExtra("BondedDeviceIndex", -1)){
             -1 -> {
@@ -33,19 +33,19 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             -2 -> {
                 // connect to last device
                 isLastConnectedDevice = true
-                ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
                 setProgressText(getString(R.string.CA_Connecting))
             }
             else -> {
                 // connect to device from list at index
                 val adr =
-                    ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices.elementAt(index).address
+                    ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(index).address
 
-                if(adr == ApplicationProperty.bluetoothConnectionManger.getLastConnectedDeviceAddress()){
+                if(adr == ApplicationProperty.bluetoothConnectionManager.getLastConnectedDeviceAddress()){
                     isLastConnectedDevice = true
                 }
 
-                ApplicationProperty.bluetoothConnectionManger.connectToBondedDeviceWithMacAddress(adr)
+                ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(adr)
                 setProgressText(getString(R.string.CA_Connecting))
             }
         }
@@ -53,7 +53,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onBackPressed() {
         super.onBackPressed()
-        ApplicationProperty.bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManager.clear()
         finish()
     }
 
@@ -95,7 +95,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // binding was rejected from the remote device due to an invalid passkey
         setErrorText(getString(R.string.CA_BindingPasskeyRejected))
         // stop connection process
-        ApplicationProperty.bluetoothConnectionManger.clear()
+        ApplicationProperty.bluetoothConnectionManager.clear()
         // navigate back with delay !?
         Handler(Looper.getMainLooper()).postDelayed({
             finish()
@@ -115,15 +115,15 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
                     connectionAttemptCounter++
                     // clear the bluetoothManager
-                    ApplicationProperty.bluetoothConnectionManger.clear()
+                    ApplicationProperty.bluetoothConnectionManager.clear()
                     // try to connect again with 1 sec delay
                     Handler(Looper.getMainLooper()).postDelayed({
-                        ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+                        ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
                     }, 1000)
                 }
             } else {
                 // all attempts to connect failed -> go back to start (main activity)
-                ApplicationProperty.bluetoothConnectionManger.clear()
+                ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()
             }
         }
@@ -139,7 +139,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             // TODO: check if this works!?
 
             blockAllFurtherProcessing = true
-            ApplicationProperty.bluetoothConnectionManger.clear()
+            ApplicationProperty.bluetoothConnectionManager.clear()
             finish()
 
         },4000)
@@ -153,15 +153,15 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             setProgressText(getString(R.string.CA_Connected))
             // send authentication request
             Handler(Looper.getMainLooper()).postDelayed({
-                ApplicationProperty.bluetoothConnectionManger.authenticate()
+                ApplicationProperty.bluetoothConnectionManager.authenticate()
 
                 // check the authentication with delay an try again if it is false
                 Handler(Looper.getMainLooper()).postDelayed({
 
                     // TODO: maybe check here if the device is disconnected and try to reconnect
 
-                    if(!ApplicationProperty.bluetoothConnectionManger.authenticationSuccess){
-                        ApplicationProperty.bluetoothConnectionManger.authenticate()
+                    if(!ApplicationProperty.bluetoothConnectionManager.authenticationSuccess){
+                        ApplicationProperty.bluetoothConnectionManager.authenticate()
                     }
                 },1500)
                 

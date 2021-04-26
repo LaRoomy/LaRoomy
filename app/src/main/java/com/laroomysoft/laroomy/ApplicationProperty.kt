@@ -51,7 +51,7 @@ const val ERROR_NOTFOUND = "error - not found"
 class ApplicationProperty : Application() {
 
     companion object {
-        lateinit var bluetoothConnectionManger: BLEConnectionManager
+        lateinit var bluetoothConnectionManager: BLEConnectionManager
     }
 
     lateinit var systemLanguage: String
@@ -67,7 +67,7 @@ class ApplicationProperty : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        bluetoothConnectionManger = BLEConnectionManager(this)
+        bluetoothConnectionManager = BLEConnectionManager(this)
         systemLanguage = Locale.getDefault().displayLanguage
     }
 
@@ -273,8 +273,12 @@ fun resourceIdForImageId(imageID: Int): Int {
 }
 
 
-interface OnItemClickListener {
+interface OnDeviceListItemClickListener {
     fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel)
+}
+
+interface OnUUIDProfileListItemClickListener {
+    fun OnItemClicked(index: Int, data: UUIDProfile)
 }
 
 interface OnPropertyClickListener {

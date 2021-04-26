@@ -22,8 +22,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         setContentView(R.layout.activity_device_settings)
 
         // align context and event objects
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceSettingsActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceSettingsActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the necessary views
         userNotificationTextView = findViewById(R.id.deviceSettingsActivityUserNotificationTextView)
@@ -31,10 +31,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
 
         // set the initial settings
-        bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManger.isBindingRequired
+        bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired
 
         // set the connection-state info
-        when(ApplicationProperty.bluetoothConnectionManger.isConnected){
+        when(ApplicationProperty.bluetoothConnectionManager.isConnected){
             true -> notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
             else -> notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
         }
@@ -51,12 +51,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                         (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
 
                     //ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
-                    ApplicationProperty.bluetoothConnectionManger.enableDeviceBinding(passkey)
+                    ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding(passkey)
                 }
                 else -> {
                     // release the device binding
                     //ApplicationProperty.bluetoothConnectionManger.sendData("SrB>$")
-                    ApplicationProperty.bluetoothConnectionManger.releaseDeviceBinding()
+                    ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding()
                 }
             }
 
@@ -78,7 +78,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             Log.d("M:DSPPage:onPause", "Device Settings Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -86,13 +86,13 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         super.onResume()
         Log.d("M:DSPPage:onResume", "onResume executed in Device Settings Activity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceSettingsActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceSettingsActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:DSPPage:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -126,7 +126,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         dialog.setTitle(R.string.DeviceSettingsActivity_FactoryResetButtonDescriptorText)
         dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
             // send factory reset command
-            ApplicationProperty.bluetoothConnectionManger.sendData("SfR=$")
+            ApplicationProperty.bluetoothConnectionManager.sendData("SfR=$")
             dialogInterface.dismiss()
         }
         dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->

@@ -19,6 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".EditUUIDProfileActivity"></activity>
+        <activity android:name=".ManageUUIDProfilesActivity" />
         <activity
             android:name=".UnlockControlActivity"
             android:screenOrientation="nosensor" />
@@ -31,15 +33,12 @@
         <activity
             android:name=".DeviceSettingsActivity"
             android:screenOrientation="nosensor" />
-        <activity
-            android:name=".AppHelpActivity" />
+        <activity android:name=".AppHelpActivity" />
         <activity
             android:name=".TimeFrameSelectorActivity"
             android:screenOrientation="nosensor" />
-        <activity
-            android:name=".AppSettingsActivity" />
-        <activity
-            android:name=".InformationActivity" />
+        <activity android:name=".AppSettingsActivity" />
+        <activity android:name=".InformationActivity" />
         <activity
             android:name=".SimpleTimeSelectorActivity"
             android:screenOrientation="nosensor" />

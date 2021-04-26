@@ -32,6 +32,7 @@
     <color name="numPadButtonColor">#FF777788</color>
     <color name="numPadOtherButtonColor">#FF444444</color>
     <color name="setupActivityButtonNormalBackground">#FF111111</color>
+    <color name="setupActivityButtonPressedBackground">#FF333333</color>
 
 
     <!-- barGraph colors -->

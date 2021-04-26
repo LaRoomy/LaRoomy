@@ -1,5 +1,6 @@
 package com.laroomysoft.laroomy
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
@@ -20,6 +21,8 @@ class AppSettingsActivity : AppCompatActivity() {
     lateinit var autoConnectSwitch: SwitchCompat
     lateinit var listAllDevicesSwitch: SwitchCompat
     lateinit var passwordContainer: ConstraintLayout
+
+    private var buttonNormalizationRequired = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +98,21 @@ class AppSettingsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if(this.buttonNormalizationRequired){
+            val cLayout = findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton)
+            cLayout.setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+            this.buttonNormalizationRequired = false
+        }
+    }
+
     private val passwordViewModeVisible: Int = 1
     private val passwordViewModeHidden: Int = 2
     var currentPasswordViewMode = passwordViewModeHidden
@@ -120,6 +138,17 @@ class AppSettingsActivity : AppCompatActivity() {
                 currentPasswordViewMode = passwordViewModeHidden
             }
         }
+    }
+
+    fun onManageUUIDProfilesButtonClick(view: View) {
+
+        val cLayout = findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton)
+        cLayout.setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
+
+        this.buttonNormalizationRequired = true
+
+        val intent = Intent(this@AppSettingsActivity, ManageUUIDProfilesActivity::class.java)
+        startActivity(intent)
     }
 
 }

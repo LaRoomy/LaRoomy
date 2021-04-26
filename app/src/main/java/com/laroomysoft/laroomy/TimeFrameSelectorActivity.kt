@@ -26,15 +26,15 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // set the header-text to the property Name
         findViewById<TextView>(R.id.tfsHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex-state object
         val timeFrameState =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
         // save reference to UI elements
         this.notificationTextView = findViewById(R.id.tfsNotificationTextView)
@@ -73,7 +73,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
             Log.d("M:TFSPage:onPause", "Time-Frame Selector Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -81,13 +81,13 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         super.onResume()
         Log.d("M:TFSPage:onResume", "onResume executed in Time-Frame Selector Activity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:TFSPage:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -96,7 +96,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         Log.d("M:CB:TimeChanged", "Time changed in TimeFrameSelector Activity." +
                 "\nTime-Type: ${if(view?.id == R.id.fromTimePicker) "On-Time" else "Off-Time"}" +
                 "New Time is: $hourOfDay : $minute")
-        ApplicationProperty.bluetoothConnectionManger.sendData(
+        ApplicationProperty.bluetoothConnectionManager.sendData(
             this.generateExecutionString(view?.id ?: 0, hourOfDay, minute)
         )
     }
@@ -157,7 +157,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:TFSPage:ComplexPCg", "Time-Frame Selector Activity - Complex Property changed - Update the UI")

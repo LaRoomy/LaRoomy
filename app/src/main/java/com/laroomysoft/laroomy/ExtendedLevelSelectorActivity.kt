@@ -3,7 +3,6 @@ package com.laroomysoft.laroomy
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import com.ramotion.fluidslider.FluidSlider
@@ -29,15 +28,15 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
         // set the header-text to the property Name
         findViewById<TextView>(R.id.elsHeaderTextView).text =
-                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex state object
         val exLevelState =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
         // save the 8bit level value
         this.currentLevel = exLevelState.valueOne
@@ -79,7 +78,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             Log.d("M:ELSPage:onPause", "Extended Level Selector Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -87,13 +86,13 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         super.onResume()
         Log.d("M:ELSPage:onResume", "onResume executed in Extended Level Selector Control")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:ELSPage:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -114,7 +113,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     private fun onOffSwitchClicked(){
         // send the instruction to the device
-        ApplicationProperty.bluetoothConnectionManger.sendData(
+        ApplicationProperty.bluetoothConnectionManager.sendData(
             generateExecutionString(this.onOffSwitch.isChecked, this.currentLevel)
         )
     }
@@ -125,7 +124,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // save the new value
         this.currentLevel = value
         // send the instruction to the device
-        ApplicationProperty.bluetoothConnectionManger.sendData(
+        ApplicationProperty.bluetoothConnectionManager.sendData(
             generateExecutionString(this.onOffSwitch.isChecked, this.currentLevel)
         )
     }
@@ -169,7 +168,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:ELSPage:ComplexPCg", "Extended Level Selector Activity - Complex Property changed - Update the UI")

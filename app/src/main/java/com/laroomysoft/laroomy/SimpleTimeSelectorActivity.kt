@@ -26,11 +26,11 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         // set the header-text to the property Name
         findViewById<TextView>(R.id.stsHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // get the complex state data for the time selector
         val timeSelectorState =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
         // set the displayed time to the current device setting
         this.currentHour = timeSelectorState.valueOne
@@ -38,8 +38,8 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // config timeSelector
         this.simpleTimePicker = findViewById(R.id.simpleTimePicker)
@@ -55,7 +55,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             Log.d("M:STSPage:onPause", "Simple Time Selector Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -73,13 +73,13 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         super.onResume()
         Log.d("M:STSPage:onResume", "onResume executed in Simple Time Selector Control")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:STSPage:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -91,7 +91,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         this.currentHour = hourOfDay
         this.currentMinute = minute
 
-        ApplicationProperty.bluetoothConnectionManger.sendData(
+        ApplicationProperty.bluetoothConnectionManager.sendData(
             this.generateExecutionString()
         )
     }
@@ -117,7 +117,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     private fun generateExecutionString() : String {
         return "C${a8BitValueToString(relatedElementID)}" +
-                "${ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(
+                "${ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                     relatedGlobalElementIndex
                 ).complexPropertyState.timeSetterIndex}" +
                 a8BitValueAsTwoCharString(currentHour) +
@@ -155,7 +155,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:STSPage:ComplexPCg", "Simple Time Selector Activity - Complex Property changed - Update the UI")

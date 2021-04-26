@@ -13,12 +13,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionManager.BleEventCallback {
+class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback {
 
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
         field.clear()
-        field = ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices
+        field = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
         return field
     }
 
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@MainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@MainActivity, this)
 
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
                 }
                 else -> {
                     // try to connect to the last successful connected device
-                    if (ApplicationProperty.bluetoothConnectionManger.isLastAddressValid) {
+                    if (ApplicationProperty.bluetoothConnectionManager.isLastAddressValid) {
                         Handler(Looper.getMainLooper()).postDelayed({
                             // move forward with delay...!
                             val intent = Intent(this@MainActivity, LoadingActivity::class.java)
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     override fun onResume() {
         super.onResume()
 
-        ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled(this)
+        ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
 
         // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
 
@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
     }
 
     private fun updateAvailableDevices(){
-        this.availableDevices = ApplicationProperty.bluetoothConnectionManger.bondedLaRoomyDevices
+        this.availableDevices = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
         if(this.availableDevices.size == 0){
             findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)
         }
@@ -191,15 +191,15 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
 
     class AvailableDevicesListAdapter(
         private val laRoomyDevListAdapter : ArrayList<LaRoomyDevicePresentationModel>,
-        private val itemClickListener: OnItemClickListener
+        private val deviceListItemClickListener: OnDeviceListItemClickListener
     ) : RecyclerView.Adapter<AvailableDevicesListAdapter.DSLRViewHolder>() {
 
         class DSLRViewHolder(val linearLayout: LinearLayout) :
             RecyclerView.ViewHolder(linearLayout){
 
-            fun bind(data: LaRoomyDevicePresentationModel, itemClick: OnItemClickListener, position: Int){
+            fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener, position: Int){
                 itemView.setOnClickListener{
-                    itemClick.onItemClicked(position, data)
+                    deviceListItemClick.onItemClicked(position, data)
                 }
             }
         }
@@ -220,7 +220,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener, BLEConnectionMana
             // currently there is only one image. In the future there must be implemented multiple images for multiple device-types
             // TODO: set the appropriate image for the device type
 
-            holder.bind(laRoomyDevListAdapter[position], itemClickListener, position)
+            holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener, position)
         }
 
         override fun getItemCount(): Int {

@@ -34,12 +34,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@UnlockControlActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex state object
         val lockState =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
         // set the UI State
         this.setCurrentViewStateFromComplexPropertyState(lockState)
@@ -63,7 +63,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             Log.d("M:UCA:onPause", "Unlock Control Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -71,13 +71,13 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         super.onResume()
         Log.d("M:UCA:onResume", "onResume executed in Unlock Control Activity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@UnlockControlActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect) {
             Log.d("M:UCA:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -176,7 +176,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:UCA:ComplexPCg", "Unlock Control Activity - Complex Property changed - Update the UI")

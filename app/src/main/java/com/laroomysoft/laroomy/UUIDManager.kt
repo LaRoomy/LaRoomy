@@ -1,8 +1,35 @@
 package com.laroomysoft.laroomy
 
 import java.util.*
+import kotlin.collections.ArrayList
+
+class UUIDProfile{
+    var profileName = ""
+    var serviceUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
+    var characteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
+}
 
 class UUIDManager {
+
+    val uUIDProfileList = ArrayList<UUIDProfile>().apply {
+
+        // add the common profiles
+        val hmXXProfile = UUIDProfile()
+        hmXXProfile.profileName = "Huamao HMxx - Modules"
+        hmXXProfile.serviceUUID = hmxxserviceUUID
+        hmXXProfile.characteristicUUID = hmxxcharacteristicUUID
+        val rn48xxProfile = UUIDProfile()
+        rn48xxProfile.profileName = "Microchip RN48xx Modules"
+        rn48xxProfile.serviceUUID = rn4870transUartserviceUUID
+        rn48xxProfile.characteristicUUID = rn4870characteristicUUID1
+
+        this.add(rn48xxProfile)
+        this.add(hmXXProfile)
+
+        // add the saved profiles
+
+    }
+
 
 
     //val rn4870_service_one = "00001800-0000-1000-8000-00805f9b34fb"

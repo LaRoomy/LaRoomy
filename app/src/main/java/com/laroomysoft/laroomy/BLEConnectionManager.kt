@@ -690,6 +690,39 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val isLastAddressValid: Boolean
     get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
 
+    val uuidManager = UUIDManager()
+
+    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
+        this.bleAdapter?.bondedDevices
+    }
+
+    var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
+        get() {
+            field.clear()
+            this.bleAdapter?.bondedDevices?.forEach {
+                // It is not possible to get the uuids from the device here
+                // -> so the name must be the criteria to identify a laroomy device!
+                if(it.name.startsWith("Laroomy") || it.name.contains("LRY", false))
+                {
+                    val device = LaRoomyDevicePresentationModel()
+                    device.name = it.name
+                    device.address = it.address
+                    device.type = laRoomyDeviceTypeFromName(it.name)
+                    field.add(device)
+                }
+            }
+            return field
+        }
+
+    private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
+
+        val bluetoothManager =
+            activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothManager.adapter
+    }
+
+    private val BluetoothAdapter.isDisabled: Boolean
+        get() = !isEnabled
 
     private val requestEnableBT: Int = 13
 
@@ -856,38 +889,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         else
             this.currentDevice = this.bondedList?.elementAt(index)
     }
-
-    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
-        this.bleAdapter?.bondedDevices
-    }
-
-    var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
-    get() {
-        field.clear()
-        this.bleAdapter?.bondedDevices?.forEach {
-            // It is not possible to get the uuids from the device here
-            // -> so the name must be the criteria to identify a laroomy device!
-            if(it.name.startsWith("Laroomy") || it.name.contains("LRY", false))
-            {
-                val device = LaRoomyDevicePresentationModel()
-                device.name = it.name
-                device.address = it.address
-                device.type = laRoomyDeviceTypeFromName(it.name)
-                field.add(device)
-            }
-        }
-        return field
-    }
-
-    private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
-
-        val bluetoothManager =
-            activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
-    }
-
-    private val BluetoothAdapter.isDisabled: Boolean
-    get() = !isEnabled
 
     fun checkBluetoothEnabled(caller: Activity){
 

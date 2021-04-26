@@ -113,6 +113,12 @@
     <string name="AppHelpActivity_Topic_ConnectDevice_P4">4. When the device is successfully bonded, open the laroomy app. The device should now be listed.</string>
     <string name="AppHelpActivity_Topic_DeviceBinding">Device-Binding</string>
 
+    <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
+    <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profile</string>
+    <string name="EditUUIDProfileActivityHeaderEditModeText">Edit UUID Profile</string>
+    <string name="EditUUIDProfileActivityHeaderNewModeText">New UUID Profile</string>
+    <string name="EditUUIDProfileActivityModeError">Invocation Error</string>
+
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
@@ -154,4 +160,6 @@
     <string name="app_settings">App-Settings</string>
     <string name="binding_code_placeholder">h5G+s%gt</string>
     <string name="pinCodePlaceholder">*****</string>
+    <string name="uuidProfileListPlaceholder" translatable="false">Profile Element</string>
+
 </resources>

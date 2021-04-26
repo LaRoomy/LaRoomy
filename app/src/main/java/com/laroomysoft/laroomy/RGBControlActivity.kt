@@ -50,7 +50,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         colorPickerView.addOnColorChangedListener(this)
 
         // get the state for this RGB control
-        val colorState = ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        val colorState = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
 
         // get the current color (if all values are zero, set the default color)
         val actualColor =
@@ -68,10 +68,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // set the header-text to the property-name
         findViewById<TextView>(R.id.rgbHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this, this@RGBControlActivity)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this, this@RGBControlActivity)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get program speed seekBar
         programSpeedSeekBar = findViewById(R.id.rgbProgramSpeedSeekBar)
@@ -133,7 +133,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             Log.d("M:RGBPage:onPause", "RGB Control Activity: The user closes the app -> suspend connection")
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManger.close()
+            ApplicationProperty.bluetoothConnectionManager.close()
         }
     }
 
@@ -141,15 +141,15 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         super.onResume()
         Log.d("M:RGBPage:onResume", "onResume executed in RGBControlActivity")
 
-        ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@RGBControlActivity, this)
-        ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@RGBControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // TODO: test if the dualContainer will be set visible on reConnection (otherwise make the visibility secure here)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
             Log.d("M:RGBPage:onResume", "The connection was suspended -> try to reconnect")
-            ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
@@ -184,9 +184,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         val greenValueAsString = a8BitValueToString(greenValue)
         val blueValueAsString = a8BitValueToString(blueValue)
 
-        val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
+        val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
 
-        ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+        ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
     }
 
     private fun transitionSpeedSliderPositionFromCommandValue(commandValue: Int): Int {
@@ -365,12 +365,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val g = Color.green(selectedColor)
             val b = Color.blue(selectedColor)
             val elID = a8BitValueToString(
-                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
             )
             val instruction =
                 "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
 
-            ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+            ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
         }
     }
 
@@ -385,12 +385,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val g = Color.green(selectedColor)
             val b = Color.blue(selectedColor)
             val elID = a8BitValueToString(
-                ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
             )
             val instruction =
                 "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
 
-            ApplicationProperty.bluetoothConnectionManger.sendData(instruction)
+            ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
         }
     }
 
@@ -399,7 +399,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         Log.d("M:RGBPage:ConStateChge", "Connection state changed in RGB Activity. New Connection state is: $state")
         if(state){
             // test the connection
-            ApplicationProperty.bluetoothConnectionManger.testConnection(200)// TODO: this must be tested
+            ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
             // set UI-State
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
             showDualContainer(true)
@@ -430,7 +430,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
-            ApplicationProperty.bluetoothConnectionManger.uIAdapterList.elementAt(UIAdapterElementIndex)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
             Log.d("M:CB:RGBPage:ComplexPCg", "RGB Activity - Complex Property changed - Updating the UI")
