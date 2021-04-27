@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@MainActivity, this)
 
+        (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
+
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
         this.availableDevicesViewAdapter = AvailableDevicesListAdapter(this.availableDevices, this)

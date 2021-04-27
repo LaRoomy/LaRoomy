@@ -2,12 +2,16 @@ package com.laroomysoft.laroomy
 
 import android.content.Context
 import java.io.File
+import java.io.FileNotFoundException
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
 const val ADD_SUCCESS = 0
+const val CHANGE_SUCCESS = 0
 const val PROFILE_NAME_ALREADY_EXIST = 1
 const val UUID_FORMAT_INVALID = 2
+const val INVALID_INDEX = 3
 
 const val FIRST_USERPROFILE_INDEX = 2
 
@@ -19,7 +23,30 @@ class UUIDProfile{
     var characteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
 }
 
-class UUIDManager(val appContext: Context) {
+class UUIDManager(private var appContext: Context) {
+
+    //val rn4870_service_one = "00001800-0000-1000-8000-00805f9b34fb"
+    //val rn4870_service_two = "00001801-0000-1000-8000-00805f9b34fb"
+    //val rn4870_service_three = "0000180a-0000-1000-8000-00805f9b34fb"
+
+    private val rn4870transUartserviceUUID: UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455")
+    private val hmxxserviceUUID: UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
+
+
+    private val hmxxcharacteristicUUID: UUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
+
+    private val rn4870characteristicUUID1: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
+
+    //private val rn4870characteristicUUID2: UUID = UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3")
+
+    private val rn4870characteristicUUID3: UUID = UUID.fromString("49535343-4c8a-39b3-2f49-511cff073b7e")
+
+    val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+
+    val serviceUUIDDefaultList = arrayListOf(rn4870transUartserviceUUID, hmxxserviceUUID)
+
+    val characteristicUUIDdefaultList = arrayListOf(rn4870characteristicUUID1, hmxxcharacteristicUUID)
+
 
     val uUIDProfileList = ArrayList<UUIDProfile>().apply {
 
@@ -40,38 +67,72 @@ class UUIDManager(val appContext: Context) {
         loadUserProfiles()
     }
 
-    fun changeExistingProfile(){
+    fun changeExistingProfile(index: Int, profileName: String, serviceUUID: String, characteristicUUID: String) : Int {
 
+        if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
+            return INVALID_INDEX
+        } else {
+            return if((checkUUIDFormat(serviceUUID) && checkUUIDFormat(characteristicUUID))){
 
-        this.saveUserProfiles()
+                this.uUIDProfileList[index].profileName = profileName
+                this.uUIDProfileList[index].serviceUUID = UUID.fromString(serviceUUID)
+                this.uUIDProfileList[index].characteristicUUID = UUID.fromString(characteristicUUID)
+
+                this.saveUserProfiles()
+                CHANGE_SUCCESS
+            } else {
+                UUID_FORMAT_INVALID
+            }
+        }
     }
 
-    fun deleteExistingProfile(){
+    fun deleteExistingProfile(index: Int){
 
-        this.saveUserProfiles()
+        if((index > -1) && (index < uUIDProfileList.size)){
+
+            if(index >= FIRST_USERPROFILE_INDEX){
+
+                this.uUIDProfileList.removeAt(index)
+
+                if(this.uUIDProfileList.isEmpty())
+                {
+                    // delete the file
+                    File(appContext.filesDir, UUID_File_UserProfiles).apply {
+                        delete()
+                    }
+                } else {
+                    this.saveUserProfiles()
+                }
+            }
+        }
     }
 
     fun addNewProfile(profileName: String, serviceUUID: String, characteristicUUID: String) : Int {
-        // first check if the name already exists
-        for (uuidProfile in this.uUIDProfileList) {
-            if(uuidProfile.profileName == profileName){
-                return PROFILE_NAME_ALREADY_EXIST
+        try {
+            // first check if the name already exists
+            for (uuidProfile in this.uUIDProfileList) {
+                if (uuidProfile.profileName == profileName) {
+                    return PROFILE_NAME_ALREADY_EXIST
+                }
             }
-        }
-        // then check the uuid-format
-        if(!checkUUIDFormat(serviceUUID) || !checkUUIDFormat(characteristicUUID)){
+            // then check the uuid-format
+            if (!checkUUIDFormat(serviceUUID) || !checkUUIDFormat(characteristicUUID)) {
+                return UUID_FORMAT_INVALID
+            }
+            // everything is ok, so add the profile
+            val p = UUIDProfile()
+            p.profileName = profileName
+            p.serviceUUID = UUID.fromString(serviceUUID)
+            p.characteristicUUID = UUID.fromString(characteristicUUID)
+            this.uUIDProfileList.add(p)
+            // write the new profile-list to file
+            this.saveUserProfiles()
+
+            return ADD_SUCCESS
+        } catch(e: Exception){
             return UUID_FORMAT_INVALID
         }
-        // everything is ok, so add the profile
-        val p = UUIDProfile()
-        p.profileName = profileName
-        p.serviceUUID = UUID.fromString(serviceUUID)
-        p.characteristicUUID = UUID.fromString(characteristicUUID)
-        this.uUIDProfileList.add(p)
-        // write the new profile-list to file
-        this.saveUserProfiles()
 
-        return ADD_SUCCESS
     }
 
     private fun saveUserProfiles(){
@@ -199,36 +260,16 @@ class UUIDManager(val appContext: Context) {
 
         val lineList = ArrayList<String>()
 
-        appContext.openFileInput(UUID_File_UserProfiles).bufferedReader().use{ bReader ->
-            bReader.forEachLine {
-                lineList.add(it)
+        try {
+            appContext.openFileInput(UUID_File_UserProfiles).bufferedReader().use { bReader ->
+                bReader.forEachLine {
+                    lineList.add(it)
+                }
             }
+        } catch (fne: FileNotFoundException) {
+            // that's ok!
         }
 
         return lineList
     }
-
-
-    //val rn4870_service_one = "00001800-0000-1000-8000-00805f9b34fb"
-    //val rn4870_service_two = "00001801-0000-1000-8000-00805f9b34fb"
-    //val rn4870_service_three = "0000180a-0000-1000-8000-00805f9b34fb"
-
-    private val rn4870transUartserviceUUID: UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455")
-    private val hmxxserviceUUID: UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
-
-
-    private val hmxxcharacteristicUUID: UUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
-
-    private val rn4870characteristicUUID1: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
-
-    //private val rn4870characteristicUUID2: UUID = UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3")
-
-    private val rn4870characteristicUUID3: UUID = UUID.fromString("49535343-4c8a-39b3-2f49-511cff073b7e")
-
-    val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-
-    val serviceUUIDDefaultList = arrayListOf(rn4870transUartserviceUUID, hmxxserviceUUID)
-
-    val characteristicUUIDdefaultList = arrayListOf(rn4870characteristicUUID1, hmxxcharacteristicUUID)
-
 }

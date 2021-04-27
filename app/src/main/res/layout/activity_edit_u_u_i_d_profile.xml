@@ -84,6 +84,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
                 android:text="@string/EditUUIDProfileActivityProfileNameDefaultValue"
+                android:singleLine="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/editUUIDActivityProfileNameDescriptorTextView" />
@@ -117,7 +118,10 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
+                android:textSize="14sp"
                 android:hint="@string/UUIDFormatHint"
+                android:typeface="monospace"
+                android:singleLine="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/editUUIDActivityServiceUUIDDescriptorTextView" />
@@ -151,7 +155,10 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
+                android:textSize="14sp"
                 android:hint="@string/UUIDFormatHint"
+                android:typeface="monospace"
+                android:singleLine="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/editUUIDActivityCharacteristicUUIDDescriptorTextView" />

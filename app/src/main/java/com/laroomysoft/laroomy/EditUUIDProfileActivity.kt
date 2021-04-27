@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
+import java.util.*
 
 class EditUUIDProfileActivity : AppCompatActivity() {
 
@@ -31,23 +32,47 @@ class EditUUIDProfileActivity : AppCompatActivity() {
 
         mode = this.intent.getStringExtra("activity-mode") ?: "err"
 
-        this.headerTextView = findViewById<AppCompatTextView>(R.id.editUUIDActivityHeaderTextView)
-            .apply {
-                when(mode){
-                    "new" -> {
-                        text = getString(R.string.EditUUIDProfileActivityHeaderNewModeText)
-                    }
-                    else -> {
-                        if(mode.startsWith("edit")){
-                            text = getString(R.string.EditUUIDProfileActivityHeaderEditModeText)
-                            elementIndex = mode.elementAt(4).toInt()
-                            deleteButton.text = getString(R.string.EditUUIDProfileActivityDeleteButtonText)
-                        } else {
-                            text = getString(R.string.EditUUIDProfileActivityModeError)
+        this.headerTextView = findViewById(R.id.editUUIDActivityHeaderTextView)
+
+        when (mode) {
+            "new" -> {
+                headerTextView.text = getString(R.string.EditUUIDProfileActivityHeaderNewModeText)
+            }
+            else -> {
+                if (mode.startsWith("edit")) {
+
+                    // set the ui-element text
+                    headerTextView.text =
+                        getString(R.string.EditUUIDProfileActivityHeaderEditModeText)
+                    deleteButton.text = getString(R.string.EditUUIDProfileActivityDeleteButtonText)
+
+                    // get the element index:
+                    var strIndex = ""
+                    mode.forEachIndexed { index, c ->
+                        if (index > 3) {
+                            strIndex += c
                         }
                     }
+                    if (strIndex.isNotEmpty())
+                        elementIndex = strIndex.toInt()
+
+
+                    // set the text to the existing data
+                    val profile =
+                        (applicationContext as ApplicationProperty).uuidManager.uUIDProfileList.elementAt(elementIndex)
+
+                    profileNameEditText.setText(profile.profileName)
+                    serviceUUIDEditText.setText(profile.serviceUUID.toString())
+                    characteristicUUIDEditText.setText(profile.characteristicUUID.toString())
+
+                    // TODO: if the index is lower than 2 -> mark all as readonly and notify user
+
+                } else {
+                    headerTextView.text = getString(R.string.EditUUIDProfileActivityModeError)
                 }
             }
+        }
+
 
 
     }
@@ -62,6 +87,48 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         this.notificationTextView.text = message
     }
 
-    fun onEditUUIDActivityDeleteButtonClick(view: View) {}
-    fun onEditUUIDActivitySaveButtonClick(view: View) {}
+    fun onEditUUIDActivityDeleteButtonClick(view: View) {
+
+        if(this.mode.startsWith("edit")){
+            (applicationContext as ApplicationProperty).uuidManager.deleteExistingProfile(
+                this.elementIndex
+            )
+        }
+        // else : it's a new action, so discard all
+        finish()
+    }
+    fun onEditUUIDActivitySaveButtonClick(view: View) {
+
+        if(this.mode.startsWith("edit")){
+
+            val result = (applicationContext as ApplicationProperty).uuidManager.changeExistingProfile(
+                this.elementIndex,
+                this.profileNameEditText.text.toString(),
+                this.serviceUUIDEditText.text.toString(),
+                this.characteristicUUIDEditText.text.toString()
+            )
+            when(result){
+                CHANGE_SUCCESS -> finish()
+                UUID_FORMAT_INVALID -> {
+                    // notify user and do not finish
+                }
+            }
+
+        } else {
+            // must be a new-action
+            val result = (applicationContext as ApplicationProperty).uuidManager.addNewProfile(
+                profileNameEditText.text.toString(), serviceUUIDEditText.text.toString(), characteristicUUIDEditText.text.toString()
+            )
+            when(result){
+                ADD_SUCCESS -> finish()
+                UUID_FORMAT_INVALID -> {
+                    // notify user and do not finish
+                }
+                PROFILE_NAME_ALREADY_EXIST -> {
+                    // notify user (ask for override??)
+                }
+            }
+        }
+        //finish()
+    }
 }

@@ -65,7 +65,7 @@ class ApplicationProperty : Application() {
 
     //var userNavigatedFromCommActivity = false
 
-    val uuidManager = UUIDManager(applicationContext)
+    lateinit var uuidManager: UUIDManager
 
     override fun onCreate() {
         super.onCreate()

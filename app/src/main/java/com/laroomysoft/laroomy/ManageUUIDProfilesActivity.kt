@@ -47,7 +47,8 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
 
             // TODO:
             // handle added/changed Profile
-            // reload the list ???
+
+            // reload the list !!!!
         }
     }
 
