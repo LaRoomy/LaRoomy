@@ -65,6 +65,8 @@ class ApplicationProperty : Application() {
 
     //var userNavigatedFromCommActivity = false
 
+    val uuidManager = UUIDManager(applicationContext)
+
     override fun onCreate() {
         super.onCreate()
         bluetoothConnectionManager = BLEConnectionManager(this)
@@ -278,7 +280,7 @@ interface OnDeviceListItemClickListener {
 }
 
 interface OnUUIDProfileListItemClickListener {
-    fun OnItemClicked(index: Int, data: UUIDProfile)
+    fun onItemClicked(index: Int, data: UUIDProfile)
 }
 
 interface OnPropertyClickListener {

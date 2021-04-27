@@ -121,6 +121,14 @@
     <string name="EditUUIDProfileActivityHeaderEditModeText">UUID Profil ändern</string>
     <string name="EditUUIDProfileActivityHeaderNewModeText">Neues UUID Profil anlegen</string>
     <string name="EditUUIDProfileActivityModeError">Modus-Fehler</string>
+    <string name="EditUUIDProfileActivityServiceUUIDDescriptorText">Service UUID:</string>
+    <string name="EditUUIDProfileActivityCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="EditUUIDProfileActivityProfileNameDefaultValue">Eigenes Profil 1</string>
+    <string name="EditUUIDProfileActivityProfileNameDescriptorText">Profil-Name:</string>
+    <string name="EditUUIDProfileActivityHelpText">Die eingegebene UUID darf nur die Nummern 0 bis 9, die Buchstaben a bis f und den Bindestrich enthalten. Das UUID-Format muss beachtet werden. Zum Beispiel: 0000f5ff&#8211;0000&#8211;1000&#8211;8000&#8211;00805f9b34fb</string>
+    <string name="EditUUIDProfileActivitySaveButtonText">Speichern</string>
+    <string name="EditUUIDProfileActivityDeleteButtonText">Löschen</string>
+    <string name="EditUUIDProfileActivityButtonTextDiscard">Verwerfen</string>
 
 
 

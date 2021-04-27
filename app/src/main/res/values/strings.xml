@@ -118,6 +118,14 @@
     <string name="EditUUIDProfileActivityHeaderEditModeText">Edit UUID Profile</string>
     <string name="EditUUIDProfileActivityHeaderNewModeText">New UUID Profile</string>
     <string name="EditUUIDProfileActivityModeError">Invocation Error</string>
+    <string name="EditUUIDProfileActivityServiceUUIDDescriptorText">Service UUID:</string>
+    <string name="EditUUIDProfileActivityCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="EditUUIDProfileActivityProfileNameDefaultValue">My Profile 1</string>
+    <string name="EditUUIDProfileActivityProfileNameDescriptorText">Profile Name:</string>
+    <string name="EditUUIDProfileActivityHelpText">The entered UUID can only contain numbers 0 to 9, lowercase letters a to f and the hyphen. Watch out for the appropriate format. For Example: 0000f5ff&#8211;0000&#8211;1000&#8211;8000&#8211;00805f9b34fb</string>
+    <string name="EditUUIDProfileActivitySaveButtonText">Save</string>
+    <string name="EditUUIDProfileActivityDeleteButtonText">Delete</string>
+    <string name="EditUUIDProfileActivityButtonTextDiscard">Discard</string>
 
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
@@ -161,5 +169,6 @@
     <string name="binding_code_placeholder">h5G+s%gt</string>
     <string name="pinCodePlaceholder">*****</string>
     <string name="uuidProfileListPlaceholder" translatable="false">Profile Element</string>
+    <string name="UUIDFormatHint" translatable="false">0000f5ff–0000-1000-8000-00805f9b34fb</string>
 
 </resources>

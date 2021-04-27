@@ -690,8 +690,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val isLastAddressValid: Boolean
     get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
 
-    val uuidManager = UUIDManager()
-
     private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
         this.bleAdapter?.bondedDevices
     }

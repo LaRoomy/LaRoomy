@@ -24,7 +24,7 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
         setContentView(R.layout.activity_manage_u_u_i_d_profiles)
 
         this.uuidProfileListViewManager = LinearLayoutManager(this)
-        this.uuidProfileListAdapter = ProfileListAdapter(ApplicationProperty.bluetoothConnectionManager.uuidManager.uUIDProfileList, this)
+        this.uuidProfileListAdapter = ProfileListAdapter((applicationContext as ApplicationProperty).uuidManager.uUIDProfileList, this)
 
         this.uuidProfileListView = findViewById<RecyclerView>(R.id.uuidProfileActivityProfileList)
             .apply {
@@ -51,7 +51,7 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
         }
     }
 
-    override fun OnItemClicked(index: Int, data: UUIDProfile) {
+    override fun onItemClicked(index: Int, data: UUIDProfile) {
 
         internalBackNavigation = true
 
@@ -79,7 +79,7 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
 
             fun bind(data: UUIDProfile, listener: OnUUIDProfileListItemClickListener, position: Int){
                 itemView.setOnClickListener{
-                    listener.OnItemClicked(position, data)
+                    listener.onItemClicked(position, data)
                 }
             }
         }
