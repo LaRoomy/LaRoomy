@@ -392,9 +392,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     gatt?.services?.forEachIndexed { index, bluetoothGattService ->
                         Log.d("M:CB:onServicesDisc", "Service discovered. Index: $index ServiceUUID: ${bluetoothGattService.uuid} Type: ${bluetoothGattService.type}")
 
-                        if(bluetoothGattService.uuid == serviceUUID)
+                        // look if the service matches an uuid profile
+                        val profileIndex = applicationProperty.uuidManager.profileIndexFromServiceUUID(bluetoothGattService.uuid)
+
+                        if(profileIndex != -1)
                         {
-                            // for my case here, we use the service with the short id 0xFFE0 (serviceUUID)
                             Log.d("M:CB:onServicesDisc", "Correct service found - retrieving characteristics for the service")
 
                             // iterate through the characteristics in the service
@@ -402,8 +404,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                                 Log.d("M:CB:onServicesDisc", "Characteristic found: UUID: ${it.uuid}  InstanceID: ${it.instanceId}")
 
-                                // set the characteristic notification for the desired characteristic in the service (uuid:0xFFE1)
-                                if(it.uuid == characteristicUUID) {
+                                // set the characteristic notification for the desired characteristic in the service
+                                if(it.uuid == applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).characteristicUUID) {
 
                                     Log.d("M:CB:onServicesDisc", "Correct characteristic found - enable notifications")
                                     // save characteristic
@@ -590,8 +592,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     // constant properties (regarding the device!) ////////////////////////
-    private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
-    private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
+    //private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
+    //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
     private val testCommand = "vXtest385_26$"// outgoing

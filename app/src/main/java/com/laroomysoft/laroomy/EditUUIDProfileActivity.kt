@@ -15,6 +15,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
     private lateinit var serviceUUIDEditText: AppCompatEditText
     private lateinit var characteristicUUIDEditText: AppCompatEditText
     private lateinit var deleteButton: AppCompatButton
+    private lateinit var saveButton: AppCompatButton
     private lateinit var notificationTextView: AppCompatTextView
 
     private var mode = ""
@@ -28,6 +29,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         serviceUUIDEditText = findViewById(R.id.editUUIDActivityServiceUUIDEditText)
         characteristicUUIDEditText = findViewById(R.id.editUUIDActivityCharacteristicUUIDEditText)
         deleteButton = findViewById(R.id.editUUIDActivityDeleteButton)
+        saveButton = findViewById(R.id.editUUIDActivitySaveButton)
         notificationTextView = findViewById(R.id.editUUIDProfileActivityNotificationTextView)
 
         mode = this.intent.getStringExtra("activity-mode") ?: "err"
@@ -56,7 +58,12 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                     if (strIndex.isNotEmpty())
                         elementIndex = strIndex.toInt()
 
-
+                    if(elementIndex < FIRST_USERPROFILE_INDEX){
+                        // if the index is lower than 2 -> mark all as readonly and notify user
+                        saveButton.isEnabled = false
+                        deleteButton.isEnabled = false
+                        notifyUser(getString(R.string.EditUUIDProfileActivityIsStaticProfileNotification), R.color.goldAccentColor)
+                    }
                     // set the text to the existing data
                     val profile =
                         (applicationContext as ApplicationProperty).uuidManager.uUIDProfileList.elementAt(elementIndex)
@@ -65,16 +72,11 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                     serviceUUIDEditText.setText(profile.serviceUUID.toString())
                     characteristicUUIDEditText.setText(profile.characteristicUUID.toString())
 
-                    // TODO: if the index is lower than 2 -> mark all as readonly and notify user
-
                 } else {
                     headerTextView.text = getString(R.string.EditUUIDProfileActivityModeError)
                 }
             }
         }
-
-
-
     }
 
     override fun onBackPressed() {
@@ -82,12 +84,17 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         finish()
     }
 
-    fun notifyUser(message: String, colorID: Int){
+    fun notifyUser(message: String, colorID: Int) {
+        if (message.isEmpty()) {
+            notificationTextView.visibility = View.GONE
+        } else {
+            notificationTextView.visibility = View.VISIBLE
+        }
         this.notificationTextView.setTextColor(getColor(colorID))
         this.notificationTextView.text = message
     }
 
-    fun onEditUUIDActivityDeleteButtonClick(view: View) {
+    fun onEditUUIDActivityDeleteButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         if(this.mode.startsWith("edit")){
             (applicationContext as ApplicationProperty).uuidManager.deleteExistingProfile(
@@ -97,7 +104,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         // else : it's a new action, so discard all
         finish()
     }
-    fun onEditUUIDActivitySaveButtonClick(view: View) {
+    fun onEditUUIDActivitySaveButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         if(this.mode.startsWith("edit")){
 
@@ -111,6 +118,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                 CHANGE_SUCCESS -> finish()
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.ErrorColor)
                 }
             }
 
@@ -123,12 +131,13 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                 ADD_SUCCESS -> finish()
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.ErrorColor)
                 }
                 PROFILE_NAME_ALREADY_EXIST -> {
-                    // notify user (ask for override??)
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityProfileNameAlreadyExistNotification), R.color.ErrorColor)
                 }
             }
         }
-        //finish()
     }
 }

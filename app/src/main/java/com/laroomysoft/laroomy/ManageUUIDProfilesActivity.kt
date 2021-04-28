@@ -45,10 +45,9 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
         if(internalBackNavigation){
             internalBackNavigation = false
 
-            // TODO:
-            // handle added/changed Profile
-
-            // reload the list !!!!
+            // reload the list
+            this.uuidProfileListAdapter = ProfileListAdapter((applicationContext as ApplicationProperty).uuidManager.uUIDProfileList, this)
+            this.uuidProfileListAdapter.notifyDataSetChanged()
         }
     }
 

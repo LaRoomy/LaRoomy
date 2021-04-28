@@ -77,6 +77,29 @@ fun a8BitValueAsTwoCharString(value: Int) : String {
     return "$tenth$single"
 }
 
+fun isHexCharacter(c: Char) : Boolean {
+    return when(c){
+        '0' -> true
+        '1' -> true
+        '2' -> true
+        '3' -> true
+        '4' -> true
+        '5' -> true
+        '6' -> true
+        '7' -> true
+        '8' -> true
+        '9' -> true
+        'a' -> true
+        'b' -> true
+        'c' -> true
+        'd' -> true
+        'e' -> true
+        'f' -> true
+        else -> false
+    }
+}
+
+
 class PercentageLevelPropertyGenerator(E8bit_level: Int){
 
     private val percentAsInt = get8BitValueAsPercent(E8bit_level)

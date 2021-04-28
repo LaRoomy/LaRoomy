@@ -140,7 +140,7 @@ class AppSettingsActivity : AppCompatActivity() {
         }
     }
 
-    fun onManageUUIDProfilesButtonClick(view: View) {
+    fun onManageUUIDProfilesButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         val cLayout = findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton)
         cLayout.setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))

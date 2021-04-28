@@ -89,7 +89,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
 
 
-    fun onLockImageClick(view: View) {
+    fun onLockImageClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         // TODO: send lock command if unlocked
 
@@ -107,7 +107,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     }
 
-    fun onShowHideButtonClick(view: View) {
+    fun onShowHideButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         showPin = when(showPin){
             true -> {
@@ -132,7 +132,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     }
 
-    fun onChangePinButtonClick(view: View) {
+    fun onChangePinButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         //  TODO: in change-pin mode set the image of the button to cancel image and implement the appropriate function
     }

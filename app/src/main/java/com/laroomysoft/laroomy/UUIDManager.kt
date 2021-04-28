@@ -25,40 +25,32 @@ class UUIDProfile{
 
 class UUIDManager(private var appContext: Context) {
 
+    private val rn4870TransparentUartServiceUUID: UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455")
+    private val rn4870CharacteristicUUID1: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
+
+    private val hmModulesServiceUUID: UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
+    private val hmModulesCharacteristicUUID: UUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
+
     //val rn4870_service_one = "00001800-0000-1000-8000-00805f9b34fb"
     //val rn4870_service_two = "00001801-0000-1000-8000-00805f9b34fb"
     //val rn4870_service_three = "0000180a-0000-1000-8000-00805f9b34fb"
-
-    private val rn4870transUartserviceUUID: UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455")
-    private val hmxxserviceUUID: UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
-
-
-    private val hmxxcharacteristicUUID: UUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
-
-    private val rn4870characteristicUUID1: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
-
     //private val rn4870characteristicUUID2: UUID = UUID.fromString("49535343-8841-43f4-a8d4-ecbe34729bb3")
-
-    private val rn4870characteristicUUID3: UUID = UUID.fromString("49535343-4c8a-39b3-2f49-511cff073b7e")
-
-    val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-
-    val serviceUUIDDefaultList = arrayListOf(rn4870transUartserviceUUID, hmxxserviceUUID)
-
-    val characteristicUUIDdefaultList = arrayListOf(rn4870characteristicUUID1, hmxxcharacteristicUUID)
-
+    //private val rn4870characteristicUUID3: UUID = UUID.fromString("49535343-4c8a-39b3-2f49-511cff073b7e")
+    //val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+    //val serviceUUIDDefaultList = arrayListOf(rn4870TransparentUartServiceUUID, hmModulesServiceUUID)
+    //val characteristicUUIDdefaultList = arrayListOf(rn4870CharacteristicUUID1, hmModulesCharacteristicUUID)
 
     val uUIDProfileList = ArrayList<UUIDProfile>().apply {
 
         // add the common profiles
         val hmXXProfile = UUIDProfile()
         hmXXProfile.profileName = "Huamao HMxx - Modules"
-        hmXXProfile.serviceUUID = hmxxserviceUUID
-        hmXXProfile.characteristicUUID = hmxxcharacteristicUUID
+        hmXXProfile.serviceUUID = hmModulesServiceUUID
+        hmXXProfile.characteristicUUID = hmModulesCharacteristicUUID
         val rn48xxProfile = UUIDProfile()
         rn48xxProfile.profileName = "Microchip RN48xx Modules"
-        rn48xxProfile.serviceUUID = rn4870transUartserviceUUID
-        rn48xxProfile.characteristicUUID = rn4870characteristicUUID1
+        rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
+        rn48xxProfile.characteristicUUID = rn4870CharacteristicUUID1
 
         this.add(rn48xxProfile)
         this.add(hmXXProfile)
@@ -67,12 +59,21 @@ class UUIDManager(private var appContext: Context) {
         loadUserProfiles()
     }
 
+    fun profileIndexFromServiceUUID(serviceUUID: UUID) : Int {
+        this.uUIDProfileList.forEachIndexed { index, uuidProfile ->
+            if(serviceUUID == uuidProfile.serviceUUID){
+                return index
+            }
+        }
+        return -1
+    }
+
     fun changeExistingProfile(index: Int, profileName: String, serviceUUID: String, characteristicUUID: String) : Int {
 
-        if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
-            return INVALID_INDEX
+        return if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
+            INVALID_INDEX
         } else {
-            return if((checkUUIDFormat(serviceUUID) && checkUUIDFormat(characteristicUUID))){
+            if((checkUUIDFormat(serviceUUID) && checkUUIDFormat(characteristicUUID))){
 
                 this.uUIDProfileList[index].profileName = profileName
                 this.uUIDProfileList[index].serviceUUID = UUID.fromString(serviceUUID)
@@ -172,8 +173,49 @@ class UUIDManager(private var appContext: Context) {
     }
 
     private fun checkUUIDFormat(uuid: String) : Boolean {
-        // TODO!
-        return true
+
+        var isValid: Boolean = uuid.length == 36
+
+        //UUID Format = "00001800-0000-1000-8000-00805f9b34fb"
+
+        if(isValid) {
+
+            uuid.forEachIndexed { index, c ->
+                when(index){
+                    8 -> {
+                        if(c != '-'){
+                            isValid = false
+                            return@forEachIndexed
+                        }
+                    }
+                    13 -> {
+                        if(c != '-'){
+                            isValid = false
+                            return@forEachIndexed
+                        }
+                    }
+                    18 -> {
+                        if(c != '-'){
+                            isValid = false
+                            return@forEachIndexed
+                        }
+                    }
+                    23 -> {
+                        if(c != '-'){
+                            isValid = false
+                            return@forEachIndexed
+                        }
+                    }
+                    else -> {
+                        if(!isHexCharacter(c)){
+                            isValid = false
+                            return@forEachIndexed
+                        }
+                    }
+                }
+            }
+        }
+        return isValid
     }
 
     private fun profilesToBuffer(profiles: ArrayList<UUIDProfile>) : String {
@@ -269,7 +311,6 @@ class UUIDManager(private var appContext: Context) {
         } catch (fne: FileNotFoundException) {
             // that's ok!
         }
-
         return lineList
     }
 }

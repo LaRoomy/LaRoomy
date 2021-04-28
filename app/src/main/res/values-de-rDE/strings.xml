@@ -129,6 +129,9 @@
     <string name="EditUUIDProfileActivitySaveButtonText">Speichern</string>
     <string name="EditUUIDProfileActivityDeleteButtonText">Löschen</string>
     <string name="EditUUIDProfileActivityButtonTextDiscard">Verwerfen</string>
+    <string name="EditUUIDProfileActivityIsStaticProfileNotification">Dies ist ein statisches Profil. Änderungen haben keine Auswirkungen. Erstellen Sie ein neues Profil um eigene UUIDs zu definieren.</string>
+    <string name="EditUUIDProfileActivityInvalidUUIDNotification">Ungültiges UUID-Format.</string>
+    <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profil-Name existiert bereits.</string>
 
 
 
