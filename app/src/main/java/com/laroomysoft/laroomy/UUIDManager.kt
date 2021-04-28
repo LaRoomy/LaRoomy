@@ -38,7 +38,7 @@ class UUIDManager(private var appContext: Context) {
     //private val rn4870characteristicUUID3: UUID = UUID.fromString("49535343-4c8a-39b3-2f49-511cff073b7e")
     //val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     //val serviceUUIDDefaultList = arrayListOf(rn4870TransparentUartServiceUUID, hmModulesServiceUUID)
-    //val characteristicUUIDdefaultList = arrayListOf(rn4870CharacteristicUUID1, hmModulesCharacteristicUUID)
+    //val characteristicUUIDDefaultList = arrayListOf(rn4870CharacteristicUUID1, hmModulesCharacteristicUUID)
 
     val uUIDProfileList = ArrayList<UUIDProfile>().apply {
 
@@ -56,7 +56,12 @@ class UUIDManager(private var appContext: Context) {
         this.add(hmXXProfile)
 
         // add the saved user profiles
-        loadUserProfiles()
+        val userProfiles = loadUserProfiles()
+        if(userProfiles.isNotEmpty()){
+            for (userProfile in userProfiles) {
+                this.add(userProfile)
+            }
+        }
     }
 
     fun profileIndexFromServiceUUID(serviceUUID: UUID) : Int {
@@ -95,7 +100,7 @@ class UUIDManager(private var appContext: Context) {
 
                 this.uUIDProfileList.removeAt(index)
 
-                if(this.uUIDProfileList.isEmpty())
+                if(this.uUIDProfileList.size <= FIRST_USERPROFILE_INDEX)
                 {
                     // delete the file
                     File(appContext.filesDir, UUID_File_UserProfiles).apply {
@@ -120,6 +125,14 @@ class UUIDManager(private var appContext: Context) {
             if (!checkUUIDFormat(serviceUUID) || !checkUUIDFormat(characteristicUUID)) {
                 return UUID_FORMAT_INVALID
             }
+
+
+            //TODO: format the hyphen!!!
+
+
+
+
+
             // everything is ok, so add the profile
             val p = UUIDProfile()
             p.profileName = profileName
@@ -158,23 +171,20 @@ class UUIDManager(private var appContext: Context) {
         }
     }
 
-    private fun loadUserProfiles(){
+    private fun loadUserProfiles() : ArrayList<UUIDProfile> {
         val loadBuffer = this.bufferFromFile()
 
         if(loadBuffer.isNotEmpty()){
-            val profiles = this.bufferToProfiles(loadBuffer)
-
-            if(profiles.isNotEmpty()){
-                profiles.forEach {
-                    this.uUIDProfileList.add(it)
-                }
-            }
+            return this.bufferToProfiles(loadBuffer)
         }
+        return ArrayList()
     }
 
     private fun checkUUIDFormat(uuid: String) : Boolean {
 
         var isValid: Boolean = uuid.length == 36
+
+        var pos = -1
 
         //UUID Format = "00001800-0000-1000-8000-00805f9b34fb"
 
@@ -183,32 +193,37 @@ class UUIDManager(private var appContext: Context) {
             uuid.forEachIndexed { index, c ->
                 when(index){
                     8 -> {
-                        if(c != '-'){
+                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
                             isValid = false
+                            pos = 1
                             return@forEachIndexed
                         }
                     }
                     13 -> {
-                        if(c != '-'){
+                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
                             isValid = false
+                            pos = 2
                             return@forEachIndexed
                         }
                     }
                     18 -> {
-                        if(c != '-'){
+                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
                             isValid = false
+                            pos = 3
                             return@forEachIndexed
                         }
                     }
                     23 -> {
-                        if(c != '-'){
+                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
                             isValid = false
+                            pos = 4
                             return@forEachIndexed
                         }
                     }
                     else -> {
                         if(!isHexCharacter(c)){
                             isValid = false
+                            pos = 5
                             return@forEachIndexed
                         }
                     }
@@ -237,48 +252,54 @@ class UUIDManager(private var appContext: Context) {
 
         val profile = UUIDProfile()
 
-        lineList.forEach {
+        try {
+            lineList.forEach {
 
-            var line = ""
+                var line = ""
 
-            when(it[0]) {
-                'N' -> {
-                    it.forEachIndexed { index, c ->
-                        if (index > 1) {
-                            line += c
+                when (it[0]) {
+                    'N' -> {
+                        it.forEachIndexed { index, c ->
+                            if (index > 1) {
+                                line += c
+                            }
                         }
+                        profile.profileName = line
+                        nameRead = true
                     }
-                    profile.profileName = line
-                    nameRead = true
-                }
-                'S' -> {
-                    it.forEachIndexed { index, c ->
-                        if (index > 1) {
-                            line += c
+                    'S' -> {
+                        it.forEachIndexed { index, c ->
+                            if (index > 1) {
+                                line += c
+                            }
                         }
                         profile.serviceUUID = UUID.fromString(line)
                         serviceUUIDRead = true
+
                     }
-                }
-                'C' -> {
-                    it.forEachIndexed { index, c ->
-                        if (index > 1) {
-                            line += c
+                    'C' -> {
+                        it.forEachIndexed { index, c ->
+                            if (index > 1) {
+                                line += c
+                            }
                         }
                         profile.characteristicUUID = UUID.fromString(line)
                         characteristicUUIDRead = true
+
+                    }
+                    else -> {
+                        // must be the end !
                     }
                 }
-                else -> {
-                    // must be the end !
+                if (nameRead && serviceUUIDRead && characteristicUUIDRead) {
+                    profileList.add(profile)
+                    nameRead = false
+                    serviceUUIDRead = false
+                    characteristicUUIDRead = false
                 }
             }
-            if(nameRead && serviceUUIDRead && characteristicUUIDRead){
-                profileList.add(profile)
-                nameRead = false
-                serviceUUIDRead = false
-                characteristicUUIDRead = false
-            }
+        } catch (e: Exception){
+            // ...
         }
         return profileList
     }

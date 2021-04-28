@@ -140,4 +140,11 @@ class EditUUIDProfileActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun onEditUUIDActivityServiceUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.serviceUUIDEditText.setText(getString(R.string.UUIDDefaultFill))
+    }
+    fun onEditUUIDActivityCharacteristicUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.characteristicUUIDEditText.setText(getString(R.string.UUIDDefaultFill))
+    }
 }
