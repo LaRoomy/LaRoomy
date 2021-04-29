@@ -3,6 +3,8 @@ package com.laroomysoft.laroomy
 import android.graphics.Color
 import java.util.*
 
+const val COMMON_PASSKEY_LENGHT = 10
+
 //fun percentageFrom8BitValue(value: Int): Int{
 //
 //    var pLevel =
@@ -98,6 +100,21 @@ fun isHexCharacter(c: Char) : Boolean {
         else -> false
     }
 }
+
+//fun createRandomPasskey(): String {
+//    val charSource = "ABCDEFGHIJKLMNOPQRSTUVMabcdefghijklmnopqrstuvw1234567890$%!=/?"
+////    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+////        return Random().ints(COMMON_PASSKEY_LENGHT.toLong(), 0, charSource.length)
+////
+////    }
+////    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+////        java.util.Random().ints(COMMON_PASSKEY_LENGHT.toLong(), 0, charSource.length)
+////            .toArray()
+////            .map(source::get)
+////            .to
+////    }
+//
+//}
 
 
 class PercentageLevelPropertyGenerator(E8bit_level: Int){

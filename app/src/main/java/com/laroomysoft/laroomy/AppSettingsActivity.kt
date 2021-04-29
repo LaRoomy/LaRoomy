@@ -21,6 +21,7 @@ class AppSettingsActivity : AppCompatActivity() {
     lateinit var autoConnectSwitch: SwitchCompat
     lateinit var listAllDevicesSwitch: SwitchCompat
     lateinit var passwordContainer: ConstraintLayout
+    lateinit var enableLogSwitch: SwitchCompat
 
     private var buttonNormalizationRequired = false
 
@@ -53,6 +54,14 @@ class AppSettingsActivity : AppCompatActivity() {
                 (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_ListAllDevices)
             this.isChecked = state
         }
+        this.enableLogSwitch = findViewById<SwitchCompat>(R.id.setupActivityEnableLoggingSwitch).apply{
+            val state =
+                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
+            this.isChecked = state
+
+            // if logging is activated, show the nav-button
+            setShowLogButtonVisibiliy(state)
+        }
 
         // add on change listener to the password-box
         this.passwordBox.addTextChangedListener {
@@ -74,6 +83,7 @@ class AppSettingsActivity : AppCompatActivity() {
             //TODO: set the password
             // TODO: if binding is required and is not activated in app-settings, the authentication process must be interrupted with an error message
             // TODO: set the parameter in bleConnectionManager, if the switch in deviceSettingsActivity is set on!
+
         } else {
             this.passwordBox.setText(R.string.binding_code_placeholder)
         }
@@ -96,6 +106,11 @@ class AppSettingsActivity : AppCompatActivity() {
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_ListAllDevices)
         }
+        this.enableLogSwitch.setOnCheckedChangeListener {  _: CompoundButton, b: Boolean ->
+
+            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
+            setShowLogButtonVisibiliy(b)
+        }
     }
 
     override fun onBackPressed() {
@@ -107,8 +122,14 @@ class AppSettingsActivity : AppCompatActivity() {
         super.onResume()
 
         if(this.buttonNormalizationRequired){
-            val cLayout = findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton)
-            cLayout.setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+            // normalize uuidManager-Button
+            findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton).apply {
+                setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+            }
+            // normalize showLog-Button
+            findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
+                setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+            }
             this.buttonNormalizationRequired = false
         }
     }
@@ -140,14 +161,33 @@ class AppSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun setShowLogButtonVisibiliy(visible: Boolean){
+        findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
+            visibility = when(visible){
+                true -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+    }
+
     fun onManageUUIDProfilesButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
-        val cLayout = findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton)
-        cLayout.setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
-
+        findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton).apply {
+            setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
+        }
         this.buttonNormalizationRequired = true
 
         val intent = Intent(this@AppSettingsActivity, ManageUUIDProfilesActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun onShowLogButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
+            setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
+        }
+        this.buttonNormalizationRequired = true
+
+        val intent = Intent(this@AppSettingsActivity, ViewLogActivity::class.java)
         startActivity(intent)
     }
 

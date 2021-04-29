@@ -93,6 +93,9 @@
     <string name="SetupActivity_ListAllDevicesElementText">Alle Bluetooth-Geräte auflisten</string>
     <string name="SetupActivity_ListAllDevicesHint">Es werden alle mit dem System gekoppelten Geräte aufgelisted. Standardmäßig werden nur Geräte aufgelistet, die den LaRoomy Namenskonventionen entsprechen</string>
     <string name="SetupActivity_UUIDManagerButtonText">UUID Profile verwalten</string>
+    <string name="SetupActivity_EnableLoggingElementText">Verbindungsprotokoll erstellen</string>
+    <string name="SetupActivity_EnableLoggingHint">Es wird ein temporäres Protokoll der Übertragung erstellt. Unter Umständen führt das zu einer Beeinträchtigung der Performance, kann aber bei der Entwicklung des Endgerätes hilfreich sein.</string>
+    <string name="SetupActivity_ShowLogButtonText">Protokoll anzeigen</string>
 
 
 
@@ -159,10 +162,7 @@
     <string name="FileKey_AppSettings">fileKeyApplicationSettingsData</string>
 
     <!-- DataKeys: -->
-    <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
-    <string name="DataKey_UseCustomBindingKey">useDeviceBindingValue</string>
-    <string name="DataKey_AutoConnect">autoConnectValue</string>
-    <string name="DataKey_BindingPasskey">bindingPasskey</string>
+    <!-- DataKeys are not translateable -->
 
 
     <!-- Working elements -->

@@ -271,8 +271,6 @@
             app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesHintTextView"
             />
 
-        <!-- Add all future switches here (re-adapt the view (border) )-->
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -322,11 +320,118 @@
             app:layout_constraintTop_toBottomOf="@id/setupActivityUUIDManagerButton"
             />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/setupActivityEnableLoggingContainer"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityForthSeparatorView"
+            >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupActivityEnableLoggingTextView"
+                android:layout_marginStart="20dp"
+                android:textSize="22sp"
+                android:text="@string/SetupActivity_EnableLoggingElementText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setupActivityEnableLoggingSwitch"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setupActivityEnableLoggingSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintStart_toEndOf="@id/setupActivityEnableLoggingTextView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/setupActivityEnableLoggingHintTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/SetupActivity_EnableLoggingHint"
+            android:alpha="0.5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityEnableLoggingContainer" />
+
+        <View
+            android:id="@+id/setupActivityFifthSeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityEnableLoggingHintTextView"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="60dp"
+            android:id="@+id/setupActivityShowLogButton"
+            android:onClick="onShowLogButtonClick"
+            android:orientation="horizontal"
+            android:background="@color/setupActivityButtonNormalBackground"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityFifthSeparatorView"
+            >
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupActivityShowLogButtonDescriptor"
+                android:textSize="20sp"
+                android:text="@string/SetupActivity_ShowLogButtonText"
+                android:layout_marginStart="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setupActivityShowLogButtonImage"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/setupActivityShowLogButtonImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/setupActivityShowLogButtonDescriptor"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/setupActivitySixthSeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityShowLogButton"
+            />
+
 
         <!-- add all future sub page navigation-buttons here -->
-
-
-
         <!-- add all future normal buttons here -->
 
     </androidx.constraintlayout.widget.ConstraintLayout>

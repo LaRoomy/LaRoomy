@@ -93,6 +93,9 @@
     <string name="SetupActivity_ListAllDevicesElementText">List all bluetooth devices</string>
     <string name="SetupActivity_ListAllDevicesHint">If activated, the app will list all bonded Bluetooth- devices. By default, only devices corresponding to the LaRoomy naming conventions are listed.</string>
     <string name="SetupActivity_UUIDManagerButtonText">Manage UUID-Profiles</string>
+    <string name="SetupActivity_EnableLoggingElementText">Enable Connection Log</string>
+    <string name="SetupActivity_EnableLoggingHint">All transmission-data and connection-events will be saved to a temporary cache. This may reduce the performance in the connection process but could be helpful during the development process of the remote device.</string>
+    <string name="SetupActivity_ShowLogButtonText">Show Log</string>
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
@@ -153,11 +156,12 @@
     <string name="FileKey_AppSettings">fileKeyApplicationSettingsData</string>
 
     <!-- DataKeys: -->
-    <string name="DataKey_LastSuccessfulConnectedDeviceAddress">lastSuccessfulConnectedDeviceAddress</string>
-    <string name="DataKey_UseCustomBindingKey">useDeviceBindingValue</string>
-    <string name="DataKey_AutoConnect">autoConnectValue</string>
-    <string name="DataKey_BindingPasskey">bindingPasskey</string>
+    <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>
+    <string name="DataKey_UseCustomBindingKey" translatable="false">useDeviceBindingValue</string>
+    <string name="DataKey_AutoConnect" translatable="false">autoConnectValue</string>
+    <string name="DataKey_BindingPasskey" translatable="false">bindingPasskey</string>
     <string name="DataKey_ListAllDevices" translatable="false">listAllDevicesValue</string>
+    <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

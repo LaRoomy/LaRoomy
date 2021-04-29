@@ -44,14 +44,16 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
 
         if(internalBackNavigation){
             internalBackNavigation = false
-
             this.uuidProfileListAdapter.notifyDataSetChanged()
+            this.resetListItemColor()
         }
     }
 
     override fun onItemClicked(index: Int, data: UUIDProfile) {
 
         internalBackNavigation = true
+
+        setListItemColor(index, R.color.uuidListSelectedItemColor)
 
         val intent = Intent(this@ManageUUIDProfilesActivity, EditUUIDProfileActivity::class.java)
         intent.putExtra("activity-mode", "edit$index")
@@ -66,6 +68,17 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
         intent.putExtra("activity-mode", "new")
         startActivity(intent)
 
+    }
+
+    private fun setListItemColor(index: Int, colorID: Int){
+        val ll = this.uuidProfileListViewManager.findViewByPosition(index) as? LinearLayout
+        ll?.setBackgroundColor(getColor(colorID))
+    }
+
+    private fun resetListItemColor(){
+        for(x in 0 until uuidProfileListAdapter.itemCount){
+            setListItemColor(x, R.color.transparentViewColor)
+        }
     }
 
     class ProfileListAdapter(
