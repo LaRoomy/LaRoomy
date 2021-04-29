@@ -176,10 +176,12 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private fun updateAvailableDevices(){
         this.availableDevices = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
         if(this.availableDevices.size == 0){
-            findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)
+            // TODO
+            //findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)
         }
         else {
-            findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
+            // TODO
+            //findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
         }
         this.availableDevicesViewAdapter.notifyDataSetChanged()
         this.resetSelectionInDeviceListView()
