@@ -44,7 +44,7 @@ class AppSettingsActivity : AppCompatActivity() {
                 (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
             this.isChecked = state
 
-            // if the device binding is active, show the password-edit container
+            // if the device binding is active, show the password-edit container and set the password to the edit-box
             if(state){
                 passwordContainer.visibility = View.VISIBLE
             }
@@ -63,29 +63,22 @@ class AppSettingsActivity : AppCompatActivity() {
             setShowLogButtonVisibiliy(state)
         }
 
-        // add on change listener to the password-box
-        this.passwordBox.addTextChangedListener {
-
-            // TODO: test if the editable <> string conversion works!!!!!!!!!!!!
-
-            if(passwordBox.text.isNotEmpty()){
-                (applicationContext as ApplicationProperty).saveStringData(passwordBox.text.toString(), R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
-            } else {
-                (applicationContext as ApplicationProperty).deleteData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
-            }
+        // set the saved password (if there is one, actually there should always be one)
+        val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+        if(pw != ERROR_NOTFOUND){
+            this.passwordBox.setText(pw)
         }
 
-        // set the saved password (if there is one)
-        val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
-        if(pw.isNotEmpty()){
-            this.passwordBox.setText(pw)
-
-            //TODO: set the password
-            // TODO: if binding is required and is not activated in app-settings, the authentication process must be interrupted with an error message
-            // TODO: set the parameter in bleConnectionManager, if the switch in deviceSettingsActivity is set on!
-
-        } else {
-            this.passwordBox.setText(R.string.binding_code_placeholder)
+        // add on change listener to the password-box
+        this.passwordBox.addTextChangedListener {
+            // check if the box is empty, if so: save the entered passkey. Otherwise restore a default value -> the passkey cannot be empty
+            if(passwordBox.text.isNotEmpty()){
+                (applicationContext as ApplicationProperty).saveStringData(passwordBox.text.toString(), R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+            } else {
+                val randomKey = createRandomPasskey(10)
+                (applicationContext as ApplicationProperty).saveStringData(randomKey, R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+                this.passwordBox.hint = randomKey
+            }
         }
 
         // add the listener for the switches
@@ -98,7 +91,17 @@ class AppSettingsActivity : AppCompatActivity() {
             (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
 
             when(b){
-                true -> passwordContainer.visibility = View.VISIBLE
+                true -> {
+                    // show the password-box
+                    passwordContainer.visibility = View.VISIBLE
+
+                    // if this is the first time a custom binding key is set, a random value must be set to prevent that the key is empty
+                    if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey) == ERROR_NOTFOUND){
+                        val randomKey = createRandomPasskey(10)
+                        (applicationContext as ApplicationProperty).saveStringData(randomKey, R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+                        passwordBox.setText(randomKey)
+                    }
+                }
                 else -> passwordContainer.visibility = View.GONE
             }
         }

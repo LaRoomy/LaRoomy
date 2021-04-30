@@ -117,6 +117,7 @@
     <string name="AppHelpActivity_Topic_DeviceBinding">Device-Binding</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
+
     <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profile</string>
     <string name="EditUUIDProfileActivityHeaderEditModeText">Edit UUID Profile</string>
     <string name="EditUUIDProfileActivityHeaderNewModeText">New UUID Profile</string>
@@ -150,16 +151,18 @@
     <string name="DeviceMainActivity">Activity to show the primary properties of the device</string>
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
+    <string name="Error_SavedBindingKeyIsEmpty">Binding Key loading failed. Key was empty.</string>
 
     <!-- FileKeys: -->
-    <string name="FileKey_BLEManagerData">fileKeyBluetoothManagerData</string>
-    <string name="FileKey_AppSettings">fileKeyApplicationSettingsData</string>
+    <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>
+    <string name="FileKey_AppSettings" translatable="false">fileKeyApplicationSettingsData</string>
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>
     <string name="DataKey_UseCustomBindingKey" translatable="false">useDeviceBindingValue</string>
     <string name="DataKey_AutoConnect" translatable="false">autoConnectValue</string>
-    <string name="DataKey_BindingPasskey" translatable="false">bindingPasskey</string>
+    <string name="DataKey_DefaultRandomBindingPasskey" translatable="false">bindingPasskey</string>
+    <string name="DataKey_CustomBindingPasskey" translatable="false">customBindingPasskey</string>
     <string name="DataKey_ListAllDevices" translatable="false">listAllDevicesValue</string>
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
 

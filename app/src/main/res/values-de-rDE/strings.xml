@@ -156,10 +156,11 @@
     <string name="DeviceMainActivity">Activity to show the primary properties of the device</string>
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">Kein gültiges Gerät gefunden</string>
+    <string name="Error_SavedBindingKeyIsEmpty">Verbindungsschlüssel konnte nicht geladen werden. Schlüssel war null.</string>
+
 
     <!-- FileKeys: -->
-    <string name="FileKey_BLEManagerData">fileKeyBluetoothManagerData</string>
-    <string name="FileKey_AppSettings">fileKeyApplicationSettingsData</string>
+    <!-- FileKeys are not translateable -->
 
     <!-- DataKeys: -->
     <!-- DataKeys are not translateable -->

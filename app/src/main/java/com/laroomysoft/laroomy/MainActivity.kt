@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // TODO: read the intent data when the user opens this app with a shared link -> retrieve the key-value pair and save it!
+
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@MainActivity, this)
 
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
@@ -45,6 +47,12 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
                     layoutManager = availableDevicesViewManager
                     adapter = availableDevicesViewAdapter
                 }
+
+        // save a default passkey if no one is saved (this should only be executed once per installation)
+        if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey) == ERROR_NOTFOUND){
+            val defaultKey = createRandomPasskey(10)
+            (applicationContext as ApplicationProperty).saveStringData(defaultKey, R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
+        }
 
         // schedule the auto-connect process if required
         if ((applicationContext as ApplicationProperty).loadBooleanData(

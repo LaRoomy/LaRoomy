@@ -470,24 +470,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     authenticationResponseBindingPasskeyRequired -> {
                         Log.d("M:CB:CharChanged", "Data Received - Authentication - Device ID confirmed - additional binding is required")
 
-                        // check if binding is activated in app-settings
-                        val isBindingActivated =
+                        // check if custom or default binding is active
+                        val defaultBindingKeyMustBeUsed =
                             (activityContext.applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
-                        if(!isBindingActivated){
-                            Log.e(
-                                "M:CB:CharChanged",
-                                "Binding is not activated - Connection attempt must be rejected!"
-                            )
-                            callback.onConnectionAttemptFailed(activityContext.getString(R.string.CA_BindingNotActivated))
-                        } else {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - Authentication - Send Binding information"
-                            )
-                            isBindingRequired = true
-                            // send the passkey to proceed
-                            sendBindingRequest()
-                        }
+
+                        isBindingRequired = true
+                        sendBindingRequest(defaultBindingKeyMustBeUsed)
+
+
+//                        if(!defaultBindingKeyMustBeUsed){
+//                            Log.e(
+//                                "M:CB:CharChanged",
+//                                "Binding is not activated - Connection attempt must be rejected!"
+//                            )
+//                            //callback.onConnectionAttemptFailed(activityContext.getString(R.string.CA_BindingNotActivated))
+//                        } else {
+//                            Log.d(
+//                                "M:CB:CharChanged",
+//                                "Data Received - Authentication - Send Binding information"
+//                            )
+//                            isBindingRequired = true
+//                            // send the passkey to proceed
+//                            sendBindingRequest()
+//                        }
                     }
                     authenticationResponseBindingPasskeyInvalid -> {
                         Log.e("M:CB:CharChanged", "Data Received - Authentication - Passkey rejected from device - PASSKEY INVALID")
@@ -2932,10 +2937,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData("D$str$")
     }
 
-    fun sendBindingRequest(){
-        val passkey =
-            (applicationProperty.loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey))
-        this.sendData("r$passkey>$")
+    fun sendBindingRequest(useCustomKey: Boolean){
+        val passkey = if(useCustomKey){
+            (applicationProperty.loadSavedStringData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_CustomBindingPasskey
+            ))
+        } else {
+            (applicationProperty.loadSavedStringData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_DefaultRandomBindingPasskey
+            ))
+        }
+        if(passkey == ERROR_NOTFOUND){
+            // critical error (should not happen)
+            this.callback.onComponentError(this.activityContext.getString(R.string.Error_SavedBindingKeyIsEmpty))
+        } else {
+            this.sendData("r$passkey>$")
+        }
     }
 
     private fun testConnection(){

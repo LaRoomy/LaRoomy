@@ -19,7 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewLogActivity"></activity>
+        <activity android:name=".ViewLogActivity" />
         <activity android:name=".EditUUIDProfileActivity" />
         <activity android:name=".ManageUUIDProfilesActivity" />
         <activity
@@ -61,10 +61,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="mainactivity" android:scheme="laroomy"/>
             </intent-filter>
         </activity>
     </application>
+
+
 
 </manifest>

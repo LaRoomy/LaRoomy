@@ -48,7 +48,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 true -> {
                     // enable the device binding
                     val passkey =
-                        (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_BindingPasskey)
+                        (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
 
                     //ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
                     ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding(passkey)
