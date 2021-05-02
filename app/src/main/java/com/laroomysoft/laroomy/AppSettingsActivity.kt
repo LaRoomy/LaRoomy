@@ -3,12 +3,14 @@ package com.laroomysoft.laroomy
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Message
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
@@ -22,6 +24,7 @@ class AppSettingsActivity : AppCompatActivity() {
     lateinit var listAllDevicesSwitch: SwitchCompat
     lateinit var passwordContainer: ConstraintLayout
     lateinit var enableLogSwitch: SwitchCompat
+    lateinit var passKeyInputNotificationTextView: AppCompatTextView
 
     private var buttonNormalizationRequired = false
 
@@ -29,10 +32,36 @@ class AppSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_settings)
 
+        // TODO: read the intent data when the user opens this app with a shared link -> retrieve the key-value pair and save it!
+
+        // test section
+
+        // TODO: put this in an extra activity
+
+//        var testString = ""
+//
+//        val intentEXT = intent
+//        if(intentEXT.action == Intent.ACTION_VIEW){
+//            val uri: Uri? = intentEXT.data
+//            val str1 = uri?.getQueryParameter("keyone")
+//            val str2 = uri?.getQueryParameter("keytwo")
+//            testString = "Data received. KeyOne= $str1 and keyTwo= $str2"
+//        }
+//
+//        if(testString.isNotEmpty()){
+//            findViewById<AppCompatTextView>(R.id.setupActivityAutoConnectHintTextView).apply {
+//                text = testString
+//            }
+//        }
+
+        // test section end
+
+
         // get the views
         this.passwordBox = findViewById(R.id.setupActivityBindingCodeBox)
         this.passwordViewModeButton = findViewById(R.id.setupActivityBindingCodeVisibilityButton)
         this.passwordContainer = findViewById(R.id.setupActivityBindingCodeContainer)
+        this.passKeyInputNotificationTextView = findViewById(R.id.setupActivityBindingKeyNotificationTextView)
 
         this.autoConnectSwitch = findViewById<SwitchCompat>(R.id.setupActivityAutoConnectSwitch).apply{
             val state =
@@ -60,7 +89,7 @@ class AppSettingsActivity : AppCompatActivity() {
             this.isChecked = state
 
             // if logging is activated, show the nav-button
-            setShowLogButtonVisibiliy(state)
+            setShowLogButtonVisibility(state)
         }
 
         // set the saved password (if there is one, actually there should always be one)
@@ -72,12 +101,29 @@ class AppSettingsActivity : AppCompatActivity() {
         // add on change listener to the password-box
         this.passwordBox.addTextChangedListener {
             // check if the box is empty, if so: save the entered passkey. Otherwise restore a default value -> the passkey cannot be empty
-            if(passwordBox.text.isNotEmpty()){
-                (applicationContext as ApplicationProperty).saveStringData(passwordBox.text.toString(), R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+            val passKey =
+                passwordBox.text.toString()
+            // the passKey will only be saved if the length is correct (0 > length < 11)
+            if(passKey.isNotEmpty()) {
+                    if(passKey.length > 10){
+                        // notify User
+                        setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyMaxIs10Character), R.color.WarningColor)
+                    } else {
+                        if(passKeyInputNotificationTextView.visibility == View.VISIBLE) {
+                            setPassKeyInputNotification("", 0)
+                        }
+
+                        (applicationContext as ApplicationProperty).saveStringData(
+                            passKey,
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_CustomBindingPasskey
+                        )
+                    }
             } else {
                 val randomKey = createRandomPasskey(10)
                 (applicationContext as ApplicationProperty).saveStringData(randomKey, R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
-                this.passwordBox.hint = randomKey
+
+                setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyMustNotBeEmpty), R.color.ErrorColor)
             }
         }
 
@@ -100,6 +146,9 @@ class AppSettingsActivity : AppCompatActivity() {
                         val randomKey = createRandomPasskey(10)
                         (applicationContext as ApplicationProperty).saveStringData(randomKey, R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
                         passwordBox.setText(randomKey)
+                    } else {
+                        // display the default key
+                        passwordBox.setText((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey))
                     }
                 }
                 else -> passwordContainer.visibility = View.GONE
@@ -112,7 +161,7 @@ class AppSettingsActivity : AppCompatActivity() {
         this.enableLogSwitch.setOnCheckedChangeListener {  _: CompoundButton, b: Boolean ->
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
-            setShowLogButtonVisibiliy(b)
+            setShowLogButtonVisibility(b)
         }
     }
 
@@ -164,7 +213,7 @@ class AppSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setShowLogButtonVisibiliy(visible: Boolean){
+    private fun setShowLogButtonVisibility(visible: Boolean){
         findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
             visibility = when(visible){
                 true -> View.VISIBLE
@@ -192,6 +241,17 @@ class AppSettingsActivity : AppCompatActivity() {
 
         val intent = Intent(this@AppSettingsActivity, ViewLogActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun setPassKeyInputNotification(message: String, colorID: Int){
+        if(message.isEmpty()){
+            this.passKeyInputNotificationTextView.setTextColor(getColor(R.color.normalTextColor))
+            this.passKeyInputNotificationTextView.visibility = View.GONE
+        } else {
+            this.passKeyInputNotificationTextView.visibility = View.VISIBLE
+            this.passKeyInputNotificationTextView.setTextColor(getColor(colorID))
+            this.passKeyInputNotificationTextView.text = message
+        }
     }
 
 }

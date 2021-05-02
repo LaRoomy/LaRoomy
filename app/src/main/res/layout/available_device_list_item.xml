@@ -6,13 +6,6 @@
     android:layout_height="80dp"
     android:orientation="horizontal"
     tools:ignore="UseCompoundDrawables">
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:id="@+id/leftBorderView"
-        android:layout_margin="5dp"
-        android:background="@color/separatorColor"
-        />
 
     <ImageView
         android:id="@+id/deviceImageView"
@@ -29,16 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:textSize="18sp"
         android:layout_marginEnd="10dp"
         android:text="@string/UniversalPlaceholderName"
         android:layout_marginTop="25dp"
-        />
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:id="@+id/rightBorderView"
-        android:layout_margin="5dp"
-        android:background="@color/separatorColor"
         />
 
 </LinearLayout>

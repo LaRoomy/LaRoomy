@@ -102,10 +102,15 @@ fun isHexCharacter(c: Char) : Boolean {
 }
 
 fun createRandomPasskey(keyLength: Int): String {
+
+    var realKeyLength = keyLength - 1
+    if(realKeyLength < 0)
+        realKeyLength = 0
+
     val charSource = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890$%!=/?"
     var randomPasskey = ""
 
-    for(i in 0..keyLength){
+    for(i in 0..realKeyLength){
         randomPasskey += charSource[floor(Math.random() * charSource.length).toInt()]
     }
     return randomPasskey

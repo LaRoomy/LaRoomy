@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback {
 
@@ -29,8 +30,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // TODO: read the intent data when the user opens this app with a shared link -> retrieve the key-value pair and save it!
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@MainActivity, this)
 
@@ -138,22 +137,36 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     fun onReloadImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
         this.updateAvailableDevices()
+
+        // TODO: add onClick feedback
+
+        // temp!
+        //this.notifyUser("List Reloaded", ERROR_MESSAGE)
     }
 
     fun onHelpImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
 //        val openUrl = Intent(ACTION_VIEW)
 //        openUrl.data = Uri.parse("https://www.laroomy.de")
 //        startActivity(openUrl)
+
+        // TODO: add onClick feedback
+
         val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
         startActivity(intent)
     }
 
     fun onInfoImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+
+        // TODO: add onClick feedback
+
         val intent = Intent(this@MainActivity, InformationActivity::class.java)
         startActivity(intent)
     }
 
     fun onSettingsImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+
+        // TODO: add onClick feedback
+
         val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
         startActivity(intent)
     }
@@ -173,11 +186,15 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     private fun setItemColor(index: Int, colorID: Int){
         val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
-        val leftView = ll?.findViewById<View>(R.id.leftBorderView)
-        val rightView = ll?.findViewById<View>(R.id.rightBorderView)
+        //val leftView = ll?.findViewById<View>(R.id.leftBorderView)
+        //val rightView = ll?.findViewById<View>(R.id.rightBorderView)
 
-        leftView?.setBackgroundColor(getColor(colorID))
-        rightView?.setBackgroundColor(getColor(colorID))
+        val textView = ll?.findViewById<TextView>(R.id.deviceNameTextView)
+
+        //leftView?.setBackgroundColor(getColor(colorID))
+        //rightView?.setBackgroundColor(getColor(colorID))
+
+        textView?.setTextColor(getColor(colorID))
 
     }
 

@@ -38,7 +38,14 @@
         <activity
             android:name=".TimeFrameSelectorActivity"
             android:screenOrientation="nosensor" />
-        <activity android:name=".AppSettingsActivity" />
+        <activity android:name=".AppSettingsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="laroomy" android:host="appsettings" />
+            </intent-filter>
+        </activity>
         <activity android:name=".InformationActivity" />
         <activity
             android:name=".SimpleTimeSelectorActivity"
@@ -62,8 +69,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="mainactivity" android:scheme="laroomy"/>
             </intent-filter>
         </activity>
     </application>

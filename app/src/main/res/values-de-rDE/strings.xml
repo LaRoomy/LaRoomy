@@ -96,6 +96,8 @@
     <string name="SetupActivity_EnableLoggingElementText">Verbindungsprotokoll erstellen</string>
     <string name="SetupActivity_EnableLoggingHint">Es wird ein temporäres Protokoll der Übertragung erstellt. Unter Umständen führt das zu einer Beeinträchtigung der Performance, kann aber bei der Entwicklung des Endgerätes hilfreich sein.</string>
     <string name="SetupActivity_ShowLogButtonText">Protokoll anzeigen</string>
+    <string name="SetupActivity_PassKeyMustNotBeEmpty">Schlüssel darf nicht leer sein.</string>
+    <string name="SetupActivity_PassKeyMaxIs10Character">Schlüssel darf maximal 10 Zeichen enthalten.</string>
 
 
 

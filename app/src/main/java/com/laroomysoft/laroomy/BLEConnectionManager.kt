@@ -15,9 +15,10 @@ import kotlin.collections.ArrayList
 
 private const val MAX_CONNECTION_ATTEMPTS = 10
 
-const val LAROOMYDEVICETYPE_NONE = 0
+const val UNKNOWN_DEVICETYPE = 0
 const val LAROOMYDEVICETYPE_XNG = 1
 const val LAROOMYDEVICETYPE_CTX = 2
+const val LAROOMYDEVICETYPE_TVM = 3
 
 const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
 const val UPDATE_TYPE_DETAIL_DEFINITION = 2
@@ -703,17 +704,36 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
         get() {
+            // clear the list:
             field.clear()
-            this.bleAdapter?.bondedDevices?.forEach {
-                // It is not possible to get the uuids from the device here
-                // -> so the name must be the criteria to identify a laroomy device!
-                if(it.name.startsWith("Laroomy") || it.name.contains("LRY", false))
-                {
+            // check if the user wants to list all bonded devices
+            val listAllDevices =
+                (activityContext.applicationContext as ApplicationProperty).loadBooleanData(
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_ListAllDevices
+                )
+            // fill the list with all bonded devices
+            if (listAllDevices) {
+                this.bleAdapter?.bondedDevices?.forEach {
                     val device = LaRoomyDevicePresentationModel()
                     device.name = it.name
                     device.address = it.address
                     device.type = laRoomyDeviceTypeFromName(it.name)
                     field.add(device)
+
+                }
+            } else {
+                // fill the list only with laroomy devices (or devices which follow the laroomy-name guidelines)
+                this.bleAdapter?.bondedDevices?.forEach {
+                    // It is not possible to get the uuids from the device here
+                    // -> so the name must be the criteria to identify a laroomy device!
+                    if (it.name.startsWith("Laroomy") || it.name.contains("LRY", false)) {
+                        val device = LaRoomyDevicePresentationModel()
+                        device.name = it.name
+                        device.address = it.address
+                        device.type = laRoomyDeviceTypeFromName(it.name)
+                        field.add(device)
+                    }
                 }
             }
             return field
@@ -940,7 +960,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return when(name){
             "LaRoomy XNG" -> LAROOMYDEVICETYPE_XNG
             "LaRoomy CTX" -> LAROOMYDEVICETYPE_CTX
-            else -> LAROOMYDEVICETYPE_NONE
+            "LaRoomy TVM" -> LAROOMYDEVICETYPE_TVM
+            else -> UNKNOWN_DEVICETYPE
         }
     }
 
