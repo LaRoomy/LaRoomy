@@ -32,31 +32,6 @@ class AppSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_settings)
 
-        // TODO: read the intent data when the user opens this app with a shared link -> retrieve the key-value pair and save it!
-
-        // test section
-
-        // TODO: put this in an extra activity
-
-//        var testString = ""
-//
-//        val intentEXT = intent
-//        if(intentEXT.action == Intent.ACTION_VIEW){
-//            val uri: Uri? = intentEXT.data
-//            val str1 = uri?.getQueryParameter("keyone")
-//            val str2 = uri?.getQueryParameter("keytwo")
-//            testString = "Data received. KeyOne= $str1 and keyTwo= $str2"
-//        }
-//
-//        if(testString.isNotEmpty()){
-//            findViewById<AppCompatTextView>(R.id.setupActivityAutoConnectHintTextView).apply {
-//                text = testString
-//            }
-//        }
-
-        // test section end
-
-
         // get the views
         this.passwordBox = findViewById(R.id.setupActivityBindingCodeBox)
         this.passwordViewModeButton = findViewById(R.id.setupActivityBindingCodeVisibilityButton)

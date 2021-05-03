@@ -19,6 +19,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".DataSharingReceiverActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="datasharing"
+                    android:scheme="laroomy" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ViewLogActivity" />
         <activity android:name=".EditUUIDProfileActivity" />
         <activity android:name=".ManageUUIDProfilesActivity" />
@@ -38,14 +48,7 @@
         <activity
             android:name=".TimeFrameSelectorActivity"
             android:screenOrientation="nosensor" />
-        <activity android:name=".AppSettingsActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="laroomy" android:host="appsettings" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".AppSettingsActivity"/>
         <activity android:name=".InformationActivity" />
         <activity
             android:name=".SimpleTimeSelectorActivity"
@@ -72,7 +75,5 @@
             </intent-filter>
         </activity>
     </application>
-
-
 
 </manifest>
