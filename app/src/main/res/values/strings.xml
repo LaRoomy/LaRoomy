@@ -97,7 +97,8 @@
     <string name="SetupActivity_EnableLoggingHint">All transmission-data and connection-events will be saved to a temporary cache. This may reduce the performance in the connection process but could be helpful during the development process of the remote device.</string>
     <string name="SetupActivity_ShowLogButtonText">Show Log</string>
     <string name="SetupActivity_PassKeyMustNotBeEmpty">Binding Code cannot be empty.</string>
-    <string name="SetupActivity_PassKeyMaxIs10Character">The maximum length of the binding-code is 10 character</string>
+    <string name="SetupActivity_PassKeyMaxIs10Character">The maximum length of the binding-code is 10 character.</string>
+    <string name="SetupActivity_PassKeyContainsInvalidCharacter">The binding-code contains invalid character.</string>
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
@@ -154,6 +155,7 @@
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
     <string name="Error_SavedBindingKeyIsEmpty">Binding Key loading failed. Key was empty.</string>
+
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>

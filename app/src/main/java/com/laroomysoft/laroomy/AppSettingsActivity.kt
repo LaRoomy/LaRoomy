@@ -81,18 +81,28 @@ class AppSettingsActivity : AppCompatActivity() {
             // the passKey will only be saved if the length is correct (0 > length < 11)
             if(passKey.isNotEmpty()) {
                     if(passKey.length > 10){
+                        // passKey too long
                         // notify User
                         setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyMaxIs10Character), R.color.WarningColor)
                     } else {
-                        if(passKeyInputNotificationTextView.visibility == View.VISIBLE) {
-                            setPassKeyInputNotification("", 0)
-                        }
+                        // check for invalid character
+                        if(!validatePassKey(passKey)){
+                            // invalid character in passKey string
+                            // notify user
+                            setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyContainsInvalidCharacter), R.color.ErrorColor)
+                        } else {
+                            // everything ok - hide notification (if there is one)
+                            if(passKeyInputNotificationTextView.visibility == View.VISIBLE) {
+                                setPassKeyInputNotification("", 0)
+                            }
+                            // save the passKey
+                            (applicationContext as ApplicationProperty).saveStringData(
+                                passKey,
+                                R.string.FileKey_AppSettings,
+                                R.string.DataKey_CustomBindingPasskey
+                            )
 
-                        (applicationContext as ApplicationProperty).saveStringData(
-                            passKey,
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_CustomBindingPasskey
-                        )
+                        }
                     }
             } else {
                 val randomKey = createRandomPasskey(10)

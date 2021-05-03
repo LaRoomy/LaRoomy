@@ -5,6 +5,8 @@ import kotlin.math.floor
 
 const val COMMON_PASSKEY_LENGHT = 10
 
+const val passKeyCharacter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890$%!=/?+#.,;:"
+
 //fun percentageFrom8BitValue(value: Int): Int{
 //
 //    var pLevel =
@@ -79,6 +81,220 @@ fun a8BitValueAsTwoCharString(value: Int) : String {
     return "$tenth$single"
 }
 
+fun macAddressToEncryptableString(macAddress: String): String {
+    return if(macAddress.length < 16){
+        ERROR_INVALID_FORMAT
+    } else {
+        var formattedString = ""
+        macAddress.forEach {
+            if(it != ':'){
+                formattedString += it
+            }
+        }
+        formattedString
+    }
+}
+
+fun encryptString(inputString: String):String {
+    // encrypt the string in reverse direction
+    return if(inputString.isNotEmpty()) {
+        var encryptedString = ""
+
+        for (i in (inputString.length - 1)..0) {
+            encryptedString += swapChar(inputString.elementAt(i))
+        }
+        encryptedString
+    } else {
+        ERROR_INVALID_PARAMETER
+    }
+}
+
+fun decryptString(inputString: String):String {
+    // decrypt the string in reverse direction
+    return if(inputString.isNotEmpty()) {
+        var decryptedString = ""
+
+        for (i in (inputString.length - 1)..0) {
+            decryptedString += reSwapChar(inputString.elementAt(i))
+        }
+        decryptedString
+    } else {
+        ERROR_INVALID_PARAMETER
+    }
+}
+
+fun swapChar(c: Char) : Char {
+    return when(c){
+        '0' -> 'Z'
+        '1' -> 'Y'
+        '2' -> 'X'
+        '3' -> 'W'
+        '4' -> 'V'
+        '5' -> 'U'
+        '6' -> 'T'
+        '7' -> 'S'
+        '8' -> 'R'
+        '9' -> 'Q'
+        'a' -> 'P'
+        'b' -> 'O'
+        'c' -> 'N'
+        'd' -> 'M'
+        'e' -> 'L'
+        'f' -> 'K'
+        'g' -> 'J'
+        'h' -> 'I'
+        'i' -> 'H'
+        'j' -> 'G'
+        'k' -> 'F'
+        'l' -> 'E'
+        'm' -> 'D'
+        'n' -> 'C'
+        'o' -> 'B'
+        'p' -> 'A'
+        'q' -> '0'
+        'r' -> '1'
+        's' -> '2'
+        't' -> '3'
+        'u' -> '4'
+        'v' -> '5'
+        'w' -> '6'
+        'x' -> '7'
+        'y' -> '8'
+        'z' -> '9'
+        'A' -> '!'
+        'B' -> '?'
+        'C' -> '='
+        'D' -> '('
+        'E' -> ')'
+        'F' -> '/'
+        'G' -> '&'
+        'H' -> '%'
+        'I' -> '$'
+        'J' -> '§'
+        'K' -> '*'
+        'L' -> '+'
+        'M' -> '#'
+        'N' -> '-'
+        'O' -> '.'
+        'P' -> ','
+        'Q' -> ':'
+        'R' -> ';'
+        'S' -> 'z'
+        'T' -> 'y'
+        'U' -> 'x'
+        'V' -> 'w'
+        'W' -> 'v'
+        'X' -> 'u'
+        'Y' -> 't'
+        'Z' -> 's'
+        '!' -> 'r'
+        '?' -> 'q'
+        '=' -> 'p'
+        ')' -> 'o'
+        '(' -> 'n'
+        '/' -> 'm'
+        '&' -> 'l'
+        '%' -> 'k'
+        '$' -> 'j'
+        '§' -> 'i'
+        '*' -> 'h'
+        '+' -> 'g'
+        '#' -> 'f'
+        '-' -> 'e'
+        '.' -> 'd'
+        ',' -> 'c'
+        ':' -> 'b'
+        ';' -> 'a'
+        else -> c
+    }
+}
+
+fun reSwapChar(c: Char): Char {
+    return when(c){
+        'Z' -> '0'
+        'Y' -> '1'
+        'X' -> '2'
+        'W' -> '3'
+        'V' -> '4'
+        'U' -> '5'
+        'T' -> '6'
+        'S' -> '7'
+        'R' -> '8'
+        'Q' -> '9'
+        'P' -> 'a'
+        'O' -> 'b'
+        'N' -> 'c'
+        'M' -> 'd'
+        'L' -> 'e'
+        'K' -> 'f'
+        'J' -> 'g'
+        'I' -> 'h'
+        'H' -> 'i'
+        'G' -> 'j'
+        'F' -> 'k'
+        'E' -> 'l'
+        'D' -> 'm'
+        'C' -> 'n'
+        'B' -> 'o'
+        'A' -> 'p'
+        '0' -> 'q'
+        '1' -> 'r'
+        '2' -> 's'
+        '3' -> 't'
+        '4' -> 'u'
+        '5' -> 'v'
+        '6' -> 'w'
+        '7' -> 'x'
+        '8' -> 'y'
+        '9' -> 'z'
+        '!' -> 'A'
+        '?' -> 'B'
+        '=' -> 'C'
+        '(' -> 'D'
+        ')' -> 'E'
+        '/' -> 'F'
+        '&' -> 'G'
+        '%' -> 'H'
+        '$' -> 'I'
+        '§' -> 'J'
+        '*' -> 'K'
+        '+' -> 'L'
+        '#' -> 'M'
+        '-' -> 'N'
+        '.' -> 'O'
+        ',' -> 'P'
+        ':' -> 'Q'
+        ';' -> 'R'
+        'z' -> 'S'
+        'y' -> 'T'
+        'x' -> 'U'
+        'w' -> 'V'
+        'v' -> 'W'
+        'u' -> 'X'
+        't' -> 'Y'
+        's' -> 'Z'
+        'r' -> '!'
+        'q' -> '?'
+        'p' -> '='
+        'o' -> ')'
+        'n' -> '('
+        'm' -> '/'
+        'l' -> '&'
+        'k' -> '%'
+        'j' -> '$'
+        'i' -> '§'
+        'h' -> '*'
+        'g' -> '+'
+        'f' -> '#'
+        'e' -> '-'
+        'd' -> '.'
+        'c' -> ','
+        'b' -> ':'
+        'a' -> ';'
+        else -> c
+    }
+}
+
 fun isHexCharacter(c: Char) : Boolean {
     return when(c){
         '0' -> true
@@ -107,13 +323,30 @@ fun createRandomPasskey(keyLength: Int): String {
     if(realKeyLength < 0)
         realKeyLength = 0
 
-    val charSource = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890$%!=/?"
     var randomPasskey = ""
 
     for(i in 0..realKeyLength){
-        randomPasskey += charSource[floor(Math.random() * charSource.length).toInt()]
+        randomPasskey += passKeyCharacter[floor(Math.random() * passKeyCharacter.length).toInt()]
     }
     return randomPasskey
+}
+
+fun isCharAcceptedInPassKey(c: Char) : Boolean {
+    passKeyCharacter.forEach {
+        if(it == c){
+            return true
+        }
+    }
+    return false
+}
+
+fun validatePassKey(key: String) : Boolean{
+    key.forEach {
+        if(!isCharAcceptedInPassKey(it)){
+            return false
+        }
+    }
+    return true
 }
 
 

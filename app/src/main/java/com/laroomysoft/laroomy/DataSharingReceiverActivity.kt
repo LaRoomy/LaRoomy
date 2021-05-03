@@ -32,9 +32,7 @@ class DataSharingReceiverActivity : AppCompatActivity() {
         }
 
         if(testString.isNotEmpty()){
-            findViewById<AppCompatTextView>(R.id.setupActivityAutoConnectHintTextView).apply {
-                text = testString
-            }
+            notificationTextView.text = testString
         }
 
 

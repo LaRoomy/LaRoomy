@@ -47,6 +47,8 @@ const val RGB_MODE_TRANSITION = 2
 
 // error indicator
 const val ERROR_NOTFOUND = "error - not found"
+const val ERROR_INVALID_FORMAT = "error - invalid format"
+const val ERROR_INVALID_PARAMETER = "error - invalid character"
 
 class ApplicationProperty : Application() {
 
