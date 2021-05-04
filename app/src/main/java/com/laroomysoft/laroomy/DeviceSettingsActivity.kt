@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -16,6 +18,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     lateinit var userNotificationTextView: AppCompatTextView
     lateinit var bindingSwitch: SwitchCompat
     lateinit var factoryResetButton: AppCompatButton
+    lateinit var bindingHintTextView: AppCompatTextView
+    lateinit var shareBindingContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +33,17 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         userNotificationTextView = findViewById(R.id.deviceSettingsActivityUserNotificationTextView)
         bindingSwitch = findViewById(R.id.deviceSettingsActivityBindingSwitch)
         factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
+        bindingHintTextView = findViewById(R.id.deviceSettingsActivityBindingHintTextView)
+        shareBindingContainer = findViewById(R.id.deviceSettingsActivityShareBindingContainer)
 
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired
+
+        // change the UI if the binding-switch is on
+        if(ApplicationProperty.bluetoothConnectionManager.isBindingRequired){
+            bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
+            shareBindingContainer.visibility = View.VISIBLE
+        }
 
         // set the connection-state info
         when(ApplicationProperty.bluetoothConnectionManager.isConnected){
@@ -48,18 +60,48 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 true -> {
                     // enable the device binding
                     val passkey =
-                        (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
-
+                        // select default or custom key in relation to the appropriate setting
+                        when((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)) {
+                            true -> {
+                                (applicationContext as ApplicationProperty).loadSavedStringData(
+                                    R.string.FileKey_AppSettings,
+                                    R.string.DataKey_CustomBindingPasskey
+                                )
+                            }
+                            false -> {
+                                (applicationContext as ApplicationProperty).loadSavedStringData(
+                                    R.string.FileKey_AppSettings,
+                                    R.string.DataKey_DefaultRandomBindingPasskey
+                                )
+                            }
+                        }
                     //ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
                     ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding(passkey)
+
+                    // update the hint for the user
+                    bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
+
+                    // show the share-button
+                    shareBindingContainer.visibility = View.VISIBLE
+
+                    // TODO: wait for response !!!!
+                    // TODO: disable the switch if the response is negative
+                    // TODO: change hint-text!!!
+                    // TODO: show/hide the share container
+
                 }
                 else -> {
                     // release the device binding
                     //ApplicationProperty.bluetoothConnectionManger.sendData("SrB>$")
                     ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding()
+
+                    // update the hint for the user
+                    bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+
+                    // hide the share-button
+                    shareBindingContainer.visibility = View.GONE
                 }
             }
-
         }
     }
 
@@ -173,5 +215,51 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
+    }
+
+    fun deviceSettingsActivityShareBindingButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+
+        // make sure there is a connected device
+        if(ApplicationProperty.bluetoothConnectionManager.isConnected){
+
+            // get passKey
+            val passKey =
+                when((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)){
+                    true -> {
+                        (applicationContext as ApplicationProperty).loadSavedStringData(
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_CustomBindingPasskey
+                        )
+                    }
+                    else -> {
+                        (applicationContext as ApplicationProperty).loadSavedStringData(
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_DefaultRandomBindingPasskey
+                        )
+                    }
+                }
+
+            // get mac-address
+            val mac = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
+            val macAddress = macAddressToEncryptString(mac ?: "")
+
+            // encrypt data
+            val encryptedPassKey = encryptString(passKey)
+            val encryptedMacAddress = encryptString(macAddress)
+
+            // build link
+            val link = "${LAROOMY_WEBAPI_BASIS_LINK}devid=$encryptedMacAddress&bdata=$encryptedPassKey"
+
+            Log.d("ACT:DSA", "Sharing Link generated: $link")
+
+            // share
+            val sendIntent:Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, link)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
     }
 }

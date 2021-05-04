@@ -50,6 +50,9 @@ const val ERROR_NOTFOUND = "error - not found"
 const val ERROR_INVALID_FORMAT = "error - invalid format"
 const val ERROR_INVALID_PARAMETER = "error - invalid character"
 
+// links
+const val LAROOMY_WEBAPI_BASIS_LINK = "https://epl2-datatransmission.blogspot.com/p/redirect.html?"
+
 class ApplicationProperty : Application() {
 
     companion object {

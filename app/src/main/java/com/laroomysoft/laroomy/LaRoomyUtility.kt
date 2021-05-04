@@ -81,7 +81,7 @@ fun a8BitValueAsTwoCharString(value: Int) : String {
     return "$tenth$single"
 }
 
-fun macAddressToEncryptableString(macAddress: String): String {
+fun macAddressToEncryptString(macAddress: String): String {
     return if(macAddress.length < 16){
         ERROR_INVALID_FORMAT
     } else {
@@ -92,6 +92,21 @@ fun macAddressToEncryptableString(macAddress: String): String {
             }
         }
         formattedString
+    }
+}
+
+fun encryptStringToMacAddress(string: String): String {
+    return if(string.length < 12){
+        ERROR_INVALID_PARAMETER
+    } else {
+        var formattedAddress = ""
+        string.forEachIndexed { index, c ->
+            if(((index % 2) == 0) && (index != 0)){
+                formattedAddress += ':'
+            }
+            formattedAddress += c
+        }
+        formattedAddress
     }
 }
 

@@ -15,32 +15,42 @@ class DataSharingReceiverActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_data_sharing_receiver)
 
+        // get the view(s)
         notificationTextView = findViewById(R.id.dataSharingActivityNotificationTextView)
 
         // TODO: read the intent data when the user opens this app with a shared link -> retrieve the key-value pair and save it!
 
-        // test section
-
-        var testString = ""
-
+        // get the intent-data and read the URL Parameter
         val intentEXT = intent
         if(intentEXT.action == Intent.ACTION_VIEW){
             val uri: Uri? = intentEXT.data
-            val str1 = uri?.getQueryParameter("devid")
-            val str2 = uri?.getQueryParameter("bdata")
-            testString = "Data received. devid= $str1 and bdata= $str2"
+            val devId = uri?.getQueryParameter("devid")
+            val bData = uri?.getQueryParameter("bdata")
+            // decrypt the parameter
+            val macDecrypted = decryptString(devId ?: "")
+            val macReformatted = encryptStringToMacAddress(macDecrypted)
+            val passKeyDecrypted = decryptString(bData ?: "")
+
+            // temp for testing
+            notifyUser("MAC: $macReformatted   PassKey: $passKeyDecrypted", R.color.goldAccentColor)
+
+            if((macReformatted != ERROR_INVALID_PARAMETER)&&(passKeyDecrypted.isNotEmpty())){
+                // data ok - TODO: save it!
+
+                // TODO: notify user!
+
+            } else {
+                // error - TODO: notify user!
+            }
+
         }
-
-        if(testString.isNotEmpty()){
-            notificationTextView.text = testString
-        }
-
-
-
-        // test section end
-
 
         // TODO: save the data, check the data and notify user!
 
+    }
+
+    private fun notifyUser(message: String, colorID: Int){
+        notificationTextView.setTextColor(getColor(colorID))
+        notificationTextView.text = message
     }
 }
