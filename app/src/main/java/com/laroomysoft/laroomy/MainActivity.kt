@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private lateinit var availableDevicesRecyclerView: RecyclerView
     private lateinit var availableDevicesViewAdapter: RecyclerView.Adapter<*>
     private lateinit var availableDevicesViewManager: RecyclerView.LayoutManager
+
+    private var buttonNormalizationRequired = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,6 +102,17 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
 
+        if(this.buttonNormalizationRequired){
+
+            findViewById<AppCompatImageButton>(R.id.generalSettingsButton).setImageResource(R.drawable.main_settings_norm)
+            findViewById<AppCompatImageButton>(R.id.informationImageButton).setImageResource(R.drawable.main_info_norm)
+            findViewById<AppCompatImageButton>(R.id.helpImageButton).setImageResource(R.drawable.main_help_norm)
+
+            this.buttonNormalizationRequired = false
+        }
+
+
+
         // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
 
         // update the device-list
@@ -135,42 +149,46 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         startActivity(intent)
     }
 
-    fun onReloadImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+    fun onReloadImageButtonClick(view: View){
+
+        val reloadButton = view as AppCompatImageButton
+        reloadButton.setImageResource(R.drawable.main_reload_pushed)
+
         this.updateAvailableDevices()
 
-        // TODO: add onClick feedback
+        Handler(Looper.getMainLooper()).postDelayed({
+            reloadButton.setImageResource(R.drawable.main_reload_norm)
 
-        // temp!
-        //this.notifyUser("List Reloaded", ERROR_MESSAGE)
+        },700)
+
     }
 
-    fun onHelpImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
-//        val openUrl = Intent(ACTION_VIEW)
-//        openUrl.data = Uri.parse("https://www.laroomy.de")
-//        startActivity(openUrl)
+    fun onHelpImageButtonClick(view: View){
 
-        // TODO: add onClick feedback
+        this.buttonNormalizationRequired = true
+        (view as AppCompatImageButton).setImageResource(R.drawable.main_help_pushed)
 
         val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
         startActivity(intent)
     }
 
-    fun onInfoImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+    fun onInfoImageButtonClick(view: View){
 
-        // TODO: add onClick feedback
+        this.buttonNormalizationRequired = true
+        (view as AppCompatImageButton).setImageResource(R.drawable.main_info_pushed)
 
         val intent = Intent(this@MainActivity, InformationActivity::class.java)
         startActivity(intent)
     }
 
-    fun onSettingsImageButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+    fun onSettingsImageButtonClick(view: View){
 
-        // TODO: add onClick feedback
+        this.buttonNormalizationRequired = true
+        (view as AppCompatImageButton).setImageResource(R.drawable.main_settings_pushed)
 
         val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
         startActivity(intent)
     }
-
 
     private fun notifyUser(message: String, type: Int){
         val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)

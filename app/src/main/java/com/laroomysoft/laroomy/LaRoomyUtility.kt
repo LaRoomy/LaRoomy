@@ -5,7 +5,7 @@ import kotlin.math.floor
 
 const val COMMON_PASSKEY_LENGHT = 10
 
-const val passKeyCharacter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890$%!=/?+#.,;:"
+const val passKeyCharacter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
 
 //fun percentageFrom8BitValue(value: Int): Int{
 //
@@ -114,9 +114,10 @@ fun encryptString(inputString: String):String {
     // encrypt the string in reverse direction
     return if(inputString.isNotEmpty()) {
         var encryptedString = ""
+        val reverseLength = inputString.length - 1
 
-        for (i in (inputString.length - 1)..0) {
-            encryptedString += swapChar(inputString.elementAt(i))
+        for (i in inputString.indices) {
+            encryptedString += swapChar(inputString.elementAt(reverseLength - i))
         }
         encryptedString
     } else {
@@ -128,9 +129,10 @@ fun decryptString(inputString: String):String {
     // decrypt the string in reverse direction
     return if(inputString.isNotEmpty()) {
         var decryptedString = ""
+        val reverseLength = inputString.length - 1
 
-        for (i in (inputString.length - 1)..0) {
-            decryptedString += reSwapChar(inputString.elementAt(i))
+        for (i in inputString.indices) {
+            decryptedString += reSwapChar(inputString.elementAt(reverseLength - i))
         }
         decryptedString
     } else {
@@ -176,24 +178,26 @@ fun swapChar(c: Char) : Char {
         'x' -> '7'
         'y' -> '8'
         'z' -> '9'
-        'A' -> '!'
-        'B' -> '?'
-        'C' -> '='
-        'D' -> '('
-        'E' -> ')'
-        'F' -> '/'
-        'G' -> '&'
-        'H' -> '%'
-        'I' -> '$'
-        'J' -> '§'
-        'K' -> '*'
-        'L' -> '+'
-        'M' -> '#'
-        'N' -> '-'
-        'O' -> '.'
-        'P' -> ','
-        'Q' -> ':'
-        'R' -> ';'
+
+        'A' -> 'r'
+        'B' -> 'q'
+        'C' -> 'p'
+        'D' -> 'o'
+        'E' -> 'n'
+        'F' -> 'm'
+        'G' -> 'l'
+        'H' -> 'k'
+        'I' -> 'j'
+        'J' -> 'i'
+        'K' -> 'h'
+        'L' -> 'g'
+        'M' -> 'f'
+        'N' -> 'e'
+        'O' -> 'd'
+        'P' -> 'c'
+        'Q' -> 'b'
+        'R' -> 'a'
+
         'S' -> 'z'
         'T' -> 'y'
         'U' -> 'x'
@@ -202,24 +206,24 @@ fun swapChar(c: Char) : Char {
         'X' -> 'u'
         'Y' -> 't'
         'Z' -> 's'
-        '!' -> 'r'
-        '?' -> 'q'
-        '=' -> 'p'
-        ')' -> 'o'
-        '(' -> 'n'
-        '/' -> 'm'
-        '&' -> 'l'
-        '%' -> 'k'
-        '$' -> 'j'
-        '§' -> 'i'
-        '*' -> 'h'
-        '+' -> 'g'
-        '#' -> 'f'
-        '-' -> 'e'
-        '.' -> 'd'
-        ',' -> 'c'
-        ':' -> 'b'
-        ';' -> 'a'
+//        '!' -> 'r'
+//        '?' -> 'q'
+//        '=' -> 'p'
+//        ')' -> 'o'
+//        '(' -> 'n'
+//        '/' -> 'm'
+//        '&' -> 'l'
+//        '%' -> 'k'
+//        '$' -> 'j'
+//        '§' -> 'i'
+//        '*' -> 'h'
+//        '+' -> 'g'
+//        '#' -> 'f'
+//        '-' -> 'e'
+//        '.' -> 'd'
+//        ',' -> 'c'
+//        ':' -> 'b'
+//        ';' -> 'a'
         else -> c
     }
 }
@@ -262,24 +266,26 @@ fun reSwapChar(c: Char): Char {
         '7' -> 'x'
         '8' -> 'y'
         '9' -> 'z'
-        '!' -> 'A'
-        '?' -> 'B'
-        '=' -> 'C'
-        '(' -> 'D'
-        ')' -> 'E'
-        '/' -> 'F'
-        '&' -> 'G'
-        '%' -> 'H'
-        '$' -> 'I'
-        '§' -> 'J'
-        '*' -> 'K'
-        '+' -> 'L'
-        '#' -> 'M'
-        '-' -> 'N'
-        '.' -> 'O'
-        ',' -> 'P'
-        ':' -> 'Q'
-        ';' -> 'R'
+
+        'r' -> 'A'
+        'q' -> 'B'
+        'p' -> 'C'
+        'o' -> 'D'
+        'n' -> 'E'
+        'm' -> 'F'
+        'l' -> 'G'
+        'k' -> 'H'
+        'j' -> 'I'
+        'i' -> 'J'
+        'h' -> 'K'
+        'g' -> 'L'
+        'f' -> 'M'
+        'e' -> 'N'
+        'd' -> 'O'
+        'c' -> 'P'
+        'b' -> 'Q'
+        'a' -> 'R'
+
         'z' -> 'S'
         'y' -> 'T'
         'x' -> 'U'
@@ -288,24 +294,24 @@ fun reSwapChar(c: Char): Char {
         'u' -> 'X'
         't' -> 'Y'
         's' -> 'Z'
-        'r' -> '!'
-        'q' -> '?'
-        'p' -> '='
-        'o' -> ')'
-        'n' -> '('
-        'm' -> '/'
-        'l' -> '&'
-        'k' -> '%'
-        'j' -> '$'
-        'i' -> '§'
-        'h' -> '*'
-        'g' -> '+'
-        'f' -> '#'
-        'e' -> '-'
-        'd' -> '.'
-        'c' -> ','
-        'b' -> ':'
-        'a' -> ';'
+//        'r' -> '!'
+//        'q' -> '?'
+//        'p' -> '='
+//        'o' -> ')'
+//        'n' -> '('
+//        'm' -> '/'
+//        'l' -> '&'
+//        'k' -> '%'
+//        'j' -> '$'
+//        'i' -> '§'
+//        'h' -> '*'
+//        'g' -> '+'
+//        'f' -> '#'
+//        'e' -> '-'
+//        'd' -> '.'
+//        'c' -> ','
+//        'b' -> ':'
+//        'a' -> ';'
         else -> c
     }
 }

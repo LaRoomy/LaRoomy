@@ -49,6 +49,11 @@ class DataSharingReceiverActivity : AppCompatActivity() {
 
     }
 
+//    override fun onPause() {
+//        super.onPause()
+//        finish()
+//    }
+
     private fun notifyUser(message: String, colorID: Int){
         notificationTextView.setTextColor(getColor(colorID))
         notificationTextView.text = message

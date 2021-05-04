@@ -27,7 +27,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/reload_turnleft_white" />
+            app:srcCompat="@drawable/main_reload_norm" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/helpImageButton"
@@ -38,7 +38,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/helpcircle_white" />
+            app:srcCompat="@drawable/main_help_norm" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -129,7 +129,7 @@
             android:onClick="onInfoImageButtonClick"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/info_image_48" />
+            app:srcCompat="@drawable/main_info_norm" />
 
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -141,7 +141,7 @@
             android:onClick="onSettingsImageButtonClick"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/settings1_white" />
+            app:srcCompat="@drawable/main_settings_norm" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
