@@ -9,11 +9,11 @@ class BindingPair {
 
 class BindingPairManager(private val appContext: Context) {
 
+    private var bindingPairs = ArrayList<BindingPair>()
+
     init {
         this.load()
     }
-
-    private var bindingPairs = ArrayList<BindingPair>()
 
     fun add(pair: BindingPair){
         this.bindingPairs.add(pair)

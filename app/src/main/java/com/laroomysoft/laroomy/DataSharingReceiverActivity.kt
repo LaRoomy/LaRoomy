@@ -4,8 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 
 class DataSharingReceiverActivity : AppCompatActivity() {
@@ -30,8 +30,7 @@ class DataSharingReceiverActivity : AppCompatActivity() {
             val macReformatted = encryptStringToMacAddress(macDecrypted)
             val passKeyDecrypted = decryptString(bData ?: "")
 
-            // temp for testing
-            notifyUser("MAC: $macReformatted   PassKey: $passKeyDecrypted", R.color.goldAccentColor)
+            Log.d("M:DSA:onCreate", "onCreate in DataSharingActivity executed. Data decrypted: Mac Address: $macReformatted   PassKey: $passKeyDecrypted")
 
             if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
                 // data valid: save the data

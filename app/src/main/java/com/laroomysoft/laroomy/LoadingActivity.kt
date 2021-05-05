@@ -12,6 +12,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     private var isLastConnectedDevice = false
     private var blockAllFurtherProcessing = false
+    private var previouslyConnected = false
     private var connectionAttemptCounter = 0
     //private var authenticationAttemptCounter = 0
 
@@ -96,7 +97,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         setErrorText(getString(R.string.CA_BindingPasskeyRejected))
         // stop connection process
         ApplicationProperty.bluetoothConnectionManager.clear()
-        // navigate back with delay !?
+        // navigate back with delay
         Handler(Looper.getMainLooper()).postDelayed({
             finish()
         }, 4000)
@@ -108,22 +109,32 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         if(!blockAllFurtherProcessing) {
             if (connectionAttemptCounter <= 4) {
                 if (!state) {
-                    Log.e(
-                        "M:CB:ConStateChange",
-                        "Disconnected in Loading Activity - try to reconnect - Attempt-Counter is: $connectionAttemptCounter"
-                    )
-                    // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
-                    connectionAttemptCounter++
-                    // clear the bluetoothManager
-                    ApplicationProperty.bluetoothConnectionManager.clear()
-                    // try to connect again with 1 sec delay
-                    Handler(Looper.getMainLooper()).postDelayed({
-
-                        // TODO: this is wrong, if the device is not reachable and wasn't the last device, another device will be connected
-
-
-                        ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
-                    }, 1000)
+                    if(!previouslyConnected){
+                        // must be a timeout, the system says disconnected, but the device was not previously connected
+                        Log.e("M:CB:ConStateChange", "Timeout for the connection-attempt. Device may be not reachable. Stop connection-process.")
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                        // notify user
+                        setMessageText(R.color.WarningColor, getString(R.string.CA_TimeoutForConnection))
+                        // navigate back with delay
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            finish()
+                        }, 1500)
+                    } else {
+                        Log.e(
+                            "M:CB:ConStateChange",
+                            "Disconnected in Loading Activity - try to reconnect - Attempt-Counter is: $connectionAttemptCounter"
+                        )
+                        // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
+                        connectionAttemptCounter++
+                        // clear the bluetoothManager
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                        // try to connect again with 1 sec delay
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+                        }, 1000)
+                    }
+                } else {
+                    previouslyConnected = true
                 }
             } else {
                 // all attempts to connect failed -> go back to start (main activity)

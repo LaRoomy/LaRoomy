@@ -15,11 +15,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var mustReconnect = false
-    lateinit var userNotificationTextView: AppCompatTextView
-    lateinit var bindingSwitch: SwitchCompat
-    lateinit var factoryResetButton: AppCompatButton
-    lateinit var bindingHintTextView: AppCompatTextView
-    lateinit var shareBindingContainer: ConstraintLayout
+    private lateinit var userNotificationTextView: AppCompatTextView
+    private lateinit var bindingSwitch: SwitchCompat
+    private lateinit var factoryResetButton: AppCompatButton
+    private lateinit var bindingHintTextView: AppCompatTextView
+    private lateinit var shareBindingContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -242,6 +242,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             // get mac-address
             val mac = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
             val macAddress = macAddressToEncryptString(mac ?: "")
+
+            Log.d("ACT:DSA", "Binding data collected: MacAddress: $mac   PassKey: $passKey")
 
             // encrypt data
             val encryptedPassKey = encryptString(passKey)
