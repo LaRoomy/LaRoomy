@@ -184,8 +184,6 @@ class UUIDManager(private var appContext: Context) {
 
         var isValid: Boolean = uuid.length == 36
 
-        var pos = -1
-
         //UUID Format = "00001800-0000-1000-8000-00805f9b34fb"
 
         if(isValid) {
@@ -193,37 +191,32 @@ class UUIDManager(private var appContext: Context) {
             uuid.forEachIndexed { index, c ->
                 when(index){
                     8 -> {
-                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
+                        if((c != '-')&&(c.code != 45)&&(c.code != 8211)){
                             isValid = false
-                            pos = 1
                             return@forEachIndexed
                         }
                     }
                     13 -> {
-                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
+                        if((c != '-')&&(c.code != 45)&&(c.code != 8211)){
                             isValid = false
-                            pos = 2
                             return@forEachIndexed
                         }
                     }
                     18 -> {
-                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
+                        if((c != '-')&&(c.code != 45)&&(c.code != 8211)){
                             isValid = false
-                            pos = 3
                             return@forEachIndexed
                         }
                     }
                     23 -> {
-                        if((c != '-')&&(c.toInt() != 45)&&(c.toInt() != 8211)){
+                        if((c != '-')&&(c.code != 45)&&(c.code != 8211)){
                             isValid = false
-                            pos = 4
                             return@forEachIndexed
                         }
                     }
                     else -> {
                         if(!isHexCharacter(c)){
                             isValid = false
-                            pos = 5
                             return@forEachIndexed
                         }
                     }

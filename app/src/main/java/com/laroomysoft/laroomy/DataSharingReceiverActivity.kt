@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -17,8 +18,6 @@ class DataSharingReceiverActivity : AppCompatActivity() {
 
         // get the view(s)
         notificationTextView = findViewById(R.id.dataSharingActivityNotificationTextView)
-
-        // TODO: read the intent data when the user opens this app with a shared link -> retrieve the key-value pair and save it!
 
         // get the intent-data and read the URL Parameter
         val intentEXT = intent
@@ -34,28 +33,36 @@ class DataSharingReceiverActivity : AppCompatActivity() {
             // temp for testing
             notifyUser("MAC: $macReformatted   PassKey: $passKeyDecrypted", R.color.goldAccentColor)
 
-            if((macReformatted != ERROR_INVALID_PARAMETER)&&(passKeyDecrypted.isNotEmpty())){
-                // data ok - TODO: save it!
-
-                // TODO: notify user!
+            if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
+                // data valid: save the data
+                val pair = BindingPair()
+                pair.macAddress = macReformatted
+                pair.passKey = passKeyDecrypted
+                val bindingPairManager = BindingPairManager(applicationContext)
+                bindingPairManager.add(pair)
+                // notify user
+                notifyUser(
+                    getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),
+                    R.color.normalTextColor
+                )
 
             } else {
-                // error - TODO: notify user!
+                // error: notify user
+                notifyUser(getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat), R.color.ErrorColor)
             }
-
         }
-
-        // TODO: save the data, check the data and notify user!
-
     }
-
-//    override fun onPause() {
-//        super.onPause()
-//        finish()
-//    }
 
     private fun notifyUser(message: String, colorID: Int){
         notificationTextView.setTextColor(getColor(colorID))
         notificationTextView.text = message
+    }
+
+    fun onDataSharingActivityGoToMainButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        // navigate back to App...
+        val intent: Intent = Intent(this@DataSharingReceiverActivity, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(intent)
     }
 }

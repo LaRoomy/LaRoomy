@@ -125,6 +125,10 @@
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
 
+    <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
+    <string name="DataSharingActivity_BindingDataSuccessfulSet">Binding Data successful saved.</string>
+    <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Error: Invalid data format.</string>
+
     <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profile</string>
     <string name="EditUUIDProfileActivityHeaderEditModeText">Edit UUID Profile</string>
     <string name="EditUUIDProfileActivityHeaderNewModeText">New UUID Profile</string>
@@ -164,6 +168,7 @@
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>
     <string name="FileKey_AppSettings" translatable="false">fileKeyApplicationSettingsData</string>
+    <string name="FileKey_BindingPairs" translatable="false">fileKeyBindingPairData</string>
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>
@@ -173,6 +178,7 @@
     <string name="DataKey_CustomBindingPasskey" translatable="false">customBindingPasskey</string>
     <string name="DataKey_ListAllDevices" translatable="false">listAllDevicesValue</string>
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
+    <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

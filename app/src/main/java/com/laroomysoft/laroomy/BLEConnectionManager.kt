@@ -497,8 +497,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                     authenticationResponseBindingPasskeyInvalid -> {
                         Log.e("M:CB:CharChanged", "Data Received - Authentication - Passkey rejected from device - PASSKEY INVALID")
-                        // raise event
-                        callback.onBindingPasskeyRejected()
+
+                        if(!passKeySecondTryOut) {
+                            Log.d("M:CB:CharChanged", "Searching for a saved passkey for a specific mac address")
+
+                            val passKey =
+                                tryUseSavedPassKeyForSpecificMacAddress(currentDevice?.address ?: "")
+
+                            if(passKey == ERROR_NOTFOUND){
+                                Log.e("M:CB:CharChanged", "No saved passKey - reject connection")
+                                callback.onBindingPasskeyRejected()
+                            } else {
+                                Log.d("M:CB:CharChanged", "Saved passkey found - try to use this key in the second chance")
+                                passKeySecondTryOut = true
+                                sendBindingRequest(passKey)
+                            }
+                        } else {
+                            Log.e("M:CB:CharChanged", "Passkey rejected on the second chance - finally reject connection")
+                            // raise event
+                            callback.onBindingPasskeyRejected()
+                        }
                     }
                     else -> Log.d("M:CB:CharChanged", "!Warning: Authentication failed! Unexpected Authentication Token")
                 }
@@ -645,6 +663,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var authRequired = true
     private var propertyLoopActive = false
     private var propertyNameResolveLoopActive = false
+    private var passKeySecondTryOut = false
     private var groupLoopActive = false
     private var groupInfoLoopActive = false
     private var propertyConfirmationModeActive = false
@@ -2978,6 +2997,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
+    fun sendBindingRequest(passKey: String){
+        if(this.isConnected){
+            this.sendData("r$passKey>$")
+        }
+    }
+
     private fun testConnection(){
         // reset test indicator and send test command
         this.connectionTestSucceeded = false
@@ -3117,6 +3142,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     fun releaseDeviceBinding(){
         this.sendData(releaseDeviceBindingCommand)
         this.isBindingRequired = false
+    }
+
+    private fun tryUseSavedPassKeyForSpecificMacAddress(macAddress: String) : String {
+        val bindingPairManager = BindingPairManager(this.activityContext)
+        return bindingPairManager.lookUpForPassKeyWithMacAddress(macAddress)
     }
 
 //    fun formatIncomingData(data: String) : String {

@@ -128,6 +128,13 @@
     <string name="AppHelpActivity_Topic_DeviceBinding">Geräte-Bindung</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
+
+    <string name="DataSharingActivity_GoToMainButtonText">Zurück zur App</string>
+    <string name="DataSharingActivity_BindingDataSuccessfulSet">Geräte-Bindung erfolgreich gespeichert.</string>
+    <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Fehler: Ungültiges Daten-Format.</string>
+
+
+
     <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profil</string>
     <string name="EditUUIDProfileActivityHeaderEditModeText">UUID Profil ändern</string>
     <string name="EditUUIDProfileActivityHeaderNewModeText">Neues UUID Profil anlegen</string>

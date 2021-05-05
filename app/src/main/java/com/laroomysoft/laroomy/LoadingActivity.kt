@@ -118,6 +118,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     ApplicationProperty.bluetoothConnectionManager.clear()
                     // try to connect again with 1 sec delay
                     Handler(Looper.getMainLooper()).postDelayed({
+
+                        // TODO: this is wrong, if the device is not reachable and wasn't the last device, another device will be connected
+
+
                         ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
                     }, 1000)
                 }
@@ -142,7 +146,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             ApplicationProperty.bluetoothConnectionManager.clear()
             finish()
 
-        },4000)
+        },3000)
     }
 
     override fun onDeviceReadyForCommunication() {
