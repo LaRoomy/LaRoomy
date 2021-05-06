@@ -404,7 +404,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    fun resetSelectedItemBackground(){
+    private fun resetSelectedItemBackground(){
         // reset the selected item background if necessary
         if (restoreIndex >= 0) {
             // check if the property is part of a group and set the appropriate background-color
@@ -537,10 +537,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // TODO: check if the execution in the UI-Thread is really necessary, maybe this breaks the UI performance
 
 
-        runOnUiThread{
+        runOnUiThread {
 
                 // maybe there is no need to call this???
                 // adapter.submitList(list) to proof
+
+            // TODO: slow this down if necessary!!!!!
 
             this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - 1)
         }
@@ -641,9 +643,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
                 GROUP_ELEMENT -> {
 
-                    // make the bottom separator line transparent
-                    // TODO: test this
-                    //holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
+                    // make the top and bottom separator black
+                    holder.linearLayout.findViewById<View>(R.id.bottomSeparator).apply {
+                        //visibility = View.VISIBLE
+                        setBackgroundResource(R.color.groupBottomSeparatorColor)
+                    }
+                    holder.linearLayout.findViewById<View>(R.id.topSeparator).apply {
+                        //visibility = View.VISIBLE
+                        setBackgroundResource(R.color.groupTopSeparatorColor)
+                    }
 
 
 
@@ -664,25 +672,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     // set the image requested by the device (or a placeholder)
 
                     // test !!!!!!!!!!!!!!!
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
-                        resourceIdForImageId(elementToRender.imageID)
-                    )
-
+                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).apply {
+                        setBackgroundResource(
+                            resourceIdForImageId(elementToRender.imageID)
+                        )
+                    }
 
 
                     // set the text for the element and show the textView
-                    val tv = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
+                        visibility = View.VISIBLE
+                        text = elementToRender.elementText
+                        textSize = 16F
+                        setTypeface(typeface, Typeface.BOLD)
+                    }
 
-                    tv.visibility = View.VISIBLE
-                    tv.text = elementToRender.elementText
-                    tv.textSize = 16F
-                    tv.setTypeface(tv.typeface, Typeface.BOLD)
                     //.visibility = View.VISIBLE
                     //holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = devicePropertyAdapter.elementAt(position).elementText
                 }
                 PROPERTY_ELEMENT -> {
 
-                    holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.groupColor))
+                    // this is the default color
+                    //holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.groupColor))
 
                     // get the element
                     //val element = devicePropertyAdapter.elementAt(position)
@@ -694,12 +705,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                     // TODO: test this
                     //holder.constraintLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.transparentViewColor)
-                    //holder.constraintLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.transparentViewColor)
 
+                    holder.linearLayout.findViewById<View>(R.id.bottomSeparator).apply {
+                        visibility = View.VISIBLE
+                        setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
+                    }
 
                     // set the appropriate image for the imageID
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).setBackgroundResource(
-                        resourceIdForImageId(elementToRender.imageID))
+                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).apply {
+                        setBackgroundResource(
+                            resourceIdForImageId(elementToRender.imageID)
+                        )
+                    }
 
                     // TODO: hide the image-view if the imageID is not set???
 
@@ -709,17 +726,19 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         -1 -> return // must be error
                         0 -> return // must be error
                         PROPERTY_TYPE_BUTTON -> {
-                            // get the button
-                            val button = holder.linearLayout.findViewById<Button>(R.id.elementButton)
-                            // show the button
-                            button.visibility = View.VISIBLE
-                            // set the text of the button
-                            button.text = elementToRender.elementText
-                            // hide the element text
-                            //holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).visibility = View.GONE
-                            // set the onClick handler
-                            button.setOnClickListener{
-                                itemClickListener.onPropertyElementButtonClick(position, elementToRender)
+                            // apply to the button
+                            holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
+                                // show the button
+                                visibility = View.VISIBLE
+                                // set the text of the button
+                                text = elementToRender.elementText
+                                // set the onClick handler
+                                setOnClickListener {
+                                    itemClickListener.onPropertyElementButtonClick(
+                                        position,
+                                        elementToRender
+                                    )
+                                }
                             }
                         }
                         PROPERTY_TYPE_SWITCH -> {
@@ -755,36 +774,40 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             }
 
                             // show the text-view
-                            val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                            textView.visibility = View.VISIBLE
-                            // set the text
-                            textView.text = elementToRender.elementText
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
+                                visibility = View.VISIBLE
+                                // set the text
+                                text = elementToRender.elementText
+                            }
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
-                            val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                            textView.visibility = View.VISIBLE
-                            // set the text
-                            textView.text = elementToRender.elementText
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
+                                visibility = View.VISIBLE
+                                // set the text
+                                text = elementToRender.elementText
+                            }
 
                             // show a level indication e.g. "96%"
                             val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
 
-                            val levelIndication = holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView)
-                            levelIndication.visibility = View.VISIBLE
-                            levelIndication.text = percentageLevelPropertyGenerator.percentageString
-                            levelIndication.setTextColor(percentageLevelPropertyGenerator.colorID)
+                            holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView).apply {
+                                visibility = View.VISIBLE
+                                text = percentageLevelPropertyGenerator.percentageString
+                                setTextColor(percentageLevelPropertyGenerator.colorID)
+                            }
                         }
                         PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
 
                             // TODO: integrate textcolor???
 
                             // show the textView
-                            val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                            textView.visibility = View.VISIBLE
-                            // set the text
-                            textView.text = elementToRender.elementText
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
+                                visibility = View.VISIBLE
+                                // set the text
+                                text = elementToRender.elementText
+                            }
 
-                            holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView).visibility = View.GONE
+                            //holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView).visibility = View.GONE
                         }
                         else -> {
                             // must be complex type!
@@ -798,20 +821,22 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             }
 
                             // show the textView
-                            val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                            textView.visibility = View.VISIBLE
-                            // set the text
-                            textView.text = elementToRender.elementText
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
+                                visibility = View.VISIBLE
+                                // set the text
+                                text = elementToRender.elementText
+                            }
                             // show the navigate arrow
                             holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
                         }
                     }
                 }
                 SEPARATOR_ELEMENT -> {
-                    // only show the double line to separate elements
-                    //holder.constraintLayout.findViewById<ConstraintLayout>(R.id.contentHolderLayout).visibility = View.GONE
+                    // for the separator element, the only necessary elements are the top and/or bottom separator
                     holder.linearLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.separatorColor)
-                    holder.linearLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.separatorColor)
+                    //holder.linearLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.separatorColor)
+
+                    holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.colorPrimary))
                 }
                 else -> {
                     // should not happen
@@ -825,9 +850,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         override fun getItemCount(): Int {
             return devicePropertyAdapter.size
         }
-
-
-        // TODO: test this implementation!!!
 
         override fun getItemId(position: Int): Long {
             return position.toLong()

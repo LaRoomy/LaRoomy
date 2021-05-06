@@ -4,6 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="@color/groupColor"
+    android:id="@+id/devicePropertyListRootLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -27,7 +29,7 @@
         <View
             android:id="@+id/startSeparator"
             android:layout_width="3dp"
-            android:layout_height="80dp"
+            android:layout_height="65dp"
             android:layout_marginStart="2dp"
             android:background="@color/groupBorderColor"
 
@@ -44,9 +46,6 @@
             android:layout_margin="5dp"
             android:layout_marginStart="10dp"
             android:layout_gravity="center_vertical"
-
-
-
             android:contentDescription="@string/DevicePropertyListElementImageDescription"
              />
 
@@ -61,9 +60,7 @@
             android:text="@{listElementData.elementText}"
             android:textSize="14sp"
             android:layout_gravity="center_vertical"
-
             android:visibility="gone"
-
              />
 
         <Button
@@ -72,10 +69,7 @@
             android:id="@+id/elementButton"
             android:layout_marginStart="10dp"
             android:layout_gravity="center_vertical"
-
             android:visibility="gone"
-
-
             />
 
         <View
@@ -88,7 +82,6 @@
             android:layout_height="match_parent"
             android:id="@+id/controlElementContainer"
             android:layout_gravity="end"
-
             >
 
             <!--    The elements "forwardImage" and "elementSwitch" must be invisible (Visibility::Gone)
@@ -102,10 +95,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/NavigateForwardImageDescription"
-
                 android:visibility="gone"
-
-
                 app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -115,8 +105,6 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="center_vertical"
-
-
                 android:visibility="gone"
 
                 />
@@ -131,9 +119,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_gravity="center_vertical"
-
                 android:visibility="gone"
-
                  />
 
         </LinearLayout>
@@ -145,9 +131,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-
         android:visibility="gone"
-
         >
 
         <SeekBar

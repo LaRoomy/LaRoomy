@@ -1799,8 +1799,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
         else {
-            Log.e("M:CheckDevComAndNoti", "Invalid Device Notification - Notifications not accepted while retrieving loops are in progress")
-            Log.e("M:CheckDevComAndNoti", "Invalid Device Notification - Data: $data")
+            Log.d("M:CheckDevComAndNoti", "Loop must be active - skip Notification or Command processing")
         }
         return dataProcessed
     }

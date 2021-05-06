@@ -19,6 +19,9 @@
     <color name="connectedTextColor">#88FFAA</color>
     <color name="groupColor">#444444</color>
     <color name="groupHeaderColor">#555555</color>
+    <color name="groupBottomSeparatorColor">#FF000000</color>
+    <color name="groupTopSeparatorColor">#FF000000</color>
+    <color name="propertyItemBottomSeparatorColor">#FF000000</color>
     <color name="transparentViewColor">#00FFFFFF</color>
     <color name="DMA_ItemSelectedColor">#222222</color>
     <color name="RGB_SelectedButtonColor">#444444</color>
