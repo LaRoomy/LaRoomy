@@ -533,9 +533,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onUIAdaptableArrayListItemAdded(item)
 
         //Log.d("M:UIListItemAdded", "Item added to UIAdapter. Index: ${item.globalIndex} Name: ${item.elementText}")
-
-        // TODO: check if the execution in the UI-Thread is really necessary, maybe this breaks the UI performance
-
+        
 
         runOnUiThread {
 
