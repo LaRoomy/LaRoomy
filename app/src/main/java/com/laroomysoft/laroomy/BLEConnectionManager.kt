@@ -28,6 +28,8 @@ const val SINGLEACTION_PARTIALLY_PROCESSED = 2
 const val SINGLEACTION_PROCESSING_COMPLETE = 3
 const val SINGLEACTION_PROCESSING_ERROR = 4
 
+const val DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED = 1
+
 class LaRoomyDeviceProperty{
 
     var propertyIndex: Int = -1 // invalid marker == -1
@@ -522,7 +524,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             }
             else {
-                var dataProcessed = checkDeviceNotificationEvent(dataAsString ?: "error")
+                var dataProcessed = checkForDeviceCommandsAndNotifications(dataAsString ?: "error")
 
                 if(!dataProcessed) {
 
@@ -574,14 +576,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-                // TODO: important!!! enable the event-filter "dataProcessed" in the laRoomy-app
                 // launch event
                 if(!dataProcessed){
                     callback.onDataReceived(dataAsString)
                 }
-
-                // only temporary for the ble-command-tester-app
-                //callback.onDataReceived(dataAsString)//  TODO: only execute this if the reception is not part of the retrieving loops
             }
         }
     }
@@ -646,7 +644,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val multiComplexPropertyDataSetterEntry = "MCD&"
     private val enableBindingSetterCommandEntry = "SeB:"
     private val releaseDeviceBindingCommand = "SrB>$"
-    private val propertyRetrievalCompleteNotifitcation = "yDnPRf-P!$"
+    private val propertyRetrievalCompleteNotification = "yDnPRf-P!$"// outgoing
+    private val requestLocalTimeCommand = "RqLcTime"// incoming
+    private val bindingNotSupportedNotification = "DnBNS=x"// incoming
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -1712,10 +1712,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun checkDeviceNotificationEvent(data: String) :Boolean {
+    private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
         var dataProcessed = false
         // log:
-        Log.d("M:CheckNotiEvent", "Check received string for notification")
+        Log.d("M:CheckDevComAndNoti", "Check received string for notification")
         // check:
 
         // only accept notifications if the property and group loops are not in progress
@@ -1724,17 +1724,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 data.startsWith(propertyChangedNotificationEntry) -> {
                     this.updateProperty(data)
                     dataProcessed = true
-                    Log.d("M:CheckNotiEvent", "Property-Changed Notification detected")
+                    Log.d("M:CheckDevComAndNoti", "Property-Changed Notification detected")
                 }
 
                 data.startsWith(propertyGroupChangedNotificationEntry) -> {
                     this.updatePropertyGroup(data)
                     dataProcessed = true
-                    Log.d("M:CheckNotiEvent", "PropertyGroup-Changed Notification detected")
+                    Log.d("M:CheckDevComAndNoti", "PropertyGroup-Changed Notification detected")
                 }
                 data.startsWith(this.complexDataStateTransmissionEntry) -> {
                     Log.d(
-                        "M:CheckNotiEvent",
+                        "M:CheckDevComAndNoti",
                         "Complex-Property-State data received -> try to resolve it!"
                     )
                     this.resolveComplexStateData(data)
@@ -1742,7 +1742,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 data.startsWith(this.multiComplexPropertyNameSetterEntry) -> {
                     Log.d(
-                        "M:CheckNotiEvent",
+                        "M:CheckDevComAndNoti",
                         "Multi-Complex-Property Name-Data received -> try to resolve it!"
                     )
                     this.resolveMultiComplexStateData(data, true)
@@ -1750,7 +1750,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 data.startsWith(this.multiComplexPropertyDataSetterEntry) -> {
                     Log.d(
-                        "M:CheckNotiEvent",
+                        "M:CheckDevComAndNoti",
                         "Multi-Complex-Property Value-Data received -> try to resolve it!"
                     )
                     this.resolveMultiComplexStateData(data, false)
@@ -1758,7 +1758,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 data.startsWith(this.simpleDataStateTransmissionEntry) -> {
                     Log.d(
-                        "M:CheckNotiEvent",
+                        "M:CheckDevComAndNoti",
                         "Simple-Property-State data received -> try to resolve it!"
                     )
                     this.resolveSimpleStateData(data)
@@ -1766,7 +1766,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 data.startsWith(this.deviceHeaderStartEntry) -> {
                     Log.d(
-                        "M:CheckNotiEvent",
+                        "M:CheckDevComAndNoti",
                         "DeviceHeader start notification detected -> start recording"
                     )
                     this.startDeviceHeaderRecording(data)
@@ -1774,22 +1774,33 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 data == this.deviceHeaderCloseMessage -> {
                     Log.d(
-                        "M:CheckNotiEvent",
+                        "M:CheckDevComAndNoti",
                         "DeviceHeader end notification detected -> reset parameter and trigger event"
                     )
                     this.endDeviceHeaderRecording()
                     dataProcessed = true
                 }
                 data == this.testCommand -> {
-                    Log.d("M:CheckNotiEvent", "Test command received.")
+                    Log.d("M:CheckDevComAndNoti", "Test command received.")
                     this.connectionTestSucceeded = true
                     this.callback.onConnectionTestSuccess()
                     dataProcessed = true
                 }
+                data == this.requestLocalTimeCommand -> {
+                    Log.d("M:CheckDevComAndNoti", "Local Time Request received. Sending Time to Device.")
+                    this.setDeviceTime()
+                }
+                data == this.bindingNotSupportedNotification -> {
+                    Log.d("M:CheckDevComAndNoti", "The device has the create-binding request rejected. -> Forward to current Activity (must be the DeviceSettingsActivity")
+                    this.propertyCallback.onDeviceNotification(
+                        DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED
+                    )
+                }
             }
         }
         else {
-            Log.e("M:CheckNotiEvent", "Invalid Device Notification - Notifications not accepted while retrieving loops are in progress")
+            Log.e("M:CheckDevComAndNoti", "Invalid Device Notification - Notifications not accepted while retrieving loops are in progress")
+            Log.e("M:CheckDevComAndNoti", "Invalid Device Notification - Data: $data")
         }
         return dataProcessed
     }
@@ -2132,23 +2143,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.dataReadyToShow = true
             this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList)
 
-            // set the device time
-            //Log.d("M:GenUIAdapter", "UI Array List Generation complete. Now setting device Time")
-
-            // TODO: set the device time at another point! this breaks the complex state loop!!!
-
-            //this.setDeviceTime()
-
             // notify finalization of the process
             Handler(Looper.getMainLooper()).postDelayed({
-                this.sendData(propertyRetrievalCompleteNotifitcation)
+                this.sendData(propertyRetrievalCompleteNotification)
             }, 700)
-
-            // set time with delay
-            Handler(Looper.getMainLooper()).postDelayed({
-                this.setDeviceTime()
-            }, 1200)
-
         }
     }
 
@@ -3214,5 +3212,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData){}
         fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
+        fun onDeviceNotification(notificationID: Int){}
     }
 }

@@ -451,8 +451,5 @@
             />
 
 
-        <!-- add all future sub page navigation-buttons here -->
-        <!-- add all future normal buttons here -->
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

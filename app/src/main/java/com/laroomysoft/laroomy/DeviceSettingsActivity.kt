@@ -4,6 +4,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -83,12 +85,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
                     // show the share-button
                     shareBindingContainer.visibility = View.VISIBLE
-
-                    // TODO: wait for response !!!!
-                    // TODO: disable the switch if the response is negative
-                    // TODO: change hint-text!!!
-                    // TODO: show/hide the share container
-
                 }
                 else -> {
                     // release the device binding
@@ -146,6 +142,17 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
     }
 
+    private fun notifyUserWithDelayedReset(message: String, colorID: Int){
+        notifyUser(message, colorID)
+        Handler(Looper.getMainLooper()).postDelayed({
+            if(ApplicationProperty.bluetoothConnectionManager.isConnected){
+                notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
+            } else {
+                notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
+            }
+        }, 4000)
+    }
+
     private fun setUIElementsEnabledState(state: Boolean){
         runOnUiThread{
             if(state){
@@ -199,7 +206,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
         super.onDeviceHeaderChanged(deviceHeaderData)
-        notifyUser(deviceHeaderData.message, R.color.InfoColor)
+        notifyUserWithDelayedReset(deviceHeaderData.message, R.color.InfoColor)
     }
 
     override fun onComplexPropertyStateChanged(
@@ -217,6 +224,23 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
 
+    override fun onDeviceNotification(notificationID: Int) {
+        super.onDeviceNotification(notificationID)
+        // look for a rejected setting notification
+        if(notificationID == DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED){
+            // update the hint for the user
+            bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+
+            // hide the share-button
+            shareBindingContainer.visibility = View.GONE
+
+            // reset the switch
+            bindingSwitch.isChecked = false
+
+            // notify user
+            notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification), R.color.WarningColor)
+        }
+    }
     fun deviceSettingsActivityShareBindingButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         // make sure there is a connected device

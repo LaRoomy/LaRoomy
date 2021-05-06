@@ -105,14 +105,15 @@
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Device Disconnected</string>
     <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Enable Binding</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">A binding-request will be sent to the remote device. If supported by the device, your binding-code will be written to the device and is necessary for all subsequent connections.</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">A binding-release-request will be sent to the remote device. If successful, the device accepts all connections.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">When activating, a binding-request will be sent to the remote device. If supported by the device, your binding-code will be written to the device and is necessary for all subsequent connections.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">When deactivating, a binding-release-request will be sent to the remote device. If successful, the device accepts all connections.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Factory Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">The remote device will be restored to the default configuration. Are you sure?</string>
     <string name="DeviceSettingsActivity_ShareButtonDescriptorText">Share Device-Binding</string>
     <string name="DeviceSettingsActivity_ShareButtonHint">The binding information for this specific device will be shared. The data will be encrypted and your binding-code is not visible to the receiver or someone else.</string>
     <string name="DeviceSettingsActivity_FactoryResetHint">A factory-reset-command will be sent to the remote device.</string>
+    <string name="DeviceSettingsActivity_BindingNotSupportedNotification">The connected device does not support binding.</string>
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>
     <string name="AppHelpTopic_ConnectDevice">Connect new device</string>

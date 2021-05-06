@@ -109,14 +109,15 @@
     <string name="DeviceSettingsActivity_UserInfo_Connected">Gerät verbunden</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Gerät getrennt</string>
     <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Gerätebindung aktivieren</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">Eine Anforderung zum Herstellen einer Bindung wird an das Gerät gesendet. Wenn das Gerät diese Funktion unterstützt, wird der Bindungs-Schlüssel an das Gerät übermittelt und ist für alle nachfolgenden Verbindungen mit dem Gerät erforderlich.</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">Eine Anforderung zum Löschen der Bindung wird an das Gerät gesendet. Es wird kein Bindungs-Schlüssel mehr benötigt um eine Verbindung herzustellen.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">Beim Aktivieren wird eine Anforderung zum Herstellen einer Bindung wird an das Gerät gesendet. Wenn das Gerät diese Funktion unterstützt, wird der Bindungs-Schlüssel an das Gerät übermittelt und ist für alle nachfolgenden Verbindungen mit dem Gerät erforderlich.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">Beim Deaktivieren wird eine Anforderung zum Löschen der Bindung wird an das Gerät gesendet. Es wird kein Bindungs-Schlüssel mehr benötigt um eine Verbindung herzustellen.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Werkseinstellungen</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>
     <string name="DeviceSettingsActivity_FactoryResetConfirmationMessage">Das Gerät wird auf Werkseinstellungen zurückgesetzt. Sind Sie sicher?</string>
     <string name="DeviceSettingsActivity_ShareButtonDescriptorText">Geräte-Bindung teilen</string>
     <string name="DeviceSettingsActivity_ShareButtonHint">Die Geräte-Bindung für dieses spezifische Gerät wird geteilt. Die Daten werden verschlüsselt und der Schlüssel ist nicht sichtbar für den Empfänger oder irgendjemanden sonst.</string>
     <string name="DeviceSettingsActivity_FactoryResetHint">Es wird eine Anforderung zum Zurücksetzen an das Gerät gesendet.</string>
+    <string name="DeviceSettingsActivity_BindingNotSupportedNotification">Die Geräte-Bindungsfuntion wird von diesem Gerät nicht unterstützt.</string>
 
 
     <string name="AppHelpActivityHeaderText">Hilfe-Themen</string>
