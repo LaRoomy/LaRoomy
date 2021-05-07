@@ -3,7 +3,6 @@ package com.laroomysoft.laroomy
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Message
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -147,6 +146,8 @@ class AppSettingsActivity : AppCompatActivity() {
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
             setShowLogButtonVisibility(b)
+
+            (this.applicationContext as ApplicationProperty).eventLogEnabled = b
         }
     }
 
@@ -161,11 +162,21 @@ class AppSettingsActivity : AppCompatActivity() {
         if(this.buttonNormalizationRequired){
             // normalize uuidManager-Button
             findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton).apply {
-                setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+                setBackgroundColor(
+                    getColor(R.color.setupActivityButtonNormalBackground)
+                )
             }
             // normalize showLog-Button
             findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
-                setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+                setBackgroundColor(
+                    getColor(R.color.setupActivityButtonNormalBackground)
+                )
+            }
+            // normalize resetData-Button
+            findViewById<ConstraintLayout>(R.id.setupActivityResetDataButton).apply {
+                setBackgroundColor(
+                    getColor(R.color.setupActivityButtonNormalBackground)
+                )
             }
             this.buttonNormalizationRequired = false
         }
@@ -205,6 +216,12 @@ class AppSettingsActivity : AppCompatActivity() {
                 else -> View.GONE
             }
         }
+        findViewById<View>(R.id.setupActivitySixthSeparatorView).apply {
+            visibility = when(visible){
+                true -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
     }
 
     fun onManageUUIDProfilesButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -239,5 +256,14 @@ class AppSettingsActivity : AppCompatActivity() {
         }
     }
 
+    fun onResetDataButtonClick(view: View) {
+        (view as ConstraintLayout).setBackgroundColor(
+            getColor(R.color.setupActivityButtonPressedBackground)
+        )
+        this.buttonNormalizationRequired = true
+
+        val intent = Intent(this@AppSettingsActivity, ResetAppDataActivity::class.java)
+        startActivity(intent)
+    }
 }
 

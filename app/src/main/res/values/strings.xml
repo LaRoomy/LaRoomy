@@ -100,6 +100,16 @@
     <string name="SetupActivity_PassKeyMustNotBeEmpty">Binding Code cannot be empty.</string>
     <string name="SetupActivity_PassKeyMaxIs10Character">The maximum length of the binding-code is 10 character.</string>
     <string name="SetupActivity_PassKeyContainsInvalidCharacter">The binding-code contains invalid character.</string>
+    <string name="SetupActivity_ResetDataButtonText">Reset App Data</string>
+
+    <string name="ResetAppActivity_HeaderText">Reset Data</string>
+    <string name="ResetAppActivity_SelectDataActionText">Select the data you want to reset:</string>
+    <string name="ResetAppActivity_SelectAllCheckBoxText">Select all</string>
+    <string name="ResetAppActivity_ResetAppSettingsCheckBoxText">App Settings</string>
+    <string name="ResetAppActivity_ResetBindingDataCheckBoxText">Binding Data</string>
+    <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxText">UUID Profiles</string>
+    <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxText">Default Binding Key</string>
+
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>

@@ -66,6 +66,7 @@ class ApplicationProperty : Application() {
     var noConnectionKillOnPauseExecution = false
     var uiAdapterChanged = false
     var complexPropertyUpdateRequired = false
+    var eventLogEnabled = false
     var complexUpdateID = -1
 
     //var userNavigatedFromCommActivity = false
@@ -76,6 +77,8 @@ class ApplicationProperty : Application() {
         super.onCreate()
         bluetoothConnectionManager = BLEConnectionManager(this)
         systemLanguage = Locale.getDefault().displayLanguage
+
+        eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
     }
 
     fun resetControlParameter(){
