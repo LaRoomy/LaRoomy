@@ -17,6 +17,8 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
@@ -29,6 +31,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private var activityWasSuspended = false
     private var restoreIndex = -1
+
+    private val propertyList = ArrayList<DevicePropertyListContentInformation>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +56,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // bind array to adapter
         this.devicePropertyListViewAdapter =
             DevicePropertyListAdapter(
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
+                //ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
+                this.propertyList,
                 this,
                 this@DeviceMainActivity,
                 this)
@@ -533,17 +539,29 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onUIAdaptableArrayListItemAdded(item)
 
         //Log.d("M:UIListItemAdded", "Item added to UIAdapter. Index: ${item.globalIndex} Name: ${item.elementText}")
-        
+
+        this.propertyList.add(item)
+
 
         runOnUiThread {
 
                 // maybe there is no need to call this???
                 // adapter.submitList(list) to proof
 
+
+
             // TODO: slow this down if necessary!!!!!
 
-            this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - 1)
+            //this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - 1)
+
+            this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
+
         }
+
+        //this.handleAddedItem(item.globalIndex)
+
+        //this.maxExecutionIndex =
+
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
@@ -857,4 +875,57 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return position
         }
     }
+
+//    private fun handleAddedItem(index: Int) {
+//        if (this.timerIsOnline) {
+//
+//            this.maxExecutionIndex = index
+//
+//        } else {
+//            this.timerIsOnline = true
+//
+////            // when this is a already
+////            if(this.curExecutionIndex == -1) {
+////                this.curExecutionIndex = 0
+////            }
+//             this.curExecutionIndex = 0
+//
+//            this.maxExecutionIndex = index
+//
+//            // start timer
+//            Timer().scheduleAtFixedRate(
+//                object : TimerTask() {
+//                    override fun run() {
+//
+//                        if ((curExecutionIndex != -1) && (maxExecutionIndex != -1)) {
+//                            if (curExecutionIndex < maxExecutionIndex) {
+//
+//                                runOnUiThread {
+//                                    devicePropertyListViewAdapter.notifyItemInserted(
+//                                        curExecutionIndex
+//                                    )
+//                                }
+//                                curExecutionIndex++
+//                            } else {
+//
+//                                runOnUiThread {
+//                                    devicePropertyListViewAdapter.notifyItemInserted(
+//                                        curExecutionIndex
+//                                    )
+//                                }
+//
+//                                cancel()
+//                                timerIsOnline = false
+//                                curExecutionIndex = -1
+//                                maxExecutionIndex = -1
+//                            }
+//                        } else {
+//                            cancel()
+//                            timerIsOnline = false
+//                        }
+//                    }
+//                }, 0, (50).toLong()
+//            )
+//        }
+//    }
 }

@@ -782,6 +782,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var propertyRequestIndexCounter = 0
     private var groupRequestIndexCounter = 0
 
+    private var itemAddCounter = -1
+
     fun clear(){
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
@@ -2064,7 +2066,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // add the group to the list
                     this.uIAdapterList.add(dpl)
                     // notify activity
-                    this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl)
+                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl) //TODO
 
                     Thread.sleep(100)
 
@@ -2090,7 +2092,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 // add it to the list
                                 this.uIAdapterList.add(propertyEntry)
                                 // notify activity
-                                this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
+                                //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) // TODO
 
                                 Thread.sleep(100)
 
@@ -2109,7 +2111,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // add the separator to the array
                     this.uIAdapterList.add(dpl2)
                     // notify activity
-                    this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2)
+                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2) //TODO
 
                     Thread.sleep(100)
                 }
@@ -2134,18 +2136,39 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // add it to the list
                     this.uIAdapterList.add(propertyEntry)
                     // notify activity
-                    this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry)
+                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) TODO
 
                     Thread.sleep(100)
                 }
             }
-            this.dataReadyToShow = true
-            this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList)
+            //this.dataReadyToShow = true // TODO
+            //this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList) // TODO
 
             // notify finalization of the process
             Handler(Looper.getMainLooper()).postDelayed({
                 this.sendData(propertyRetrievalCompleteNotification)
             }, 700)
+
+
+            // temp!!!!
+
+
+            itemAddCounter = 0
+
+            Timer().scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    propertyCallback.onUIAdaptableArrayListItemAdded(uIAdapterList.elementAt(itemAddCounter))
+
+                    itemAddCounter++
+
+                    if(itemAddCounter == uIAdapterList.size){
+                        cancel()
+                        itemAddCounter = -1
+                        dataReadyToShow = true
+                        propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
+                    }
+                }
+            }, (0).toLong(), (300).toLong())
         }
     }
 

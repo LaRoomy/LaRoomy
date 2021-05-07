@@ -19,6 +19,8 @@
     <string name="DMA_ConnectionStatus_connected">verbunden</string>
     <string name="DMA_Ready">Bereit</string>
     <string name="DMA_DeviceConnectionSuspended">Verbindung unterbrochen</string>
+    <string name="DMA_LoadingPropertiesUserInfo">Lade Eigenschaften..</string>
+
 
     <string name="RGB_HeaderText">RGB Steuerung</string>
     <string name="RGB_OnOff">An / Aus</string>
@@ -195,7 +197,6 @@
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
     <string name="LaRoomyDevicePlaceholderName">LaRoomy XNG</string>
-    <string name="LaRoomyDeviceInfoPlaceholder">Loading Properties..</string>
     <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
     <string name="LevelIndicationTextPlaceholder">100%</string>
     <string name="PropertySubPagePlaceholder">This is a property Page</string>
