@@ -111,6 +111,8 @@
     <string name="ResetAppActivity_ResetBindingDataCheckBoxText">Binding Data</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxText">UUID Profiles</string>
     <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxText">Default Binding Key</string>
+    <string name="ResetAppActivity_ResetAppSettingsCheckBoxHint">The common app settings will be set to default.</string>
+    <string name="ResetAppActivity_ResetBindingDataCheckBoxHint">All data regarding the device-binding will be deleted. Including the shared binding data.</string>
 
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>

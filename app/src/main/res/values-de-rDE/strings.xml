@@ -112,6 +112,8 @@
     <string name="ResetAppActivity_ResetBindingDataCheckBoxText">Bindungsdaten</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxText">UUID Profile</string>
     <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxText">Standard Bindungs-Schlüssel</string>
+    <string name="ResetAppActivity_ResetAppSettingsCheckBoxHint">Die allgemeinen Einstellungen werden auf Standardwerte zurückgesetzt.</string>
+    <string name="ResetAppActivity_ResetBindingDataCheckBoxHint">Alle Daten bezüglich der Geräte-Bindung werden gelöscht. Inklusive the geteilen Bindungsdaten.</string>
 
 
 
