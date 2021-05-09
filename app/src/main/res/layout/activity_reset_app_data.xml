@@ -135,6 +135,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetBindingDataCheckBoxHintTextView" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/resetAppActivityResetUUIDProfilesCheckBoxHintTextView"
+                android:text="@string/ResetAppActivity_ResetUUIDProfilesCheckBoxHint"
+                android:layout_marginStart="30dp"
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBox"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/resetAppActivityResetDefaultBindingKeyCheckBox"
                 android:layout_width="match_parent"
@@ -144,7 +156,69 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBox" />
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBoxHintTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/resetAppActivityResetDefaultBindingKeyCheckBoxHintTextView"
+                android:text="@string/ResetAppActivity_ResetDefaultBindingKeyCheckBoxHint"
+                android:layout_marginStart="30dp"
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetDefaultBindingKeyCheckBox"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/resetAppActivitySecondSeparator"
+            android:background="@color/separatorColor"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/resetAppCheckBoxSubContainer"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/resetAppActivityButtonContainer"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/resetAppActivitySecondSeparator"
+            >
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/resetAppActivityCancelButton"
+                android:textSize="20sp"
+                android:text="@string/ResetAppActivity_CancelButtonText"
+                android:onClick="resetAppActivityOnCancelButtonClick"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/resetAppActivityResetButton"
+                android:textSize="20sp"
+                android:text="@string/ResetAppActivity_ResetButtonText"
+                android:onClick="resetAppActivityOnResetButtonClick"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
