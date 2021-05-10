@@ -157,6 +157,18 @@ class ApplicationProperty : Application() {
             commit()
         }
     }
+
+    fun deleteFileWithFileKey(fileKeyID: Int){
+        val sharedPref =
+            getSharedPreferences(
+                getString(fileKeyID),
+                Context.MODE_PRIVATE
+            )
+        with(sharedPref.edit()) {
+            clear()
+            commit()
+        }
+    }
 }
 
 fun resourceIdForImageId(imageID: Int): Int {

@@ -73,6 +73,34 @@ class UUIDManager(private var appContext: Context) {
         return -1
     }
 
+    fun clearAllUserProfiles(){
+
+        if(this.uUIDProfileList.size > FIRST_USERPROFILE_INDEX)
+        {
+            // clear the list
+            this.uUIDProfileList.clear()
+
+            // re-add the common profiles
+            this.uUIDProfileList.apply {
+                val hmXXProfile = UUIDProfile()
+                hmXXProfile.profileName = "Huamao HMxx - Modules"
+                hmXXProfile.serviceUUID = hmModulesServiceUUID
+                hmXXProfile.characteristicUUID = hmModulesCharacteristicUUID
+                val rn48xxProfile = UUIDProfile()
+                rn48xxProfile.profileName = "Microchip RN48xx Modules"
+                rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
+                rn48xxProfile.characteristicUUID = rn4870CharacteristicUUID1
+
+                this.add(rn48xxProfile)
+                this.add(hmXXProfile)
+            }
+            // delete the file
+            File(appContext.filesDir, UUID_File_UserProfiles).apply {
+                delete()
+            }
+        }
+    }
+
     fun changeExistingProfile(index: Int, profileName: String, serviceUUID: String, characteristicUUID: String) : Int {
 
         return if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){

@@ -118,6 +118,11 @@
     <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxHint">Es wird ein neuer Zufalls-Schlüssel generiert. Vorsicht mit dieser Reset-Option wenn Geräte den aktuellen Bindungs-Schlüssel benötigen.</string>
     <string name="ResetAppActivity_CancelButtonText">Abbrechen</string>
     <string name="ResetAppActivity_ResetButtonText">Reset</string>
+    <string name="ResetAppActivity_NoDataSelected">Keine Daten ausgewählt.</string>
+    <string name="ResetAppActivity_DialogMessage">Die ausgewählten Daten werden gelöscht oder auf Standartwerte zurückgesetzt.</string>
+    <string name="ResetAppActivity_DialogTitle">Reset</string>
+    <string name="ResetAppActivity_DialogPositiveButtonText">OK</string>
+    <string name="ResetAppActivity_DialogNegativeButtonText">Abbrechen</string>
 
 
 

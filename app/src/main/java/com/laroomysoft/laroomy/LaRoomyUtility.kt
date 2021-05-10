@@ -3,7 +3,7 @@ package com.laroomysoft.laroomy
 import android.graphics.Color
 import kotlin.math.floor
 
-const val COMMON_PASSKEY_LENGHT = 10
+const val COMMON_PASSKEY_LENGTH = 10
 
 const val passKeyCharacter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
 

@@ -117,6 +117,11 @@
     <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxHint">A new custom Binding-Key will be generated. Be careful if there are remote devices which require the current Key.</string>
     <string name="ResetAppActivity_CancelButtonText">Cancel</string>
     <string name="ResetAppActivity_ResetButtonText">Reset</string>
+    <string name="ResetAppActivity_NoDataSelected">No data selected.</string>
+    <string name="ResetAppActivity_DialogMessage">The selected data will be deleted or restored to default.</string>
+    <string name="ResetAppActivity_DialogTitle">Reset</string>
+    <string name="ResetAppActivity_DialogPositiveButtonText">OK</string>
+    <string name="ResetAppActivity_DialogNegativeButtonText">Cancel</string>
 
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
