@@ -15,10 +15,10 @@ import kotlin.collections.ArrayList
 
 private const val MAX_CONNECTION_ATTEMPTS = 10
 
-const val UNKNOWN_DEVICETYPE = 0
-const val LAROOMYDEVICETYPE_XNG = 1
-const val LAROOMYDEVICETYPE_CTX = 2
-const val LAROOMYDEVICETYPE_TVM = 3
+//const val UNKNOWN_DEVICETYPE = 0
+//const val LAROOMYDEVICETYPE_XNG = 1
+//const val LAROOMYDEVICETYPE_CTX = 2
+//const val LAROOMYDEVICETYPE_TVM = 3
 
 const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
 const val UPDATE_TYPE_DETAIL_DEFINITION = 2
@@ -266,10 +266,11 @@ class LaRoomyDevicePropertyGroup{
 }
 
 class LaRoomyDevicePresentationModel {
-    // NOTE: This is the data-model for the DeviceListItem in the start-activity
+    // NOTE: This is the data-model for the DeviceListItem in the main-activity
     var name = ""
     var address = ""
-    var type = 0
+    //var type = 0
+    var image = 0
 }
 
 class ComplexPropertyState {
@@ -733,24 +734,35 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 )
             // fill the list with all bonded devices
             if (listAllDevices) {
+
+                var imageIndex = 0
+
                 this.bleAdapter?.bondedDevices?.forEach {
                     val device = LaRoomyDevicePresentationModel()
                     device.name = it.name
                     device.address = it.address
-                    device.type = laRoomyDeviceTypeFromName(it.name)
-                    field.add(device)
 
+                    //device.type = laRoomyDeviceTypeFromName(it.name)
+
+                    if(device.name.contains("laroomy", true)||(device.name.contains("lry", true))){
+                        device.image = R.drawable.laroomy_icon_sq64
+                    } else {
+                        device.image = imageFromIndexCounter(imageIndex)
+                        imageIndex++
+                    }
+                    field.add(device)
                 }
             } else {
                 // fill the list only with laroomy devices (or devices which follow the laroomy-name guidelines)
                 this.bleAdapter?.bondedDevices?.forEach {
                     // It is not possible to get the uuids from the device here
                     // -> so the name must be the criteria to identify a laroomy device!
-                    if (it.name.startsWith("Laroomy") || it.name.contains("LRY", false)) {
+                    if (it.name.startsWith("Laroomy") || it.name.contains("LRY", true) || it.name.contains("laroomy", true)) {
                         val device = LaRoomyDevicePresentationModel()
                         device.name = it.name
                         device.address = it.address
-                        device.type = laRoomyDeviceTypeFromName(it.name)
+                        device.image = R.drawable.laroomy_icon_sq64
+                        //device.type = laRoomyDeviceTypeFromName(it.name)
                         field.add(device)
                     }
                 }
@@ -811,6 +823,50 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.multiComplexPageID = -1
         this.multiComplexTypeID = -1
         this.isBindingRequired = false
+    }
+
+    private fun imageFromIndexCounter(indexCounter: Int) : Int {
+        return when(indexCounter){
+            0 -> {
+                R.drawable.bluetooth_green_glow_sq64
+            }
+            1 -> {
+                R.drawable.bluetooth_orange_glow_sq64
+            }
+            2 -> {
+                R.drawable.bluetooth_blue_glow_sq64
+            }
+            3 -> {
+                R.drawable.bluetooth_purple_glow_sq64
+            }
+            4 -> {
+                R.drawable.bluetooth_green_glow_sq64
+            }
+            5 -> {
+                R.drawable.bluetooth_orange_glow_sq64
+            }
+            6 -> {
+                R.drawable.bluetooth_blue_glow_sq64
+            }
+            7 -> {
+                R.drawable.bluetooth_purple_glow_sq64
+            }
+            8 -> {
+                R.drawable.bluetooth_green_glow_sq64
+            }
+            9 -> {
+                R.drawable.bluetooth_orange_glow_sq64
+            }
+            10 -> {
+                R.drawable.bluetooth_blue_glow_sq64
+            }
+            11 -> {
+                R.drawable.bluetooth_purple_glow_sq64
+            }
+            else -> {
+                R.drawable.bluetooth_orange_glow_sq64
+            }
+        }
     }
 
     fun connectToDeviceWithInternalScanList(macAddress: String?){
@@ -977,14 +1033,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun laRoomyDeviceTypeFromName(name: String): Int {
-        return when(name){
-            "LaRoomy XNG" -> LAROOMYDEVICETYPE_XNG
-            "LaRoomy CTX" -> LAROOMYDEVICETYPE_CTX
-            "LaRoomy TVM" -> LAROOMYDEVICETYPE_TVM
-            else -> UNKNOWN_DEVICETYPE
-        }
-    }
+//    private fun laRoomyDeviceTypeFromName(name: String): Int {
+//        return when(name){
+//            "LaRoomy XNG" -> LAROOMYDEVICETYPE_XNG
+//            "LaRoomy CTX" -> LAROOMYDEVICETYPE_CTX
+//            "LaRoomy TVM" -> LAROOMYDEVICETYPE_TVM
+//            else -> UNKNOWN_DEVICETYPE
+//        }
+//    }
 
     fun saveLastSuccessfulConnectedDeviceAddress(address: String){
         Log.d("M:SaveAddress", "Saving address of successful connected device - address: $address")

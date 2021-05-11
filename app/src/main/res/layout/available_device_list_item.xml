@@ -14,7 +14,7 @@
         android:contentDescription="@string/AvailableDeviceListImageDescription"
         android:layout_marginStart="10dp"
         android:layout_marginTop="7dp"
-        android:src="@drawable/laroomy_icon_sq64"
+        android:src="@drawable/bluetooth_green_glow_sq64"
         />
 
     <TextView

@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -262,10 +263,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         }
 
         override fun onBindViewHolder(holder: DSLRViewHolder, position: Int) {
+            // set the device-name
             holder.linearLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].name
-
-            // currently there is only one image. In the future there must be implemented multiple images for multiple device-types
-            // TODO: set the appropriate image for the device type
+            // set the appropriate image for the device type
+            holder.linearLayout.findViewById<ImageView>(R.id.deviceImageView).setImageResource(laRoomyDevListAdapter[position].image)
 
             holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener, position)
         }
