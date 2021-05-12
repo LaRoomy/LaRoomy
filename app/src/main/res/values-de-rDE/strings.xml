@@ -129,7 +129,7 @@
 
 
 
-    <string name="DeviceSettingsActivity_HeaderText">Gerät-Einstellungen</string>
+    <string name="DeviceSettingsActivity_HeaderText">Geräte-Einstellungen</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Gerät verbunden</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Gerät getrennt</string>
     <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Gerätebindung aktivieren</string>

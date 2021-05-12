@@ -857,7 +857,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     holder.linearLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.separatorColor)
                     //holder.linearLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.separatorColor)
 
-                    holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.colorPrimary))
+                    holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.transparentViewColor))
                 }
                 else -> {
                     // should not happen

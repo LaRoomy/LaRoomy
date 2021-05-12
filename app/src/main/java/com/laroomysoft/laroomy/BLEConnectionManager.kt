@@ -2224,7 +2224,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
                     }
                 }
-            }, (0).toLong(), (300).toLong())
+            }, (0).toLong(), (210).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
         }
     }
 
