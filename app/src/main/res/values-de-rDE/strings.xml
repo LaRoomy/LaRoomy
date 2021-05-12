@@ -104,6 +104,9 @@
     <string name="SetupActivity_PassKeyMaxIs10Character">Schlüssel darf maximal 10 Zeichen enthalten.</string>
     <string name="SetupActivity_PassKeyContainsInvalidCharacter">Schlüssel enthält ungültige Zeichen.</string>
     <string name="SetupActivity_ResetDataButtonText">App zurücksetzen</string>
+    <string name="SetupActivity_KeepScreenActiveElementText">Bildschirm aktiv halten</string>
+    <string name="SetupActivity_KeepScreenActiveHint">Verhindert den Stromsparmodus wenn das Gerät verbunden ist.</string>
+
 
     <string name="ResetAppActivity_HeaderText">App-Daten zurücksetzen</string>
     <string name="ResetAppActivity_SelectDataActionText">Daten auswählen:</string>

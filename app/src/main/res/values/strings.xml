@@ -103,6 +103,8 @@
     <string name="SetupActivity_PassKeyMaxIs10Character">The maximum length of the binding-code is 10 character.</string>
     <string name="SetupActivity_PassKeyContainsInvalidCharacter">The binding-code contains invalid character.</string>
     <string name="SetupActivity_ResetDataButtonText">Reset App Data</string>
+    <string name="SetupActivity_KeepScreenActiveElementText">Keep screen active</string>
+    <string name="SetupActivity_KeepScreenActiveHint">Prevents the device from falling in sleep-mode when the remote device is connected.</string>
 
     <string name="ResetAppActivity_HeaderText">Reset Data</string>
     <string name="ResetAppActivity_SelectDataActionText">Select the data you want to reset:</string>
@@ -204,6 +206,7 @@
     <string name="DataKey_ListAllDevices" translatable="false">listAllDevicesValue</string>
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
     <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>
+    <string name="DataKey_KeepScreenActive" translatable="false">keepScreenActiveKey</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

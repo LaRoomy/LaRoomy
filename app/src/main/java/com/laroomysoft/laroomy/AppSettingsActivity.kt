@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatImageButton
@@ -24,6 +25,7 @@ class AppSettingsActivity : AppCompatActivity() {
     lateinit var passwordContainer: ConstraintLayout
     lateinit var enableLogSwitch: SwitchCompat
     lateinit var passKeyInputNotificationTextView: AppCompatTextView
+    lateinit var keepScreenActiveSwitchCompat: SwitchCompat
 
     private var buttonNormalizationRequired = false
 
@@ -64,6 +66,11 @@ class AppSettingsActivity : AppCompatActivity() {
 
             // if logging is activated, show the nav-button
             setShowLogButtonVisibility(state)
+        }
+        this.keepScreenActiveSwitchCompat = findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
+            val state =
+                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)
+            this.isChecked = state
         }
 
         // set the saved password (if there is one, actually there should always be one)
@@ -149,6 +156,10 @@ class AppSettingsActivity : AppCompatActivity() {
 
             (this.applicationContext as ApplicationProperty).eventLogEnabled = b
         }
+        this.keepScreenActiveSwitchCompat.setOnCheckedChangeListener {  _: CompoundButton, b: Boolean ->
+
+            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)
+        }
     }
 
     override fun onBackPressed() {
@@ -220,6 +231,13 @@ class AppSettingsActivity : AppCompatActivity() {
             visibility = when(visible){
                 true -> View.VISIBLE
                 else -> View.GONE
+            }
+        }
+        findViewById<View>(R.id.setupActivityFifthSeparatorView).apply {
+            if(visible) {
+                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(0,10,0,0)
+            } else {
+                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(10,10,10,0)
             }
         }
     }

@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +35,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_main)
@@ -52,6 +52,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         dc.elementType = NO_CONTENT_ELEMENT
         this.devicePropertyList.add(dc)
 */
+
+        // keep screen active if requested
+        if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
 
         // bind array to adapter
         this.devicePropertyListViewAdapter =
