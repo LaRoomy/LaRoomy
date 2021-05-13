@@ -95,7 +95,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             else -> true
         }
         onOffSwitch.setOnClickListener{
-            Log.d("M:RGB:OnOffSwitchClick", "On / Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}")
+            if(verboseLog) {
+                Log.d(
+                    "M:RGB:OnOffSwitchClick",
+                    "On / Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
+                )
+            }
             onMainOnOffSwitchClick(it)
         }
 
@@ -103,7 +108,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         transitionSwitch = findViewById(R.id.transitionTypeSwitch)
         transitionSwitch.isChecked = !colorState.hardTransitionFlag
         transitionSwitch.setOnClickListener{
-            Log.d("M:RGB:transSwitchClick", "Transition Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}")
+            if(verboseLog) {
+                Log.d(
+                    "M:RGB:transSwitchClick",
+                    "Transition Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
+                )
+            }
             onTransitionTypeSwitchClicked(it)
         }
     }
@@ -121,7 +131,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onPause() {
         super.onPause()
-        Log.d("M:RGBPage:onPause", "onPause executed in RGBControlActivity")
+        if(verboseLog) {
+            Log.d("M:RGBPage:onPause", "onPause executed in RGBControlActivity")
+        }
 
         // TODO: check if onPause will be executed after onBackPressed!!!!!!!!!!!!!!!
 
@@ -130,7 +142,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // if this is true, onBackPressed was executed before
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:RGBPage:onPause", "RGB Control Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:RGBPage:onPause",
+                    "RGB Control Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -139,7 +156,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:RGBPage:onResume", "onResume executed in RGBControlActivity")
+
+        if(verboseLog) {
+            Log.d("M:RGBPage:onResume", "onResume executed in RGBControlActivity")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@RGBControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -148,7 +168,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:RGBPage:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:RGBPage:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
@@ -355,7 +377,15 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     override fun onColorSelected(selectedColor: Int) {
-        Log.d("M:RGBPage:onColorSelect","New color selected in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
+
+        if(verboseLog) {
+            Log.d(
+                "M:RGBPage:onColorSelect",
+                "New color selected in RGBControlActivity. New Color: ${
+                    Integer.toHexString(selectedColor)
+                }"
+            )
+        }
 
         this.currentColor = selectedColor
 
@@ -375,7 +405,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     override fun onColorChanged(selectedColor: Int) {
-        Log.d("M:RGBPage:onColorChange","Color changed in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}")
+        if(verboseLog) {
+            Log.d(
+                "M:RGBPage:onColorChange",
+                "Color changed in RGBControlActivity. New Color: ${Integer.toHexString(selectedColor)}"
+            )
+        }
 
         this.currentColor = selectedColor
 
@@ -396,7 +431,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:RGBPage:ConStateChge", "Connection state changed in RGB Activity. New Connection state is: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:RGBPage:ConStateChge",
+                "Connection state changed in RGB Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             // test the connection
             ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
@@ -412,7 +452,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:RGBPage:onConnFailed", "Connection Attempt failed in RGBControlActivity")
+        (applicationContext as ApplicationProperty).logControl("E: Connection failed in RGBControl Activity")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -433,7 +476,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:RGBPage:ComplexPCg", "RGB Activity - Complex Property changed - Updating the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:RGBPage:ComplexPCg",
+                    "RGB Activity - Complex Property changed - Updating the UI"
+                )
+            }
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }

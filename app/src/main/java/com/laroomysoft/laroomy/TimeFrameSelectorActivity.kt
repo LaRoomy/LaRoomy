@@ -70,7 +70,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         super.onPause()
         // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:TFSPage:onPause", "Time-Frame Selector Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:TFSPage:onPause",
+                    "Time-Frame Selector Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -79,23 +84,32 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:TFSPage:onResume", "onResume executed in Time-Frame Selector Activity")
+
+        if(verboseLog) {
+            Log.d("M:TFSPage:onResume", "onResume executed in Time-Frame Selector Activity")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:TFSPage:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:TFSPage:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
 
     override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        Log.d("M:CB:TimeChanged", "Time changed in TimeFrameSelector Activity." +
-                "\nTime-Type: ${if(view?.id == R.id.fromTimePicker) "On-Time" else "Off-Time"}" +
-                "New Time is: $hourOfDay : $minute")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:TimeChanged", "Time changed in TimeFrameSelector Activity." +
+                        "\nTime-Type: ${if (view?.id == R.id.fromTimePicker) "On-Time" else "Off-Time"}" +
+                        "New Time is: $hourOfDay : $minute"
+            )
+        }
         ApplicationProperty.bluetoothConnectionManager.sendData(
             this.generateExecutionString(view?.id ?: 0, hourOfDay, minute)
         )
@@ -129,7 +143,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:TFSPage:ConStateChge", "Connection state changed in Time-Frame Selector Activity. New Connection state is: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:TFSPage:ConStateChge",
+                "Connection state changed in Time-Frame Selector Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -139,7 +158,10 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:TFSPage:onConnFailed", "Connection Attempt failed in Time-Frame Selector Activity")
+        (applicationContext as ApplicationProperty).logControl("E: Connection failed in TimeFrameSelector")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -160,7 +182,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:TFSPage:ComplexPCg", "Time-Frame Selector Activity - Complex Property changed - Update the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:TFSPage:ComplexPCg",
+                    "Time-Frame Selector Activity - Complex Property changed - Update the UI"
+                )
+            }
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }

@@ -46,7 +46,12 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     override fun onPause() {
         super.onPause()
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:NavCon:onPause", "Navigator Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:NavCon:onPause",
+                    "Navigator Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -65,14 +70,18 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:NavCon:onResume", "onResume executed in Navigator Control Activity")
+        if(verboseLog) {
+            Log.d("M:NavCon:onResume", "onResume executed in Navigator Control Activity")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@NavigatorControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:NavCon:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:NavCon:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
@@ -152,7 +161,13 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:NavCon:ConStateChge", "Connection state changed in Navigator Control Activity. New Connection state is: $state")
+
+        if(verboseLog) {
+            Log.d(
+                "M:NavCon:ConStateChge",
+                "Connection state changed in Navigator Control Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -191,7 +206,12 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:NavCon:ComplexPCg", "Navigator Control Activity - Complex Property changed - Update the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:NavCon:ComplexPCg",
+                    "Navigator Control Activity - Complex Property changed - Update the UI"
+                )
+            }
             runOnUiThread {
                 this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
             }

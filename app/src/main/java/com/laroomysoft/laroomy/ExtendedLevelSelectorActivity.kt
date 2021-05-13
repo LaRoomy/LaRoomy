@@ -44,7 +44,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // get the uiElements and set the initial values
         this.onOffSwitch = findViewById(R.id.elsSwitch)
         this.onOffSwitch.setOnClickListener{
-            Log.d("M:ELS:onOffSwitchClick", "On/Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}")
+            if(verboseLog) {
+                Log.d(
+                    "M:ELS:onOffSwitchClick",
+                    "On/Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
+                )
+            }
             onOffSwitchClicked()
         }
         this.onOffSwitch.isChecked = exLevelState.onOffState
@@ -75,7 +80,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         super.onPause()
         // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:ELSPage:onPause", "Extended Level Selector Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:ELSPage:onPause",
+                    "Extended Level Selector Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -84,14 +94,19 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:ELSPage:onResume", "onResume executed in Extended Level Selector Control")
+
+        if(verboseLog) {
+            Log.d("M:ELSPage:onResume", "onResume executed in Extended Level Selector Control")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:ELSPage:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:ELSPage:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
@@ -120,7 +135,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     private fun onSliderPositionChanged(value: Int){
         // the value must be in 0..255 (8bit) format
-        Log.d("M:CB:ELS:SliderPosC", "Slider Position changed in ExtendedLevelSelectorActivity. New Level: $value")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:ELS:SliderPosC",
+                "Slider Position changed in ExtendedLevelSelectorActivity. New Level: $value"
+            )
+        }
         // save the new value
         this.currentLevel = value
         // send the instruction to the device
@@ -139,7 +159,14 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:ELSPage:ConStateChge", "Connection state changed in ExtendedLevelSelector Activity. New Connection state is: $state")
+
+        if(verboseLog) {
+            Log.d(
+                "M:ELSPage:ConStateChge",
+                "Connection state changed in ExtendedLevelSelector Activity. New Connection state is: $state"
+            )
+        }
+
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -149,7 +176,10 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:ELSPage:onConnFailed", "Connection Attempt failed in Extended Level Selector Activity")
+        (applicationContext as ApplicationProperty).logControl("Failed to connect in ExtendedLevelSelectorActivity")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -171,7 +201,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:ELSPage:ComplexPCg", "Extended Level Selector Activity - Complex Property changed - Update the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:ELSPage:ComplexPCg",
+                    "Extended Level Selector Activity - Complex Property changed - Update the UI"
+                )
+            }
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }

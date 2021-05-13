@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.TextView
+import java.util.*
 
 class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -23,10 +24,32 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@LoadingActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
+        // if logging is enabled set the appropriate data
+        if((applicationContext as ApplicationProperty).eventLogEnabled){
+
+            // clear the log array
+            (applicationContext as ApplicationProperty).connectionLog.clear()
+
+            // get date and time
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
+            val min = calendar.get(Calendar.MINUTE)
+            val sec = calendar.get(Calendar.SECOND)
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // set the time-stamp
+            (applicationContext as ApplicationProperty).logRecordingTime = "Rec:Time: $hour:$min:$sec - $dayOfMonth/$month/$year"
+        }
+
+
+
         when(val index = this.intent.getIntExtra("BondedDeviceIndex", -1)){
             -1 -> {
                 // error state
                 Log.e("M:LoadingAct::onCreate", "The given DeviceListIndex is -ErrorState- (-1)")
+                (applicationContext as ApplicationProperty).logControl("E: Device-List-Index invalid.")
 
                 // TODO: Notify user? Navigate back? With delay?
 
@@ -105,13 +128,21 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:CB:ConStateChange", "Connection State changed in Loading Activity: new State: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:ConStateChange",
+                "Connection State changed in Loading Activity: new State: $state"
+            )
+        }
+        (applicationContext as ApplicationProperty).logControl("I: Connection-State changed to: $state")
+
         if(!blockAllFurtherProcessing) {
             if (connectionAttemptCounter <= 4) {
                 if (!state) {
                     if(!previouslyConnected){
                         // must be a timeout, the system says disconnected, but the device was not previously connected
                         Log.e("M:CB:ConStateChange", "Timeout for the connection-attempt. Device may be not reachable. Stop connection-process.")
+                        (applicationContext as ApplicationProperty).logControl("E: Timeout for connection. Device may be not reachable. Stop process.")
                         ApplicationProperty.bluetoothConnectionManager.clear()
                         // notify user
                         setMessageText(R.color.WarningColor, getString(R.string.CA_TimeoutForConnection))
@@ -124,6 +155,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                             "M:CB:ConStateChange",
                             "Disconnected in Loading Activity - try to reconnect - Attempt-Counter is: $connectionAttemptCounter"
                         )
+                        (applicationContext as ApplicationProperty).logControl("W: Disconnected in LoadingActivity - try to reconnect")
                         // the device was disconnected, this should not happen in this activity, so try to reconnect 5 times
                         connectionAttemptCounter++
                         // clear the bluetoothManager
@@ -138,6 +170,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 }
             } else {
                 // all attempts to connect failed -> go back to start (main activity)
+                (applicationContext as ApplicationProperty).logControl("E: Connection failed. Navigate back to main.")
                 ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()
             }
@@ -146,7 +179,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:CB:ConAttemptFail", "Error - Connection Failed in Loading Activity")
+        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in LoadingActivity")
+
         setErrorText(message)
         // navigate back with delay
         Handler(Looper.getMainLooper()).postDelayed({
@@ -162,7 +198,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onDeviceReadyForCommunication() {
         super.onDeviceReadyForCommunication()
-        Log.e("M:CB:onDRFC", "Loading Activity - Device ready for communication reported")
+
+        if(verboseLog) {
+            Log.d("M:CB:onDRFC", "Loading Activity - Device ready for communication reported")
+        }
+        (applicationContext as ApplicationProperty).logControl("I: Device ready for communication - sending authentication string")
+
         // device ready -> send authentication
         runOnUiThread {
             setProgressText(getString(R.string.CA_Connected))

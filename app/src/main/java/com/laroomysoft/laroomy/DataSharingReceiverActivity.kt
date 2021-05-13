@@ -30,7 +30,12 @@ class DataSharingReceiverActivity : AppCompatActivity() {
             val macReformatted = encryptStringToMacAddress(macDecrypted)
             val passKeyDecrypted = decryptString(bData ?: "")
 
-            Log.d("M:DSA:onCreate", "onCreate in DataSharingActivity executed. Data decrypted: Mac Address: $macReformatted   PassKey: $passKeyDecrypted")
+            if(verboseLog) {
+                Log.d(
+                    "M:DSA:onCreate",
+                    "onCreate in DataSharingActivity executed. Data decrypted: Mac Address: $macReformatted   PassKey: $passKeyDecrypted"
+                )
+            }
 
             if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
                 // data valid: save the data

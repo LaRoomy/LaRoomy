@@ -1,8 +1,12 @@
 package com.laroomysoft.laroomy
 
+import android.app.ActionBar
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.PersistableBundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -17,15 +21,15 @@ import androidx.core.widget.addTextChangedListener
 
 class AppSettingsActivity : AppCompatActivity() {
 
-    lateinit var passwordBox: EditText
-    lateinit var passwordViewModeButton: AppCompatImageButton
-    lateinit var useCustomBindingKeySwitch: SwitchCompat
-    lateinit var autoConnectSwitch: SwitchCompat
-    lateinit var listAllDevicesSwitch: SwitchCompat
-    lateinit var passwordContainer: ConstraintLayout
-    lateinit var enableLogSwitch: SwitchCompat
-    lateinit var passKeyInputNotificationTextView: AppCompatTextView
-    lateinit var keepScreenActiveSwitchCompat: SwitchCompat
+    private lateinit var passwordBox: EditText
+    private lateinit var passwordViewModeButton: AppCompatImageButton
+    private lateinit var useCustomBindingKeySwitch: SwitchCompat
+    private lateinit var autoConnectSwitch: SwitchCompat
+    private lateinit var listAllDevicesSwitch: SwitchCompat
+    private lateinit var passwordContainer: ConstraintLayout
+    private lateinit var enableLogSwitch: SwitchCompat
+    private lateinit var passKeyInputNotificationTextView: AppCompatTextView
+    private lateinit var keepScreenActiveSwitchCompat: SwitchCompat
 
     private var buttonNormalizationRequired = false
 
@@ -65,7 +69,14 @@ class AppSettingsActivity : AppCompatActivity() {
             this.isChecked = state
 
             // if logging is activated, show the nav-button
-            setShowLogButtonVisibility(state)
+            //setShowLogButtonVisibility(state)
+
+            // FIXME: not the best approach???? Why does setting the margins of the separator view in onCreate not work???
+            Handler(Looper.getMainLooper()).postDelayed({
+                setShowLogButtonVisibility(state)
+            }, 200)
+
+            // TODO: delete logArray and time-stamp??
         }
         this.keepScreenActiveSwitchCompat = findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
             val state =
@@ -195,7 +206,7 @@ class AppSettingsActivity : AppCompatActivity() {
 
     private val passwordViewModeVisible: Int = 1
     private val passwordViewModeHidden: Int = 2
-    var currentPasswordViewMode = passwordViewModeHidden
+    private var currentPasswordViewMode = passwordViewModeHidden
 
     fun onPasswordViewModeButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
         when(currentPasswordViewMode){
@@ -234,11 +245,14 @@ class AppSettingsActivity : AppCompatActivity() {
             }
         }
         findViewById<View>(R.id.setupActivityFifthSeparatorView).apply {
+
             if(visible) {
                 (layoutParams as ViewGroup.MarginLayoutParams).setMargins(0,10,0,0)
             } else {
                 (layoutParams as ViewGroup.MarginLayoutParams).setMargins(10,10,10,0)
             }
+//            requestLayout()
+//            invalidate()
         }
     }
 

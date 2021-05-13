@@ -113,7 +113,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         super.onPause()
         // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:DSPPage:onPause", "Device Settings Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:DSPPage:onPause",
+                    "Device Settings Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -122,14 +127,18 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:DSPPage:onResume", "onResume executed in Device Settings Activity")
+        if(verboseLog) {
+            Log.d("M:DSPPage:onResume", "onResume executed in Device Settings Activity")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceSettingsActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:DSPPage:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:DSPPage:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
@@ -188,7 +197,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:DSPPage:ConStateChge", "Connection state changed in Device Settings Activity. New Connection state is: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:DSPPage:ConStateChge",
+                "Connection state changed in Device Settings Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
             setUIElementsEnabledState(state)
@@ -200,7 +214,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:DSPPage:onConnFailed", "Connection Attempt failed in Device Settings Activity")
+        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in DeviceSettingsActivity")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -267,7 +284,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             val mac = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
             val macAddress = macAddressToEncryptString(mac ?: "")
 
-            Log.d("ACT:DSA", "Binding data collected: MacAddress: $mac   PassKey: $passKey")
+            if(verboseLog) {
+                Log.d("ACT:DSA", "Binding data collected: MacAddress: $mac   PassKey: $passKey")
+            }
 
             // encrypt data
             val encryptedPassKey = encryptString(passKey)
@@ -276,7 +295,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             // build link
             val link = "${LAROOMY_WEBAPI_BASIS_LINK}devid=$encryptedMacAddress&bdata=$encryptedPassKey"
 
-            Log.d("ACT:DSA", "Sharing Link generated: $link")
+            if(verboseLog) {
+                Log.d("ACT:DSA", "Sharing Link generated: $link")
+            }
 
             // share
             val sendIntent:Intent = Intent().apply {

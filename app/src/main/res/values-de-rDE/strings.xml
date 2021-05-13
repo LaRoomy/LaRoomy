@@ -156,6 +156,11 @@
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
 
+    <string name="ViewLogActivity_HeaderText">Verbindungs-Protokoll</string>
+    <string name="ViewLogActivity_NotificationNoLogDataAvailable">Keine Protokolldaten vorhanden</string>
+
+
+
     <string name="DataSharingActivity_GoToMainButtonText">Zurück zur App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Geräte-Bindung erfolgreich gespeichert.</string>
     <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Fehler: Ungültiges Daten-Format.</string>
@@ -219,5 +224,7 @@
     <string name="app_settings">App-Settings</string>
     <string name="binding_code_placeholder">h5G+s%gt</string>
     <string name="pinCodePlaceholder">*****</string>
+    <string name="ConnectionLog_NoContent">Keine Daten vorhanden..</string>
+
 
 </resources>

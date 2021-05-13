@@ -105,11 +105,13 @@ class LaRoomyDeviceProperty{
                         17 -> imgID += c
                     }
                 }
-                Log.d("M:DevProp:fromString", "Data Recorded - Results:")
-                Log.d("M:DevProp:fromString", "PropertyID: $propID")
-                Log.d("M:DevProp:fromString", "PropertyType: $propType")
-                Log.d("M:DevProp:fromString", "PropertyIndex: $propIndex")
-                Log.d("M:DevProp:fromString", "PropertyImageID: $imgID")
+                if(verboseLog) {
+                    Log.d("M:DevProp:fromString", "Data Recorded - Results:")
+                    Log.d("M:DevProp:fromString", "PropertyID: $propID")
+                    Log.d("M:DevProp:fromString", "PropertyType: $propType")
+                    Log.d("M:DevProp:fromString", "PropertyIndex: $propIndex")
+                    Log.d("M:DevProp:fromString", "PropertyImageID: $imgID")
+                }
 
                 this.propertyID = propID.toInt()
                 this.propertyType = propType.toInt()
@@ -119,16 +121,24 @@ class LaRoomyDeviceProperty{
                 if(grID.isNotEmpty()){
                     this.groupID = grID.toInt()
                     this.isGroupMember = true
-                    Log.d("M:DevProp:fromString", "isGroupMember: $isGroupMember -- GroupID: $groupID")
+
+                    if(verboseLog) {
+                        Log.d(
+                            "M:DevProp:fromString",
+                            "isGroupMember: $isGroupMember -- GroupID: $groupID"
+                        )
+                    }
                 }
             }
-            Log.d(
-                "M:LRDevice:FromString",
-                "LaRoomy device property string read:\n -PropertyID: ${this.propertyID}\n -PropertyType: ${this.propertyType}\n - PropertyIndex: ${this.propertyIndex}\n - PropertyImageID: ${this.imageID}"
-            )
+            if(verboseLog) {
+                Log.d(
+                    "M:LRDevice:FromString",
+                    "LaRoomy device property string read:\n -PropertyID: ${this.propertyID}\n -PropertyType: ${this.propertyType}\n - PropertyIndex: ${this.propertyIndex}\n - PropertyImageID: ${this.imageID}"
+                )
+            }
         }
         catch(except: Exception){
-            Log.d("M:LDP:Prop:fromString", "Exception occurred: ${except.message}")
+            Log.e("M:LDP:Prop:fromString", "Exception occurred: ${except.message}")
         }
      }
 
@@ -219,24 +229,28 @@ class LaRoomyDevicePropertyGroup{
                         14 -> imgID += c
                     }
                 }
-                Log.d("M:PropGroup:fromString", "Data Recorded - Results:")
-                Log.d("M:PropGroup:fromString", "GroupID: $localGroupID")
-                Log.d("M:PropGroup:fromString", "GroupIndex: $localGroupIndex")
-                Log.d("M:PropGroup:fromString", "MemberAmount: $memberAmount")
-                Log.d("M:PropGroup:fromString", "GroupImageID: $imgID")
+                if(verboseLog) {
+                    Log.d("M:PropGroup:fromString", "Data Recorded - Results:")
+                    Log.d("M:PropGroup:fromString", "GroupID: $localGroupID")
+                    Log.d("M:PropGroup:fromString", "GroupIndex: $localGroupIndex")
+                    Log.d("M:PropGroup:fromString", "MemberAmount: $memberAmount")
+                    Log.d("M:PropGroup:fromString", "GroupImageID: $imgID")
+                }
 
                 this.groupID = localGroupID.toInt()
                 this.groupIndex = localGroupIndex.toInt()
                 this.memberCount = memberAmount.toInt()
                 this.imageID = imgID.toInt()
             }
-            Log.d(
-                "M:PropGroup:fromString",
-                "LaRoomy device property GROUP string read:\n -GroupID: ${this.groupID}\n -GroupIndex: ${this.groupIndex}\n - MemberAmount: ${this.memberCount}\n - GroupImageID: ${this.imageID}"
-            )
+            if(verboseLog) {
+                Log.d(
+                    "M:PropGroup:fromString",
+                    "LaRoomy device property GROUP string read:\n -GroupID: ${this.groupID}\n -GroupIndex: ${this.groupIndex}\n - MemberAmount: ${this.memberCount}\n - GroupImageID: ${this.imageID}"
+                )
+            }
         }
         catch(except: Exception){
-            Log.d("M:LDP:Group:fromString", "Exception occurred: ${except.message}")
+            Log.e("M:LDP:Group:fromString", "Exception occurred: ${except.message}")
         }
     }
 
@@ -359,17 +373,33 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     isConnected = true
 
-                    Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
+                    if(verboseLog) {
+                        Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
+                    }
                     callback.onConnectionStateChanged(true)
 
                     if(!isResumeConnectionAttempt) {
-                        Log.d("M:CB:ConStateChanged", "This is no resume action, so discover services")
-                        Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
+                        if(verboseLog) {
+                            Log.d(
+                                "M:CB:ConStateChanged",
+                                "This is no resume action, so discover services"
+                            )
+                            Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
+                        }
+                        applicationProperty.logControl("I: Starting to discover Services")
+
                         gatt?.discoverServices()// start to discover the services of the device
                     } else {
                         isResumeConnectionAttempt = false
                         suspendedDeviceAddress = ""
-                        Log.d("M:CB:ConStateChanged", "This is a resume action -> DO NOT DISCOVER SERVICES!")
+
+                        if(verboseLog) {
+                            Log.d(
+                                "M:CB:ConStateChanged",
+                                "This is a resume action -> DO NOT DISCOVER SERVICES!"
+                            )
+                        }
+                        applicationProperty.logControl("I: Connection restored")
 
                         Handler(Looper.getMainLooper()).postDelayed({
                             // TODO: test if this works
@@ -381,7 +411,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     isConnected = false
 
-                    Log.d("M:CB:ConStateChanged", "Connection-state changed to: DISCONNECTED")
+                    if(verboseLog) {
+                        Log.d("M:CB:ConStateChanged", "Connection-state changed to: DISCONNECTED")
+                    }
                     callback.onConnectionStateChanged(false)
                 }
             }
@@ -394,31 +426,61 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 BluetoothGatt.GATT_SUCCESS -> {
                     // iterate throughout the services and display it in the debug-log
                     gatt?.services?.forEachIndexed { index, bluetoothGattService ->
-                        Log.d("M:CB:onServicesDisc", "Service discovered. Index: $index ServiceUUID: ${bluetoothGattService.uuid} Type: ${bluetoothGattService.type}")
+
+                        if(verboseLog) {
+                            Log.d(
+                                "M:CB:onServicesDisc",
+                                "Service discovered. Index: $index ServiceUUID: ${bluetoothGattService.uuid} Type: ${bluetoothGattService.type}"
+                            )
+                        }
+                        applicationProperty.logControl("I: Service discovered. UUID: ${bluetoothGattService.uuid}")
 
                         // look if the service matches an uuid profile
                         val profileIndex = applicationProperty.uuidManager.profileIndexFromServiceUUID(bluetoothGattService.uuid)
 
                         if(profileIndex != -1)
                         {
-                            Log.d("M:CB:onServicesDisc", "Correct service found - retrieving characteristics for the service")
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:onServicesDisc",
+                                    "Correct service found - retrieving characteristics for the service"
+                                )
+                            }
+                            applicationProperty.logControl("I: This service is found in UUID Profile")
+                            applicationProperty.logControl("I: Perform lookup for Characteristic UUID")
 
                             // iterate through the characteristics in the service
                             bluetoothGattService.characteristics.forEach {
 
-                                Log.d("M:CB:onServicesDisc", "Characteristic found: UUID: ${it.uuid}  InstanceID: ${it.instanceId}")
+                                if(verboseLog) {
+                                    Log.d(
+                                        "M:CB:onServicesDisc",
+                                        "Characteristic found: UUID: ${it.uuid}  InstanceID: ${it.instanceId}"
+                                    )
+                                }
+                                applicationProperty.logControl("I: Characteristic in Service found. UUID: ${it.uuid}")
 
                                 // set the characteristic notification for the desired characteristic in the service
                                 if(it.uuid == applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).characteristicUUID) {
 
-                                    Log.d("M:CB:onServicesDisc", "Correct characteristic found - enable notifications")
+                                    if(verboseLog) {
+                                        Log.d(
+                                            "M:CB:onServicesDisc",
+                                            "Correct characteristic found - enable notifications"
+                                        )
+                                    }
+                                    applicationProperty.logControl("I: Characteristic match: enable notifications")
+
                                     // save characteristic
                                     gattCharacteristic = it
                                     //gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_SIGNED//WRITE_TYPE_NO_RESPONSE
                                     // enable notification on the device
                                     gatt.setCharacteristicNotification(gattCharacteristic, true)
 
-                                    Log.d("M:CB:onServicesDisc", "Set Descriptor")
+                                    if(verboseLog) {
+                                        Log.d("M:CB:onServicesDisc", "Set Descriptor")
+                                    }
+
                                     // set the correct descriptor for this characteristic
                                     val descriptor = gattCharacteristic.getDescriptor(clientCharacteristicConfig)
                                         .apply {
@@ -434,7 +496,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                 }
                 else -> {
-                    Log.d("M:CB:onServicesDisc", "Gatt-Status: $status")
+                    Log.e("M:CB:onServicesDisc", "Gatt-Status: $status")
+                    applicationProperty.logControl("E: Unexpected Gatt-Status: $status")
                 }
             }
         }
@@ -455,16 +518,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //            dataAsString = formatIncomingData(dataAsString ?: "")
 
             // log (string)
-            Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $dataAsString")
+            if(verboseLog) {
+                Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $dataAsString")
+            }
+            applicationProperty.logControl("I: Characteristic changed: $dataAsString")
 
             // check authentication
             if(authRequired){
 
-                Log.d("M:CB:CharChanged", "Data Received - Authentication Required")
+                if(verboseLog) {
+                    Log.d("M:CB:CharChanged", "Data Received - Authentication Required")
+                }
 
                 when(dataAsString){
                     authenticationResponse -> {
-                        Log.d("M:CB:CharChanged", "Data Received - Authentication successful - Device ID confirmed")
+                        if(verboseLog) {
+                            Log.d(
+                                "M:CB:CharChanged",
+                                "Data Received - Authentication successful - Device ID confirmed"
+                            )
+                        }
                         authRequired = false
                         authenticationSuccess = true
                         // save the device address (but only if the authentication was successful)
@@ -472,7 +545,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         callback.onAuthenticationSuccessful()
                     }
                     authenticationResponseBindingPasskeyRequired -> {
-                        Log.d("M:CB:CharChanged", "Data Received - Authentication - Device ID confirmed - additional binding is required")
+                        if(verboseLog) {
+                            Log.d(
+                                "M:CB:CharChanged",
+                                "Data Received - Authentication - Device ID confirmed - additional binding is required"
+                            )
+                        }
+                        applicationProperty.logControl("I: Authentication success. Binding is required!")
 
                         // check if custom or default binding is active
                         val defaultBindingKeyMustBeUsed =
@@ -500,28 +579,47 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                     authenticationResponseBindingPasskeyInvalid -> {
                         Log.e("M:CB:CharChanged", "Data Received - Authentication - Passkey rejected from device - PASSKEY INVALID")
+                        applicationProperty.logControl("E: Passkey invalid - Connection rejected")
 
                         if(!passKeySecondTryOut) {
-                            Log.d("M:CB:CharChanged", "Searching for a saved passkey for a specific mac address")
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:CharChanged",
+                                    "Searching for a saved passkey for a specific mac address"
+                                )
+                            }
+                            applicationProperty.logControl("I: Generate lookup for shared passkey")
 
                             val passKey =
                                 tryUseSavedPassKeyForSpecificMacAddress(currentDevice?.address ?: "")
 
                             if(passKey == ERROR_NOTFOUND){
                                 Log.e("M:CB:CharChanged", "No saved passKey - reject connection")
+                                applicationProperty.logControl("E: No shared key - reject connection")
                                 callback.onBindingPasskeyRejected()
                             } else {
-                                Log.d("M:CB:CharChanged", "Saved passkey found - try to use this key in the second chance")
+                                if(verboseLog) {
+                                    Log.d(
+                                        "M:CB:CharChanged",
+                                        "Saved passkey found - try to use this key in the second chance"
+                                    )
+                                }
+                                applicationProperty.logControl("I: Shared passkey found - try again")
+
                                 passKeySecondTryOut = true
                                 sendBindingRequest(passKey)
                             }
                         } else {
                             Log.e("M:CB:CharChanged", "Passkey rejected on the second chance - finally reject connection")
+                            applicationProperty.logControl("E: Passkey finally rejected. Stop process.")
                             // raise event
                             callback.onBindingPasskeyRejected()
                         }
                     }
-                    else -> Log.d("M:CB:CharChanged", "!Warning: Authentication failed! Unexpected Authentication Token")
+                    else -> {
+                        Log.w("M:CB:CharChanged", "!Warning: Authentication failed! Unexpected Authentication Token")
+                        applicationProperty.logControl("E: Authentication failed: Unexpected token.")
+                    }
                 }
             }
             else {
@@ -534,45 +632,57 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //                    }
                     dataProcessed = processElementUpdateStack(dataAsString ?: "error")
 
+                    // TODO: add user-logs to all loops:  ???
+
                     if(!dataProcessed) {
                         // check if one of the property-retrieving-loops is active
                         if (propertyLoopActive) {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - Property Loop is active - check for property-string"
-                            )
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:CharChanged",
+                                    "Data Received - Property Loop is active - check for property-string"
+                                )
+                            }
                             // try to add the device property, if the end is reached the loop will be cut off
                             dataProcessed = addDeviceProperty(dataAsString ?: "error")
                         }
                         if (propertyNameResolveLoopActive) {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - PropertyName resolve Loop is active - check for name-strings"
-                            )
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:CharChanged",
+                                    "Data Received - PropertyName resolve Loop is active - check for name-strings"
+                                )
+                            }
                             // check and handle property-name-resolve-request
                             dataProcessed = resolvePropertyName(dataAsString ?: "error")
                         }
                         if (groupLoopActive) {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - group indexing Loop is active - check for group-id for indexes"
-                            )
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:CharChanged",
+                                    "Data Received - group indexing Loop is active - check for group-id for indexes"
+                                )
+                            }
                             // try to add the group, if the end is reached, the loop will be cut off
                             dataProcessed = addPropertyGroup(dataAsString ?: "error")
                         }
                         if (groupInfoLoopActive) {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - group-detail-info Loop is active - check the detailed info for the given ID"
-                            )
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:CharChanged",
+                                    "Data Received - group-detail-info Loop is active - check the detailed info for the given ID"
+                                )
+                            }
                             // if the detailed group info loop is active, check the string for group info
                             dataProcessed = resolveGroupInfo(dataAsString ?: "error")
                         }
                         if(deviceHeaderRecordingActive){
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - deviceHeaderDataRecording is active -> add string to buffer. Data: $dataAsString"
-                            )
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:CB:CharChanged",
+                                    "Data Received - deviceHeaderDataRecording is active -> add string to buffer. Data: $dataAsString"
+                                )
+                            }
                             deviceInfoHeaderData.message += dataAsString
                         }
                     }
@@ -607,7 +717,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun authenticate(){
-        Log.d("M:BLE:Authenticate", "Sending authentication string")
+        if(verboseLog) {
+            Log.d("M:BLE:Authenticate", "Sending authentication string")
+        }
         if(this.isConnected){
             this.authRequired = true
             this.sendData(this.authenticationString)
@@ -996,7 +1108,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         // TODO: check if this function works!
 
-        Log.d("M:bluetoothEnabled?", "Check if bluetooth is enabled")
+        if(verboseLog) {
+            Log.d("M:bluetoothEnabled?", "Check if bluetooth is enabled")
+        }
 
         bleAdapter?.takeIf{it.isDisabled}?.apply{
             // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
@@ -1073,9 +1187,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     fun addDeviceProperty(property: String) :Boolean {
         var stringProcessed = false
 
-        if(property == this.propertyLoopEndIndication){
+        if (property == this.propertyLoopEndIndication) {
             // log
-            Log.d("M:addDeviceProperty", "Device property loop end received - stopping loop.")
+            if (verboseLog) {
+                Log.d(
+                    "M:addDeviceProperty",
+                    "Device property loop end received - stopping loop."
+                )
+            }
+            applicationProperty.logControl("I: Property-Loop END mark received - stopping loop")
+
             this.propertyLoopActive = false
             // set return value
             stringProcessed = true
@@ -1085,7 +1206,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         else {
             if(property.startsWith("IPR")){
                 // log
-                Log.d("M:addDeviceProperty", "Device property string received: $property")
+                if (verboseLog) {
+                    Log.d("M:addDeviceProperty", "Device property string received: $property")
+                }
+                applicationProperty.logControl("I: Property-String received: $property")
                 // add the element (only if the confirmation-mode is inactive)
                 val laRoomyDeviceProperty = LaRoomyDeviceProperty()
                 laRoomyDeviceProperty.fromString(property)
@@ -1093,9 +1217,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // confirmation mode active: compare the property but note: at this point we can not use
                     // the overridden member "equals(...)" to compare, because only the raw data is recorded to the class
                     // -> so use the .checkRawEquality(...) member!
-                    if(!this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).checkRawEquality(laRoomyDeviceProperty)){
+                    if (!this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex)
+                            .checkRawEquality(laRoomyDeviceProperty)
+                    ) {
                         // log:
-                        Log.d("M:addDeviceProperty", "Confirmation-Process active: This property data does not confirm with the saved structure.\nPropertyID: ${laRoomyDeviceProperty.propertyID}\nPropertyIndex: ${laRoomyDeviceProperty.propertyIndex}")
+                        if (verboseLog) {
+                            Log.d(
+                                "M:addDeviceProperty",
+                                "Confirmation-Process active: This property data does not confirm with the saved structure.\nPropertyID: ${laRoomyDeviceProperty.propertyID}\nPropertyIndex: ${laRoomyDeviceProperty.propertyIndex}"
+                            )
+                        }
                         // the element does not confirm
                         // invalidate all property
                         this.stopAllPendingLoopsAndResetParameter()
@@ -1124,7 +1255,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 else -> "A${this.propertyRequestIndexCounter}$"
             }
         // log:
-        Log.d("M:requestNextProperty", "Send next request index - message: $data")
+        if(verboseLog) {
+            Log.d("M:requestNextProperty", "Send next request index - message: $data")
+        }
         // send the string
         this.sendData(data)
     }
@@ -1355,11 +1488,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun addPropertyGroup(group: String) : Boolean {
         var stringProcessed = false
         // log:
-        Log.d("M:AddPropGroup", "Add Property Group Invoked - check for type of data")
+        if(verboseLog) {
+            Log.d("M:AddPropGroup", "Add Property Group Invoked - check for type of data")
+        }
         // check type of data
         if(group == this.groupLoopEndIndication){
             // log:
-            Log.d("M:AddPropGroup", "This was the finalization indicator - close loop, reset parameter and start detailed-info-loop")
+            if (verboseLog) {
+                Log.d(
+                    "M:AddPropGroup",
+                    "This was the finalization indicator - close loop, reset parameter and start detailed-info-loop"
+                )
+            }
+            applicationProperty.logControl("I: Group-Loop END marker received")
+
             // reset params:
             this.groupLoopActive = false
             this.groupRequestIndexCounter = 0
@@ -1370,12 +1512,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         else{
             // log:
-            Log.d("M:AddPropGroup", "This could be a property-group-definition string - check this!")
+            if (verboseLog) {
+                Log.d(
+                    "M:AddPropGroup",
+                    "This could be a property-group-definition string - check this!"
+                )
+            }
 
             // check start-character to identify the group-string
             if(group.startsWith(groupStringPrefix, false)){
                 // log:
-                Log.d("M:AddPropGroup", "It is a group string - add to collection")
+                if (verboseLog) {
+                    Log.d("M:AddPropGroup", "It is a group string - add to collection")
+                }
+                applicationProperty.logControl("I: Group-String received: $group")
                 // add group to collection
                 val propertyGroup = LaRoomyDevicePropertyGroup()
                 propertyGroup.fromString(group)
@@ -1386,7 +1536,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // -> so use the .checkRawEquality(...) member!
                     if(this.laRoomyPropertyGroupList.elementAt(propertyGroup.groupIndex).checkRawEquality(propertyGroup)){
                         // log:
-                        Log.d("M:AddPropGroup", "Confirmation-Mode active: The element differs from the saved one:\nGroupID: ${propertyGroup.groupID}\nGroupIndex: ${propertyGroup.groupIndex}")
+                        if (verboseLog) {
+                            Log.d(
+                                "M:AddPropGroup",
+                                "Confirmation-Mode active: The element differs from the saved one:\nGroupID: ${propertyGroup.groupID}\nGroupIndex: ${propertyGroup.groupIndex}"
+                            )
+                        }
                         // the group element differs from the saved element
                         // the proceeding of this process is not necessary
                         // -> invalidate all property data!
@@ -1581,7 +1736,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun requestNextGroupInfo(){
         // log
-        Log.d("M:RQNextGroupInfo", "Requesting next group info")
+        if(verboseLog) {
+            Log.d("M:RQNextGroupInfo", "Requesting next group info")
+        }
         // increment the group index counter and send next request
         currentGroupResolveIndex++
         // check if the index is inside the valid scope
@@ -1606,12 +1763,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // create the request string
             val requestString = "F$languageIdentificationChar$hundred$tenth$single$"
             // log:
-            Log.d("M:RQNextGroup", "Sending next request: $requestString")
+            if(verboseLog) {
+                Log.d("M:RQNextGroup", "Sending next request: $requestString")
+            }
             // send data:
             this.sendData(requestString)
         }
         else {
-            Log.d("M:RQNextGroupInfo", "!! unexpected end of group array found, this should not happen, because the preliminary executed method \"resolveGroupInfo\" is expected to close the retrieving loop")
+            Log.e("M:RQNextGroupInfo", "!! unexpected end of group array found, this should not happen, because the preliminary executed method \"resolveGroupInfo\" is expected to close the retrieving loop")
             // !! unexpected end of group array found, this should not happen, because the preliminary executed method "resolveGroupInfo" is expected to close the retrieving loop
             // be that as it may. Force loop closing:
             groupInfoLoopActive = false
@@ -1773,7 +1932,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
         var dataProcessed = false
         // log:
-        Log.d("M:CheckDevComAndNoti", "Check received string for notification")
+        if(verboseLog) {
+            Log.d("M:CheckDevComAndNoti", "Check received string for notification")
+        }
+
+        // TODO: add user-logs to all notifications???
         // check:
 
         // only accept notifications if the property and group loops are not in progress
@@ -1782,74 +1945,104 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 data.startsWith(propertyChangedNotificationEntry) -> {
                     this.updateProperty(data)
                     dataProcessed = true
-                    Log.d("M:CheckDevComAndNoti", "Property-Changed Notification detected")
+
+                    if(verboseLog) {
+                        Log.d("M:CheckDevComAndNoti", "Property-Changed Notification detected")
+                    }
                 }
 
                 data.startsWith(propertyGroupChangedNotificationEntry) -> {
                     this.updatePropertyGroup(data)
                     dataProcessed = true
-                    Log.d("M:CheckDevComAndNoti", "PropertyGroup-Changed Notification detected")
+
+                    if(verboseLog) {
+                        Log.d("M:CheckDevComAndNoti", "PropertyGroup-Changed Notification detected")
+                    }
                 }
                 data.startsWith(this.complexDataStateTransmissionEntry) -> {
-                    Log.d(
-                        "M:CheckDevComAndNoti",
-                        "Complex-Property-State data received -> try to resolve it!"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "Complex-Property-State data received -> try to resolve it!"
+                        )
+                    }
                     this.resolveComplexStateData(data)
                     dataProcessed = true
                 }
                 data.startsWith(this.multiComplexPropertyNameSetterEntry) -> {
-                    Log.d(
-                        "M:CheckDevComAndNoti",
-                        "Multi-Complex-Property Name-Data received -> try to resolve it!"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "Multi-Complex-Property Name-Data received -> try to resolve it!"
+                        )
+                    }
                     this.resolveMultiComplexStateData(data, true)
                     dataProcessed = true
                 }
                 data.startsWith(this.multiComplexPropertyDataSetterEntry) -> {
-                    Log.d(
-                        "M:CheckDevComAndNoti",
-                        "Multi-Complex-Property Value-Data received -> try to resolve it!"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "Multi-Complex-Property Value-Data received -> try to resolve it!"
+                        )
+                    }
                     this.resolveMultiComplexStateData(data, false)
                     dataProcessed = true
                 }
                 data.startsWith(this.simpleDataStateTransmissionEntry) -> {
-                    Log.d(
-                        "M:CheckDevComAndNoti",
-                        "Simple-Property-State data received -> try to resolve it!"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "Simple-Property-State data received -> try to resolve it!"
+                        )
+                    }
                     this.resolveSimpleStateData(data)
                     dataProcessed = true
                 }
                 data.startsWith(this.deviceHeaderStartEntry) -> {
-                    Log.d(
-                        "M:CheckDevComAndNoti",
-                        "DeviceHeader start notification detected -> start recording"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "DeviceHeader start notification detected -> start recording"
+                        )
+                    }
                     this.startDeviceHeaderRecording(data)
                     dataProcessed = true
                 }
                 data == this.deviceHeaderCloseMessage -> {
-                    Log.d(
-                        "M:CheckDevComAndNoti",
-                        "DeviceHeader end notification detected -> reset parameter and trigger event"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "DeviceHeader end notification detected -> reset parameter and trigger event"
+                        )
+                    }
                     this.endDeviceHeaderRecording()
                     dataProcessed = true
                 }
                 data == this.testCommand -> {
-                    Log.d("M:CheckDevComAndNoti", "Test command received.")
+                    if(verboseLog) {
+                        Log.d("M:CheckDevComAndNoti", "Test command received.")
+                    }
                     this.connectionTestSucceeded = true
                     this.callback.onConnectionTestSuccess()
                     dataProcessed = true
                 }
                 data == this.requestLocalTimeCommand -> {
-                    Log.d("M:CheckDevComAndNoti", "Local Time Request received. Sending Time to Device.")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "Local Time Request received. Sending Time to Device."
+                        )
+                    }
                     this.setDeviceTime()
                 }
                 data == this.bindingNotSupportedNotification -> {
-                    Log.d("M:CheckDevComAndNoti", "The device has the create-binding request rejected. -> Forward to current Activity (must be the DeviceSettingsActivity")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CheckDevComAndNoti",
+                            "The device has the create-binding request rejected. -> Forward to current Activity (must be the DeviceSettingsActivity"
+                        )
+                    }
                     this.propertyCallback.onDeviceNotification(
                         DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED
                     )
@@ -1857,7 +2050,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
         else {
-            Log.d("M:CheckDevComAndNoti", "Loop must be active - skip Notification or Command processing")
+            if(verboseLog) {
+                Log.d(
+                    "M:CheckDevComAndNoti",
+                    "Loop must be active - skip Notification or Command processing"
+                )
+            }
         }
         return dataProcessed
     }
@@ -2239,9 +2437,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: if the retrieving loop is active, this should not be executed
 
         if(this.singlePropertyRetrievingAction) {
-            Log.d("M:CheckSingleAction", "Single Property Request is active, look for an appropriate transmission")
+            if(verboseLog) {
+                Log.d(
+                    "M:CheckSingleAction",
+                    "Single Property Request is active, look for an appropriate transmission"
+                )
+            }
             if (data.startsWith(propertyStringPrefix)) {
-                Log.d("M:CheckSingleAction", "Property-String-Prefix detected")
+                if(verboseLog) {
+                    Log.d("M:CheckSingleAction", "Property-String-Prefix detected")
+                }
                 // its a  single property request response
 
                 // initialize the property element from string
@@ -2314,10 +2519,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singlePropertyDetailRetrievingAction){
-            Log.d("M:CheckSingleAction", "Single Property DETAIL Request is active, look for an appropriate transmission")
+            if(verboseLog) {
+                Log.d(
+                    "M:CheckSingleAction",
+                    "Single Property DETAIL Request is active, look for an appropriate transmission"
+                )
+            }
             when{
                 data.startsWith(propertyNameStartIndicator) -> {
-                    Log.d("M:CheckSingleAction", "Property-Name start indicator detected")
+                    if(verboseLog) {
+                        Log.d("M:CheckSingleAction", "Property-Name start indicator detected")
+                    }
                     // its a property description request -> look for the property id to record
                     val id = this.propertyIDFromStartEntry(data)
                     if(id != -1){
@@ -2327,7 +2539,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     return SINGLEACTION_PARTIALLY_PROCESSED
                 }
                 data.startsWith(propertyNameEndIndicator) -> {
-                    Log.d("M:CheckSingleAction", "Property-Name end indicator detected")
+                    if(verboseLog) {
+                        Log.d("M:CheckSingleAction", "Property-Name end indicator detected")
+                    }
                     // end of transmission, set marker to false and erase the ID
                     this.currentPropertyResolveID = -1
                     this.singlePropertyDetailRetrievingAction = false
@@ -2337,7 +2551,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     var updateIndex = -1
 
                     if(this.currentPropertyResolveID != -1){
-                        Log.d("M:CheckSingleAction", "Must be the property name. Data is: <$data>")
+                        if(verboseLog) {
+                            Log.d(
+                                "M:CheckSingleAction",
+                                "Must be the property name. Data is: <$data>"
+                            )
+                        }
                         // must be the name for the property
                         // search the element in the property-list
                         this.laRoomyDevicePropertyList.forEach {
@@ -2362,9 +2581,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singleGroupRetrievingAction){
-            Log.d("M:CheckSingleAction", "Single Group Request is active, look for an appropriate transmission")
+            if(verboseLog) {
+                Log.d(
+                    "M:CheckSingleAction",
+                    "Single Group Request is active, look for an appropriate transmission"
+                )
+            }
             if(data.startsWith(groupStringPrefix)){
-                Log.d("M:CheckSingleAction", "Group-Prefix detected")
+                if(verboseLog) {
+                    Log.d("M:CheckSingleAction", "Group-Prefix detected")
+                }
                 // its a group request response
 
                 val updatedGroup = LaRoomyDevicePropertyGroup()
@@ -2429,10 +2655,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(this.singleGroupDetailRetrievingAction){
-            Log.d("M:CheckSingleAction", "Single Group DETAIL Request is active, look for an appropriate transmission")
+            if(verboseLog) {
+                Log.d(
+                    "M:CheckSingleAction",
+                    "Single Group DETAIL Request is active, look for an appropriate transmission"
+                )
+            }
            when{
                data.startsWith(groupInfoStartIndicator) -> {
-                   Log.d("M:CheckSingleAction", "Group Info start indicator detected")
+                   if(verboseLog) {
+                       Log.d("M:CheckSingleAction", "Group Info start indicator detected")
+                   }
                    // its a group detail request response start entry -> look for the group id to record
                    val id = this.groupIDFromStartEntry(data)
                    if(id != -1){
@@ -2442,7 +2675,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                    return SINGLEACTION_PARTIALLY_PROCESSED
                }
                data.startsWith(groupInfoEndIndicator) -> {
-                   Log.d("M:CheckSingleAction", "Group Info end indicator detected")
+                   if(verboseLog) {
+                       Log.d("M:CheckSingleAction", "Group Info end indicator detected")
+                   }
                    // end of transmission, set marker to false and erase the ID
                    this.currentGroupResolveID = -1
                    this.singleGroupDetailRetrievingAction = false
@@ -2451,15 +2686,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                else -> {
                    // must be the new group detail
                    if(this.currentGroupResolveID != -1){
-                       Log.d("M:CheckSingleAction", "Must be Group-detail data. Data is <$data>")
+                       if(verboseLog) {
+                           Log.d(
+                               "M:CheckSingleAction",
+                               "Must be Group-detail data. Data is <$data>"
+                           )
+                       }
                        return if(data.startsWith(groupMemberStringPrefix)){
-                           Log.d("M:CheckSingleAction", "Group-Member String Prefix detected")
+                           if(verboseLog) {
+                               Log.d("M:CheckSingleAction", "Group-Member String Prefix detected")
+                           }
                            // must be the member ID transmission part
                            // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
                            //this.propertyCallback.onCompletePropertyInvalidated()
                            SINGLEACTION_PARTIALLY_PROCESSED
                        } else {
-                           Log.d("M:CheckSingleAction", "Must be the Group-Name..")
+                           if(verboseLog) {
+                               Log.d("M:CheckSingleAction", "Must be the Group-Name..")
+                           }
                            // must be the name for the group
                            // search the element in the groupList
                            this.laRoomyPropertyGroupList.forEach {
@@ -3130,14 +3374,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun processElementUpdateStack(data: String): Boolean {
         return if(this.updateStackProcessActive) {
-            Log.d("M:USP", "ProcessElementUpdateStack invoked. Check transmission..")
+            if(verboseLog) {
+                Log.d("M:USP", "ProcessElementUpdateStack invoked. Check transmission..")
+            }
 
             val singleAction = this.checkSingleAction(data)
             val processed = singleAction != SINGLEACTION_NOT_PROCESSED
 
             // check if the first element was processed
             if (singleAction == SINGLEACTION_PROCESSING_COMPLETE) {
-                Log.d("M:USP", "ProcessElementUpdateStack - Element processed - remove the last and look for other elements in the array")
+                if(verboseLog) {
+                    Log.d(
+                        "M:USP",
+                        "ProcessElementUpdateStack - Element processed - remove the last and look for other elements in the array"
+                    )
+                }
 
                 // remove the element
                 this.elementUpdateList.removeAt(0)
@@ -3146,7 +3397,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     val updateElement = this.elementUpdateList.elementAt(0)
 
-                    Log.d("M:USP", "ProcessElementUpdateStack - Request next element: ID: ${updateElement.elementID} Index: ${updateElement.elementIndex}")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:USP",
+                            "ProcessElementUpdateStack - Request next element: ID: ${updateElement.elementID} Index: ${updateElement.elementIndex}"
+                        )
+                    }
 
                     when (updateElement.elementType) {
                         PROPERTY_ELEMENT -> {
@@ -3171,7 +3427,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 } else {
-                    Log.d("M:USP", "ProcessElementUpdateStack - NO MORE ELEMENTS LEFT - Stop update process")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:USP",
+                            "ProcessElementUpdateStack - NO MORE ELEMENTS LEFT - Stop update process"
+                        )
+                    }
                     this.updateStackProcessActive = false
                 }
             }
@@ -3202,11 +3463,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.multiComplexPropertyPageOpen = true
         this.multiComplexTypeID = this.propertyTypeFromID(propertyID)
 
-        Log.d(
-            "M:NotifyMCPPI",
-            "Multi-Complex-Property-Page invoked notification send for property-ID: ${this.multiComplexPageID} and type-ID: ${this.multiComplexTypeID}"
-        )
-
+        if(verboseLog) {
+            Log.d(
+                "M:NotifyMCPPI",
+                "Multi-Complex-Property-Page invoked notification send for property-ID: ${this.multiComplexPageID} and type-ID: ${this.multiComplexTypeID}"
+            )
+        }
         sendData("${this.multiComplexPropertyPageInvokedStartEntry}${a8BitValueToString(propertyID)}$")
     }
 

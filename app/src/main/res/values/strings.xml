@@ -152,6 +152,9 @@
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
 
+    <string name="ViewLogActivity_HeaderText">Connection Log</string>
+    <string name="ViewLogActivity_NotificationNoLogDataAvailable">No Log-Data available</string>
+
     <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Binding Data successful saved.</string>
     <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Error: Invalid data format.</string>
@@ -222,5 +225,6 @@
     <string name="uuidProfileListPlaceholder" translatable="false">Profile Element</string>
     <string name="UUIDFormatHint" translatable="false">0000ffff–0000-1000-8000-00805f9b34fb</string>
     <string name="UUIDDefaultFill" translatable="false">00000000-0000-1000-8000-00805f9b34fb</string>
+    <string name="ConnectionLog_NoContent">Nothing to show..</string>
 
 </resources>

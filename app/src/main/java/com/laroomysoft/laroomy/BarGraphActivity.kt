@@ -68,7 +68,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onPause()
         // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:BGD:onPause", "Bar Graph Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:BGD:onPause",
+                    "Bar Graph Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -77,14 +82,19 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:BGD:onResume", "onResume executed in Bar-Graph Activity")
+
+        if(verboseLog) {
+            Log.d("M:BGD:onResume", "onResume executed in Bar-Graph Activity")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@BarGraphActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:BGD:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:BGD:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         } else {
@@ -151,7 +161,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:BGD:ConStateChge", "Connection state changed in BarGraph Activity. New Connection state is: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:BGD:ConStateChge",
+                "Connection state changed in BarGraph Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -161,7 +176,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
-        Log.e("M:BGD:onConnFailed", "Connection Attempt failed in BarGraph Activity")
+
+        Log.e(
+            "M:BGD:onConnFailed",
+            "Connection Attempt failed in BarGraph Activity"
+        )
+        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in BarGraphActivity")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -183,7 +204,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:BGD:ComplexPCg", "BarGraph Activity - Complex Property changed - Update the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:BGD:ComplexPCg",
+                    "BarGraph Activity - Complex Property changed - Update the UI"
+                )
+            }
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }

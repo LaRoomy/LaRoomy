@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.appcompat.widget.SwitchCompat
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val ERROR_MESSAGE = 0
 const val WARNING_MESSAGE = 1
@@ -33,6 +34,8 @@ const val COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL = 9
 const val COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR = 10
 const val COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR = 11
 const val COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY = 12
+
+const val verboseLog = true
 
 
 // seekBar handler types
@@ -73,12 +76,18 @@ class ApplicationProperty : Application() {
 
     lateinit var uuidManager: UUIDManager
 
+    var connectionLog = ArrayList<String>()
+    var logRecordingTime = ""
+
     override fun onCreate() {
         super.onCreate()
         bluetoothConnectionManager = BLEConnectionManager(this)
         systemLanguage = Locale.getDefault().displayLanguage
 
         eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
+
+        // add the initial placeholder value
+        this.connectionLog.add(getString(R.string.ConnectionLog_NoContent))
     }
 
     fun resetControlParameter(){
@@ -89,8 +98,22 @@ class ApplicationProperty : Application() {
         this.navigatedFromPropertySubPage = false
     }
 
+    fun logControl(message: String){
+        if(eventLogEnabled){
+            this.connectionLog.add(message)
+        }
+    }
+
     fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int) : String {
-        Log.d("M:LoadSavedStringData", "Loading String-Data. FileKey: ${getString(fileKeyID)} / DataKey: ${getString(dataKeyID)}")
+
+        if(verboseLog) {
+            Log.d(
+                "M:LoadSavedStringData",
+                "Loading String-Data. FileKey: ${getString(fileKeyID)} / DataKey: ${
+                    getString(dataKeyID)
+                }"
+            )
+        }
 
         val sharedPref = getSharedPreferences(
             getString(fileKeyID),
@@ -103,7 +126,10 @@ class ApplicationProperty : Application() {
     }
 
     fun saveStringData(data: String, fileKeyID: Int, dataKeyID: Int){
-        Log.d("M:SaveStringData", "Saving data to memory - Data: $data")
+
+        if(verboseLog) {
+            Log.d("M:SaveStringData", "Saving data to memory - Data: $data")
+        }
 
         if(data.isNotEmpty()) {
             val sharedPref =

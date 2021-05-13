@@ -52,7 +52,12 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     override fun onPause() {
         super.onPause()
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:STSPage:onPause", "Simple Time Selector Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:STSPage:onPause",
+                    "Simple Time Selector Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -71,22 +76,30 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:STSPage:onResume", "onResume executed in Simple Time Selector Control")
+        if(verboseLog) {
+            Log.d("M:STSPage:onResume", "onResume executed in Simple Time Selector Control")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect){
-            Log.d("M:STSPage:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:STSPage:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
     }
 
     override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        Log.d("M:CB:TimeChanged", "Time changed in SimpleTimeSelector Activity." +
-                "Selected Time is: $hourOfDay : $minute")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:TimeChanged", "Time changed in SimpleTimeSelector Activity." +
+                        "Selected Time is: $hourOfDay : $minute"
+            )
+        }
 
         this.currentHour = hourOfDay
         this.currentMinute = minute
@@ -127,7 +140,12 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:STSPage:ConStateChge", "Connection state changed in SimpleTimeSelector Activity. New Connection state is: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:STSPage:ConStateChge",
+                "Connection state changed in SimpleTimeSelector Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -137,7 +155,10 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:STSPage:onConnFailed", "Connection Attempt failed in Simple Time Selector Activity")
+        (applicationContext as ApplicationProperty).logControl("E: Connection failed in SimpleTimeSelector")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -158,7 +179,12 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:STSPage:ComplexPCg", "Simple Time Selector Activity - Complex Property changed - Update the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:STSPage:ComplexPCg",
+                    "Simple Time Selector Activity - Complex Property changed - Update the UI"
+                )
+            }
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }

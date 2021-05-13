@@ -84,7 +84,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // only suspend the connection if the user left this application
         if(!(this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution) {
 
-            Log.d("M:CB:onPause", "onPause executed in DeviceMainActivity - User left the app or navigated back - suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:onPause",
+                    "onPause executed in DeviceMainActivity - User left the app or navigated back - suspend connection"
+                )
+            }
 
             // TODO: suspend connection (maybe delayed in background???)
             //ApplicationProperty.bluetoothConnectionManger.close()
@@ -110,7 +115,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:onResume", "Activity resumed. Previous loading done: ${this.activityWasSuspended}")
+
+        if(verboseLog) {
+            Log.d(
+                "M:onResume",
+                "Activity resumed. Previous loading done: ${this.activityWasSuspended}"
+            )
+        }
 
         // at first check if this callback will be invoked due to a back-navigation from a property sub-page
         // or if it was invoked on creation or a resume from outside of the application
@@ -134,10 +145,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             } else {
                 // do a complex state- update if required...
                 if ((this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired) {
-                    Log.d(
-                        "M:onResume",
-                        "Complex-State-Update required for ID ${(this.applicationContext as ApplicationProperty).complexUpdateID}"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:onResume",
+                            "Complex-State-Update required for ID ${(this.applicationContext as ApplicationProperty).complexUpdateID}"
+                        )
+                    }
+
+                    (applicationContext as ApplicationProperty).logControl("Resumed Device Main Activity: Complex-State-Update required for ID: ${(this.applicationContext as ApplicationProperty).complexUpdateID}")
 
                     (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired =
                         false
@@ -270,11 +285,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         index: Int,
         devicePropertyListContentInformation: DevicePropertyListContentInformation
     ) {
-        Log.d("M:CB:onPropBtnClk", "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
-                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
-                "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:onPropBtnClk",
+                "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
+                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+            )
+        }
         // NOTE: the button has no state the execution command contains always "1"
         ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}1$")
     }
@@ -284,12 +304,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         devicePropertyListContentInformation: DevicePropertyListContentInformation,
         switch: SwitchCompat
     ) {
-        Log.d("M:CB:onPropSwitchClk", "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
-                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
-                "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
-
+        if(verboseLog) {
+            Log.d(
+                "M:CB:onPropSwitchClk",
+                "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
+                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+            )
+        }
         // TODO: check if the newState comes with the right terminology
 
         val c = when(switch.isChecked){
@@ -306,18 +330,26 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     ) {
         val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
 
-        Log.d("M:CB:onSeekBarChange", "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
-                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
-                "Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
-                "SeekBar specific values:\n" +
-                "New Value: $newValue\n" +
-                "Change-Type: ${when(changeType){
-                    SEEK_BAR_START_TRACK -> "Start tracking"
-                    SEEK_BAR_PROGRESS_CHANGING -> "Tracking"
-                    SEEK_BAR_STOP_TRACK -> "Stop tracking"
-                    else -> "error" }}")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:onSeekBarChange",
+                "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
+                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
+                        "SeekBar specific values:\n" +
+                        "New Value: $newValue\n" +
+                        "Change-Type: ${
+                            when (changeType) {
+                                SEEK_BAR_START_TRACK -> "Start tracking"
+                                SEEK_BAR_PROGRESS_CHANGING -> "Tracking"
+                                SEEK_BAR_STOP_TRACK -> "Stop tracking"
+                                else -> "error"
+                            }
+                        }"
+            )
+        }
 
         if(changeType == SEEK_BAR_PROGRESS_CHANGING){
             val bitValue =
@@ -331,11 +363,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         index: Int,
         devicePropertyListContentInformation: DevicePropertyListContentInformation
     ) {
-        Log.d("M:CB:onNavElementClk", "Property element was clicked. Element-Type is Complex/Navigate forward at index: $index\n\nData is:\n" +
-                "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
-                "Element-Index: ${devicePropertyListContentInformation.globalIndex}")
+        if(verboseLog) {
+            Log.d(
+                "M:CB:onNavElementClk",
+                "Property element was clicked. Element-Type is Complex/Navigate forward at index: $index\n\nData is:\n" +
+                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+            )
+        }
 
         // set it to selected color
         setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
@@ -500,6 +537,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
         // this callback will only invoked in this activity if this is a re-connect-process (the initial connection attempt will be executed in the loading activity!)
+
+        (applicationContext as ApplicationProperty).logControl("I: Connection State changed in DeviceMainActivity to $state")
 
         // set the UI State to connected:
         this.setUIConnectionStatus(state)

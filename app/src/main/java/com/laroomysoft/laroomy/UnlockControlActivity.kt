@@ -60,7 +60,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         super.onPause()
         // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            Log.d("M:UCA:onPause", "Unlock Control Activity: The user closes the app -> suspend connection")
+            if(verboseLog) {
+                Log.d(
+                    "M:UCA:onPause",
+                    "Unlock Control Activity: The user closes the app -> suspend connection"
+                )
+            }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.close()
@@ -69,14 +74,18 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     override fun onResume() {
         super.onResume()
-        Log.d("M:UCA:onResume", "onResume executed in Unlock Control Activity")
+        if(verboseLog) {
+            Log.d("M:UCA:onResume", "onResume executed in Unlock Control Activity")
+        }
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
         if(this.mustReconnect) {
-            Log.d("M:UCA:onResume", "The connection was suspended -> try to reconnect")
+            if(verboseLog) {
+                Log.d("M:UCA:onResume", "The connection was suspended -> try to reconnect")
+            }
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
             this.mustReconnect = false
         }
@@ -148,7 +157,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        Log.d("M:UCA:ConStateChge", "Connection state changed in UnlockControl Activity. New Connection state is: $state")
+        if(verboseLog) {
+            Log.d(
+                "M:UCA:ConStateChge",
+                "Connection state changed in UnlockControl Activity. New Connection state is: $state"
+            )
+        }
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
@@ -158,7 +172,10 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
+
         Log.e("M:UCA:onConnFailed", "Connection Attempt failed in UnlockControl Activity")
+        (applicationContext as ApplicationProperty).logControl("E: Connection failed in UnlockControlActivity")
+
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
     }
 
@@ -179,7 +196,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.elementID == this.relatedElementID){
-            Log.d("M:CB:UCA:ComplexPCg", "Unlock Control Activity - Complex Property changed - Update the UI")
+            if(verboseLog) {
+                Log.d(
+                    "M:CB:UCA:ComplexPCg",
+                    "Unlock Control Activity - Complex Property changed - Update the UI"
+                )
+            }
             this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
         }
     }
