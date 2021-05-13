@@ -35,6 +35,7 @@ const val COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR = 10
 const val COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR = 11
 const val COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY = 12
 
+// change this to true to enable an internal verbose log output (this means not the user-log!)
 const val verboseLog = true
 
 

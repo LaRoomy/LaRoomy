@@ -1059,16 +1059,33 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     fun sendData(data: String){
 
         if(!this.isConnected){
-            Log.d("M:sendData", "Unexpected error, bluetooth device not connected")
+            Log.e("M:sendData", "Unexpected error, bluetooth device not connected")
+            applicationProperty.logControl("E: Unexpected: sendData invoked, but device not connected")
             this.callback.onComponentError("Unexpected error, bluetooth device not connected")
         }
         else {
-            Log.d("M:sendData", "writing characteristic: data: $data")
+            if(verboseLog) {
+                Log.d("M:sendData", "writing characteristic: data: $data")
+            }
+
+            // make sure the passkey is hidden in the connection log
+            // TODO: let the user decide if the passkey should be hidden or not
+
+            if(data.elementAt(0) == 'r'){
+                // must be the binding request -> hide passkey
+                applicationProperty.logControl("I: Send Data: r*****>$")
+            } else {
+                if(data.startsWith("SeB:", false)){
+                    applicationProperty.logControl("I: Send Data: SeB:*****$")
+                } else {
+                    applicationProperty.logControl("I: Send Data: $data")
+                }
+            }
 
             this.gattCharacteristic.setValue(data)
 
             if (this.bluetoothGatt == null)
-                Log.d("M:sendData", "Member bluetoothGatt was null!")
+                Log.e("M:sendData", "Member bluetoothGatt was null!")
 
             this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
 
@@ -1126,7 +1143,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun suspendConnection(){
-        Log.d("M:Bmngr:suspendC", "BluetoothManager: suspendConnection invoked")
+        if(verboseLog) {
+            Log.d("M:Bmngr:suspendC", "BluetoothManager: suspendConnection invoked")
+        }
         this.isResumeConnectionAttempt = false
         this.connectionSuspended = true
         this.suspendedDeviceAddress = this.currentDevice?.address ?: ""
@@ -1139,7 +1158,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isResumeConnectionAttempt = true
 
         if(this.suspendedDeviceAddress.isNotEmpty()){
-            Log.d("M:Bmngr:resumeC", "BluetoothManager: resumeConnection: Internal Device Address: ${this.suspendedDeviceAddress}")
+            if(verboseLog) {
+                Log.d(
+                    "M:Bmngr:resumeC",
+                    "BluetoothManager: resumeConnection: Internal Device Address: ${this.suspendedDeviceAddress}"
+                )
+            }
             this.connectToRemoteDevice(this.suspendedDeviceAddress)
         } else {
             Log.e("M:Bmngr:resumeC", "BluetoothManager: Internal Device Address invalid- trying to connect to saved address")
@@ -1157,7 +1181,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //    }
 
     fun saveLastSuccessfulConnectedDeviceAddress(address: String){
-        Log.d("M:SaveAddress", "Saving address of successful connected device - address: $address")
+        if(verboseLog) {
+            Log.d(
+                "M:SaveAddress",
+                "Saving address of successful connected device - address: $address"
+            )
+        }
         this.applicationProperty.saveStringData(address, R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
     }
 
@@ -1168,7 +1197,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(this.isConnected){
             // only start if there is no pending process/loop
             if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
-                Log.d("M:StartPropListing", "Device property listing started.")
+                if(verboseLog) {
+                    Log.d("M:StartPropListing", "Device property listing started.")
+                }
                 this.propertyRequestIndexCounter = 0
                 this.propertyLoopActive = true
                 this.propertyUpToDate = false
@@ -1263,7 +1294,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun startRetrievingPropertyNames(){
-        Log.d("M:RetrievingPropNames", "Starting to resolve the property descriptions")
+        if(verboseLog) {
+            Log.d("M:RetrievingPropNames", "Starting to resolve the property descriptions")
+        }
         if(this.isConnected){
             if(this.laRoomyDevicePropertyList.isNotEmpty()) {
 
@@ -1286,7 +1319,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 val requestString = "B$languageIdentificationChar$hundred$tenth$single$"
 
-                Log.d("M:RetrievingPropNames", "Sending Request String for the first element: $requestString")
+                if(verboseLog) {
+                    Log.d(
+                        "M:RetrievingPropNames",
+                        "Sending Request String for the first element: $requestString"
+                    )
+                }
                 this.propertyNameResolveLoopActive = true
                 this.sendData(requestString)
             }
@@ -1297,11 +1335,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         var stringProcessed = false
 
-        Log.d("M:resolvePropNames", "Task: trying to resolve the received string to property name")
+        if(verboseLog) {
+            Log.d(
+                "M:resolvePropNames",
+                "Task: trying to resolve the received string to property name"
+            )
+        }
 
         if(currentPropertyResolveID == -1) {
 
-            Log.d("M:resolvePropNames", "The resolve-ID was invalidated, look if this is a description-name start indicator")
+            if(verboseLog) {
+                Log.d(
+                    "M:resolvePropNames",
+                    "The resolve-ID was invalidated, look if this is a description-name start indicator"
+                )
+            }
 
             var propertyID = ""
             var propertyState = ""
@@ -1339,18 +1387,33 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             }
 
-
-
-            Log.d("M:resolvePropNames", "This was a start indicator. The next received string should be the name for the property with ID: $propertyID")
+            if(verboseLog) {
+                Log.d(
+                    "M:resolvePropNames",
+                    "This was a start indicator. The next received string should be the name for the property with ID: $propertyID"
+                )
+            }
         }
         else {
-            Log.d("M:resolvePropNames", "This must be the name string or a end indicator")
+            if(verboseLog) {
+                Log.d("M:resolvePropNames", "This must be the name string or a end indicator")
+            }
             // must be the name-string or the finalization-string
             if(propertyName == propertyNameEndIndicator){
-                Log.d("M:resolvePropNames", "It's a finalization string: reset necessary parameter")
+                if(verboseLog) {
+                    Log.d(
+                        "M:resolvePropNames",
+                        "It's a finalization string: reset necessary parameter"
+                    )
+                }
                 // it's a finalization string -> check for loop end
                 if(this.laRoomyDevicePropertyList.last().propertyID == currentPropertyResolveID){
-                    Log.d("M:resolvePropNames", "This was the last property name to resolve: close loop and reset parameter")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:resolvePropNames",
+                            "This was the last property name to resolve: close loop and reset parameter"
+                        )
+                    }
                     // it's the last index, close loop
                     propertyNameResolveLoopActive = false
                     // invalidate the index
@@ -1359,13 +1422,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if(!this.propertyConfirmationModeActive)
                         this.propertyCallback.onPropertyDataRetrievalCompleted(this.laRoomyDevicePropertyList)
                     // check if one of the device-properties is part of a Group -> if so, start group-retrieving loop
-                    Log.d("M:resolvePropNames", "Check if some properties are part of a group")
+                    if(verboseLog) {
+                        Log.d("M:resolvePropNames", "Check if some properties are part of a group")
+                    }
                     if(this.groupRequestLoopRequired()){
                         if(!this.propertyNameResolveSingleAction) {
-                            Log.d(
-                                "M:resolvePropNames",
-                                "This checkup was true. A group retrieval is required: start loop!"
-                            )
+                            if(verboseLog) {
+                                Log.d(
+                                    "M:resolvePropNames",
+                                    "This checkup was true. A group retrieval is required: start loop!"
+                                )
+                            }
                             // start retrieving
                             this.startGroupIndexingLoop()
                         }
@@ -1396,7 +1463,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                 }
                 else {
-                    Log.d("M:resolvePropNames", "This was not the last property index: send next request")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:resolvePropNames",
+                            "This was not the last property index: send next request"
+                        )
+                    }
                     // it's not the last index, request next propertyName
                     requestNextPropertyDescription()
                 }
@@ -1406,13 +1478,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 stringProcessed = true
             }
             else {
-                Log.d("M:resolvePropNames", "This must be the name string for the property with ID: $currentPropertyResolveID")
+                if(verboseLog) {
+                    Log.d(
+                        "M:resolvePropNames",
+                        "This must be the name string for the property with ID: $currentPropertyResolveID"
+                    )
+                }
                 // must be a name-string
                 if(this.propertyConfirmationModeActive){
                     // confirmation mode active: compare the property name
-                    if(propertyName != this.laRoomyDevicePropertyList.elementAt(this.currentPropertyResolveIndex).propertyDescriptor){
+                    if (propertyName != this.laRoomyDevicePropertyList.elementAt(this.currentPropertyResolveIndex).propertyDescriptor) {
                         // log:
-                        Log.d("M:resolvePropNames", "Confirmation-Mode active: this propertyName does not equal to the saved one.\nPropertyID: $currentPropertyResolveID\nPropertyIndex: $currentGroupResolveIndex")
+                        if (verboseLog) {
+                            Log.d(
+                                "M:resolvePropNames",
+                                "Confirmation-Mode active: this propertyName does not equal to the saved one.\nPropertyID: $currentPropertyResolveID\nPropertyIndex: $currentGroupResolveIndex"
+                            )
+                        }
                         // the property-name has changed
                         this.laRoomyDevicePropertyList.elementAt(this.currentPropertyResolveIndex).hasChanged = true
                         this.propertyDetailChangedOnConfirmation = true
@@ -1428,7 +1510,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun requestNextPropertyDescription(){
-        Log.d("M:RQNextPropNames", "Requesting next property description")
+        if(verboseLog) {
+            Log.d("M:RQNextPropNames", "Requesting next property description")
+        }
         // increment the property counter and send next request
         currentPropertyResolveIndex++
 
@@ -1453,11 +1537,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             val requestString = "B$languageIdentificationChar$hundred$tenth$single$"
 
-            Log.d("M:RQNextPropNames", "Sending next request: $requestString")
+            if(verboseLog) {
+                Log.d("M:RQNextPropNames", "Sending next request: $requestString")
+            }
             this.sendData(requestString)
         }
         else {
-            Log.d("M:RQNextPropNames", "!! unexpected end of property array found, this should not happen, because the preliminary executed method \"resolvePropertyName\" is expected to close the retrieving loop")
+            Log.w("M:RQNextPropNames", "!! unexpected end of property array found, this should not happen, because the preliminary executed method \"resolvePropertyName\" is expected to close the retrieving loop")
             // !! unexpected end of property array found, this should not happen, because the preliminary executed method "resolvePropertyName" is expected to close the retrieving loop
             // be that as it may. Force loop closing:
             propertyNameResolveLoopActive = false
@@ -1474,7 +1560,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: make sure there is no possibility of a double execution
 
         if(this.isConnected){
-            Log.d("M:StartGroupListing", "Device property GROUP listing started.")
+            if(verboseLog) {
+                Log.d("M:StartGroupListing", "Device property GROUP listing started.")
+            }
             this.groupRequestIndexCounter = 0
             this.groupLoopActive = true
             // only clear the list if this is not the confirmation mode
@@ -1571,13 +1659,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 else -> "E${this.groupRequestIndexCounter}$"
             }
         // log:
-        Log.d("M:requestNextGroup", "Send next property-group request index - message: $data")
+        if(verboseLog) {
+            Log.d("M:requestNextGroup", "Send next property-group request index - message: $data")
+        }
         // send the string
         this.sendData(data)
     }
 
     private fun startDetailedGroupInfoLoop(){
-        Log.d("M:RetrievingGroupNames", "Starting to resolve the detailed group info")
+        if(verboseLog) {
+            Log.d("M:RetrievingGroupNames", "Starting to resolve the detailed group info")
+        }
         if(this.isConnected){
             if(this.laRoomyPropertyGroupList.isNotEmpty()) {
 
@@ -1600,7 +1692,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 val requestString = "F$languageIdentificationChar$hundred$tenth$single$"
 
-                Log.d("M:RetrievingGroupInfo", "Sending Group-Info Request String for the first element: $requestString")
+                if(verboseLog) {
+                    Log.d(
+                        "M:RetrievingGroupInfo",
+                        "Sending Group-Info Request String for the first element: $requestString"
+                    )
+                }
                 this.groupInfoLoopActive = true
                 this.sendData(requestString)
             }
@@ -1610,10 +1707,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun resolveGroupInfo(groupInfoData: String) : Boolean {
         var stringProcessed = false
         // log:
-        Log.d("M:resolveGroupInfo", "Task: trying to resolve the received string to group info data")
+        if(verboseLog) {
+            Log.d(
+                "M:resolveGroupInfo",
+                "Task: trying to resolve the received string to group info data"
+            )
+        }
         // check invalidated condition
         if(currentGroupResolveID == -1) {
-            Log.d("M:resolveGroupInfo", "The resolve-ID was invalidated, look if this is a group-info start indicator")
+
+            if(verboseLog) {
+                Log.d(
+                    "M:resolveGroupInfo",
+                    "The resolve-ID was invalidated, look if this is a group-info start indicator"
+                )
+            }
 
             var groupID = ""
 
@@ -1638,16 +1746,33 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // mark the string as processed
                 stringProcessed = true
             }
-            Log.d("M:resolveGroupInfo", "This was a start indicator. The next received string should be some data for the group with ID: $groupID")
+            if(verboseLog) {
+                Log.d(
+                    "M:resolveGroupInfo",
+                    "This was a start indicator. The next received string should be some data for the group with ID: $groupID"
+                )
+            }
         }
         else {
-            Log.d("M:resolveGroupInfo", "This must be the group-info or a end indicator")
+            if(verboseLog) {
+                Log.d("M:resolveGroupInfo", "This must be the group-info or a end indicator")
+            }
             // must be the name-string or the finalization-string
             if(groupInfoData == groupInfoEndIndicator){
-                Log.d("M:resolveGroupInfo", "It's a finalization string: reset necessary parameter")
+                if(verboseLog) {
+                    Log.d(
+                        "M:resolveGroupInfo",
+                        "It's a finalization string: reset necessary parameter"
+                    )
+                }
                 // it's a finalization string -> check for loop end
                 if(this.laRoomyPropertyGroupList.last().groupID == currentGroupResolveID){
-                    Log.d("M:resolveGroupInfo", "This was the last group-info to resolve: close loop and reset parameter")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:resolveGroupInfo",
+                            "This was the last group-info to resolve: close loop and reset parameter"
+                        )
+                    }
                     // it's the last index, close loop
                     groupInfoLoopActive = false
                     this.propertyUpToDate = true
@@ -1681,7 +1806,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                 }
                 else {
-                    Log.d("M:resolveGroupInfo", "This was not the last group index: send next request")
+                    if(verboseLog) {
+                        Log.d(
+                            "M:resolveGroupInfo",
+                            "This was not the last group index: send next request"
+                        )
+                    }
                     // it's not the last index, request next propertyName
                     requestNextGroupInfo()
                 }
@@ -1691,41 +1821,70 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 stringProcessed = true
             }
             else {
-                Log.d("M:resolveGroupInfo", "This must be the data for the group with ID: $currentGroupResolveID")
+                if(verboseLog) {
+                    Log.d(
+                        "M:resolveGroupInfo",
+                        "This must be the data for the group with ID: $currentGroupResolveID"
+                    )
+                }
                 // must be group data:
                 // check the type of data:
-                if(groupInfoData.startsWith(groupMemberStringPrefix, false)){
+                if (groupInfoData.startsWith(groupMemberStringPrefix, false)) {
                     // log
-                    Log.d("M:resolveGroupInfo", "This must be the member IDs for the group with ID: $currentGroupResolveID")
+                    if (verboseLog) {
+                        Log.d(
+                            "M:resolveGroupInfo",
+                            "This must be the member IDs for the group with ID: $currentGroupResolveID"
+                        )
+                    }
                     // this was the member id identification, so set the member IDs
-                    return if(this.propertyConfirmationModeActive){
+                    return if (this.propertyConfirmationModeActive) {
                         // confirmation mode is active so check the element
-                        if(!this.compareMemberIDStringWithIntegerArrayList(groupInfoData, this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).memberIDs)){
+                        if (!this.compareMemberIDStringWithIntegerArrayList(
+                                groupInfoData,
+                                this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).memberIDs
+                            )
+                        ) {
                             // log:
-                            Log.d("M:resolveGroupInfo", "Confirmation-Mode active: The received member IDs differ from the saved ones.\nGroupID: $currentGroupResolveID")
+                            if (verboseLog) {
+                                Log.d(
+                                    "M:resolveGroupInfo",
+                                    "Confirmation-Mode active: The received member IDs differ from the saved ones.\nGroupID: $currentGroupResolveID"
+                                )
+                            }
                             // the member ids differ from the save ones
-                            this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).hasChanged = true
+                            this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).hasChanged =
+                                true
                             this.groupDetailChangedOnConfirmation = true
                         }
                         true
                     }
                     else setGroupMemberIDArrayForGroupID(this.currentGroupResolveID, groupInfoData)
-                }
-                else{
+                } else {
                     // log
-                    Log.d("M:resolveGroupInfo", "This must be the name-string for the group with ID: $currentGroupResolveID")
+                    if (verboseLog) {
+                        Log.d(
+                            "M:resolveGroupInfo",
+                            "This must be the name-string for the group with ID: $currentGroupResolveID"
+                        )
+                    }
                     // this should be the name of the group, so set the group name
-                    if(this.propertyConfirmationModeActive){
+                    if (this.propertyConfirmationModeActive) {
                         // confirmation mode active: check for changes in the group-name
-                        if(groupInfoData != this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).groupName){
+                        if (groupInfoData != this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).groupName) {
                             // log:
-                            Log.d("M:resolveGroupInfo", "Confirmation-Mode active: detected changed group-name.\nGroupID: $currentGroupResolveID")
+                            if (verboseLog) {
+                                Log.d(
+                                    "M:resolveGroupInfo",
+                                    "Confirmation-Mode active: detected changed group-name.\nGroupID: $currentGroupResolveID"
+                                )
+                            }
                             // the group-name changed
-                            this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).hasChanged = true
+                            this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).hasChanged =
+                                true
                             this.groupDetailChangedOnConfirmation = true
                         }
-                    }
-                    else setGroupName(this.currentGroupResolveID, groupInfoData)
+                    } else setGroupName(this.currentGroupResolveID, groupInfoData)
                 }
                 // TODO: the string should be marked as processed, but are you sure at this point??
                 //stringProcessed = true
@@ -1913,7 +2072,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun startPropertyConfirmationProcess(){
         // log:
-        Log.d("M:StartConfirmation", "Property Listing started in Confirmation-Mode")
+        if(verboseLog) {
+            Log.d("M:StartConfirmation", "Property Listing started in Confirmation-Mode")
+        }
         // start the confirmation process (!!but only if there is no pending retrieving process!!)
         if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
             if(this.laRoomyDevicePropertyList.isNotEmpty()) {
@@ -1921,10 +2082,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.propertyDetailChangedOnConfirmation = false
                 this.groupDetailChangedOnConfirmation = false
                 this.startDevicePropertyListing()
-            }
-            else {
+            } else {
                 // there are no properties to confirm!
-                Log.d("M:StartConfirmation", "Property List empty - confirmation not possible")
+                if (verboseLog) {
+                    Log.d(
+                        "M:StartConfirmation",
+                        "Property List empty - confirmation not possible"
+                    )
+                }
             }
         }
     }
@@ -2109,8 +2274,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     16 -> if(c != '0')thisPropertyDetail = true
                 }
             }
-            Log.d("M:updateProperty", "Recording of Property-Update String complete:\nUpdate: entireProperty = $entireProperty\nUpdate: entireDetail = $entireDetail\nUpdate: thisProperty = $thisProperty\nUpdate: thisPropertyDetail = $thisPropertyDetail")
-
+            if(verboseLog) {
+                Log.d(
+                    "M:updateProperty",
+                    "Recording of Property-Update String complete:\nUpdate: entireProperty = $entireProperty\nUpdate: entireDetail = $entireDetail\nUpdate: thisProperty = $thisProperty\nUpdate: thisPropertyDetail = $thisPropertyDetail"
+                )
+            }
             if(entireProperty){
                 // TODO: this must be checked
                 this.propertyCallback.onCompletePropertyInvalidated()
@@ -2149,7 +2318,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
         }
-        else Log.d("M:updateProperty", "Error: insufficient string length")
+        else {
+            Log.e("M:updateProperty", "Error: insufficient string length")
+        }
     }
 
     private fun updatePropertyGroup(data: String){
@@ -2175,7 +2346,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     16 -> if(c != '0')thisGroupDetail = true
                 }
             }
-            Log.d("M:updatePropGroup", "Recording of Property Group Update String complete:\nUpdate: entirePropertyGroup = $entirePropertyGroup\nUpdate: entireGroupDetail = $entireGroupDetail\nUpdate: thisgroup = $thisGroup\nUpdate: thisGroupDetail = $thisGroupDetail")
+            if(verboseLog) {
+                Log.d(
+                    "M:updatePropGroup",
+                    "Recording of Property Group Update String complete:\nUpdate: entirePropertyGroup = $entirePropertyGroup\nUpdate: entireGroupDetail = $entireGroupDetail\nUpdate: thisgroup = $thisGroup\nUpdate: thisGroupDetail = $thisGroupDetail"
+                )
+            }
 
             if(entirePropertyGroup){
                 // TODO: check if this works!
@@ -2215,11 +2391,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
         }
-        else Log.d("M:updatePropGroup", "Error: insufficient string length")
+        else {
+            Log.e("M:updatePropGroup", "Error: insufficient string length")
+        }
     }
 
     private fun sendSinglePropertyRequest(propertyIndex: Int){
-        Log.d("M:SendRequest", "SendSinglePropertyRequest: Invoked")
+        if(verboseLog) {
+            Log.d("M:SendRequest", "SendSinglePropertyRequest: Invoked")
+        }
         if(this.isConnected) {
             // set marker
             this.singlePropertyRetrievingAction = true
@@ -2236,7 +2416,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun sendSinglePropertyGroupRequest(groupIndex: Int){
-        Log.d("M:SendRequest", "SendSinglePropertyGroupRequest: Invoked")
+        if(verboseLog) {
+            Log.d("M:SendRequest", "SendSinglePropertyGroupRequest: Invoked")
+        }
         if(this.isConnected) {
             // set marker
             this.singleGroupRetrievingAction = true
@@ -2253,7 +2435,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun sendSinglePropertyResolveRequest(propertyID: Int){
-        Log.d("M:SendRequest", "SendSinglePropertyResolveRequest: Invoked")
+        if(verboseLog) {
+            Log.d("M:SendRequest", "SendSinglePropertyResolveRequest: Invoked")
+        }
         if(this.isConnected) {
             // set marker
             this.singlePropertyDetailRetrievingAction = true
@@ -2275,7 +2459,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun sendSingleGroupDetailRequest(groupID: Int){
-        Log.d("M:SendRequest", "SendSingleGroupDetailRequest: Invoked")
+        if(verboseLog) {
+            Log.d("M:SendRequest", "SendSingleGroupDetailRequest: Invoked")
+        }
         if(this.isConnected) {
             // set marker
             this.singleGroupDetailRetrievingAction = true
@@ -2754,7 +2940,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             strID += data.elementAt(5)
             propertyID = strID.toInt()
 
-            Log.d("M:resolveSimpleSData", "Trying to resolve simple state data for Property-ID: $propertyID")
+            if(verboseLog) {
+                Log.d(
+                    "M:resolveSimpleSData",
+                    "Trying to resolve simple state data for Property-ID: $propertyID"
+                )
+            }
 
             if(propertyID > -1 && propertyID < 256) {
                 val propertyElement = this.propertyElementFromID(propertyID)
@@ -2805,7 +2996,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             val propertyID =
                 id.toInt()
 
-            Log.d("M:resolveComplexSData", "Trying to resolve complexStateData for ID: $propertyID")
+            if(verboseLog) {
+                Log.d(
+                    "M:resolveComplexSData",
+                    "Trying to resolve complexStateData for ID: $propertyID"
+                )
+            }
 
             if(propertyID > -1 && propertyID < 256) {
                 val propertyElement = this.propertyElementFromID(propertyID)
@@ -2848,10 +3044,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // 3. Change UI Adapter
                 if (propertyStateChanged) {
-                    Log.d(
-                        "M:resolveComplexSData",
-                        "ComplexPropertyState has changed -> adapting changes to UI"
-                    )
+                    if(verboseLog) {
+                        Log.d(
+                            "M:resolveComplexSData",
+                            "ComplexPropertyState has changed -> adapting changes to UI"
+                        )
+                    }
 
                     var changedIndex = -1
 
@@ -2875,7 +3073,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // 5. Check if the state-loop is active and continue or close it
                 if (this.complexStateLoopActive) {
-                    Log.d("M:resolveComplexSData", "Complex state loop is active")
+                    if(verboseLog) {
+                        Log.d("M:resolveComplexSData", "Complex state loop is active")
+                    }
                     if (this.currentStateRetrievingIndex < this.complexStatePropertyIDs.size) {
                         this.requestPropertyState(
                             this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
@@ -2887,10 +3087,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                             // works!!!
 
-                            Log.d(
-                                "M:resolveComplexSData",
-                                "Complex state loop reached invalid index -> close Loop"
-                            )
+                                if(verboseLog) {
+                                    Log.d(
+                                        "M:resolveComplexSData",
+                                        "Complex state loop reached invalid index -> close Loop"
+                                    )
+                                }
                             this.complexStateLoopActive = false
                             this.currentStateRetrievingIndex = -1
 
@@ -2898,26 +3100,31 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
 
                     } else {
-                        Log.d(
-                            "M:resolveComplexSData",
-                            "Complex state loop reached invalid index -> close Loop"
-                        )
+                        if(verboseLog) {
+                            Log.d(
+                                "M:resolveComplexSData",
+                                "Complex state loop reached invalid index -> close Loop"
+                            )
+                        }
                         this.complexStateLoopActive = false
                         this.currentStateRetrievingIndex = -1
                     }
                 }
             } else {
                 Log.e("M:resolveComplexSData", "Property-ID invalid ID: $propertyID")
+                applicationProperty.logControl("E: Property ID invalid: $propertyID")
             }
         }
     }
 
     private fun resolveMultiComplexStateData(data: String, isName: Boolean){
 
-        Log.d(
-            "M:RslveMultiCmplx",
-            "ResolveMultiComplexStateData invoked - isName = $isName / data = $data"
-        )
+        if(verboseLog) {
+            Log.d(
+                "M:RslveMultiCmplx",
+                "ResolveMultiComplexStateData invoked - isName = $isName / data = $data"
+            )
+        }
 
         if(this.multiComplexPropertyPageOpen){
             val dataIndex = data.elementAt(4).toString().toInt()
@@ -3185,7 +3392,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun startComplexStateDataLoop(){
-        Log.d("M:startCompDataLoop", "ComplexStateDataLoop started - At first: Indexing the Property-IDs with complexStateData")
+        if(verboseLog) {
+            Log.d(
+                "M:startCompDataLoop",
+                "ComplexStateDataLoop started - At first: Indexing the Property-IDs with complexStateData"
+            )
+        }
         // clear the ID-Array
         this.complexStatePropertyIDs.clear()
         // loop the properties and save the ones with complex state
@@ -3198,7 +3410,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
         if(this.complexStatePropertyIDs.isNotEmpty()) {
-            Log.d("M:startCompDataLoop", "Found ${this.complexStatePropertyIDs.size} Elements with ComplexStateData -> start collecting from device")
+            if(verboseLog) {
+                Log.d(
+                    "M:startCompDataLoop",
+                    "Found ${this.complexStatePropertyIDs.size} Elements with ComplexStateData -> start collecting from device"
+                )
+            }
 
             this.currentStateRetrievingIndex = 0
             this.complexStateLoopActive = true
@@ -3288,7 +3505,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val min = calendar.get(Calendar.MINUTE)
         val sec = calendar.get(Calendar.SECOND)
         val outString = "ScT&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
-        Log.d("M:setDeviceTime", "Sending current local time to the device. Output Data is: $outString")
+        if(verboseLog) {
+            Log.d(
+                "M:setDeviceTime",
+                "Sending current local time to the device. Output Data is: $outString"
+            )
+        }
         this.sendData(outString)
     }
 
@@ -3339,7 +3561,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(this.elementUpdateList.isNotEmpty()) {
             if(!this.updateStackProcessActive) {
 
-                Log.d("M:startUSP", "Update stack processing started..")
+                if(verboseLog) {
+                    Log.d("M:startUSP", "Update stack processing started..")
+                }
                 this.updateStackProcessActive = true
 
                 val updateElement = this.elementUpdateList.elementAt(0)

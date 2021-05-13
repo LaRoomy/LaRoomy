@@ -62,7 +62,14 @@ class ViewLogActivity : AppCompatActivity() {
             holder.linearLayout.findViewById<AppCompatTextView>(R.id.logListItemContentTextView).apply {
                 text = logDataList[position]
 
-                // TODO: set error/info/warning color?
+                when (text.elementAt(0)) {
+                    'E' -> {
+                        setTextColor(holder.linearLayout.context.getColor(R.color.errorLightColor))
+                    }
+                    'W' -> {
+                        setTextColor(holder.linearLayout.context.getColor(R.color.warningLightColor))
+                    }
+                }
             }
         }
 

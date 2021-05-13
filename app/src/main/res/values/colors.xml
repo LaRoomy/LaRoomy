@@ -38,6 +38,8 @@
     <color name="setupActivityButtonNormalBackground">#FF111111</color>
     <color name="setupActivityButtonPressedBackground">#FF333333</color>
     <color name="uuidListSelectedItemColor">#FF000000</color>
+    <color name="errorLightColor">#FF8888</color>
+    <color name="warningLightColor">#F99F08</color>
 
 
     <!-- barGraph colors -->
