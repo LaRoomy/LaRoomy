@@ -69,6 +69,9 @@ class ViewLogActivity : AppCompatActivity() {
                     'W' -> {
                         setTextColor(holder.linearLayout.context.getColor(R.color.warningLightColor))
                     }
+                    else -> {
+                        setTextColor(holder.linearLayout.context.getColor(R.color.normalTextColor))
+                    }
                 }
             }
         }

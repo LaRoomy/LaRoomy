@@ -142,6 +142,9 @@
     <string name="DeviceSettingsActivity_ShareButtonHint">Die Geräte-Bindung für dieses spezifische Gerät wird geteilt. Die Daten werden verschlüsselt und der Schlüssel ist nicht sichtbar für den Empfänger oder irgendjemanden sonst.</string>
     <string name="DeviceSettingsActivity_FactoryResetHint">Es wird eine Anforderung zum Zurücksetzen an das Gerät gesendet.</string>
     <string name="DeviceSettingsActivity_BindingNotSupportedNotification">Die Geräte-Bindungsfuntion wird von diesem Gerät nicht unterstützt.</string>
+    <string name="DeviceSettingsActivity_OnlyTheOriginCanShareTheBindingNotification">Die Verbindung mit diesem Gerät wurde durch einen geteilten Bindungs-Schlüssel hergestellt. Das teilen eines geteilten Schlüssels ist nicht möglich. Nur der Urheber kann die Verbindung teilen.</string>
+    <string name="DeviceSettingsActivity_OnlyTheOriginCanReleaseTheBinding">Die Verbindung mit diesem Gerät wurde durch einen geteilten Bindungs-Schlüssel hergestellt. Nur der Urheber kann die Geräte-Bindung entfernen.</string>
+
 
 
     <string name="AppHelpActivityHeaderText">Hilfe-Themen</string>

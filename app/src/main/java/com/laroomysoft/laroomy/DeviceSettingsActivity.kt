@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -45,6 +46,19 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         if(ApplicationProperty.bluetoothConnectionManager.isBindingRequired){
             bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
             shareBindingContainer.visibility = View.VISIBLE
+
+            if(ApplicationProperty.bluetoothConnectionManager.isCurrentConnectionDoneWithSharedBindingKey){
+                // the current connection is established with a shared binding key
+                // -> no sharing is possible, only the origin can share the binding, so disable the button and notify the user
+                findViewById<AppCompatImageButton>(R.id.deviceSettingsActivityShareButton).isEnabled = false
+                findViewById<AppCompatTextView>(R.id.deviceSettingsActivityShareBindingHint).apply {
+                    setTextColor(getColor(R.color.errorLightColor))
+                    text = getString(R.string.DeviceSettingsActivity_OnlyTheOriginCanShareTheBindingNotification)
+                }
+                bindingSwitch.isEnabled = false
+                bindingHintTextView.setTextColor(getColor(R.color.errorLightColor))
+                bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_OnlyTheOriginCanReleaseTheBinding)
+            }
         }
 
         // set the connection-state info

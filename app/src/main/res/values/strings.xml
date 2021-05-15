@@ -139,6 +139,8 @@
     <string name="DeviceSettingsActivity_ShareButtonHint">The binding information for this specific device will be shared. The data will be encrypted and your binding-code is not visible to the receiver or someone else.</string>
     <string name="DeviceSettingsActivity_FactoryResetHint">A factory-reset-command will be sent to the remote device.</string>
     <string name="DeviceSettingsActivity_BindingNotSupportedNotification">The connected device does not support binding.</string>
+    <string name="DeviceSettingsActivity_OnlyTheOriginCanShareTheBindingNotification">The connection with this device is established with a shared binding-key. Sharing a shared key is not possible, only the originator is able to share the binding.</string>
+    <string name="DeviceSettingsActivity_OnlyTheOriginCanReleaseTheBinding">The connection with this device is established with a shared binding-key. Only the originator is able to release the binding.</string>
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>
     <string name="AppHelpTopic_ConnectDevice">Connect new device</string>

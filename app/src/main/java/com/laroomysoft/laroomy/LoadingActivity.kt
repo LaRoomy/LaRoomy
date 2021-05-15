@@ -14,7 +14,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     private var isLastConnectedDevice = false
     private var blockAllFurtherProcessing = false
     private var previouslyConnected = false
+    private var timeOut = false
+    private var timeOutHandlerStarted = false
     private var connectionAttemptCounter = 0
+    private var macAddressToConnect = ""
     //private var authenticationAttemptCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +58,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
             }
             -2 -> {
+                // cache the address to connect again if an unexpected disconnect event occurs
+                this.macAddressToConnect = (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
+
                 // connect to last device
                 isLastConnectedDevice = true
                 ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
@@ -64,6 +70,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 // connect to device from list at index
                 val adr =
                     ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(index).address
+
+                // cache the address to connect again if an unexpected disconnect event occurs
+                this.macAddressToConnect = adr
 
                 if(adr == ApplicationProperty.bluetoothConnectionManager.getLastConnectedDeviceAddress()){
                     isLastConnectedDevice = true
@@ -139,17 +148,39 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         if(!blockAllFurtherProcessing) {
             if (connectionAttemptCounter <= 4) {
                 if (!state) {
-                    if(!previouslyConnected){
-                        // must be a timeout, the system says disconnected, but the device was not previously connected
-                        Log.e("M:CB:ConStateChange", "Timeout for the connection-attempt. Device may be not reachable. Stop connection-process.")
-                        (applicationContext as ApplicationProperty).logControl("E: Timeout for connection. Device may be not reachable. Stop process.")
-                        ApplicationProperty.bluetoothConnectionManager.clear()
-                        // notify user
-                        setMessageText(R.color.WarningColor, getString(R.string.CA_TimeoutForConnection))
-                        // navigate back with delay
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            finish()
-                        }, 1500)
+                    if (!previouslyConnected) {
+                        // unexpected disconnected event, the system says disconnected, but the device was not previously connected
+                        // set up a timeout-handler and try to connect again
+                        if (!timeOut) {
+                            ApplicationProperty.bluetoothConnectionManager.clear()
+                            ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(
+                                this.macAddressToConnect
+                            )
+                            if (!timeOutHandlerStarted) {
+                                // make sure this will only be executed once:
+                                timeOutHandlerStarted = true
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    timeOut = true
+                                }, 5000) // timeout 5 seconds!
+                            }
+                        } else {
+                            // must be a timeout, the system says disconnected, but the device was not previously connected
+                            Log.e(
+                                "M:CB:ConStateChange",
+                                "Timeout for the connection-attempt. Device may be not reachable. Stop connection-process."
+                            )
+                            (applicationContext as ApplicationProperty).logControl("E: Timeout for connection. Device may be not reachable. Stop process.")
+                            ApplicationProperty.bluetoothConnectionManager.clear()
+                            // notify user
+                            setMessageText(
+                                R.color.WarningColor,
+                                getString(R.string.CA_TimeoutForConnection)
+                            )
+                            // navigate back with delay
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                finish()
+                            }, 1500)
+                        }
                     } else {
                         Log.e(
                             "M:CB:ConStateChange",
@@ -162,7 +193,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                         ApplicationProperty.bluetoothConnectionManager.clear()
                         // try to connect again with 1 sec delay
                         Handler(Looper.getMainLooper()).postDelayed({
-                            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+                            ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(this.macAddressToConnect)
+                            // TODO: check this!
+                            //ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
                         }, 1000)
                     }
                 } else {

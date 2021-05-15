@@ -538,6 +538,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 "Data Received - Authentication successful - Device ID confirmed"
                             )
                         }
+                        if(passKeySecondTryOut){
+                            isCurrentConnectionDoneWithSharedBindingKey = true
+                        }
                         authRequired = false
                         authenticationSuccess = true
                         // save the device address (but only if the authentication was successful)
@@ -773,6 +776,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var connectionSuspended = false
         private set
 
+    var isCurrentConnectionDoneWithSharedBindingKey = false
+
     private var authRequired = true
     private var propertyLoopActive = false
     private var propertyNameResolveLoopActive = false
@@ -935,6 +940,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.multiComplexPageID = -1
         this.multiComplexTypeID = -1
         this.isBindingRequired = false
+        this.isCurrentConnectionDoneWithSharedBindingKey = false
+        this.passKeySecondTryOut = false
     }
 
     private fun imageFromIndexCounter(indexCounter: Int) : Int {
