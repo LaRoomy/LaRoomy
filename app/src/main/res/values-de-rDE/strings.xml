@@ -3,7 +3,7 @@
     <string name="app_name">LaRoomy</string>
     <string name="app_version">App-Version 2.1.0</string>
     <!-- UI Strings -->
-    <string name="MA_AvailableDevicesPresentationTextViewText">Bitte wählen Sie Ihr Gerät:</string>
+    <string name="MA_AvailableDevicesPresentationTextViewText">Gerät auswählen:</string>
     <string name="MA_NoAvailableDevices">Keine Geräte gefunden. Bitte stellen Sie sicher dass das Gerät mit dem System gekoppelt ist.</string>
     <string name="MA_PopUp_SettingsTitle">Einstellungen</string>
     <string name="MA_PopUp_InformationTitle">Info</string>
