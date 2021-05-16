@@ -5,6 +5,13 @@
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Bitte wählen Sie Ihr Gerät:</string>
     <string name="MA_NoAvailableDevices">Keine Geräte gefunden. Bitte stellen Sie sicher dass das Gerät mit dem System gekoppelt ist.</string>
+    <string name="MA_PopUp_SettingsTitle">Einstellungen</string>
+    <string name="MA_PopUp_InformationTitle">Info</string>
+    <string name="MA_PopUp_HelpTitle">Hilfe</string>
+    <string name="MA_PopUp_ShowLogTitle">Protokoll anzeigen</string>
+    <string name="MA_PopUp_ReloadList">Liste aktualisieren</string>
+
+
 
     <string name="CA_Connecting">Verbinde..</string>
     <string name="CA_Connected">Verbunden</string>

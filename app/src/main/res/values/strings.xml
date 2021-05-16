@@ -4,6 +4,11 @@
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Please select your device:</string>
     <string name="MA_NoAvailableDevices">No devices found. Please make sure the device is bonded to the system.</string>
+    <string name="MA_PopUp_SettingsTitle">Settings</string>
+    <string name="MA_PopUp_InformationTitle">Info</string>
+    <string name="MA_PopUp_HelpTitle">Help</string>
+    <string name="MA_PopUp_ShowLogTitle">Show Log</string>
+    <string name="MA_PopUp_ReloadList">Reload List</string>
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>

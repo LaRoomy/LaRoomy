@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mainActivityHeaderImageButtonContainer"
+        android:id="@+id/mainActivityHeaderContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -19,26 +19,80 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/reloadImageButton"
+            android:id="@+id/mainActivityHamburgerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:onClick="onReloadImageButtonClick"
+            android:src="@drawable/hamburger_button_icon_norm"
+            android:background="@color/transparentViewColor"
+            android:onClick="onMainActivityMenuButtonClick"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/main_reload_norm" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/helpImageButton"
+        <TextView
+            android:id="@+id/AvailableDevicesTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:onClick="onHelpImageButtonClick"
+            android:layout_marginStart="20dp"
+            android:text="@string/MA_AvailableDevicesPresentationTextViewText"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/main_help_norm" />
+            app:layout_constraintStart_toEndOf="@id/mainActivityHamburgerButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <!--
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/reloadImageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:onClick="onReloadImageButtonClick"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/main_reload_norm" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/informationImageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/InformationImageDescription"
+                    android:onClick="onInfoImageButtonClick"
+                    android:layout_marginEnd="30dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/helpImageButton"
+                    app:srcCompat="@drawable/main_info_norm" />
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/helpImageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:onClick="onHelpImageButtonClick"
+                    android:layout_marginEnd="30dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/generalSettingsButton"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/main_help_norm" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/generalSettingsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/SettingsImageDescription"
+                    android:onClick="onSettingsImageButtonClick"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/main_settings_norm" />
+        -->
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -53,8 +107,9 @@
         app:layout_constraintBottom_toTopOf="@id/MA_UserNotificationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderImageButtonContainer">
+        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderContainer">
 
+<!--
         <TextView
             android:id="@+id/AvailableDevicesTextView"
             android:layout_width="match_parent"
@@ -79,16 +134,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/AvailableDevicesTextView" />
+-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/AvailableDevicesListView"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/underlineView" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -102,12 +158,13 @@
         android:layout_marginBottom="10dp"
         android:textAlignment="center"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@id/mainActivityFooterImageButtonContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mainActivityListSectionContainer" />
 
 
+<!--
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainActivityFooterImageButtonContainer"
         android:layout_width="match_parent"
@@ -120,28 +177,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/informationImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/InformationImageDescription"
-            android:onClick="onInfoImageButtonClick"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/main_info_norm" />
 
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/generalSettingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/SettingsImageDescription"
-            android:onClick="onSettingsImageButtonClick"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/main_settings_norm" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

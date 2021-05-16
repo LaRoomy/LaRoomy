@@ -1,22 +1,28 @@
 package com.laroomysoft.laroomy
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.drawable.InsetDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.TypedValue
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
 
-class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback {
+@SuppressLint("RestrictedApi")
+class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback, MenuBuilder.Callback {
 
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
@@ -29,7 +35,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private lateinit var availableDevicesViewAdapter: RecyclerView.Adapter<*>
     private lateinit var availableDevicesViewManager: RecyclerView.LayoutManager
 
-    private var buttonNormalizationRequired = false
+    //private var buttonNormalizationRequired = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,14 +109,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
 
-        if(this.buttonNormalizationRequired){
-
-            findViewById<AppCompatImageButton>(R.id.generalSettingsButton).setImageResource(R.drawable.main_settings_norm)
-            findViewById<AppCompatImageButton>(R.id.informationImageButton).setImageResource(R.drawable.main_info_norm)
-            findViewById<AppCompatImageButton>(R.id.helpImageButton).setImageResource(R.drawable.main_help_norm)
-
-            this.buttonNormalizationRequired = false
-        }
+//        if(this.buttonNormalizationRequired){
+//
+//            findViewById<AppCompatImageButton>(R.id.generalSettingsButton).setImageResource(R.drawable.main_settings_norm)
+//            findViewById<AppCompatImageButton>(R.id.informationImageButton).setImageResource(R.drawable.main_info_norm)
+//            findViewById<AppCompatImageButton>(R.id.helpImageButton).setImageResource(R.drawable.main_help_norm)
+//
+//            this.buttonNormalizationRequired = false
+//        }
 
 
 
@@ -150,46 +156,46 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         startActivity(intent)
     }
 
-    fun onReloadImageButtonClick(view: View){
+//    fun onReloadImageButtonClick(view: View){
+//
+//        val reloadButton = view as AppCompatImageButton
+//        reloadButton.setImageResource(R.drawable.main_reload_pushed)
+//
+//        this.updateAvailableDevices()
+//
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            reloadButton.setImageResource(R.drawable.main_reload_norm)
+//
+//        },700)
+//
+//    }
 
-        val reloadButton = view as AppCompatImageButton
-        reloadButton.setImageResource(R.drawable.main_reload_pushed)
+//    fun onHelpImageButtonClick(view: View){
+//
+//        this.buttonNormalizationRequired = true
+//        (view as AppCompatImageButton).setImageResource(R.drawable.main_help_pushed)
+//
+//        val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
+//        startActivity(intent)
+//    }
 
-        this.updateAvailableDevices()
+//    fun onInfoImageButtonClick(view: View){
+//
+//        this.buttonNormalizationRequired = true
+//        (view as AppCompatImageButton).setImageResource(R.drawable.main_info_pushed)
+//
+//        val intent = Intent(this@MainActivity, InformationActivity::class.java)
+//        startActivity(intent)
+//    }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            reloadButton.setImageResource(R.drawable.main_reload_norm)
-
-        },700)
-
-    }
-
-    fun onHelpImageButtonClick(view: View){
-
-        this.buttonNormalizationRequired = true
-        (view as AppCompatImageButton).setImageResource(R.drawable.main_help_pushed)
-
-        val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
-        startActivity(intent)
-    }
-
-    fun onInfoImageButtonClick(view: View){
-
-        this.buttonNormalizationRequired = true
-        (view as AppCompatImageButton).setImageResource(R.drawable.main_info_pushed)
-
-        val intent = Intent(this@MainActivity, InformationActivity::class.java)
-        startActivity(intent)
-    }
-
-    fun onSettingsImageButtonClick(view: View){
-
-        this.buttonNormalizationRequired = true
-        (view as AppCompatImageButton).setImageResource(R.drawable.main_settings_pushed)
-
-        val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
-        startActivity(intent)
-    }
+//    fun onSettingsImageButtonClick(view: View){
+//
+//        this.buttonNormalizationRequired = true
+//        (view as AppCompatImageButton).setImageResource(R.drawable.main_settings_pushed)
+//
+//        val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
+//        startActivity(intent)
+//    }
 
     private fun notifyUser(message: String, type: Int){
         val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)
@@ -280,4 +286,51 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     override fun onComponentError(message: String) {
         notifyUser(message, ERROR_MESSAGE)
     }
+
+    fun onMainActivityMenuButtonClick(view: View) {
+
+        this.availableDevicesRecyclerView.alpha = 0.2f
+        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_pushed)
+
+        val menuBuilder = MenuBuilder(this)
+        menuBuilder.setCallback(this)
+
+        val popupMenu = PopupMenu(this, view)
+        popupMenu.menuInflater.inflate(R.menu.main_activity_popup_menu, menuBuilder)
+
+        val menuPopupHelper = MenuPopupHelper(this, menuBuilder, view)
+        menuPopupHelper.setForceShowIcon(true)
+        menuPopupHelper.setOnDismissListener {
+            this.availableDevicesRecyclerView.alpha = 1f
+            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_norm)
+        }
+        menuPopupHelper.show()
+    }
+
+    override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.helpMenuItem -> {
+                val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.settingsMenuItem -> {
+                val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.informationMenuItem -> {
+                val intent = Intent(this@MainActivity, InformationActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.showLogMenuItem -> {
+                val intent = Intent(this@MainActivity, ViewLogActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.reloadListMenuItem -> {
+                updateAvailableDevices()
+            }
+        }
+        return true
+    }
+
+    override fun onMenuModeChange(menu: MenuBuilder) {}
 }
