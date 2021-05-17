@@ -298,6 +298,10 @@ fun isHexCharacter(c: Char) : Boolean {
     }
 }
 
+fun isLaroomyDevice(name: String) : Boolean {
+    return name.contains("laroomy", true)||(name.contains("lry", true))
+}
+
 fun createRandomPasskey(keyLength: Int): String {
 
     var realKeyLength = keyLength - 1

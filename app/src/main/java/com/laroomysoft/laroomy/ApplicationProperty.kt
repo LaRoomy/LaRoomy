@@ -70,6 +70,7 @@ class ApplicationProperty : Application() {
     var noConnectionKillOnPauseExecution = false
     var uiAdapterChanged = false
     var complexPropertyUpdateRequired = false
+    var appSettingsResetDone = false
     var eventLogEnabled = false
     var complexUpdateID = -1
 

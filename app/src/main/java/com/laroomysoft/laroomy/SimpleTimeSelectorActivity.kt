@@ -2,9 +2,11 @@ package com.laroomysoft.laroomy
 
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import android.widget.TextView
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 
 class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
@@ -14,19 +16,30 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private var currentHour = 0
     private var currentMinute = 0
 
-    lateinit var simpleTimePicker: TimePicker
+    private lateinit var simpleTimePicker: TimePicker
+    private lateinit var headerTextView: AppCompatTextView
+    private lateinit var notificationTextView: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_simple_time_selector)
+
+        // keep screen active if requested
+        if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // set the header-text to the property Name
-        findViewById<TextView>(R.id.stsHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        this.headerTextView = findViewById<AppCompatTextView>(R.id.stsHeaderTextView).apply {
+            text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                relatedGlobalElementIndex
+            ).elementText
+        }
+        this.notificationTextView = findViewById(R.id.stsUserNotificationTextView)
 
         // get the complex state data for the time selector
         val timeSelectorState =
@@ -122,10 +135,10 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     }
 
     private fun notifyUser(message: String, colorID: Int){
-
-        val userNotificationTextView = findViewById<TextView>(R.id.stsUserNotificationTextView)
-        userNotificationTextView.setTextColor(getColor(colorID))
-        userNotificationTextView.text = message
+        runOnUiThread {
+            notificationTextView.setTextColor(getColor(colorID))
+            notificationTextView.text = message
+        }
     }
 
     private fun generateExecutionString() : String {

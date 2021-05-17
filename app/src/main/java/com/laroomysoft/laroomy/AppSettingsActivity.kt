@@ -41,52 +41,76 @@ class AppSettingsActivity : AppCompatActivity() {
         this.passwordBox = findViewById(R.id.setupActivityBindingCodeBox)
         this.passwordViewModeButton = findViewById(R.id.setupActivityBindingCodeVisibilityButton)
         this.passwordContainer = findViewById(R.id.setupActivityBindingCodeContainer)
-        this.passKeyInputNotificationTextView = findViewById(R.id.setupActivityBindingKeyNotificationTextView)
+        this.passKeyInputNotificationTextView =
+            findViewById(R.id.setupActivityBindingKeyNotificationTextView)
 
-        this.autoConnectSwitch = findViewById<SwitchCompat>(R.id.setupActivityAutoConnectSwitch).apply{
-            val state =
-                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_AutoConnect)
-            this.isChecked = state
-        }
-        this.useCustomBindingKeySwitch = findViewById<SwitchCompat>(R.id.setupActivityCustomBindingCodeSwitch).apply{
-            val state =
-                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
-            this.isChecked = state
-
-            // if the device binding is active, show the password-edit container and set the password to the edit-box
-            if(state){
-                passwordContainer.visibility = View.VISIBLE
+        this.autoConnectSwitch =
+            findViewById<SwitchCompat>(R.id.setupActivityAutoConnectSwitch).apply {
+                val state =
+                    (applicationContext as ApplicationProperty).loadBooleanData(
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_AutoConnect
+                    )
+                this.isChecked = state
             }
-        }
-        this.listAllDevicesSwitch = findViewById<SwitchCompat>(R.id.setupActivityListAllDevicesSwitch).apply{
-            val state =
-                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_ListAllDevices)
-            this.isChecked = state
-        }
-        this.enableLogSwitch = findViewById<SwitchCompat>(R.id.setupActivityEnableLoggingSwitch).apply{
-            val state =
-                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
-            this.isChecked = state
+        this.useCustomBindingKeySwitch =
+            findViewById<SwitchCompat>(R.id.setupActivityCustomBindingCodeSwitch).apply {
+                val state =
+                    (applicationContext as ApplicationProperty).loadBooleanData(
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_UseCustomBindingKey
+                    )
+                this.isChecked = state
 
-            // if logging is activated, show the nav-button
-            //setShowLogButtonVisibility(state)
+                // if the device binding is active, show the password-edit container and set the password to the edit-box
+                if (state) {
+                    passwordContainer.visibility = View.VISIBLE
+                }
+            }
+        this.listAllDevicesSwitch =
+            findViewById<SwitchCompat>(R.id.setupActivityListAllDevicesSwitch).apply {
+                val state =
+                    (applicationContext as ApplicationProperty).loadBooleanData(
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_ListAllDevices
+                    )
+                this.isChecked = state
+            }
+        this.enableLogSwitch =
+            findViewById<SwitchCompat>(R.id.setupActivityEnableLoggingSwitch).apply {
+                val state =
+                    (applicationContext as ApplicationProperty).loadBooleanData(
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_EnableLog
+                    )
+                this.isChecked = state
 
-            // FIXME: not the best approach???? Why does setting the margins of the separator view in onCreate not work???
-            Handler(Looper.getMainLooper()).postDelayed({
-                setShowLogButtonVisibility(state)
-            }, 200)
+                // if logging is activated, show the nav-button
+                //setShowLogButtonVisibility(state)
 
-            // TODO: delete logArray and time-stamp??
-        }
-        this.keepScreenActiveSwitchCompat = findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
-            val state =
-                (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)
-            this.isChecked = state
-        }
+                // FIXME: not the best approach???? Why does setting the margins of the separator view in onCreate not work???
+                Handler(Looper.getMainLooper()).postDelayed({
+                    setShowLogButtonVisibility(state)
+                }, 200)
+
+                // TODO: delete logArray and time-stamp??
+            }
+        this.keepScreenActiveSwitchCompat =
+            findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
+                val state =
+                    (applicationContext as ApplicationProperty).loadBooleanData(
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_KeepScreenActive
+                    )
+                this.isChecked = state
+            }
 
         // set the saved password (if there is one, actually there should always be one)
-        val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
-        if(pw != ERROR_NOTFOUND){
+        val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(
+            R.string.FileKey_AppSettings,
+            R.string.DataKey_CustomBindingPasskey
+        )
+        if (pw != ERROR_NOTFOUND) {
             this.passwordBox.setText(pw)
         }
 
@@ -96,80 +120,126 @@ class AppSettingsActivity : AppCompatActivity() {
             val passKey =
                 passwordBox.text.toString()
             // the passKey will only be saved if the length is correct (0 > length < 11)
-            if(passKey.isNotEmpty()) {
-                    if(passKey.length > 10){
-                        // passKey too long
-                        // notify User
-                        setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyMaxIs10Character), R.color.WarningColor)
+            if (passKey.isNotEmpty()) {
+                if (passKey.length > 10) {
+                    // passKey too long
+                    // notify User
+                    setPassKeyInputNotification(
+                        getString(R.string.SetupActivity_PassKeyMaxIs10Character),
+                        R.color.WarningColor
+                    )
+                } else {
+                    // check for invalid character
+                    if (!validatePassKey(passKey)) {
+                        // invalid character in passKey string
+                        // notify user
+                        setPassKeyInputNotification(
+                            getString(R.string.SetupActivity_PassKeyContainsInvalidCharacter),
+                            R.color.ErrorColor
+                        )
                     } else {
-                        // check for invalid character
-                        if(!validatePassKey(passKey)){
-                            // invalid character in passKey string
-                            // notify user
-                            setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyContainsInvalidCharacter), R.color.ErrorColor)
-                        } else {
-                            // everything ok - hide notification (if there is one)
-                            if(passKeyInputNotificationTextView.visibility == View.VISIBLE) {
-                                setPassKeyInputNotification("", 0)
-                            }
-                            // save the passKey
-                            (applicationContext as ApplicationProperty).saveStringData(
-                                passKey,
-                                R.string.FileKey_AppSettings,
-                                R.string.DataKey_CustomBindingPasskey
-                            )
-
+                        // everything ok - hide notification (if there is one)
+                        if (passKeyInputNotificationTextView.visibility == View.VISIBLE) {
+                            setPassKeyInputNotification("", 0)
                         }
+                        // save the passKey
+                        (applicationContext as ApplicationProperty).saveStringData(
+                            passKey,
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_CustomBindingPasskey
+                        )
+
                     }
+                }
             } else {
                 val randomKey = createRandomPasskey(10)
-                (applicationContext as ApplicationProperty).saveStringData(randomKey, R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+                (applicationContext as ApplicationProperty).saveStringData(
+                    randomKey,
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_CustomBindingPasskey
+                )
 
-                setPassKeyInputNotification(getString(R.string.SetupActivity_PassKeyMustNotBeEmpty), R.color.ErrorColor)
+                setPassKeyInputNotification(
+                    getString(R.string.SetupActivity_PassKeyMustNotBeEmpty),
+                    R.color.ErrorColor
+                )
             }
         }
 
         // add the listener for the switches
-        this.autoConnectSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+        this.autoConnectSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
-            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_AutoConnect)
+            (this.applicationContext as ApplicationProperty).saveBooleanData(
+                b,
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_AutoConnect
+            )
         }
-        this.useCustomBindingKeySwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+        this.useCustomBindingKeySwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
-            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
+            (this.applicationContext as ApplicationProperty).saveBooleanData(
+                b,
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_UseCustomBindingKey
+            )
 
-            when(b){
+            when (b) {
                 true -> {
                     // show the password-box
                     passwordContainer.visibility = View.VISIBLE
 
                     // if this is the first time a custom binding key is set, a random value must be set to prevent that the key is empty
-                    if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey) == ERROR_NOTFOUND){
+                    if ((applicationContext as ApplicationProperty).loadSavedStringData(
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_CustomBindingPasskey
+                        ) == ERROR_NOTFOUND
+                    ) {
                         val randomKey = createRandomPasskey(10)
-                        (applicationContext as ApplicationProperty).saveStringData(randomKey, R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey)
+                        (applicationContext as ApplicationProperty).saveStringData(
+                            randomKey,
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_CustomBindingPasskey
+                        )
                         passwordBox.setText(randomKey)
                     } else {
                         // display the default key
-                        passwordBox.setText((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_CustomBindingPasskey))
+                        passwordBox.setText(
+                            (applicationContext as ApplicationProperty).loadSavedStringData(
+                                R.string.FileKey_AppSettings,
+                                R.string.DataKey_CustomBindingPasskey
+                            )
+                        )
                     }
                 }
                 else -> passwordContainer.visibility = View.GONE
             }
         }
-        this.listAllDevicesSwitch.setOnCheckedChangeListener{ _: CompoundButton, b: Boolean ->
+        this.listAllDevicesSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
-            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_ListAllDevices)
+            (this.applicationContext as ApplicationProperty).saveBooleanData(
+                b,
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_ListAllDevices
+            )
         }
-        this.enableLogSwitch.setOnCheckedChangeListener {  _: CompoundButton, b: Boolean ->
+        this.enableLogSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
-            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
+            (this.applicationContext as ApplicationProperty).saveBooleanData(
+                b,
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_EnableLog
+            )
             setShowLogButtonVisibility(b)
 
             (this.applicationContext as ApplicationProperty).eventLogEnabled = b
         }
-        this.keepScreenActiveSwitchCompat.setOnCheckedChangeListener {  _: CompoundButton, b: Boolean ->
+        this.keepScreenActiveSwitchCompat.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
-            (this.applicationContext as ApplicationProperty).saveBooleanData(b, R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)
+            (this.applicationContext as ApplicationProperty).saveBooleanData(
+                b,
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_KeepScreenActive
+            )
         }
     }
 
@@ -181,7 +251,7 @@ class AppSettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if(this.buttonNormalizationRequired){
+        if (this.buttonNormalizationRequired) {
             // normalize uuidManager-Button
             findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton).apply {
                 setBackgroundColor(
@@ -202,14 +272,28 @@ class AppSettingsActivity : AppCompatActivity() {
             }
             this.buttonNormalizationRequired = false
         }
+
+        if ((applicationContext as ApplicationProperty).appSettingsResetDone) {
+            // app setting were reset by reset activity -> apply changes to UI:
+            // this are the default values:
+            this.autoConnectSwitch.isChecked = false
+            this.useCustomBindingKeySwitch.isChecked = false
+            passwordContainer.visibility = View.GONE
+            this.listAllDevicesSwitch.isChecked = false
+            this.enableLogSwitch.isChecked = false
+            this.setShowLogButtonVisibility(false)
+            this.keepScreenActiveSwitchCompat.isChecked = false
+
+            (applicationContext as ApplicationProperty).appSettingsResetDone = false
+        }
     }
 
     private val passwordViewModeVisible: Int = 1
     private val passwordViewModeHidden: Int = 2
     private var currentPasswordViewMode = passwordViewModeHidden
 
-    fun onPasswordViewModeButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
-        when(currentPasswordViewMode){
+    fun onPasswordViewModeButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        when (currentPasswordViewMode) {
             // the password is hidden -> show it
             passwordViewModeHidden -> {
                 // set the crossed eye image
@@ -231,25 +315,25 @@ class AppSettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setShowLogButtonVisibility(visible: Boolean){
+    private fun setShowLogButtonVisibility(visible: Boolean) {
         findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
-            visibility = when(visible){
+            visibility = when (visible) {
                 true -> View.VISIBLE
                 else -> View.GONE
             }
         }
         findViewById<View>(R.id.setupActivitySixthSeparatorView).apply {
-            visibility = when(visible){
+            visibility = when (visible) {
                 true -> View.VISIBLE
                 else -> View.GONE
             }
         }
         findViewById<View>(R.id.setupActivityFifthSeparatorView).apply {
 
-            if(visible) {
-                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(0,10,0,0)
+            if (visible) {
+                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(0, 10, 0, 0)
             } else {
-                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(10,10,10,0)
+                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(10, 10, 10, 0)
             }
 //            requestLayout()
 //            invalidate()
@@ -277,8 +361,8 @@ class AppSettingsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun setPassKeyInputNotification(message: String, colorID: Int){
-        if(message.isEmpty()){
+    private fun setPassKeyInputNotification(message: String, colorID: Int) {
+        if (message.isEmpty()) {
             this.passKeyInputNotificationTextView.setTextColor(getColor(R.color.normalTextColor))
             this.passKeyInputNotificationTextView.visibility = View.GONE
         } else {

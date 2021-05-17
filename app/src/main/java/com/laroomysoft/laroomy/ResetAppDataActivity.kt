@@ -27,6 +27,8 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reset_app_data)
 
+        (applicationContext as ApplicationProperty).appSettingsResetDone = false
+
         this.selectAllCheckBox = findViewById(R.id.resetAppActivitySelectAllCheckBox)
         this.selectAllCheckBox.setOnCheckedChangeListener(this)
 
@@ -90,6 +92,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     fun resetAppActivityOnCancelButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         finish()
     }
+
     fun resetAppActivityOnResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         if(this.resetAppSettingsCheckBox.isChecked || this.resetBindingDataCheckBox.isChecked || this.resetUUIDProfilesCheckBox.isChecked || this.resetDefaultBindingKeyCheckBox.isChecked){
@@ -116,6 +119,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     private fun resetData(){
         if(this.resetAppSettingsCheckBox.isChecked){
             (applicationContext as ApplicationProperty).deleteFileWithFileKey(R.string.FileKey_AppSettings)
+            (applicationContext as ApplicationProperty).appSettingsResetDone = true
         }
         if(this.resetBindingDataCheckBox.isChecked){
             // if there are another future binding-data, clear it here!

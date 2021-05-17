@@ -18,6 +18,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     private var timeOutHandlerStarted = false
     private var connectionAttemptCounter = 0
     private var macAddressToConnect = ""
+    private var curDeviceListIndex = -5
     //private var authenticationAttemptCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +47,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             (applicationContext as ApplicationProperty).logRecordingTime = "Rec:Time: $hour:$min:$sec - $dayOfMonth/$month/$year"
         }
 
+        this.curDeviceListIndex = this.intent.getIntExtra("BondedDeviceIndex", -1)
 
-
-        when(val index = this.intent.getIntExtra("BondedDeviceIndex", -1)){
+        when(this.curDeviceListIndex){
             -1 -> {
                 // error state
                 Log.e("M:LoadingAct::onCreate", "The given DeviceListIndex is -ErrorState- (-1)")
@@ -69,7 +70,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             else -> {
                 // connect to device from list at index
                 val adr =
-                    ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(index).address
+                    ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).address
 
                 // cache the address to connect again if an unexpected disconnect event occurs
                 this.macAddressToConnect = adr
@@ -118,6 +119,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // navigate to the next activity and retrieve the properties there:
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+        intent.putExtra("BondedDeviceImageResourceId", ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).image)
         startActivity(intent)
         // finish this activity
         finish()

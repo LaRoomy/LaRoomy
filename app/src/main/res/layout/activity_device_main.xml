@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".DeviceMainActivity">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/deviceHeaderLayout"
         android:layout_width="match_parent"
@@ -16,13 +15,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/deviceTypeHeaderImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
             android:contentDescription="@string/DeviceTypeHeaderImageDescription"
-            android:src="@drawable/laroomy_icon_sq64"
+            android:src="@drawable/electronic_device"
             android:onClick="onReconnectDevice"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,19 +36,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.2">
 
-            <TextView
-                android:id="@+id/deviceTypeHeaderName"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/deviceMainAcitivityDeviceTypeHeaderNameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/LaRoomyDevicePlaceholderName"
+                android:text="@string/ConnectedDevicePlaceholderName"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/deviceConnectionStatusTextView"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/deviceMainActivityDeviceConnectionStatusTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
@@ -58,11 +57,11 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deviceTypeHeaderName" />
+                app:layout_constraintTop_toBottomOf="@id/deviceMainAcitivityDeviceTypeHeaderNameTextView" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageButton
-            android:id="@+id/changeDeviceButton"
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/deviceMainActivityDiscardDeviceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -73,15 +72,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/deviceSettingsButton"
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/deviceMainActivityDeviceSettingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/DeviceReConnectImageButtonDescription"
             android:onClick="onDeviceSettingsButtonClick"
-
             android:src="@drawable/settings_white_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -109,19 +107,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerSeparatorLineView">
 
-        <ImageView
-            android:id="@+id/deviceInfoSubHeaderImage"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/deviceMainActivityDeviceInfoSubHeaderImageView"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:layout_marginStart="40dp"
+            android:layout_marginStart="30dp"
             android:contentDescription="@string/DeviceInfoSubHeaderImageDescription"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/settings1_white" />
 
-        <TextView
-            android:id="@+id/deviceInfoSubHeaderTextView"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/deviceMainActivityDeviceInfoSubHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -129,7 +127,7 @@
             android:text="@string/DMA_LoadingPropertiesUserInfo"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/deviceInfoSubHeaderImage"
+            app:layout_constraintStart_toEndOf="@id/deviceMainActivityDeviceInfoSubHeaderImageView"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.github.ybq.android.spinkit.SpinKitView

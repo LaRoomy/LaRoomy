@@ -225,7 +225,7 @@
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
-    <string name="LaRoomyDevicePlaceholderName">LaRoomy XNG</string>
+    <string name="ConnectedDevicePlaceholderName">Gerät 001</string>
     <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
     <string name="LevelIndicationTextPlaceholder">100%</string>
     <string name="PropertySubPagePlaceholder">This is a property Page</string>

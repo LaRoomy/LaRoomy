@@ -3,8 +3,10 @@ package com.laroomysoft.laroomy
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import android.widget.TextView
 import android.widget.TimePicker
+import androidx.appcompat.widget.AppCompatTextView
 
 class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
@@ -12,21 +14,30 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     var relatedElementID = -1
     var relatedGlobalElementIndex = -1
 
-    lateinit var notificationTextView: TextView
-    lateinit var toTimePicker: TimePicker
-    lateinit var fromTimePicker: TimePicker
+    private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var headerTextView: AppCompatTextView
+    private lateinit var toTimePicker: TimePicker
+    private lateinit var fromTimePicker: TimePicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_frame_selector)
+
+        // keep screen active if requested
+        if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // set the header-text to the property Name
-        findViewById<TextView>(R.id.tfsHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        this.headerTextView = findViewById<AppCompatTextView>(R.id.tfsHeaderTextView).apply {
+            text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                relatedGlobalElementIndex
+            ).elementText
+        }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
@@ -137,8 +148,10 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     }
 
     private fun notifyUser(message: String, colorID: Int){
-        notificationTextView.setTextColor(getColor(colorID))
-        notificationTextView.text = message
+        runOnUiThread {
+            notificationTextView.setTextColor(getColor(colorID))
+            notificationTextView.text = message
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

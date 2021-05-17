@@ -14,6 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,8 +33,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var devicePropertyListLayoutManager: RecyclerView.LayoutManager
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
 
+    private lateinit var deviceTypeHeaderImageView: AppCompatImageView
+    private lateinit var deviceTypeHeaderTextView: AppCompatTextView
+    private lateinit var deviceConnectionStatusTextView: AppCompatTextView
+    private lateinit var deviceHeaderNotificationImageView: AppCompatImageView
+    private lateinit var deviceHeaderNotificationTextView: AppCompatTextView
+    private lateinit var deviceSettingsButton: AppCompatImageButton
+
     private var activityWasSuspended = false
+    private var buttonRecoveryRequired = false
     private var restoreIndex = -1
+    private var deviceImageResourceId = -1
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -39,9 +51,24 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_main)
 
+        // keep screen active if requested
+        if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+
+        this.deviceImageResourceId = intent.getIntExtra("BondedDeviceImageResourceId", -1)
+
         // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceMainActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
+
+        // get UI Elements
+        this.deviceTypeHeaderImageView = findViewById(R.id.deviceTypeHeaderImageView)
+        this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainAcitivityDeviceTypeHeaderNameTextView)
+        this.deviceConnectionStatusTextView = findViewById(R.id.deviceMainActivityDeviceConnectionStatusTextView)
+        this.deviceHeaderNotificationImageView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderImageView)
+        this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
+        this.deviceSettingsButton = findViewById(R.id.deviceMainActivityDeviceSettingsButton)
 
         // init recycler view!!
         this.devicePropertyListLayoutManager = LinearLayoutManager(this)
@@ -53,10 +80,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyList.add(dc)
 */
 
-        // keep screen active if requested
-        if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
 
         // bind array to adapter
         this.devicePropertyListViewAdapter =
@@ -216,9 +239,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         } else {
             // creation or resume action:
 
-            // make sure to set the right Name for the device
-            findViewById<TextView>(R.id.deviceTypeHeaderName).text =
+            // make sure to set the right Name and image for the device
+            this.deviceTypeHeaderTextView.text =
                 ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+            this.deviceTypeHeaderImageView.setImageResource(this.deviceImageResourceId)
 
             // Update the connection status
             setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManager.isConnected)
@@ -246,8 +270,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 ApplicationProperty.bluetoothConnectionManager.startDevicePropertyListing()
             }
 
-            // how to confirm the device-properties
+            // TODO: how to confirm the device-properties
             // maybe make a changed-parameter in the device firmware and call that to upgrade performance and hold the line clear for communication?
+        }
+        // check if a button needs to be recovered
+        if(this.buttonRecoveryRequired){
+            this.buttonRecoveryRequired = false
+            this.deviceSettingsButton.setImageResource(R.drawable.settings_white_24)
         }
     }
 
@@ -486,6 +515,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         if(ApplicationProperty.bluetoothConnectionManager.isConnected) {
+            // highlight button
+            this.deviceSettingsButton.setImageResource(R.drawable.settings_gold_pushed_24)
+            this.buttonRecoveryRequired = true
             // prevent the normal "onPause" execution
             (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
             // navigate to the device settings activity..
@@ -509,15 +541,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private fun setUIConnectionStatus(status :Boolean){
 
         runOnUiThread {
-            val statusText =
-                findViewById<TextView>(R.id.deviceConnectionStatusTextView)
+//            val statusText =
+//                findViewById<TextView>(R.id.deviceMainActivityDeviceConnectionStatusTextView)
 
             if (status) {
-                statusText.setTextColor(getColor(R.color.connectedTextColor))
-                statusText.text = getString(R.string.DMA_ConnectionStatus_connected)
+                this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.connectedTextColor))
+                this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ConnectionStatus_connected)
             } else {
-                statusText.setTextColor(getColor(R.color.disconnectedTextColor))
-                statusText.text = getString(R.string.DMA_ConnectionStatus_disconnected)
+                this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.disconnectedTextColor))
+                this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ConnectionStatus_disconnected)
             }
         }
     }
@@ -527,10 +559,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // TODO: Problem: the view is outside of the screen if the text is too long -> it must be wrapped
 
         runOnUiThread {
-            findViewById<ImageView>(R.id.deviceInfoSubHeaderImage).setImageResource(
+            this.deviceHeaderNotificationImageView.setImageResource(
                 resourceIdForImageId(imageID)
             )
-            findViewById<TextView>(R.id.deviceInfoSubHeaderTextView).text = message
+            this.deviceHeaderNotificationTextView.text = message
         }
     }
 
