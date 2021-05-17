@@ -242,7 +242,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // make sure to set the right Name and image for the device
             this.deviceTypeHeaderTextView.text =
                 ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
-            this.deviceTypeHeaderImageView.setImageResource(this.deviceImageResourceId)
+            // TODO: reactivate!:
+            //this.deviceTypeHeaderImageView.setImageResource(this.deviceImageResourceId)
 
             // Update the connection status
             setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManager.isConnected)

@@ -5,8 +5,8 @@
     <string name="MA_AvailableDevicesPresentationTextViewText">Select Device:</string>
     <string name="MA_NoAvailableDevices">No devices found. Please make sure the device is bonded to the system.</string>
     <string name="MA_PopUp_SettingsTitle">Settings</string>
-    <string name="MA_PopUp_InformationTitle">Info</string>
-    <string name="MA_PopUp_HelpTitle">Help</string>
+    <string name="MA_PopUp_InformationTitle">App-Info</string>
+    <string name="MA_PopUp_HelpTitle">Help Topics</string>
     <string name="MA_PopUp_ShowLogTitle">Show Log</string>
     <string name="MA_PopUp_ReloadList">Reload List</string>
 

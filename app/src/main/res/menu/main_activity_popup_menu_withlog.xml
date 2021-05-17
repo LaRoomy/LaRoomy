@@ -5,6 +5,10 @@
         android:icon="@drawable/main_settings_norm"
         android:title="@string/MA_PopUp_SettingsTitle" />
     <item
+        android:id="@+id/showLogMenuItem"
+        android:icon="@drawable/main_show_log_norm"
+        android:title="@string/MA_PopUp_ShowLogTitle" />
+    <item
         android:id="@+id/informationMenuItem"
         android:icon="@drawable/main_info_norm"
         android:title="@string/MA_PopUp_InformationTitle" />
@@ -12,10 +16,6 @@
         android:id="@+id/helpMenuItem"
         android:icon="@drawable/main_help_norm"
         android:title="@string/MA_PopUp_HelpTitle" />
-    <item
-        android:id="@+id/showLogMenuItem"
-        android:icon="@drawable/main_show_log_norm"
-        android:title="@string/MA_PopUp_ShowLogTitle" />
     <item
         android:id="@+id/reloadListMenuItem"
         android:icon="@drawable/main_reload_norm"

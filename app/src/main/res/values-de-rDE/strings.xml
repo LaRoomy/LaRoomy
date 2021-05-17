@@ -6,8 +6,8 @@
     <string name="MA_AvailableDevicesPresentationTextViewText">Gerät auswählen:</string>
     <string name="MA_NoAvailableDevices">Keine Geräte gefunden. Bitte stellen Sie sicher dass das Gerät mit dem System gekoppelt ist.</string>
     <string name="MA_PopUp_SettingsTitle">Einstellungen</string>
-    <string name="MA_PopUp_InformationTitle">Info</string>
-    <string name="MA_PopUp_HelpTitle">Hilfe</string>
+    <string name="MA_PopUp_InformationTitle">App-Info</string>
+    <string name="MA_PopUp_HelpTitle">Hilfe Themen</string>
     <string name="MA_PopUp_ShowLogTitle">Protokoll anzeigen</string>
     <string name="MA_PopUp_ReloadList">Liste aktualisieren</string>
 

@@ -2,12 +2,9 @@ package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.drawable.InsetDrawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.TypedValue
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -19,7 +16,6 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import org.w3c.dom.Text
 
 @SuppressLint("RestrictedApi")
 class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback, MenuBuilder.Callback {
@@ -197,6 +193,65 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 //        startActivity(intent)
 //    }
 
+    fun onMainActivityMenuButtonClick(view: View) {
+
+        this.availableDevicesRecyclerView.alpha = 0.2f
+        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_pushed)
+
+        val menuBuilder = MenuBuilder(this)
+        menuBuilder.setCallback(this)
+
+        val popupMenu =
+            PopupMenu(this, view)
+
+        if ((applicationContext as ApplicationProperty).loadBooleanData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_EnableLog
+            )
+        ) {
+            popupMenu.menuInflater.inflate(R.menu.main_activity_popup_menu_withlog, menuBuilder)
+        } else {
+            popupMenu.menuInflater.inflate(R.menu.main_activity_popup_menu_nolog, menuBuilder)
+        }
+
+
+        val menuPopupHelper = MenuPopupHelper(this, menuBuilder, view)
+        menuPopupHelper.setForceShowIcon(true)
+        menuPopupHelper.setOnDismissListener {
+            this.availableDevicesRecyclerView.alpha = 1f
+            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_norm)
+        }
+        menuPopupHelper.show()
+    }
+
+    override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.helpMenuItem -> {
+                val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.settingsMenuItem -> {
+                val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.informationMenuItem -> {
+                val intent = Intent(this@MainActivity, InformationActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.showLogMenuItem -> {
+                val intent = Intent(this@MainActivity, ViewLogActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.reloadListMenuItem -> {
+                updateAvailableDevices()
+            }
+        }
+        return true
+    }
+
+    override fun onMenuModeChange(menu: MenuBuilder) {}
+
+
     private fun notifyUser(message: String, type: Int){
         val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)
         notificationView.text = message
@@ -286,51 +341,4 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     override fun onComponentError(message: String) {
         notifyUser(message, ERROR_MESSAGE)
     }
-
-    fun onMainActivityMenuButtonClick(view: View) {
-
-        this.availableDevicesRecyclerView.alpha = 0.2f
-        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_pushed)
-
-        val menuBuilder = MenuBuilder(this)
-        menuBuilder.setCallback(this)
-
-        val popupMenu = PopupMenu(this, view)
-        popupMenu.menuInflater.inflate(R.menu.main_activity_popup_menu, menuBuilder)
-
-        val menuPopupHelper = MenuPopupHelper(this, menuBuilder, view)
-        menuPopupHelper.setForceShowIcon(true)
-        menuPopupHelper.setOnDismissListener {
-            this.availableDevicesRecyclerView.alpha = 1f
-            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_norm)
-        }
-        menuPopupHelper.show()
-    }
-
-    override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.helpMenuItem -> {
-                val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.settingsMenuItem -> {
-                val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.informationMenuItem -> {
-                val intent = Intent(this@MainActivity, InformationActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.showLogMenuItem -> {
-                val intent = Intent(this@MainActivity, ViewLogActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.reloadListMenuItem -> {
-                updateAvailableDevices()
-            }
-        }
-        return true
-    }
-
-    override fun onMenuModeChange(menu: MenuBuilder) {}
 }
