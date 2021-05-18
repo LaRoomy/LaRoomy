@@ -19,6 +19,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ResetAppDataActivity" />
         <activity
             android:name=".DataSharingReceiverActivity"
@@ -37,48 +44,42 @@
         <activity android:name=".ViewLogActivity" />
         <activity android:name=".EditUUIDProfileActivity" />
         <activity android:name=".ManageUUIDProfilesActivity" />
-        <activity
-            android:name=".UnlockControlActivity"
-            android:screenOrientation="nosensor" />
-        <activity
-            android:name=".BarGraphActivity"
-            android:screenOrientation="nosensor" />
-        <activity
-            android:name=".NavigatorControlActivity"
-            android:screenOrientation="nosensor" />
-        <activity
-            android:name=".DeviceSettingsActivity"
-            android:screenOrientation="nosensor" />
-        <activity android:name=".AppHelpActivity" />
-        <activity
-            android:name=".TimeFrameSelectorActivity"
-            android:screenOrientation="nosensor" />
         <activity android:name=".AppSettingsActivity" />
         <activity android:name=".InformationActivity" />
+        <activity android:name=".AppHelpActivity" />
+        <!-- Activities in connected state:  -->
+        <activity
+            android:name=".UnlockControlActivity"
+            android:screenOrientation="locked" />
+        <activity
+            android:name=".BarGraphActivity"
+            android:screenOrientation="locked" />
+        <activity
+            android:name=".NavigatorControlActivity"
+            android:screenOrientation="locked" />
+        <activity
+            android:name=".DeviceSettingsActivity"
+            android:screenOrientation="locked" />
+        <activity
+            android:name=".TimeFrameSelectorActivity"
+            android:screenOrientation="locked" />
         <activity
             android:name=".SimpleTimeSelectorActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="locked" />
         <activity
             android:name=".ExtendedLevelSelectorActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="locked" />
         <activity
             android:name=".RGBControlActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="locked" />
         <activity
             android:name=".DeviceMainActivity"
             android:label="@string/DeviceMainActivity"
-            android:screenOrientation="nosensor" />
+            android:screenOrientation="locked" />
         <activity
             android:name=".LoadingActivity"
             android:label="@string/LoadingActivityLabel"
-            android:screenOrientation="nosensor" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="locked" />
     </application>
 
 </manifest>
