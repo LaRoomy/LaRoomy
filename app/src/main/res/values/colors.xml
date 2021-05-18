@@ -41,6 +41,8 @@
     <color name="errorLightColor">#FF8888</color>
     <color name="warningLightColor">#F99F08</color>
 
+    <color  name="deviceMainHeaderColor">#000000</color>
+
 
     <!-- barGraph colors -->
     <color name="barGraphGridLineColor">#FFFFFFFF</color>

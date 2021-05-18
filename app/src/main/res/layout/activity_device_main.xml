@@ -37,7 +37,7 @@
             app:layout_constraintVertical_bias="0.2">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/deviceMainAcitivityDeviceTypeHeaderNameTextView"
+                android:id="@+id/deviceMainActivityDeviceTypeHeaderNameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ConnectedDevicePlaceholderName"
@@ -57,7 +57,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deviceMainAcitivityDeviceTypeHeaderNameTextView" />
+                app:layout_constraintTop_toBottomOf="@id/deviceMainActivityDeviceTypeHeaderNameTextView" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatImageButton

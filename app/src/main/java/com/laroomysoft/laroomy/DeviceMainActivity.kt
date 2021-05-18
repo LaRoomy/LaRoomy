@@ -64,7 +64,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // get UI Elements
         this.deviceTypeHeaderImageView = findViewById(R.id.deviceTypeHeaderImageView)
-        this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainAcitivityDeviceTypeHeaderNameTextView)
+        this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainActivityDeviceTypeHeaderNameTextView)
         this.deviceConnectionStatusTextView = findViewById(R.id.deviceMainActivityDeviceConnectionStatusTextView)
         this.deviceHeaderNotificationImageView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderImageView)
         this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
