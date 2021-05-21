@@ -1,12 +1,10 @@
 package com.laroomysoft.laroomy
 
-import android.app.ActionBar
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.PersistableBundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -349,6 +347,8 @@ class AppSettingsActivity : AppCompatActivity() {
 
         val intent = Intent(this@AppSettingsActivity, ManageUUIDProfilesActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+
     }
 
     fun onShowLogButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {

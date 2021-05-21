@@ -150,6 +150,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         val intent = Intent(this@MainActivity, LoadingActivity::class.java)
         intent.putExtra("BondedDeviceIndex", index)
         startActivity(intent)
+        //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
 //    fun onReloadImageButtonClick(view: View){

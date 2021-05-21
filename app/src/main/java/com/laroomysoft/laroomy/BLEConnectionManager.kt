@@ -10,6 +10,7 @@ import android.os.*
 import android.util.Log
 import android.widget.SeekBar
 import java.io.Serializable
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -2604,15 +2605,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             Timer().scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                    propertyCallback.onUIAdaptableArrayListItemAdded(uIAdapterList.elementAt(itemAddCounter))
+                    try {
 
-                    itemAddCounter++
 
-                    if(itemAddCounter == uIAdapterList.size){
+                        propertyCallback.onUIAdaptableArrayListItemAdded(
+                            uIAdapterList.elementAt(
+                                itemAddCounter
+                            )
+                        )
+
+                        itemAddCounter++
+
+                        if (itemAddCounter == uIAdapterList.size) {
+                            cancel()
+                            itemAddCounter = -1
+                            dataReadyToShow = true
+                            propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
+                        }
+                    } catch (e: IndexOutOfBoundsException){
+                        // FIXME: reset the whole???
                         cancel()
-                        itemAddCounter = -1
-                        dataReadyToShow = true
-                        propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
                     }
                 }
             }, (0).toLong(), (210).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
