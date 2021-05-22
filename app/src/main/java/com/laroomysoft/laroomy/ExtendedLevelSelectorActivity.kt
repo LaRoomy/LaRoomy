@@ -10,10 +10,11 @@ import com.ramotion.fluidslider.FluidSlider
 
 class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
-    var mustReconnect = false
-    var relatedElementID = -1
-    var relatedGlobalElementIndex = -1
-    var currentLevel = 0
+    private var mustReconnect = false
+    private var relatedElementID = -1
+    private var relatedGlobalElementIndex = -1
+    private var currentLevel = 0
+    private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     lateinit var onOffSwitch: SwitchCompat
     lateinit var fluidLevelSlider: FluidSlider
@@ -31,6 +32,9 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // set the header-text to the property Name
         findViewById<TextView>(R.id.elsHeaderTextView).text =
@@ -80,6 +84,13 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
         // close activity
         finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
     }
 
     override fun onPause() {

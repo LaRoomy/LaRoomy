@@ -16,6 +16,8 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var mustReconnect = false
+    private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // get the complex state data for the navigator
         val navigatorState =
@@ -72,6 +77,13 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
         // close activity
         finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
     }
 
     override fun onResume() {

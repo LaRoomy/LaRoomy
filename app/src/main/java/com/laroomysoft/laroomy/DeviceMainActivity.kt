@@ -419,7 +419,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
                 // prevent the normal "onPause" execution
@@ -428,7 +430,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, ExtendedLevelSelectorActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
                 // prevent the normal "onPause" execution
@@ -437,7 +441,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, SimpleTimeSelectorActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                 // prevent the normal "onPause" execution
@@ -446,7 +452,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
                 // prevent the normal "onPause" execution
@@ -455,7 +463,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
                 // prevent the normal "onPause" execution
@@ -464,7 +474,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, NavigatorControlActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
                 // prevent the normal "onPause" execution
@@ -473,8 +485,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 val intent = Intent(this@DeviceMainActivity, BarGraphActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
-
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
             else -> {
                 // what to do here??

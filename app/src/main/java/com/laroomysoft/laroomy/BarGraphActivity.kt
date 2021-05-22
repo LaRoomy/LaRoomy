@@ -9,12 +9,14 @@ import androidx.appcompat.widget.AppCompatTextView
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
-    var mustReconnect = false
-    var relatedElementID = -1
-    var relatedGlobalElementIndex = -1
+    private var mustReconnect = false
+    private var relatedElementID = -1
+    private var relatedGlobalElementIndex = -1
+    private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
-    lateinit var barGraph: BarGraph
-    lateinit var notificationTextView: AppCompatTextView
+
+    private lateinit var barGraph: BarGraph
+    private lateinit var notificationTextView: AppCompatTextView
 
     private var barDataList = ArrayList<BarGraphData>()
     private var maxBarIndex = -1
@@ -33,6 +35,9 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // set the header-text to the property Name
         findViewById<TextView>(R.id.bgdHeaderTextView).text =
@@ -62,12 +67,19 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         super.onBackPressed()
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
         (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
 
         // close activity
         finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
+
     }
 
     override fun onPause() {
@@ -243,6 +255,8 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 }
             }
             this.refreshBarGraph()
+        } else {
+            (applicationContext as ApplicationProperty).logControl("E: BarGraph dataIndex invalid. Index was: ${data.dataIndex}. Maximum Bar index is $maxBarIndex")
         }
     }
 }

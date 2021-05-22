@@ -17,9 +17,13 @@ class ViewLogActivity : AppCompatActivity() {
     private lateinit var logDataListAdapter: RecyclerView.Adapter<*>
     private lateinit var logDataListLayoutManager: RecyclerView.LayoutManager
 
+    private var wasInvokedFromSettingsActivity = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_log)
+
+        this.wasInvokedFromSettingsActivity = intent.getBooleanExtra("wasInvokedFromSettingsActivity", false)
 
         this.notificationTextView = findViewById(R.id.viewLogActivityNotificationTextView)
 
@@ -36,6 +40,17 @@ class ViewLogActivity : AppCompatActivity() {
             notifyUser(getString(R.string.ViewLogActivity_NotificationNoLogDataAvailable), R.color.InfoColor)
         } else {
             notifyUser((applicationContext as ApplicationProperty).logRecordingTime, R.color.goldAccentColor)
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+        if(wasInvokedFromSettingsActivity) {
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
         }
     }
 

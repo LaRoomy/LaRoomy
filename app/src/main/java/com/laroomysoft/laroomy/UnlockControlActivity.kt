@@ -10,12 +10,14 @@ import androidx.appcompat.widget.AppCompatTextView
 
 class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
-    var mustReconnect = false
-    var relatedElementID = -1
-    var relatedGlobalElementIndex = -1
+    private var mustReconnect = false
+    private var relatedElementID = -1
+    private var relatedGlobalElementIndex = -1
 
-    var showPin = false
-    var pinChangeModeActive = false
+    private var showPin = false
+    private var pinChangeModeActive = false
+    private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
@@ -30,7 +32,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
-        // get view parameter
+        // get UI-Views
         this.notificationTextView = findViewById(R.id.ucNotificationTextView)
         this.lockStatusTextView = findViewById(R.id.ucLockConditionStatusTextView)
         this.showHideButton = findViewById(R.id.ucShowPinButton)
@@ -38,6 +40,9 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)
@@ -59,6 +64,13 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
         // close activity
         finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
     }
 
     override fun onPause() {

@@ -272,7 +272,7 @@ class AppSettingsActivity : AppCompatActivity() {
         }
 
         if ((applicationContext as ApplicationProperty).appSettingsResetDone) {
-            // app setting were reset by reset activity -> apply changes to UI:
+            // app setting were reset by reset-activity -> apply changes to UI:
             // this are the default values:
             this.autoConnectSwitch.isChecked = false
             this.useCustomBindingKeySwitch.isChecked = false
@@ -358,7 +358,9 @@ class AppSettingsActivity : AppCompatActivity() {
         this.buttonNormalizationRequired = true
 
         val intent = Intent(this@AppSettingsActivity, ViewLogActivity::class.java)
+        intent.putExtra("wasInvokedFromSettingsActivity", true)
         startActivity(intent)
+        overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
     }
 
     private fun setPassKeyInputNotification(message: String, colorID: Int) {
@@ -380,6 +382,7 @@ class AppSettingsActivity : AppCompatActivity() {
 
         val intent = Intent(this@AppSettingsActivity, ResetAppDataActivity::class.java)
         startActivity(intent)
+        overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
     }
 }
 

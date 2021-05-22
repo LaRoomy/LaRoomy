@@ -10,9 +10,11 @@ import androidx.appcompat.widget.AppCompatTextView
 
 class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
-    var mustReconnect = false
-    var relatedElementID = -1
-    var relatedGlobalElementIndex = -1
+    private var mustReconnect = false
+    private var relatedElementID = -1
+    private var relatedGlobalElementIndex = -1
+    private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
@@ -31,6 +33,9 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // set the header-text to the property Name
         this.headerTextView = findViewById<AppCompatTextView>(R.id.tfsHeaderTextView).apply {
@@ -75,6 +80,13 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
         // close activity
         finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
     }
 
     override fun onPause() {

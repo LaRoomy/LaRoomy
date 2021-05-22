@@ -38,6 +38,8 @@ const val COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY = 12
 // change this to true to enable an internal verbose log output (this means not the user-log!)
 const val verboseLog = true
 
+// default value
+const val COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE = false
 
 // seekBar handler types
 const val SEEK_BAR_START_TRACK = 1

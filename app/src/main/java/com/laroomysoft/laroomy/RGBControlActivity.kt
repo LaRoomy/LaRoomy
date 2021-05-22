@@ -32,6 +32,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private var currentColor = Color.WHITE
     private var currentProgram = 12
     private var currentMode = RGB_MODE_SINGLE_COLOR
+    private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +46,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // get the element ID
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // get color picker
         colorPickerView = findViewById(R.id.color_picker_view)
@@ -133,6 +137,13 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
         // close activity
         finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
     }
 
     override fun onPause() {

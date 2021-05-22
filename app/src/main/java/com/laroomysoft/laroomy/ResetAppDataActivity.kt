@@ -81,16 +81,24 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+        overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
+    }
+
     override fun onDismiss(dialog: DialogInterface?) {
         if (this.dataResetConfirmedByUser) {
             // reset data and quit activity
             resetData()
             finish()
+            overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
         }
     }
 
     fun resetAppActivityOnCancelButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         finish()
+        overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
     }
 
     fun resetAppActivityOnResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
