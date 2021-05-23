@@ -12,6 +12,9 @@ import android.widget.SeekBar
 import java.io.Serializable
 import java.lang.IndexOutOfBoundsException
 import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 private const val MAX_CONNECTION_ATTEMPTS = 10
@@ -30,6 +33,10 @@ const val SINGLEACTION_PROCESSING_COMPLETE = 3
 const val SINGLEACTION_PROCESSING_ERROR = 4
 
 const val DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED = 1
+
+const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE = "unable to resume connection - device not reachable"
+const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = "unable to resume connection - invalid address"
+
 
 class LaRoomyDeviceProperty{
 
@@ -389,7 +396,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         applicationProperty.logControl("I: Starting to discover Services")
 
-                        gatt?.discoverServices()// start to discover the services of the device
+                        // start to discover the services of the device
+                        gatt?.discoverServices()
                     } else {
                         isResumeConnectionAttempt = false
                         suspendedDeviceAddress = ""
@@ -403,9 +411,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         applicationProperty.logControl("I: Connection restored")
 
                         Handler(Looper.getMainLooper()).postDelayed({
-                            // TODO: test if this works
                             sendData(deviceReconnectedNotification)
-                        }, 300)
+                        }, 200)
                     }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
@@ -823,7 +830,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     var complexStatePropertyIDs = ArrayList<Int>()
 
-    private val scanResultList: MutableList<ScanResult?> = ArrayList()
+    //private val scanResultList: MutableList<ScanResult?> = ArrayList()
 
     private lateinit var mHandler: Handler
 
@@ -905,7 +912,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private var mScanning: Boolean = false
 
-    private var preselectIndex: Int = -1
+    //private var preselectIndex: Int = -1
 
     private var connectionAttemptCounter = 0// remove!
 
@@ -917,8 +924,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     fun clear(){
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
-        this.preselectIndex = -1
-        this.scanResultList.clear()
+        //this.preselectIndex = -1
+        //this.scanResultList.clear()
         this.currentDevice = null
         this.isConnected = false
         this.authRequired = true
@@ -943,6 +950,42 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isBindingRequired = false
         this.isCurrentConnectionDoneWithSharedBindingKey = false
         this.passKeySecondTryOut = false
+
+        this.propertyRequestIndexCounter = 0
+
+        this.propertyLoopActive = false
+        this.propertyNameResolveLoopActive = false
+        this.groupLoopActive = false
+        this.groupInfoLoopActive = false
+        this.deviceHeaderRecordingActive = false
+
+        this.laRoomyDevicePropertyList.clear()
+    }
+
+    fun clearPropertyRelatedParameter(){
+        this.propertyUpToDate = false
+        this.uIAdapterList.clear()
+        this.elementUpdateList.clear()
+        this.singlePropertyRetrievingAction = false
+        this.singleGroupRetrievingAction = false
+        this.singlePropertyDetailRetrievingAction = false
+        this.singleGroupDetailRetrievingAction = false
+        this.updateStackProcessActive = false
+        this.multiComplexPropertyPageOpen = false
+        this.currentPropertyResolveID = -1
+        this.currentGroupResolveID = -1
+        this.multiComplexPageID = -1
+        this.multiComplexTypeID = -1
+
+        this.propertyRequestIndexCounter = 0
+
+        this.propertyLoopActive = false
+        this.propertyNameResolveLoopActive = false
+        this.groupLoopActive = false
+        this.groupInfoLoopActive = false
+        this.deviceHeaderRecordingActive = false
+
+        this.laRoomyDevicePropertyList.clear()
     }
 
     private fun imageFromIndexCounter(indexCounter: Int) : Int {
@@ -989,26 +1032,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun connectToDeviceWithInternalScanList(macAddress: String?){
-
-        var i: Int = -1
-        // search for the mac-address in the result list and try to connect
-        this.scanResultList.forEachIndexed { index, scanResult ->
-
-            if(scanResult?.device?.address == macAddress){
-                i = index
-            }
-        }
-        when(i){
-            -1 -> return
-            else -> {
-                this.currentDevice = scanResultList[i]?.device
-
-                this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
-
-            }
-        }
-    }
+//    fun connectToDeviceWithInternalScanList(macAddress: String?){
+//
+//        var i: Int = -1
+//        // search for the mac-address in the result list and try to connect
+//        this.scanResultList.forEachIndexed { index, scanResult ->
+//
+//            if(scanResult?.device?.address == macAddress){
+//                i = index
+//            }
+//        }
+//        when(i){
+//            -1 -> return
+//            else -> {
+//                this.currentDevice = scanResultList[i]?.device
+//
+//                this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
+//
+//            }
+//        }
+//    }
 
     fun getLastConnectedDeviceAddress() : String {
 
@@ -1121,13 +1164,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun selectCurrentDeviceFromInternalList(index: Int){
-
-        if(this.scanResultList.isNotEmpty())
-            this.currentDevice = this.scanResultList[index]?.device
-        else
-            this.currentDevice = this.bondedList?.elementAt(index)
-    }
+//    fun selectCurrentDeviceFromInternalList(index: Int){
+//
+//        if(this.scanResultList.isNotEmpty())
+//            this.currentDevice = this.scanResultList[index]?.device
+//        else
+//            this.currentDevice = this.bondedList?.elementAt(index)
+//    }
 
     fun checkBluetoothEnabled(caller: Activity){
 
@@ -1150,6 +1193,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isConnected = false
     }
 
+    private fun disconnect(){
+        this.bluetoothGatt?.disconnect()
+        this.isConnected = false
+    }
+
     fun suspendConnection(){
         if(verboseLog) {
             Log.d("M:Bmngr:suspendC", "BluetoothManager: suspendConnection invoked")
@@ -1157,7 +1205,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isResumeConnectionAttempt = false
         this.connectionSuspended = true
         this.suspendedDeviceAddress = this.currentDevice?.address ?: ""
-        this.close()
+        this.disconnect()
     }
 
     fun resumeConnection(){
@@ -1172,10 +1220,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     "BluetoothManager: resumeConnection: Internal Device Address: ${this.suspendedDeviceAddress}"
                 )
             }
-            this.connectToRemoteDevice(this.suspendedDeviceAddress)
+            this.bluetoothGatt?.connect()
+
+            // set up a handler to check if the connection works
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                if(!isConnected){
+                    callback.onComponentError(
+                        BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE)
+                }
+            }, 3000, TimeUnit.MILLISECONDS)
+
         } else {
             Log.e("M:Bmngr:resumeC", "BluetoothManager: Internal Device Address invalid- trying to connect to saved address")
-            this.connectToLastSuccessfulConnectedDevice()
+            this.callback.onComponentError(
+                BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE)
         }
     }
 
@@ -1211,6 +1269,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.propertyRequestIndexCounter = 0
                 this.propertyLoopActive = true
                 this.propertyUpToDate = false
+
                 // only clear the list if this is not the confirmation mode
                 if(!this.propertyConfirmationModeActive) {
                     this.dataReadyToShow = false
@@ -1221,6 +1280,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.sendData("A000$")// request first index (0)
             }
         }
+    }
+
+    fun reloadProperties(){
+
+        // TODO: reset all necessary arrays and parameter???
+        // something is reset in "startDevicePropertyListing":
+
+        this.clearPropertyRelatedParameter()
+        this.startDevicePropertyListing()
+
     }
 
     fun addDeviceProperty(property: String) :Boolean {
@@ -1805,11 +1874,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         else {
                             // trigger retrieval event
-                            this.propertyCallback.onGroupDataRetrievalCompleted(this.laRoomyPropertyGroupList)
+                            this.propertyCallback.onGroupDataRetrievalCompleted(this.laRoomyPropertyGroupList)// TODO: this is not used - delete??
+
                             this.generateUIAdaptableArrayListFromDeviceProperties()
 
                             // TODO: start retrieving the complex property states
-                            this.startComplexStateDataLoop()
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                this.startComplexStateDataLoop()
+                            }, 2000)// TODO: no delay???
                         }
                     }
                 }
@@ -2516,7 +2588,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // notify activity
                     //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl) //TODO
 
-                    Thread.sleep(100)
+                    //Thread.sleep(100)
 
                     // add the device properties to the group by their IDs
                     for (ID in laRoomyDevicePropertyGroup.memberIDs) {
@@ -2542,7 +2614,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 // notify activity
                                 //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) // TODO
 
-                                Thread.sleep(100)
+                                //Thread.sleep(100)
 
                                 // ID found -> further processing not necessary -> break the loop
                                 return@forEachIndexed
@@ -2561,7 +2633,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // notify activity
                     //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2) //TODO
 
-                    Thread.sleep(100)
+                    //Thread.sleep(100)
                 }
             }
             // now add the properties which are not part of a group
@@ -2586,7 +2658,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // notify activity
                     //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) TODO
 
-                    Thread.sleep(100)
+                    //Thread.sleep(100)
                 }
             }
             //this.dataReadyToShow = true // TODO
@@ -2950,7 +3022,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun resolveSimpleStateData(data: String){
         // simple state data transmission length is 11 chars, for example: "PSS0221840$
-        if(data.length > 10){
+        if(data.length > 9){
             // resolve ID:
             val propertyID: Int
             var strID = ""

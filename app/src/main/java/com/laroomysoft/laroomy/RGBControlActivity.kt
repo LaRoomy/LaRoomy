@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.flask.colorpicker.ColorPickerView
@@ -25,6 +26,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private lateinit var onOffSwitch: SwitchCompat
     private lateinit var transitionSwitch: SwitchCompat
     private lateinit var programSpeedSeekBar: SeekBar
+    private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var headerTextView: AppCompatTextView
 
     private var mustReconnect = false
     private var relatedElementID = -1
@@ -54,6 +57,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         colorPickerView = findViewById(R.id.color_picker_view)
         // get lightnessSlider
         lightnessSliderView = findViewById(R.id.v_lightness_slider)
+        // get notification textView
+        notificationTextView = findViewById(R.id.rgbUserNotificationTextView)
 
         // add listeners
         colorPickerView.addOnColorSelectedListener(this)
@@ -77,8 +82,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }, 500)
 
         // set the header-text to the property-name
-        findViewById<TextView>(R.id.rgbHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        this.headerTextView = findViewById(R.id.rgbHeaderTextView)
+        this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this, this@RGBControlActivity)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -203,7 +208,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     fun onSingleColorModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
 
-        if(findViewById<Switch>(R.id.rgbSwitch).isChecked){
+        if(onOffSwitch.isChecked){
             this.setCurrentSingleColor()
         }
     }
@@ -211,7 +216,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     fun onTransitionModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         setPageSelectorModeState(RGB_MODE_TRANSITION)
 
-        if(findViewById<Switch>(R.id.rgbSwitch).isChecked){
+        if(this.onOffSwitch.isChecked){
             this.setCurrentProgram()
         }
     }
@@ -347,9 +352,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private fun notifyUser(message: String, colorID: Int){
 
         runOnUiThread {
-            val textView = findViewById<TextView>(R.id.rgbUserNotificationTextView)
-            textView.text = message
-            textView.setTextColor(getColor(colorID))
+            notificationTextView.text = message
+            notificationTextView.setTextColor(getColor(colorID))
         }
     }
 

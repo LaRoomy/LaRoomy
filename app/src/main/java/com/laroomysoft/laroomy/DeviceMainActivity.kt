@@ -44,6 +44,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var buttonRecoveryRequired = false
     private var restoreIndex = -1
     private var deviceImageResourceId = -1
+    private var propertyLoadingFinished = false
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -254,18 +255,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // check if this is a call on creation or resume:
             if (this.activityWasSuspended) {
 
+                // must be a resume action
+
                 // realign objects
                 //ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
                 //ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
 
+
+
                 // try to reconnect
                 ApplicationProperty.bluetoothConnectionManager.resumeConnection()
-
-
-                //ApplicationProperty.bluetoothConnectionManger.connectToLastSuccessfulConnectedDevice()
-
-
                 this.activityWasSuspended = false
+
             } else {
                 // must be the creation process -> start property listing
                 ApplicationProperty.bluetoothConnectionManager.startDevicePropertyListing()
@@ -288,13 +289,53 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // maybe get the sub holder constraintLayout (ID: contentHolderLayout) ????
     }
 
-    private fun setItemSeparatorViewColors(index: Int, colorID: Int){
+//    private fun setItemSeparatorViewColors(index: Int, top_colorID: Int, bottom_colorID: Int){
+//        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
+//        val top = linearLayout?.findViewById<View>(R.id.topSeparator)
+//        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
+//
+//        if(top_colorID != -1) {
+//            top?.setBackgroundColor(getColor(top_colorID))
+//        }
+//
+//        if(bottom_colorID != -1) {
+//            bottom?.setBackgroundColor(getColor(bottom_colorID))
+//        }
+//    }
+
+    private fun setItemTopSeparatorColor(index: Int, colorID: Int){
         val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
         val top = linearLayout?.findViewById<View>(R.id.topSeparator)
-        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
         top?.setBackgroundColor(getColor(colorID))
-        bottom?.setBackgroundColor(getColor(colorID))
+    }
 
+    private fun setItemBottomSeparatorColor(index: Int, colorID: Int){
+        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
+        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
+        bottom?.setBackgroundColor(getColor(colorID))
+    }
+
+    private fun reloadProperties(){
+
+        // TODO: log
+
+        if(verboseLog) {
+            Log.d(
+                "M:DMA:reloadProperties",
+                "Reloading Properties requested!"
+            )
+        }
+
+        // at first update the UI
+        runOnUiThread {
+            this.propertyList.clear()
+            this.devicePropertyListViewAdapter.notifyDataSetChanged()
+            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
+            this.setDeviceInfoHeader(33, getString(R.string.DMA_LoadingPropertiesUserInfo))
+        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            ApplicationProperty.bluetoothConnectionManager.reloadProperties()
+        }, 500) // TODO: shorter time?
     }
 
 //    override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
@@ -406,7 +447,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set it to selected color
         setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
-        setItemSeparatorViewColors(index, R.color.selectedSeparatorColor)
+        //setItemSeparatorViewColors(index, R.color.selectedSeparatorColor)
+        setItemTopSeparatorColor(index, R.color.selectedSeparatorColor)
+        setItemBottomSeparatorColor(index, R.color.selectedSeparatorColor)
+
         // save the index of the highlighted item to reset it on back-navigation
         restoreIndex = index
 
@@ -505,12 +549,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ) {
                 // set group background
                 setItemBackgroundColor(restoreIndex, R.color.groupColor)
-                setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
+
+                //setItemSeparatorViewColors(restoreIndex, R.color.groupBottomSeparatorColor)
+
+                setItemTopSeparatorColor(restoreIndex, R.color.transparentViewColor)
+                setItemBottomSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
 
             } else {
                 // set default background
                 setItemBackgroundColor(restoreIndex, R.color.transparentViewColor)
-                setItemSeparatorViewColors(restoreIndex, R.color.transparentViewColor)
+
+                //setItemSeparatorViewColors(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+
+                setItemTopSeparatorColor(restoreIndex, R.color.transparentViewColor)
+                setItemBottomSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
             }
         }
 
@@ -548,6 +600,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         if(!ApplicationProperty.bluetoothConnectionManager.isConnected) {
             ApplicationProperty.bluetoothConnectionManager.close()
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+        } else {
+            // TODO: remove this, this is temporary
+            ApplicationProperty.bluetoothConnectionManager.sendData("D024$")
+            //this.reloadProperties()
         }
     }
 
@@ -590,12 +646,22 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.setUIConnectionStatus(state)
         // stop the loading circle and set the info-header
         if(state) {
-            // send a test command
-            ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
-            // stop spinner and set info header
-            runOnUiThread {
-                this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-                this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
+
+
+            // send a test command // FIXME: why?
+            //ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
+
+
+            // check if the property-loading was successful finished
+            if(!this.propertyLoadingFinished){
+                // property-loading must have been interrupted - start again!
+                this.reloadProperties()
+            } else {
+                // stop spinner and set info header
+                runOnUiThread {
+                    this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+                    this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
+                }
             }
         }
     }
@@ -610,10 +676,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
+    override fun onComponentError(message: String) {
+        super.onComponentError(message)
+
+        when(message){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
+                ApplicationProperty.bluetoothConnectionManager.clear()
+                finish()
+            }
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
+                ApplicationProperty.bluetoothConnectionManager.clear()
+                finish()
+            }
+        }
+    }
+
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
 
         // ?? description!
+
+
+        this.propertyLoadingFinished = true
 
 
         runOnUiThread {
@@ -628,30 +712,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {
         super.onUIAdaptableArrayListItemAdded(item)
 
-        //Log.d("M:UIListItemAdded", "Item added to UIAdapter. Index: ${item.globalIndex} Name: ${item.elementText}")
-
+        // add the data to the UI-List
         this.propertyList.add(item)
-
-
+        // notify the UI to change
         runOnUiThread {
-
-                // maybe there is no need to call this???
-                // adapter.submitList(list) to proof
-
-
-
-            // TODO: slow this down if necessary!!!!!
-
-            //this.devicePropertyListViewAdapter.notifyItemInserted(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - 1)
-
             this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
-
         }
-
-        //this.handleAddedItem(item.globalIndex)
-
-        //this.maxExecutionIndex =
-
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
@@ -758,8 +824,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         //visibility = View.VISIBLE
                         setBackgroundResource(R.color.groupTopSeparatorColor)
                     }
-
-
 
                     holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.groupHeaderColor))
 
