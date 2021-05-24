@@ -65,7 +65,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManager.close()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
 
@@ -100,7 +100,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             if(verboseLog) {
                 Log.d("M:NavCon:onResume", "The connection was suspended -> try to reconnect")
             }
-            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
         }
     }

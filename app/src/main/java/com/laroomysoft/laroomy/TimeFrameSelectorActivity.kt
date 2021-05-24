@@ -101,7 +101,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManager.close()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
 
@@ -120,7 +120,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
             if(verboseLog) {
                 Log.d("M:TFSPage:onResume", "The connection was suspended -> try to reconnect")
             }
-            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
         }
     }

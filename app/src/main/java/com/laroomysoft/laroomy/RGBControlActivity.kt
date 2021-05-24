@@ -172,7 +172,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManager.close()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
 
@@ -193,7 +193,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             if(verboseLog) {
                 Log.d("M:RGBPage:onResume", "The connection was suspended -> try to reconnect")
             }
-            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
         }
     }
@@ -478,6 +478,39 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         (applicationContext as ApplicationProperty).logControl("E: Connection failed in RGBControl Activity")
 
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
+    }
+
+    override fun onComponentError(message: String) {
+        super.onComponentError(message)
+
+        // check if the reconnect-function succeeded, if not -> navigate back
+        when(message){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
+                //ApplicationProperty.bluetoothConnectionManager.clear()
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+                if(!isStandAlonePropertyMode) {
+                    // only set slide transition if the activity was invoked from the deviceMainActivity
+                    overridePendingTransition(
+                        R.anim.finish_activity_slide_animation_in,
+                        R.anim.finish_activity_slide_animation_out
+                    )
+                }
+            }
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
+                //ApplicationProperty.bluetoothConnectionManager.clear()
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+                if(!isStandAlonePropertyMode) {
+                    // only set slide transition if the activity was invoked from the deviceMainActivity
+                    overridePendingTransition(
+                        R.anim.finish_activity_slide_animation_in,
+                        R.anim.finish_activity_slide_animation_out
+                    )
+                }
+            }
+        }
+
     }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {

@@ -27,6 +27,7 @@
     <string name="DMA_Ready">Bereit</string>
     <string name="DMA_DeviceConnectionSuspended">Verbindung unterbrochen</string>
     <string name="DMA_LoadingPropertiesUserInfo">Lade Eigenschaften..</string>
+    <string name="DMA_NoConnection">Keine Verbindung</string>
 
 
     <string name="RGB_HeaderText">RGB Steuerung</string>

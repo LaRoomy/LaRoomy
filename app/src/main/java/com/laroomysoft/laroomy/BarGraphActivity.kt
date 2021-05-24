@@ -94,7 +94,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManager.close()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
 
@@ -113,7 +113,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             if(verboseLog) {
                 Log.d("M:BGD:onResume", "The connection was suspended -> try to reconnect")
             }
-            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
         } else {
             // notify the device that multi-complex property was invoked

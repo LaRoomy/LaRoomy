@@ -23,6 +23,7 @@
     <string name="DMA_Ready">Ready</string>
     <string name="DMA_DeviceConnectionSuspended">Connection suspended</string>
     <string name="DMA_LoadingPropertiesUserInfo">Loading Properties..</string>
+    <string name="DMA_NoConnection">No connection</string>
 
 
     <string name="RGB_HeaderText">RGB Control</string>

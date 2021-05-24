@@ -155,16 +155,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // if the device was disconnected on a property sub-page, navigate back with delay
             if (!ApplicationProperty.bluetoothConnectionManager.isConnected) {
+
                 // set UI visual state
                 resetSelectedItemBackground()
                 setUIConnectionStatus(false)
+                setDeviceInfoHeader(30, getString(R.string.DMA_NoConnection))
 
                 // schedule back-navigation
                 Handler(Looper.getMainLooper()).postDelayed({
                     (applicationContext as ApplicationProperty).resetControlParameter()
                     ApplicationProperty.bluetoothConnectionManager.clear()
                     finish()
-                }, 2000)
+                }, 1500)
 
             } else {
                 // do a complex state- update if required...

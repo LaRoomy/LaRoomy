@@ -135,7 +135,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManager.close()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
 
@@ -153,7 +153,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             if(verboseLog) {
                 Log.d("M:DSPPage:onResume", "The connection was suspended -> try to reconnect")
             }
-            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
+            ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
         }
     }
