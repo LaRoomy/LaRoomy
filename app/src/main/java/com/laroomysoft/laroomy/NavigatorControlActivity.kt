@@ -193,6 +193,35 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         }
     }
 
+    override fun onComponentError(message: String) {
+        super.onComponentError(message)
+        // if there is a connection failure -> navigate back
+        when(message){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+                if(!isStandAlonePropertyMode) {
+                    // only set slide transition if the activity was invoked from the deviceMainActivity
+                    overridePendingTransition(
+                        R.anim.finish_activity_slide_animation_in,
+                        R.anim.finish_activity_slide_animation_out
+                    )
+                }
+            }
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+                if(!isStandAlonePropertyMode) {
+                    // only set slide transition if the activity was invoked from the deviceMainActivity
+                    overridePendingTransition(
+                        R.anim.finish_activity_slide_animation_in,
+                        R.anim.finish_activity_slide_animation_out
+                    )
+                }
+            }
+        }
+    }
+
 //    fun onNavigateButtonClick(view: View){
 //
 //        val directionChar = when(view.id){

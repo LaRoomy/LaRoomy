@@ -191,13 +191,33 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
     }
 
-    override fun onConnectionAttemptFailed(message: String) {
-        super.onConnectionAttemptFailed(message)
-
-        Log.e("M:ELSPage:onConnFailed", "Connection Attempt failed in Extended Level Selector Activity")
-        (applicationContext as ApplicationProperty).logControl("Failed to connect in ExtendedLevelSelectorActivity")
-
-        notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
+    override fun onComponentError(message: String) {
+        super.onComponentError(message)
+        // if there is a connection failure -> navigate back
+        when(message){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+                if(!isStandAlonePropertyMode) {
+                    // only set slide transition if the activity was invoked from the deviceMainActivity
+                    overridePendingTransition(
+                        R.anim.finish_activity_slide_animation_in,
+                        R.anim.finish_activity_slide_animation_out
+                    )
+                }
+            }
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+                if(!isStandAlonePropertyMode) {
+                    // only set slide transition if the activity was invoked from the deviceMainActivity
+                    overridePendingTransition(
+                        R.anim.finish_activity_slide_animation_in,
+                        R.anim.finish_activity_slide_animation_out
+                    )
+                }
+            }
+        }
     }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {

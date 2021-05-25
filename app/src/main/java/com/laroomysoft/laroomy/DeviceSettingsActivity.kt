@@ -229,10 +229,25 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     override fun onConnectionAttemptFailed(message: String) {
         super.onConnectionAttemptFailed(message)
 
-        Log.e("M:DSPPage:onConnFailed", "Connection Attempt failed in Device Settings Activity")
-        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in DeviceSettingsActivity")
+        Log.e("M:DSPPage:onConnFailed", "Connection Attempt failed in Device Settings Activity. Message: $message")
+        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in DeviceSettingsActivity. Reason: $message")
 
         notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
+    }
+
+    override fun onComponentError(message: String) {
+        super.onComponentError(message)
+        // if there is a connection failure -> navigate back
+        when(message){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+            }
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+            }
+        }
     }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {

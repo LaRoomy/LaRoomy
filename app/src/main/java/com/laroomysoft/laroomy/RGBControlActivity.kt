@@ -471,22 +471,11 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
     }
 
-    override fun onConnectionAttemptFailed(message: String) {
-        super.onConnectionAttemptFailed(message)
-
-        Log.e("M:RGBPage:onConnFailed", "Connection Attempt failed in RGBControlActivity")
-        (applicationContext as ApplicationProperty).logControl("E: Connection failed in RGBControl Activity")
-
-        notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
-    }
-
     override fun onComponentError(message: String) {
         super.onComponentError(message)
-
-        // check if the reconnect-function succeeded, if not -> navigate back
+        // if there is a connection failure -> navigate back
         when(message){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
-                //ApplicationProperty.bluetoothConnectionManager.clear()
                 (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
                 finish()
                 if(!isStandAlonePropertyMode) {
@@ -498,7 +487,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 }
             }
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
-                //ApplicationProperty.bluetoothConnectionManager.clear()
                 (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
                 finish()
                 if(!isStandAlonePropertyMode) {
@@ -510,7 +498,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 }
             }
         }
-
     }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
