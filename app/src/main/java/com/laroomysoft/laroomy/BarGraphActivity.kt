@@ -14,7 +14,6 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     private var relatedGlobalElementIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
-
     private lateinit var barGraph: BarGraph
     private lateinit var notificationTextView: AppCompatTextView
 
