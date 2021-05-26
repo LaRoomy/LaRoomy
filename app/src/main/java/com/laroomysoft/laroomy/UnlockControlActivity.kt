@@ -22,6 +22,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
     private lateinit var showHideButton: AppCompatButton
+    private lateinit var headerTextView: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +37,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.notificationTextView = findViewById(R.id.ucNotificationTextView)
         this.lockStatusTextView = findViewById(R.id.ucLockConditionStatusTextView)
         this.showHideButton = findViewById(R.id.ucShowPinButton)
+        this.headerTextView = findViewById(R.id.ucHeaderTextView)
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -43,6 +45,10 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
+
+        // set the header-text to the property-name
+        this.headerTextView.text =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)

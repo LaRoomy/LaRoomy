@@ -53,8 +53,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // set the displayed time to the current device setting
         this.currentHour = timeSelectorState.valueOne
         this.currentMinute = timeSelectorState.valueTwo
-
-
+        
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)

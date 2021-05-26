@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import com.ramotion.fluidslider.FluidSlider
 
@@ -16,9 +17,10 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private var currentLevel = 0
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
-    lateinit var onOffSwitch: SwitchCompat
-    lateinit var fluidLevelSlider: FluidSlider
-    lateinit var notificationTextView: TextView
+    private lateinit var onOffSwitch: SwitchCompat
+    private lateinit var fluidLevelSlider: FluidSlider
+    private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var headerTextView: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +38,14 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
-        // set the header-text to the property Name
-        findViewById<TextView>(R.id.elsHeaderTextView).text =
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        // get the header-text and set it to the property Name
+        this.headerTextView = findViewById(R.id.elsHeaderTextView)
+        this.headerTextView.apply {
+            text =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                    relatedGlobalElementIndex
+                ).elementText
+        }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
@@ -53,26 +60,34 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
         // get the uiElements and set the initial values
         this.onOffSwitch = findViewById(R.id.elsSwitch)
-        this.onOffSwitch.setOnClickListener{
-            if(verboseLog) {
-                Log.d(
-                    "M:ELS:onOffSwitchClick",
-                    "On/Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
-                )
+        this.onOffSwitch.apply {
+
+            setOnClickListener {
+                if (verboseLog) {
+                    Log.d(
+                        "M:ELS:onOffSwitchClick",
+                        "On/Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
+                    )
+                }
+                onOffSwitchClicked()
             }
-            onOffSwitchClicked()
+            isChecked = exLevelState.onOffState
         }
-        this.onOffSwitch.isChecked = exLevelState.onOffState
 
         this.notificationTextView = findViewById(R.id.elsUserNotificationTextView)
 
-        this.fluidLevelSlider = findViewById(R.id.exLevelSlider)
-        this.fluidLevelSlider.position = get8BitValueAsPartOfOne(exLevelState.valueOne)
-        this.fluidLevelSlider.positionListener = {
-            this.onSliderPositionChanged(
-                percentTo8Bit(
-                (100*it).toInt())
-            )
+        this.fluidLevelSlider =
+            findViewById(R.id.exLevelSlider)
+
+        this.fluidLevelSlider.apply {
+            position = get8BitValueAsPartOfOne(exLevelState.valueOne)
+            positionListener = {
+                onSliderPositionChanged(
+                    percentTo8Bit(
+                        (100 * it).toInt()
+                    )
+                )
+            }
         }
     }
 

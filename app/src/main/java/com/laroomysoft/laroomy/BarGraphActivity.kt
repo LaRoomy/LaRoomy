@@ -16,6 +16,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     private lateinit var barGraph: BarGraph
     private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var headerTextView: AppCompatTextView
 
     private var barDataList = ArrayList<BarGraphData>()
     private var maxBarIndex = -1
@@ -39,8 +40,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // set the header-text to the property Name
-        findViewById<TextView>(R.id.bgdHeaderTextView).text =
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        this.headerTextView = findViewById(R.id.bgdHeaderTextView)
+        this.headerTextView.apply {
+            text =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                    relatedGlobalElementIndex
+                ).elementText
+        }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@BarGraphActivity, this)

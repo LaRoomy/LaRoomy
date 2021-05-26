@@ -9,6 +9,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, View.OnTouchListener {
@@ -17,6 +18,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     private var relatedGlobalElementIndex = -1
     private var mustReconnect = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+
+    private lateinit var userNotificationTextView: AppCompatTextView
+    private lateinit var headerTextView: AppCompatTextView
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -39,6 +43,13 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         // get the complex state data for the navigator
         val navigatorState =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+
+        // get UI-Views
+        this.userNotificationTextView = findViewById(R.id.navConUserNotificationTextView)
+        this.headerTextView = findViewById(R.id.navConHeaderTextView)
+
+        // set header text to property name
+        this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@NavigatorControlActivity, this)
@@ -170,10 +181,8 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     private fun notifyUser(message: String, colorID: Int){
 
         runOnUiThread {
-            val userNotificationTextView =
-                findViewById<TextView>(R.id.navConUserNotificationTextView)
-            userNotificationTextView.setTextColor(getColor(colorID))
-            userNotificationTextView.text = message
+            this.userNotificationTextView.setTextColor(getColor(colorID))
+            this.userNotificationTextView.text = message
         }
     }
 
