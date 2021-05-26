@@ -119,6 +119,11 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // navigate to the next activity and retrieve the properties there:
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+
+
+        //FIXME: in auto-connect-mode the parameter "curDeviceListIndex" is -2, this is an invalid index and not suitable to get the image of the device
+
+
         intent.putExtra("BondedDeviceImageResourceId", ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).image)
         startActivity(intent)
         // finish this activity

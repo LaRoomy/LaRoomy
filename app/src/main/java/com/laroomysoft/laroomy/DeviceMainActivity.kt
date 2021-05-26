@@ -544,30 +544,33 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private fun resetSelectedItemBackground(){
         // reset the selected item background if necessary
         if (restoreIndex >= 0) {
+            val element =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(restoreIndex)
             // check if the property is part of a group and set the appropriate background-color
-            if (ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    restoreIndex
-                ).isGroupMember
-            ) {
+            if (element.isGroupMember) {
                 // set group background
                 setItemBackgroundColor(restoreIndex, R.color.groupColor)
-
-                //setItemSeparatorViewColors(restoreIndex, R.color.groupBottomSeparatorColor)
-
+                // set separator colors
                 setItemTopSeparatorColor(restoreIndex, R.color.transparentViewColor)
                 setItemBottomSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
 
             } else {
                 // set default background
-                setItemBackgroundColor(restoreIndex, R.color.transparentViewColor)
+                setItemBackgroundColor(restoreIndex, R.color.groupColor)
 
-                //setItemSeparatorViewColors(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+                if(element.globalIndex == 0){
+                    setItemTopSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+                } else {
+                    val previousIndex = element.globalIndex - 1
 
+                    if((previousIndex > 0) && (ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(previousIndex).elementType == SEPARATOR_ELEMENT)){
+                        setItemTopSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+                    }
+                }
                 setItemTopSeparatorColor(restoreIndex, R.color.transparentViewColor)
                 setItemBottomSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
             }
         }
-
     }
 
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
@@ -604,7 +607,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
         } else {
             // TODO: remove this, this is temporary
-            ApplicationProperty.bluetoothConnectionManager.sendData("D024$")
+            //ApplicationProperty.bluetoothConnectionManager.sendData("D024$")
             //this.reloadProperties()
         }
     }
@@ -850,7 +853,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         )
                     }
 
-
                     // set the text for the element and show the textView
                     holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
                         visibility = View.VISIBLE
@@ -883,6 +885,29 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
                     }
 
+                    if (!elementToRender.isGroupMember) {
+
+                        if (elementToRender.globalIndex == 0) {
+                            holder.linearLayout.findViewById<View>(R.id.topSeparator).apply {
+                                visibility = View.VISIBLE
+                                setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
+                            }
+                        } else {
+                            val previousIndex =
+                                elementToRender.globalIndex - 1
+
+                            if ((previousIndex > 0) && (devicePropertyAdapter.elementAt(
+                                    previousIndex
+                                ).elementType == SEPARATOR_ELEMENT)
+                            ) {
+                                holder.linearLayout.findViewById<View>(R.id.topSeparator).apply {
+                                    visibility = View.VISIBLE
+                                    setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
+                                }
+                            }
+                        }
+                    }
+
                     // set the appropriate image for the imageID
                     holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).apply {
                         setBackgroundResource(
@@ -891,7 +916,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     }
 
                     // TODO: hide the image-view if the imageID is not set???
-
 
                     // set the appropriate elements for the type of the property:
                     when(elementToRender.propertyType){

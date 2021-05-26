@@ -62,9 +62,12 @@
                 android:layout_height="70dp"
                 android:src="@drawable/navbutton_up_image"
                 android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/navConNavigateMiddleButton"
@@ -72,6 +75,8 @@
                 android:layout_height="70dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/navbutton_mid_image"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -83,6 +88,8 @@
                 android:layout_height="70dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/navbutton_left_image"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -93,6 +100,8 @@
                 android:layout_height="70dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/navbutton_right_image"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -103,6 +112,8 @@
                 android:layout_height="70dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/navbutton_down_image"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />

@@ -133,7 +133,8 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             }
             else -> {}
         }
-        return true
+        // NOTE: returning true blocks the image-changes on user-interaction
+        return false
     }
 
     private fun executeButtonCommand(Id: Int?, activate: Boolean){
