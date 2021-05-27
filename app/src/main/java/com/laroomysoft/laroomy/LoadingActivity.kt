@@ -120,11 +120,34 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)
 
+        // in auto-connect-mode the parameter "curDeviceListIndex" is -2, this is an invalid index and not suitable to get the image of the device
+        // so get the image for the device
+        var image = -1
 
-        //FIXME: in auto-connect-mode the parameter "curDeviceListIndex" is -2, this is an invalid index and not suitable to get the image of the device
+        if(curDeviceListIndex < 0){
+            // the list index is invalid, must be an auto-connect procedure
+                // generate lookup for the address in the bonded device list:
+            ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.forEach {
+                if(it.address == ApplicationProperty.bluetoothConnectionManager.currentDevice?.address){
+                    image = it.image
+                    return@forEach
+                }
+            }
+            if(image == -1){
+                // image was not found, set a placeholder image
+                image = if(isLaroomyDevice(ApplicationProperty.bluetoothConnectionManager.currentDevice?.name ?: "Name")){
+                    // laroomy device
+                    R.drawable.laroomy_icon_sq64
+                } else {
+                    // any device
+                    R.drawable.bluetooth_green_glow_sq64
+                }
+            }
+        } else {
+            image = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).image
+        }
 
-
-        intent.putExtra("BondedDeviceImageResourceId", ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).image)
+        intent.putExtra("BondedDeviceImageResourceId", image)
         startActivity(intent)
         // finish this activity
         finish()

@@ -147,6 +147,12 @@
     <string name="DeviceSettingsActivity_BindingNotSupportedNotification">The connected device does not support binding.</string>
     <string name="DeviceSettingsActivity_OnlyTheOriginCanShareTheBindingNotification">The connection with this device is established with a shared binding-key. Sharing a shared key is not possible, only the originator is able to share the binding.</string>
     <string name="DeviceSettingsActivity_OnlyTheOriginCanReleaseTheBinding">The connection with this device is established with a shared binding-key. Only the originator is able to release the binding.</string>
+    <string name="DeviceSettingsActivity_BindingSuccessNotification">Binding successful generated.</string>
+    <string name="DeviceSettingsActivity_BindingErrorNotification">Binding failure. Error occurred on the device.</string>
+    <string name="DeviceSettingsActivity_DeviceInfoHeaderText"><u>Device Info:</u></string>
+    <string name="DeviceSettingsActivity_DeviceInfoNameDescriptorText">Name:</string>
+    <string name="DeviceSettingsActivity_DeviceMACAddressDescriptorText">MAC:</string>
+
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>
     <string name="AppHelpTopic_ConnectDevice">Connect new device</string>

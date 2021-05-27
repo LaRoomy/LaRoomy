@@ -152,6 +152,13 @@
     <string name="DeviceSettingsActivity_BindingNotSupportedNotification">Die Geräte-Bindungsfuntion wird von diesem Gerät nicht unterstützt.</string>
     <string name="DeviceSettingsActivity_OnlyTheOriginCanShareTheBindingNotification">Die Verbindung mit diesem Gerät wurde durch einen geteilten Bindungs-Schlüssel hergestellt. Das teilen eines geteilten Schlüssels ist nicht möglich. Nur der Urheber kann die Verbindung teilen.</string>
     <string name="DeviceSettingsActivity_OnlyTheOriginCanReleaseTheBinding">Die Verbindung mit diesem Gerät wurde durch einen geteilten Bindungs-Schlüssel hergestellt. Nur der Urheber kann die Geräte-Bindung entfernen.</string>
+    <string name="DeviceSettingsActivity_BindingSuccessNotification">Gerätebindung erfolgreich hergestellt.</string>
+    <string name="DeviceSettingsActivity_BindingErrorNotification">Gerätebindung fehlgeschlagen. Auf dem Gerät ist ein Fehler aufgetreten.</string>
+    <string name="DeviceSettingsActivity_DeviceInfoHeaderText"><u>Gerät Info:</u></string>
+    <string name="DeviceSettingsActivity_DeviceInfoNameDescriptorText">Name:</string>
+    <string name="DeviceSettingsActivity_DeviceMACAddressDescriptorText">MAC:</string>
+
+
 
 
 

@@ -33,6 +33,8 @@ const val SINGLEACTION_PROCESSING_COMPLETE = 3
 const val SINGLEACTION_PROCESSING_ERROR = 4
 
 const val DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED = 1
+const val DEVICE_NOTIFICATION_BINDING_SUCCESS = 2
+const val DEVICE_NOTIFICATION_BINDING_ERROR = 3
 
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE = "unable to resume connection - device not reachable"
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = "unable to resume connection - invalid address"
@@ -771,6 +773,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val propertyRetrievalCompleteNotification = "yDnPRf-P!$"// outgoing
     private val requestLocalTimeCommand = "RqLcTime"// incoming
     private val bindingNotSupportedNotification = "DnBNS=x"// incoming
+    private val bindingSuccessNotification = "DnBNS=y"// incoming
+    private val bindingErrorNotification = "DnBNS=e"// incoming
+
     /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
@@ -2288,9 +2293,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             "The device has the create-binding request rejected. -> Forward to current Activity (must be the DeviceSettingsActivity"
                         )
                     }
-                    this.propertyCallback.onDeviceNotification(
-                        DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED
+                    this.propertyCallback.onDeviceNotification(DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED)
+                }
+                data == this.bindingSuccessNotification -> {
+                    Log.d(
+                        "M:CheckDevComAndNoti",
+                        "Binding-Success: The device has the binding command accepted."
                     )
+                    this.propertyCallback.onDeviceNotification(DEVICE_NOTIFICATION_BINDING_SUCCESS)
+                }
+                data == this.bindingErrorNotification -> {
+                    Log.d(
+                        "M:CheckDevComAndNoti",
+                        "Binding-Error: The device has reported an error on a binding command"
+                    )
+                    this.propertyCallback.onDeviceNotification(DEVICE_NOTIFICATION_BINDING_ERROR)
                 }
             }
         }

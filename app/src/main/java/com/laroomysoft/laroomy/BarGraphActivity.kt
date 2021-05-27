@@ -40,8 +40,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // set the header-text to the property Name
-        this.headerTextView = findViewById(R.id.bgdHeaderTextView)
-        this.headerTextView.apply {
+        this.headerTextView = findViewById<AppCompatTextView>(R.id.bgdHeaderTextView).apply {
             text =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                     relatedGlobalElementIndex
@@ -84,7 +83,6 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 R.anim.finish_activity_slide_animation_out
             )
         }
-
     }
 
     override fun onPause() {

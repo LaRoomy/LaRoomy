@@ -23,6 +23,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private lateinit var factoryResetButton: AppCompatButton
     private lateinit var bindingHintTextView: AppCompatTextView
     private lateinit var shareBindingContainer: ConstraintLayout
+    private lateinit var deviceNameTextView: AppCompatTextView
+    private lateinit var deviceAddressTextView: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
         bindingHintTextView = findViewById(R.id.deviceSettingsActivityBindingHintTextView)
         shareBindingContainer = findViewById(R.id.deviceSettingsActivityShareBindingContainer)
+        deviceNameTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoNameTextView)
+        deviceAddressTextView = findViewById(R.id.deviceSettingsActivityDeviceMACAddressNameTextView)
+
+        // set device info
+        deviceNameTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+        deviceAddressTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
 
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired
@@ -272,21 +280,36 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onDeviceNotification(notificationID: Int) {
         super.onDeviceNotification(notificationID)
-        // look for a rejected setting notification
-        if(notificationID == DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED){
-            // update the hint for the user
-            bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+        // look for a rejected/error/success setting notification
+        when(notificationID){
+            DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED -> {
+                // update the hint for the user
+                bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
 
-            // hide the share-button
-            shareBindingContainer.visibility = View.GONE
+                // hide the share-button
+                shareBindingContainer.visibility = View.GONE
 
-            // reset the switch
-            bindingSwitch.isChecked = false
+                // reset the switch
+                bindingSwitch.isChecked = false
 
-            // notify user
-            notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification), R.color.WarningColor)
+                // notify user
+                notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification), R.color.WarningColor)
+            }
+            DEVICE_NOTIFICATION_BINDING_SUCCESS -> {
+                //notify user
+                notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingSuccessNotification), R.color.successLightColor)
+            }
+            DEVICE_NOTIFICATION_BINDING_ERROR -> {
+                // update the hint for the user
+                bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                // reset the switch
+                bindingSwitch.isChecked = false
+                //notify user
+                notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingErrorNotification), R.color.errorLightColor)
+            }
         }
     }
+
     fun deviceSettingsActivityShareBindingButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         // make sure there is a connected device
