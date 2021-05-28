@@ -40,7 +40,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             val min = calendar.get(Calendar.MINUTE)
             val sec = calendar.get(Calendar.SECOND)
             val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
+            val month = calendar.get(Calendar.MONTH) + 1 // (January is 0, so this is a index, so add one to fit)
             val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
 
             // set the time-stamp
