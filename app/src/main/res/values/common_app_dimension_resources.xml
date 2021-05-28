@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <dimen name="common_textSize_normalText">16sp</dimen>
-    <dimen name="common_textSize_bigParagraphText">12sp</dimen>
-    <dimen name="common_textSize_bigParagraphMainHeadlineText">16sp</dimen>
-    <dimen name="common_textSize_bigParagraphSubHeadlineText">14sp</dimen>
+
+
+    <!-- Information-Activity -->
+    <dimen name="infoActivity_textSize_bigParagraphText">12sp</dimen>
+    <dimen name="infoActivity_textSize_bigParagraphMainHeadlineText">16sp</dimen>
+    <dimen name="infoActivity_textSize_bigParagraphSubHeadlineText">14sp</dimen>
+    <dimen name="infoActivity_textSize_ExternalLink">16sp</dimen>
 </resources>

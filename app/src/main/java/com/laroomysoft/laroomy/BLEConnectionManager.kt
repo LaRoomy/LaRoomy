@@ -459,6 +459,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             applicationProperty.logControl("I: This service is found in UUID Profile")
                             applicationProperty.logControl("I: Perform lookup for Characteristic UUID")
 
+                            // cache the service uuid
+                            currentUsedServiceUUID = bluetoothGattService.uuid.toString()
+
                             // iterate through the characteristics in the service
                             bluetoothGattService.characteristics.forEach {
 
@@ -835,6 +838,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     var complexStatePropertyIDs = ArrayList<Int>()
 
+    var currentUsedServiceUUID = ""
+        // used to cache the current service uuid
+        private set
+
+    val currentUsedCharacteristicUUID: String
+    get() = this.gattCharacteristic.uuid.toString()
+
+
     //private val scanResultList: MutableList<ScanResult?> = ArrayList()
 
     private lateinit var mHandler: Handler
@@ -932,6 +943,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         //this.preselectIndex = -1
         //this.scanResultList.clear()
         this.currentDevice = null
+        this.currentUsedServiceUUID = ""
         this.isConnected = false
         this.authRequired = true
         this.propertyUpToDate = false

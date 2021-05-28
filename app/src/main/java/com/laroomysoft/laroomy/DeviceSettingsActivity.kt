@@ -26,6 +26,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private lateinit var shareBindingContainer: ConstraintLayout
     private lateinit var deviceNameTextView: AppCompatTextView
     private lateinit var deviceAddressTextView: AppCompatTextView
+    private lateinit var deviceServiceUUIDTextView: AppCompatTextView
+    private lateinit var deviceCharacteristicUUIDTextView: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,10 +50,14 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         shareBindingContainer = findViewById(R.id.deviceSettingsActivityShareBindingContainer)
         deviceNameTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoNameTextView)
         deviceAddressTextView = findViewById(R.id.deviceSettingsActivityDeviceMACAddressNameTextView)
+        deviceServiceUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoServiceUUIDTextView)
+        deviceCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoCharacteristicUUIDTextView)
 
         // set device info
         deviceNameTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
         deviceAddressTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
+        deviceServiceUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedServiceUUID
+        deviceCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedCharacteristicUUID
 
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired

@@ -45,6 +45,10 @@
     <color  name="deviceMainHeaderColor">#000000</color>
 
 
+    <!-- pure colors -->
+    <color name="pureWhite">#FFFFFFFF</color>
+
+
     <!-- barGraph colors -->
     <color name="barGraphGridLineColor">#FFFFFFFF</color>
     <color name="decent_bar_0_color">#FF7BC7CC</color>
