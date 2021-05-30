@@ -9,4 +9,9 @@
     <dimen name="infoActivity_textSize_bigParagraphMainHeadlineText">16sp</dimen>
     <dimen name="infoActivity_textSize_bigParagraphSubHeadlineText">14sp</dimen>
     <dimen name="infoActivity_textSize_ExternalLink">16sp</dimen>
+
+    <!-- Help Activity -->
+    <dimen name="helpActivity_textSizeHeaderText">20sp</dimen>
+    <dimen name="helpActivity_textSizeHelpTopicExpandButton">16sp</dimen>
+    <dimen name="helpActivity_textSizeHelpTopicSubText">14sp</dimen>
 </resources>

@@ -165,6 +165,14 @@
     <string name="AppHelpActivity_Topic_ConnectDevice_P3">3. If the desired device is found, click on it to create bond. You may will be asked for a bonding password. Usually it is something like 000000 or 123456.</string>
     <string name="AppHelpActivity_Topic_ConnectDevice_P4">4. When the device is successfully bonded, open the laroomy app. The device should now be listed.</string>
     <string name="AppHelpActivity_Topic_DeviceBinding">Device-Binding</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H1">What is device-binding?</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P1">By default everyone with the LaRoomy App installed is able to connect to your remote device. To make the connection to your device private, device-binding could be enabled. A random generated, unique internal binding code will be transmitted to the remote device and (if supported by the device) is then required for further connections to the device.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H2">What if more than one person wants to use a private device?</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P2">The originator of the device-binding can share the binding-data with other persons by clicking the share button on the device-settings page. A share link will be generated and could be shared via messenger,email and so on. The binding-data will be encrypted and is device specific. The receiver is not able to connect to another device of the originator, even though the binding is generated with the same binding key.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H3">What is the purpose of the custom binding key?</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P3">The default binding key is hidden and not visible to a user. Its lifetime is limited to the lifetime of the application data. If an apps data is set back to default, the key will be generated new. To keep the key over that lifetime you can set your own key and note it somewhere for secure.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H4">Important Notes:</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P4">Shared binding-data cannot be shared again by the receiver, only the originator is able to do that. Only the originator of the device-binding is able to unbind it.</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
 

@@ -20,6 +20,8 @@ class AppHelpActivity : AppCompatActivity() {
     // connect device topic
     private lateinit var connectDeviceExpandImageView: AppCompatImageView
     private lateinit var connectDeviceContentContainer: ConstraintLayout
+    private lateinit var deviceBindingExpandImageView: AppCompatImageView
+    private lateinit var deviceBindingContentContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +30,9 @@ class AppHelpActivity : AppCompatActivity() {
         // connect device topic elements
         this.connectDeviceExpandImageView = findViewById(R.id.appHelpActivityConnectDeviceExpandImageView)
         this.connectDeviceContentContainer = findViewById(R.id.appHelpActivityConnectDeviceContentView)
+
+        this.deviceBindingExpandImageView = findViewById(R.id.appHelpActivityDeviceBindingExpandImageView)
+        this.deviceBindingContentContainer = findViewById(R.id.appHelpActivityDeviceBindingContentContainer)
     }
 
     fun onGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
@@ -43,10 +48,20 @@ class AppHelpActivity : AppCompatActivity() {
                     View.GONE -> {
                         connectDeviceContentContainer.visibility = View.VISIBLE
                         connectDeviceExpandImageView.setImageResource(R.drawable.exp_arrow_up)
-                    }
-                    else -> {
+                    } else -> {
                         connectDeviceContentContainer.visibility = View.GONE
                         connectDeviceExpandImageView.setImageResource(R.drawable.exp_arrow_right)
+                    }
+                }
+            }
+            R.id.appHelpActivityDeviceBindingContainer -> {
+                when(deviceBindingContentContainer.visibility){
+                    View.GONE -> {
+                        deviceBindingContentContainer.visibility = View.VISIBLE
+                        deviceBindingExpandImageView.setImageResource(R.drawable.exp_arrow_up)
+                    } else -> {
+                        deviceBindingContentContainer.visibility = View.GONE
+                        deviceBindingExpandImageView.setImageResource(R.drawable.exp_arrow_right)
                     }
                 }
             }

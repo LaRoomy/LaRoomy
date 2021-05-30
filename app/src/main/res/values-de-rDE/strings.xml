@@ -173,6 +173,16 @@
     <string name="AppHelpActivity_Topic_ConnectDevice_P3">3. Wenn das gewünschte Gerät gefunden wurde, klicken Sie darauf um es mit dem System zu koppeln. Sie werden möglicherweise nach einem Passwort gefragt, probieren Sie etwas wie 000000 oder 123456.</string>
     <string name="AppHelpActivity_Topic_ConnectDevice_P4">4. Nachdem das Gerät erfolgreich gekoppelt ist, öffnen Sie die Laroomy App. Das Gerät sollte nun angezeigt werden.</string>
     <string name="AppHelpActivity_Topic_DeviceBinding">Geräte-Bindung</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H1">Was ist die Geräte-Bindung?</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P1">Standardmäßig kann jeder mit installierter LaRoomy-App eine Verbindung zum Gerät herstellen. Um die Verbindung zum Gerät exklusiv zu machen kann die Geräte-Bindung verwendet werden. Ein zufällig generierter, einzigartiger Bindungs-Schlüssel wird an das Gerät übermittelt. Dieser Schlüssel ist dann für alle weiteren Verbindungen zu diesem Gerät erforderlich (wenn vom Gerät unterstützt).</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H2">Was wenn mehr als eine Person ein privates Gerät benutzen möchte?</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P2">Der Urheber der Geräte-Bindung kann die Bindungs-Informationen mit anderen Benutzern über den Share-Button auf der Geräte-Einstellungs Seite teilen. Ein Link wird generiert, der über Messenger/Email und so weiter geteilt werden kann. Die Bindungs-Daten werden verschlüsselt und sind Geräte-spezifisch. Dem Empfänger ist es nicht möglich sich mit einem anderen Gerät des Urhebers zu verbinden, auch wenn dafür der gleiche Bindungs-Schlüssel verwendet wurde.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H3">Was ist der Sinn des benutzerdefinierten Bindungs-Schlüssels?</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P3">Der Standardschlüssel ist versteckt und nicht sichtbar für den Benutzer. Die Lebenszeit des Schlüssels ist limitiert auf die Lebenszeit der App-Daten. Wenn eine App zurückgesetzt wird, dann wird ein neuer Schlüssel generiert. Um einen Schlüssel über diese Zeit hinaus zu sichern, kann ein eigener Schlüssel eingegeben werden und an einem sicheren Ort verwahrt werden</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_H4">Wichtige Hinweise:</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P4">Geteilte Bindungen können vom Empfänger nicht erneut geteilt werden, nur der Urheber kann die Verbindung teilen. Nur der Urheber kann die Geräte-Bindung wieder lösen.</string>
+
+
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
 

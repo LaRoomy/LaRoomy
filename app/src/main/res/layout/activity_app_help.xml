@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:text="@string/AppHelpActivityHeaderText"
-                android:textSize="20sp"
+                android:textSize="@dimen/helpActivity_textSizeHeaderText"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/appHelpActivityHeaderImage"
@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:text="@string/AppHelpTopic_ConnectDevice"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicExpandButton"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/appHelpActivityConnectDeviceExpandImageView"
@@ -115,6 +115,7 @@
                 android:visibility="gone"
 
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceHeader">
 
 
@@ -124,7 +125,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_Explanation"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -134,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_P1"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceExplanation" />
@@ -145,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_P2"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP1" />
 
@@ -155,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_P3"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP2" />
 
@@ -165,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_P4"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP3" />
 
@@ -174,6 +175,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:textAllCaps="false"
                     android:onClick="onGotoBluetoothButtonClick"
                     android:text="@string/AppHelpActivityGotoBluetoothButtonText"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -225,16 +227,126 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicExpandButton"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/appHelpActivityDeviceBindingExpandImageView"
                     app:layout_constraintTop_toTopOf="parent" />
 
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityDeviceBindingContentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
 
+                android:visibility="gone"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingHeader">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingFirstHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_H1"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingFirstParagraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_P1"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFirstHeadline" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingSecondHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_H2"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFirstParagraph" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingSecondParagraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_P2"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingSecondHeadline" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingThirdHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_H3"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingSecondParagraph" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingThirdParagraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_P3"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingThirdHeadline" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingFourthHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_H4"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingThirdParagraph" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityDeviceBindingFourthParagraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/AppHelpActivity_Topic_DeviceBinding_P4"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFourthHeadline" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
         <!-- Topic 3: *************************************************** -->
