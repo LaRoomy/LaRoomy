@@ -180,7 +180,7 @@
     <string name="AppHelpActivity_Topic_DeviceBinding_H3">Was ist der Sinn des benutzerdefinierten Bindungs-Schlüssels?</string>
     <string name="AppHelpActivity_Topic_DeviceBinding_P3">Der Standardschlüssel ist versteckt und nicht sichtbar für den Benutzer. Die Lebenszeit des Schlüssels ist limitiert auf die Lebenszeit der App-Daten. Wenn eine App zurückgesetzt wird, dann wird ein neuer Schlüssel generiert. Um einen Schlüssel über diese Zeit hinaus zu sichern, kann ein eigener Schlüssel eingegeben werden und an einem sicheren Ort verwahrt werden</string>
     <string name="AppHelpActivity_Topic_DeviceBinding_H4">Wichtige Hinweise:</string>
-    <string name="AppHelpActivity_Topic_DeviceBinding_P4">Geteilte Bindungen können vom Empfänger nicht erneut geteilt werden, nur der Urheber kann die Verbindung teilen. Nur der Urheber kann die Geräte-Bindung wieder lösen.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P4">Geteilte Bindungen können vom Empfänger nicht erneut geteilt werden, nur der Urheber kann die Verbindung teilen. Und nur der Urheber kann die Geräte-Bindung wieder lösen.</string>
 
 
 

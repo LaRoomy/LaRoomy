@@ -172,7 +172,7 @@
     <string name="AppHelpActivity_Topic_DeviceBinding_H3">What is the purpose of the custom binding key?</string>
     <string name="AppHelpActivity_Topic_DeviceBinding_P3">The default binding key is hidden and not visible to a user. Its lifetime is limited to the lifetime of the application data. If an apps data is set back to default, the key will be generated new. To keep the key over that lifetime you can set your own key and note it somewhere for secure.</string>
     <string name="AppHelpActivity_Topic_DeviceBinding_H4">Important Notes:</string>
-    <string name="AppHelpActivity_Topic_DeviceBinding_P4">Shared binding-data cannot be shared again by the receiver, only the originator is able to do that. Only the originator of the device-binding is able to unbind it.</string>
+    <string name="AppHelpActivity_Topic_DeviceBinding_P4">Shared binding-data cannot be shared again by the receiver, only the originator is able to do that. And only the originator of the device-binding is able to unbind it.</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
 
