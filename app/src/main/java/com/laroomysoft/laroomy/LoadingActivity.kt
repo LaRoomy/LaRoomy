@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.TextView
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 
 class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
@@ -68,19 +69,30 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 setProgressText(getString(R.string.CA_Connecting))
             }
             else -> {
-                // connect to device from list at index
-                val adr =
-                    ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).address
+                try {
+                    // connect to device from list at index
+                    val adr =
+                        ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(
+                            this.curDeviceListIndex
+                        ).address
 
-                // cache the address to connect again if an unexpected disconnect event occurs
-                this.macAddressToConnect = adr
+                    // cache the address to connect again if an unexpected disconnect event occurs
+                    this.macAddressToConnect = adr
 
-                if(adr == ApplicationProperty.bluetoothConnectionManager.getLastConnectedDeviceAddress()){
-                    isLastConnectedDevice = true
+                    if (adr == ApplicationProperty.bluetoothConnectionManager.getLastConnectedDeviceAddress()) {
+                        isLastConnectedDevice = true
+                    }
+
+                    ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(
+                        adr
+                    )
+                    setProgressText(getString(R.string.CA_Connecting))
+                } catch (e: IndexOutOfBoundsException){
+                    Log.e("M:E:onCreate", "IndexOutOfBoundsException in LoadingActivity in onCreate")
+                    Log.e("M:E:onCreate", "Index was: ${this.curDeviceListIndex} / bonded-list-size: ${ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.size}")
+
+                    // TODO: navigate back??? Notify User???
                 }
-
-                ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(adr)
-                setProgressText(getString(R.string.CA_Connecting))
             }
         }
     }
@@ -144,7 +156,16 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 }
             }
         } else {
-            image = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(this.curDeviceListIndex).image
+            image = try {
+                ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(
+                    this.curDeviceListIndex
+                ).image
+            } catch (e: IndexOutOfBoundsException){
+                Log.e("M:E:Auth:Success", "IndexOutOfBoundsException in LoadingActivity in callback-method: onAuthenticationSuccessful")
+                Log.e("M:E:Auth:Success", "ExceptionMessage: ${e.message}")
+                Log.e("M:E:Auth:Success", "Current index was ${this.curDeviceListIndex} / size of bonded-list: ${ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.size}")
+                R.drawable.bluetooth_green_glow_sq64
+            }
         }
 
         intent.putExtra("BondedDeviceImageResourceId", image)
@@ -282,11 +303,11 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     if(!ApplicationProperty.bluetoothConnectionManager.authenticationSuccess){
                         ApplicationProperty.bluetoothConnectionManager.authenticate()
                     }
-                },1500)
+                },2000)// FIXME: what is the right time interval??
                 
                 // notify User:
                 setProgressText(getString(R.string.CA_Authenticate))
-            }, 1200)
+            }, 1500) // FIXME: what is the right time interval??
         }
     }
 
