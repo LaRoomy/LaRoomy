@@ -940,8 +940,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     fun clear(){
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
+
         //this.preselectIndex = -1
         //this.scanResultList.clear()
+
         this.currentDevice = null
         this.currentUsedServiceUUID = ""
         this.isConnected = false
