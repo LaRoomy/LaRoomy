@@ -59,11 +59,13 @@
                 android:id="@+id/setupActivityAutoConnectSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityAutoConnectElementTextView"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DuplicateSpeakableTextCheck" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -71,14 +73,15 @@
             android:id="@+id/setupActivityAutoConnectHintTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_AutoConnectHint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectContainer" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectContainer"
+            tools:ignore="TextContrastCheck" />
 
         <View
             android:id="@+id/setupActivityFirstSeparatorView"
@@ -118,6 +121,7 @@
                 android:id="@+id/setupActivityCustomBindingCodeSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -130,14 +134,15 @@
             android:id="@+id/setupActivityDeviceBindingHintTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_CustomBindingCodeHint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityCustomBindingCodeContainer" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityCustomBindingCodeContainer"
+            tools:ignore="TextContrastCheck" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setupActivityBindingCodeContainer"
@@ -255,6 +260,7 @@
                 android:id="@+id/setupActivityListAllDevicesSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -267,14 +273,15 @@
             android:id="@+id/setupActivityListAllDevicesHintTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_ListAllDevicesHint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesContainer" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesContainer"
+            tools:ignore="TextContrastCheck" />
 
         <View
             android:id="@+id/setupActivityThirdSeparatorView"
@@ -358,6 +365,7 @@
                 android:id="@+id/setupActivityEnableLoggingSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -370,14 +378,15 @@
             android:id="@+id/setupActivityEnableLoggingHintTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_EnableLoggingHint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityEnableLoggingContainer" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityEnableLoggingContainer"
+            tools:ignore="TextContrastCheck" />
 
         <View
             android:id="@+id/setupActivityFifthSeparatorView"
@@ -464,6 +473,7 @@
                 android:id="@+id/setupActivityKeepScreenActiveSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -476,14 +486,15 @@
             android:id="@+id/setupActivityKeepScreenActiveHintTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_KeepScreenActiveHint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityKeepScreenActiveContainer" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityKeepScreenActiveContainer"
+            tools:ignore="TextContrastCheck" />
 
 
         <View

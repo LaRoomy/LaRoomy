@@ -22,9 +22,12 @@
             android:id="@+id/mainActivityHamburgerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
             android:src="@drawable/hamburger_button_icon_norm"
             android:background="@color/transparentViewColor"
             android:onClick="onMainActivityMenuButtonClick"
+            android:contentDescription="@string/MainActivityHamburgerButtonContentDescription"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

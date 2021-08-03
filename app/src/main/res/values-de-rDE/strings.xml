@@ -106,7 +106,7 @@
     <string name="SetupActivity_ListAllDevicesHint">Es werden alle mit dem System gekoppelten Geräte aufgelisted. Standardmäßig werden nur Geräte aufgelistet, die den LaRoomy Namenskonventionen entsprechen</string>
     <string name="SetupActivity_UUIDManagerButtonText">UUID Profile verwalten</string>
     <string name="SetupActivity_EnableLoggingElementText">Verbindungsprotokoll erstellen</string>
-    <string name="SetupActivity_EnableLoggingHint">Es wird ein temporäres Protokoll der Übertragung erstellt. Unter Umständen führt das zu einer Beeinträchtigung der Performance, kann aber bei der Entwicklung des Endgerätes hilfreich sein.</string>
+    <string name="SetupActivity_EnableLoggingHint">Es wird ein temporäres Übertragungs-Protokoll erstellt. Unter Umständen führt das zu einer Beeinträchtigung der Performance, kann aber bei der Fehlersuche oder der Entwicklung des Endgerätes hilfreich sein.</string>
     <string name="SetupActivity_ShowLogButtonText">Protokoll anzeigen</string>
     <string name="SetupActivity_PassKeyMustNotBeEmpty">Schlüssel darf nicht leer sein.</string>
     <string name="SetupActivity_PassKeyMaxIs10Character">Schlüssel darf maximal 10 Zeichen enthalten.</string>
@@ -219,7 +219,7 @@
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
-    <string name="DeviceTypeHeaderImageButtonDescription">Button to remove the device and select a new device</string>
+    <string name="DeviceTypeHeaderImageButtonDescription">Remove the device and select a new device</string>
     <string name="DeviceInfoSubHeaderImageDescription">Image for the additional device info</string>
     <string name="DevicePropertyListElementImageDescription">Image for the appropriate device property</string>
     <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>

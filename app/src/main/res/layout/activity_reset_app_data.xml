@@ -54,7 +54,8 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/resetAppActivityDataToResetTextView" />
+            app:layout_constraintTop_toBottomOf="@id/resetAppActivityDataToResetTextView"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <View
             android:layout_width="match_parent"
@@ -88,7 +89,8 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
@@ -110,7 +112,8 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetAppSettingsCheckBoxHintTextView" />
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetAppSettingsCheckBoxHintTextView"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
@@ -133,7 +136,8 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetBindingDataCheckBoxHintTextView" />
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetBindingDataCheckBoxHintTextView"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
@@ -156,7 +160,8 @@
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBoxHintTextView" />
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBoxHintTextView"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"

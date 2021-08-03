@@ -21,11 +21,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
             android:contentDescription="@string/DeviceTypeHeaderImageDescription"
-            android:src="@drawable/electronic_device"
             android:onClick="onReconnectDevice"
+            android:src="@drawable/electronic_device"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ImageContrastCheck" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -64,9 +65,10 @@
             android:id="@+id/deviceMainActivityDiscardDeviceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/DeviceTypeHeaderImageButtonDescription"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
             android:onClick="onDiscardDeviceButtonClick"
             android:src="@drawable/cross_white24"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,9 +78,10 @@
             android:id="@+id/deviceMainActivityDeviceSettingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/DeviceReConnectImageButtonDescription"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
             android:onClick="onDeviceSettingsButtonClick"
             android:src="@drawable/settings_white_24"
             app:layout_constraintBottom_toBottomOf="parent"

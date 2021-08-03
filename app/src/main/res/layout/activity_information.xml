@@ -105,21 +105,22 @@
             android:id="@+id/infoActivityMailToTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
+            android:minHeight="48dp"
+            android:onClick="onMailToLinkClick"
+            android:text="@string/InfoActivity_MailTo"
             android:textColor="@color/clickableTextColor"
             android:textSize="20sp"
-            android:text="@string/InfoActivity_MailTo"
-            android:onClick="onMailToLinkClick"
-            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="center_vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoActivityRightsReservedTextView"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityRightsReservedTextView" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:id="@+id/infoActivitySecondSeparator"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:background="@color/separatorColor"
@@ -230,14 +231,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:minHeight="48dp"
+                android:onClick="onGooglePlayServiceLinkClick"
+                android:text="@string/InfoActivity_PP_ThirdPartyServiceLink_one"
                 android:textColor="@color/clickableTextColor"
                 android:textSize="@dimen/infoActivity_textSize_ExternalLink"
-                android:text="@string/InfoActivity_PP_ThirdPartyServiceLink_one"
-                android:onClick="onGooglePlayServiceLinkClick"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="center_vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/infoActivityICUContentTextView"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityICUContentTextView" />
 
             <View
                 android:layout_width="match_parent"

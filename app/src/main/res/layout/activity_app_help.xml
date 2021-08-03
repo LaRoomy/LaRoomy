@@ -65,6 +65,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:background="@color/helpTopicBackground"
+            android:minHeight="48dp"
             android:onClick="onTopicClick"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
@@ -79,6 +80,7 @@
                 android:layout_marginStart="20dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -114,8 +116,8 @@
 
                 android:visibility="gone"
 
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceHeader">
 
 
@@ -175,9 +177,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:textAllCaps="false"
                     android:onClick="onGotoBluetoothButtonClick"
                     android:text="@string/AppHelpActivityGotoBluetoothButtonText"
+                    android:textAllCaps="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP4" />
@@ -196,6 +198,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:background="@color/helpTopicBackground"
+            android:minHeight="48dp"
             android:onClick="onTopicClick"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
@@ -210,6 +213,7 @@
                 android:layout_marginStart="20dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -244,8 +248,8 @@
 
                 android:visibility="gone"
 
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingHeader">
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -263,13 +267,13 @@
                     android:id="@+id/appHelpActivityDeviceBindingFirstParagraph"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P1"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFirstHeadline" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -287,13 +291,13 @@
                     android:id="@+id/appHelpActivityDeviceBindingSecondParagraph"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P2"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingSecondHeadline" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -312,8 +316,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P3"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -336,13 +340,13 @@
                     android:id="@+id/appHelpActivityDeviceBindingFourthParagraph"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P4"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFourthHeadline" />
 
 
