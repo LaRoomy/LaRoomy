@@ -214,6 +214,8 @@
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profil-Name existiert bereits.</string>
 
 
+    <string name="AddDeviceActivityHeaderText">Neues Gerät hinzufügen</string>
+
 
 
     <!-- Image content descriptions -->

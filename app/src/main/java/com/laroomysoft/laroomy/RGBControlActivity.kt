@@ -8,8 +8,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.SeekBar
-import android.widget.Switch
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -85,7 +83,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         this.headerTextView = findViewById(R.id.rgbHeaderTextView)
         this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this, this@RGBControlActivity)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this, this@RGBControlActivity)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get program speed seekBar
@@ -183,7 +181,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             Log.d("M:RGBPage:onResume", "onResume executed in RGBControlActivity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@RGBControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@RGBControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // TODO: test if the dualContainer will be set visible on reConnection (otherwise make the visibility secure here)

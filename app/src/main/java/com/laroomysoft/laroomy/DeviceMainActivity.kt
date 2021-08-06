@@ -60,7 +60,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.deviceImageResourceId = intent.getIntExtra("BondedDeviceImageResourceId", -1)
 
         // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceMainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@DeviceMainActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get UI Elements
@@ -213,7 +213,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     false
 
                 // realign the context objects to the bluetoothManager
-                ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(
+                ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(
                     this@DeviceMainActivity,
                     this
                 )

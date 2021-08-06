@@ -20,11 +20,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".AddDeviceActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -48,8 +52,7 @@
         <activity android:name=".ManageUUIDProfilesActivity" />
         <activity android:name=".AppSettingsActivity" />
         <activity android:name=".InformationActivity" />
-        <activity android:name=".AppHelpActivity" />
-        <!-- Activities in connected state:  -->
+        <activity android:name=".AppHelpActivity" /> <!-- Activities in connected state: -->
         <activity
             android:name=".UnlockControlActivity"
             android:screenOrientation="locked" />

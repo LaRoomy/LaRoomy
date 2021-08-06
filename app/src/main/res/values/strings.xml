@@ -199,6 +199,8 @@
     <string name="EditUUIDProfileActivityInvalidUUIDNotification">Invalid UUID-Format.</string>
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profile-Name already exist.</string>
 
+    <string name="AddDeviceActivityHeaderText">Add new Device</string>
+
     <!-- Image/ImageButton content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
@@ -217,6 +219,7 @@
     <string name="NavigatorControlActivityDownButtonContentDescription" translatable="false">Send a Down command to the remote device</string>
     <string name="NavigatorControlActivityRightButtonContentDescription" translatable="false">Send a right command to the remote device</string>
     <string name="NavigatorControlActivityLeftButtonContentDescription" translatable="false">Send an left command to the remote device</string>
+    <string name="MainActivityAddButtonContentDescription" translatable="false">Add a new device to your list</string>
 
     <!-- Activity Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>

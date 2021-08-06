@@ -711,7 +711,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun reAlignContextObjects(cContext: Context, eventHandlerObject: BleEventCallback){
+    fun reAlignContextReferences(cContext: Context, eventHandlerObject: BleEventCallback){
         this.activityContext = cContext
         this.callback = eventHandlerObject
     }
@@ -739,6 +739,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(this.isConnected){
             this.authRequired = true
             this.sendData(this.authenticationString)
+        } else {
+            if(verboseLog){
+                Log.e("M:authenticate", "Cannot Authenticate - no connection/ dev-info: address: ${this.currentDevice?.address} dev-type: ${this.currentDevice?.type} ?: ${this.currentDevice}")
+                Log.e("M:authenticate", "Cannot Authenticate - no connection/ gatt-info: ${this.bluetoothGatt}")
+            }
         }
     }
 

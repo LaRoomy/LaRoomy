@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
@@ -52,7 +51,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@NavigatorControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@NavigatorControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).setOnTouchListener(this)
@@ -103,7 +102,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             Log.d("M:NavCon:onResume", "onResume executed in Navigator Control Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@NavigatorControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@NavigatorControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
@@ -48,7 +47,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@BarGraphActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@BarGraphActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the notification text-view
@@ -108,7 +107,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             Log.d("M:BGD:onResume", "onResume executed in Bar-Graph Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@BarGraphActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@BarGraphActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

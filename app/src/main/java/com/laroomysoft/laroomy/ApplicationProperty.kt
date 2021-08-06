@@ -317,6 +317,8 @@ fun resourceIdForImageId(imageID: Int): Int {
         110 -> R.drawable.redo_white
         111 -> R.drawable.flash_blue
         112 -> R.drawable.flash_yellow
+        113 -> R.drawable.add_white_sq48_simple
+        114 -> R.drawable.add_blue_sq48_simple
 
         // TODO: implement all new image resources here...
 
@@ -327,6 +329,10 @@ fun resourceIdForImageId(imageID: Int): Int {
 
 interface OnDeviceListItemClickListener {
     fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel)
+}
+
+interface OnAddDeviceListItemClickListener {
+    fun onItemClicked(index: Int)
 }
 
 interface OnUUIDProfileListItemClickListener {

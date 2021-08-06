@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -31,16 +32,25 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private lateinit var availableDevicesViewAdapter: RecyclerView.Adapter<*>
     private lateinit var availableDevicesViewManager: RecyclerView.LayoutManager
 
+    private lateinit var addDeviceButton: AppCompatImageButton
+    private lateinit var bottomSeparator: View
+
     //private var buttonNormalizationRequired = false
+
+    private var addButtonNormalizationRequired = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@MainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@MainActivity, this)
 
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
+
+        // get UI Elements
+        this.addDeviceButton = findViewById(R.id.mainActivityAddDeviceImageButton)
+        this.bottomSeparator = findViewById(R.id.mainActivityBottomSeparatorView)
 
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
@@ -104,6 +114,12 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     override fun onResume() {
         super.onResume()
 
+        bottomSeparator.visibility = when(this.resources.configuration.orientation){
+            Configuration.ORIENTATION_LANDSCAPE -> View.GONE
+            else -> View.VISIBLE
+        }
+
+
         ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
 
 //        if(this.buttonNormalizationRequired){
@@ -115,9 +131,17 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 //            this.buttonNormalizationRequired = false
 //        }
 
+        if(addButtonNormalizationRequired){
+            addButtonNormalizationRequired = false
+            addDeviceButton.setImageResource(R.drawable.add_white_sq32)
+        }
+
 
 
         // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
+
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@MainActivity, this)
+
 
         // update the device-list
         updateAvailableDevices()
@@ -255,15 +279,15 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
 
     private fun notifyUser(message: String, type: Int){
-        val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)
-        notificationView.text = message
-
-        when(type){
-            ERROR_MESSAGE -> notificationView.setTextColor(getColor(R.color.ErrorColor))
-            WARNING_MESSAGE -> notificationView.setTextColor(getColor(R.color.WarningColor))
-            INFO_MESSAGE -> notificationView.setTextColor(getColor(R.color.InfoColor))
-            else -> notificationView.setTextColor(getColor(R.color.InfoColor))
-        }
+//        val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)
+//        notificationView.text = message
+//
+//        when(type){
+//            ERROR_MESSAGE -> notificationView.setTextColor(getColor(R.color.ErrorColor))
+//            WARNING_MESSAGE -> notificationView.setTextColor(getColor(R.color.WarningColor))
+//            INFO_MESSAGE -> notificationView.setTextColor(getColor(R.color.InfoColor))
+//            else -> notificationView.setTextColor(getColor(R.color.InfoColor))
+//        }
     }
 
     private fun setItemColor(index: Int, colorID: Int){
@@ -290,7 +314,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
             // TODO
             //findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
         }
-        this.availableDevicesViewAdapter.notifyDataSetChanged()
+        //this.availableDevicesViewAdapter.notifyDataSetChanged()
         this.resetSelectionInDeviceListView()
     }
 
@@ -342,5 +366,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     // Interface methods:
     override fun onComponentError(message: String) {
         notifyUser(message, ERROR_MESSAGE)
+    }
+
+    fun onMainActivityAddDeviceButtonClick(view: View) {
+
+        addDeviceButton.setImageResource(R.drawable.add_white_sq32_pressed)
+        addButtonNormalizationRequired = true
+
+        val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
+        startActivity(intent)
     }
 }

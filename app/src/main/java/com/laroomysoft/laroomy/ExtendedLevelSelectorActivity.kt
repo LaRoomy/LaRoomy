@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import com.ramotion.fluidslider.FluidSlider
@@ -48,7 +47,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@ExtendedLevelSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex state object
@@ -131,7 +130,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             Log.d("M:ELSPage:onResume", "onResume executed in Extended Level Selector Control")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@ExtendedLevelSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@ExtendedLevelSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -26,7 +27,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@LoadingActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@LoadingActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // if logging is enabled set the appropriate data
@@ -314,5 +315,11 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onComponentError(message: String) {
         super.onComponentError(message)
         setErrorText(message)
+    }
+
+    fun onLoadingStringClick(view: View) {
+
+        // FIXME: maybe temp, this has no effect, the problem is/was that there is no connection
+        ApplicationProperty.bluetoothConnectionManager.authenticate()
     }
 }

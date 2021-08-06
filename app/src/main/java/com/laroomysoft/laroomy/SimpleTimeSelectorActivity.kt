@@ -3,7 +3,6 @@ package com.laroomysoft.laroomy
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import android.widget.TextView
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
@@ -55,7 +54,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         this.currentMinute = timeSelectorState.valueTwo
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@SimpleTimeSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // config timeSelector
@@ -104,7 +103,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             Log.d("M:STSPage:onResume", "onResume executed in Simple Time Selector Control")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@SimpleTimeSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

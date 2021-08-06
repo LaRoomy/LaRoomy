@@ -51,7 +51,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@UnlockControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex state object
@@ -102,7 +102,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             Log.d("M:UCA:onResume", "onResume executed in Unlock Control Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@UnlockControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@UnlockControlActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

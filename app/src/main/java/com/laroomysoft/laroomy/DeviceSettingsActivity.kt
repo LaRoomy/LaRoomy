@@ -39,7 +39,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
 
         // align context and event objects
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceSettingsActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@DeviceSettingsActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the necessary views
@@ -165,7 +165,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             Log.d("M:DSPPage:onResume", "onResume executed in Device Settings Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@DeviceSettingsActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@DeviceSettingsActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)

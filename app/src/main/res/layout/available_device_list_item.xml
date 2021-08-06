@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="70dp"
     android:orientation="horizontal"
     tools:ignore="UseCompoundDrawables">
 
@@ -12,8 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/AvailableDeviceListImageDescription"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="3dp"
         android:src="@drawable/bluetooth_green_glow_sq64"
         />
 
@@ -25,7 +25,7 @@
         android:textSize="18sp"
         android:layout_marginEnd="10dp"
         android:text="@string/UniversalPlaceholderName"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="20dp"
         />
 
 </LinearLayout>
