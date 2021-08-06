@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import android.widget.TextView
 import android.widget.TimePicker
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -44,7 +43,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@TimeFrameSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex-state object
@@ -111,7 +110,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
             Log.d("M:TFSPage:onResume", "onResume executed in Time-Frame Selector Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextObjects(this@TimeFrameSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@TimeFrameSelectorActivity, this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
