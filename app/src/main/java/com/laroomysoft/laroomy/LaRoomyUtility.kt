@@ -302,6 +302,15 @@ fun isLaroomyDevice(name: String) : Boolean {
     return name.contains("laroomy", true)||(name.contains("lry", true))
 }
 
+fun deviceImageFromName(name: String): Int {
+    return when {
+        (isLaroomyDevice(name)) -> R.drawable.laroomy_icon_sq64
+        else -> {
+            R.drawable.bluetooth_green_glow_sq64
+        }
+    }
+}
+
 fun createRandomPasskey(keyLength: Int): String {
 
     var realKeyLength = keyLength - 1

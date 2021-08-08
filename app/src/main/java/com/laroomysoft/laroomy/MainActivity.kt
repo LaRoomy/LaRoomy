@@ -24,7 +24,15 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
         field.clear()
-        field = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
+
+        for (device in (applicationContext as ApplicationProperty).addedDevices.devices) {
+            val dev = LaRoomyDevicePresentationModel()
+            dev.address = device.macAddress
+            dev.name = device.name
+            dev.image = deviceImageFromName(device.name)
+
+            field.add(dev)
+        }
         return field
     }
 
@@ -47,6 +55,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@MainActivity, this)
 
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
+        (applicationContext as ApplicationProperty).addedDevices = AddedDevices(applicationContext)
 
         // get UI Elements
         this.addDeviceButton = findViewById(R.id.mainActivityAddDeviceImageButton)
@@ -63,6 +72,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
                     layoutManager = availableDevicesViewManager
                     adapter = availableDevicesViewAdapter
                 }
+
+        // TODO: if there are no devices, present the user a call to action (add your first device...!)
+
 
         // save a default passkey if no one is saved (this should only be executed once per installation)
         if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey) == ERROR_NOTFOUND){
@@ -144,7 +156,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
 
         // update the device-list
-        updateAvailableDevices()
+        //updateAvailableDevices()
+
+        if((applicationContext as ApplicationProperty).mainActivityListElementWasAdded){
+            (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = false
+            this.availableDevicesViewAdapter.notifyItemInserted(this.availableDevices.size - 1)
+        }
+
+        this.resetSelectionInDeviceListView()
 
 
         //reset the selected color
@@ -173,7 +192,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         //ll?.setBackgroundColor()
 
         val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-        intent.putExtra("BondedDeviceIndex", index)
+        intent.putExtra("DeviceListIndex", index)
         startActivity(intent)
         //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
@@ -305,7 +324,29 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     }
 
     private fun updateAvailableDevices(){
-        this.availableDevices = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
+
+        //this.availableDevices = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
+
+        //this.availableDevicesViewAdapter = AvailableDevicesListAdapter(this.availableDevices, this)
+
+       //this.availableDevicesViewAdapter.notifyDataSetChanged()
+
+        //this.availableDevices.clear()
+
+//        val devList = ArrayList<LaRoomyDevicePresentationModel>()
+//
+//        for (device in (applicationContext as ApplicationProperty).addedDevices.devices) {
+//            val dev = LaRoomyDevicePresentationModel()
+//            dev.address = device.macAddress
+//            dev.name = device.name
+//
+//            devList.add(dev)
+//        }
+//
+//        this.availableDevices = devList
+
+
+
         if(this.availableDevices.size == 0){
             // TODO
             //findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)

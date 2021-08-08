@@ -234,6 +234,7 @@
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>
     <string name="FileKey_AppSettings" translatable="false">fileKeyApplicationSettingsData</string>
     <string name="FileKey_BindingPairs" translatable="false">fileKeyBindingPairData</string>
+    <string name="FileKey_AddedDevices" translatable="false">fileKeyAddedDevices</string>
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>

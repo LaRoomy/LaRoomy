@@ -49,7 +49,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             (applicationContext as ApplicationProperty).logRecordingTime = "Rec:Time: $hour:$min:$sec - $dayOfMonth/$month/$year"
         }
 
-        this.curDeviceListIndex = this.intent.getIntExtra("BondedDeviceIndex", -1)
+        this.curDeviceListIndex = this.intent.getIntExtra("DeviceListIndex", -1)
 
         when(this.curDeviceListIndex){
             -1 -> {
@@ -73,9 +73,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 try {
                     // connect to device from list at index
                     val adr =
-                        ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(
+                        (applicationContext as ApplicationProperty).addedDevices.devices.elementAt(
                             this.curDeviceListIndex
-                        ).address
+                        ).macAddress
 
                     // cache the address to connect again if an unexpected disconnect event occurs
                     this.macAddressToConnect = adr

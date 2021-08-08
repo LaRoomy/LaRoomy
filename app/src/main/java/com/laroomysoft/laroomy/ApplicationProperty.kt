@@ -74,11 +74,13 @@ class ApplicationProperty : Application() {
     var complexPropertyUpdateRequired = false
     var appSettingsResetDone = false
     var eventLogEnabled = false
+    var mainActivityListElementWasAdded = false
     var complexUpdateID = -1
 
     //var userNavigatedFromCommActivity = false
 
     lateinit var uuidManager: UUIDManager
+    lateinit var addedDevices: AddedDevices
 
     var connectionLog = ArrayList<String>()
     var logRecordingTime = ""

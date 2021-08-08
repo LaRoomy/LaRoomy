@@ -109,9 +109,26 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
     override fun onItemClicked(index: Int) {
 
+        // TODO: check if the device is already added!
+
+
         // temp
         val txt = "Element clicked! Index: $index"
         findViewById<AppCompatTextView>(R.id.addDeviceActivityHeaderTextView).text = txt
+
+
+        (applicationContext as ApplicationProperty).addedDevices.add(
+            bondedDevices.elementAt(index).address,
+            bondedDevices.elementAt(index).name
+        )
+
+        (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
+
+        // TODO: change the element to indicate that it was added
+
+
+        finish()// not good ???
+
     }
 
 }

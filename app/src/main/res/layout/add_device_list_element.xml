@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/addDeviceListElementImageView"
-        android:src="@drawable/bluetooth_glow_sq48"
+        android:src="@drawable/outline_devices_white_36dp"
         android:layout_marginStart="3dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
