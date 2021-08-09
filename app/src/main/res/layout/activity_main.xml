@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="48dp"
-            android:src="@drawable/hamburger_button_icon_norm"
+            android:src="@drawable/ic_menu_white_36dp"
             android:background="@color/transparentViewColor"
             android:onClick="onMainActivityMenuButtonClick"
             android:contentDescription="@string/MainActivityHamburgerButtonContentDescription"
@@ -32,18 +32,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/AvailableDevicesTextView"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:text="@string/MA_AvailableDevicesPresentationTextViewText"-->
-<!--            android:textAlignment="center"-->
-<!--            android:textSize="20sp"-->
-<!--            android:textStyle="bold"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@id/mainActivityHamburgerButton"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+        <TextView
+            android:id="@+id/AvailableDevicesTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/MA_AvailableDevicesPresentationTextViewText"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/mainActivityAddDeviceImageButton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/mainActivityHamburgerButton"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="wrap_content"
@@ -51,7 +53,7 @@
             android:minHeight="48dp"
             android:minWidth="48dp"
             android:id="@+id/mainActivityAddDeviceImageButton"
-            android:src="@drawable/add_white_sq32"
+            android:src="@drawable/ic_add_white_36dp"
             android:background="@color/transparentViewColor"
             android:contentDescription="@string/MainActivityAddButtonContentDescription"
             android:onClick="onMainActivityAddDeviceButtonClick"
