@@ -1,21 +1,21 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.lang.invoke.ConstantCallSite
@@ -74,6 +74,16 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
                     layoutManager = availableDevicesViewManager
                     adapter = availableDevicesViewAdapter
                 }
+
+        val swipeHandler = object : SwipeToDeleteCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(viewHolder.position)
+                (applicationContext as ApplicationProperty).addedDevices.removeAt(viewHolder.position)
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(availableDevicesRecyclerView)
 
         // TODO: if there are no devices, present the user a call to action (add your first device...!)
 
@@ -147,7 +157,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         if(addButtonNormalizationRequired){
             addButtonNormalizationRequired = false
-            addDeviceButton.setImageResource(R.drawable.add_white_sq32)
+            addDeviceButton.setImageResource(R.drawable.ic_add_white_36dp)
         }
 
 
@@ -243,7 +253,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     fun onMainActivityMenuButtonClick(view: View) {
 
         this.availableDevicesRecyclerView.alpha = 0.2f
-        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_pushed)
+        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.outline_menu_yellow_36dp)
 
         val menuBuilder = MenuBuilder(this)
         menuBuilder.setCallback(this)
@@ -266,7 +276,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         menuPopupHelper.setForceShowIcon(true)
         menuPopupHelper.setOnDismissListener {
             this.availableDevicesRecyclerView.alpha = 1f
-            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.hamburger_button_icon_norm)
+            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_white_36dp)
         }
         menuPopupHelper.show()
     }
@@ -403,6 +413,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         override fun getItemCount(): Int {
             return laRoomyDevListAdapter.size
         }
+
+        fun removeAt(position: Int){
+            laRoomyDevListAdapter.removeAt(position)
+            notifyItemRemoved(position)
+        }
     }
 
     // Interface methods:
@@ -412,10 +427,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     fun onMainActivityAddDeviceButtonClick(view: View) {
 
-        addDeviceButton.setImageResource(R.drawable.add_white_sq32_pressed)
+        addDeviceButton.setImageResource(R.drawable.outline_add_yellow_36dp)
         addButtonNormalizationRequired = true
 
         val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
         startActivity(intent)
     }
+
 }

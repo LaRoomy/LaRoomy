@@ -42,8 +42,9 @@
     <color name="warningLightColor">#F99F08</color>
     <color name="successLightColor">#88FFAA</color>
     <color name="fullWhiteTextColor">#FFFFFFFF</color>
-    <color name="addDeviceListElementBackgroundColor">#FF555555</color>
-    <color name="myDevicesListElementBackgroundColor">#FF555555</color>
+    <color name="addDeviceListElementBackgroundColor">#FF444444</color>
+    <color name="myDevicesListElementBackgroundColor">#FF444444</color>
+    <color name="myDevicesListDeleteElementColor">#FFF44336</color>
 
     <color  name="deviceMainHeaderColor">#000000</color>
 

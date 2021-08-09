@@ -41,6 +41,11 @@ class AddedDevices(private val appContext: Context) {
         }
     }
 
+    fun removeAt(index: Int){
+        val adr = devices.elementAt(index).macAddress
+        this.remove(adr)
+    }
+
     fun remove(macAddress: String){
 
         var indexToRemove = -1
