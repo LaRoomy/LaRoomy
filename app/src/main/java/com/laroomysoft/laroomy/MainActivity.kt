@@ -15,8 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.invoke.ConstantCallSite
 
 @SuppressLint("RestrictedApi")
 class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback, MenuBuilder.Callback {
@@ -370,8 +372,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         private val deviceListItemClickListener: OnDeviceListItemClickListener
     ) : RecyclerView.Adapter<AvailableDevicesListAdapter.DSLRViewHolder>() {
 
-        class DSLRViewHolder(val linearLayout: LinearLayout) :
-            RecyclerView.ViewHolder(linearLayout){
+        class DSLRViewHolder(val constraintLayout: ConstraintLayout) :
+            RecyclerView.ViewHolder(constraintLayout){
 
             fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener, position: Int){
                 itemView.setOnClickListener{
@@ -380,21 +382,20 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
             }
         }
 
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DSLRViewHolder {
 
-            val linearLayout =
+            val constraintLayout =
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.available_device_list_item, parent, false) as LinearLayout
+                    .inflate(R.layout.my_devices_list_element, parent, false) as ConstraintLayout
 
-            return DSLRViewHolder(linearLayout)
+            return DSLRViewHolder(constraintLayout)
         }
 
         override fun onBindViewHolder(holder: DSLRViewHolder, position: Int) {
             // set the device-name
-            holder.linearLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].name
+            holder.constraintLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].name
             // set the appropriate image for the device type
-            holder.linearLayout.findViewById<ImageView>(R.id.deviceImageView).setImageResource(laRoomyDevListAdapter[position].image)
+            holder.constraintLayout.findViewById<ImageView>(R.id.myDevicesListElementImageView).setImageResource(laRoomyDevListAdapter[position].image)
 
             holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener, position)
         }

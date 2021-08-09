@@ -3,35 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout-land/activity_unlock_control.xml" value="0.33" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_add_device.xml" value="0.34120370370370373" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_app_help.xml" value="0.38425925925925924" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_app_settings.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_bar_graph.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_data_sharing_receiver.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_device_main.xml" value="0.37777777777777777" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_device_settings.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_edit_u_u_i_d_profile.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_extended_level_selector.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_information.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_loading.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_manage_u_u_i_d_profiles.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_navigator_control.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_r_g_b_control.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_reset_app_data.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_simple_time_selector.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_time_frame_selector.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_unlock_control.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/add_device_list_element.xml" value="0.38055555555555554" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/add_new_device_list_element.xml" value="0.38055555555555554" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/available_device_list_item.xml" value="0.37407407407407406" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_nolog.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_withlog.xml" value="0.37592592592592594" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/add_device_list_element_background.xml" value="0.25601851851851853" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/my_devices_list_element_background.xml" value="0.25601851851851853" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_help.xml" value="0.24212962962962964" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/add_device_list_element.xml" value="0.33" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/available_device_list_item.xml" value="0.33" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/my_devices_list_element.xml" value="0.33" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

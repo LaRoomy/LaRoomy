@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="54dp"
+    android:layout_height="60dp"
+    android:background="@drawable/add_device_list_element_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -9,7 +10,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/addDeviceListElementImageView"
         android:src="@drawable/outline_devices_white_36dp"
-        android:layout_marginStart="3dp"
+        android:layout_marginStart="11dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -22,6 +23,7 @@
         android:text="@string/UniversalPlaceholderName"
         android:textSize="18sp"
         android:layout_marginStart="10dp"
+        android:textColor="@color/fullWhiteTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/addDeviceListElementImageView"
@@ -32,6 +34,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/addDeviceListElementAddButton"
         android:src="@drawable/add_white_sq32"
+        android:layout_marginEnd="11dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
