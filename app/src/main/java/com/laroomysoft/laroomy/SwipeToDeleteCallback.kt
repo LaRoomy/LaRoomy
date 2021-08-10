@@ -1,9 +1,10 @@
 package com.laroomysoft.laroomy
 
 import android.content.Context
-import android.graphics.*
-import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,8 +14,6 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
     private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete_white_36dp)
     private val intrinsicWidth = deleteIcon?.intrinsicWidth
     private val intrinsicHeight = deleteIcon?.intrinsicHeight
-    //private val background = getDrawable(context, R.drawable.my_devices_list_element_delete_background)//ColorDrawable()
-    //private val backgroundColor = Color.parseColor("#f44336")
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
 
@@ -61,20 +60,15 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
         }
 
         // Draw the red delete background
-        //background.color = backgroundColor
-        //background.setBounds(itemView.right + dX.toInt(), itemView.top + 5, itemView.right, itemView.bottom - 5)
-        //background.
-        //background?.draw(c)
         c.drawRoundRect(
             itemView.left.toFloat(),
-            itemView.top.toFloat() + 7,
+            itemView.top.toFloat() + 8,
             itemView.right.toFloat() - 10,
-            itemView.bottom.toFloat() - 7,
-            10.0F,
-            10.0F,
+            itemView.bottom.toFloat() - 8,
+            15.0F,
+            15.0F,
             itemPaint
         )
-
 
         // Calculate position of delete icon
         val deleteIconTop = itemView.top + (itemHeight - (intrinsicHeight ?: 0)) / 2
@@ -98,5 +92,4 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
         this.style = Paint.Style.FILL
         this.color = context.getColor(R.color.myDevicesListDeleteElementColor)
     }
-
 }
