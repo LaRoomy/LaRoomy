@@ -42,12 +42,23 @@
     <color name="warningLightColor">#F99F08</color>
     <color name="successLightColor">#88FFAA</color>
     <color name="fullWhiteTextColor">#FFFFFFFF</color>
+
+    <!-- List Elements -->
     <color name="addDeviceListElementBackgroundColor">#FF444444</color>
     <color name="myDevicesListElementBackgroundColor">#FF444444</color>
     <color name="myDevicesListDeleteElementColor">#FFF44336</color>
 
+    <!-- Main Activity PopUp Flyout -->
+    <color name="mainActivityPopUpFlyoutBackgroundColor">#FF505050</color>
+    <color name="mainActivityPopUpFlyoutSeparatorColor">#FF606060</color>
+
+
+
     <color  name="deviceMainHeaderColor">#000000</color>
 
+
+
+    <color name="yellowAccentColor">#FFF6D82E</color>
 
     <!-- pure colors -->
     <color name="pureWhite">#FFFFFFFF</color>
