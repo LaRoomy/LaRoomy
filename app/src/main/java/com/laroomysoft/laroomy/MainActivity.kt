@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -8,16 +9,20 @@ import android.os.Handler
 import android.os.Looper
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.Exception
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
-@SuppressLint("RestrictedApi")
-class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback, MenuBuilder.Callback {
+class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback {
 
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
@@ -41,6 +46,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private lateinit var addDeviceButton: AppCompatImageButton
     private lateinit var bottomSeparator: View
     private lateinit var headerSeparator: View
+    private lateinit var popUpWindow: PopupWindow
 
     //private var buttonNormalizationRequired = false
 
@@ -75,8 +81,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         val swipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(viewHolder.position)
-                (applicationContext as ApplicationProperty).addedDevices.removeAt(viewHolder.position)
+
+                val pos = viewHolder.absoluteAdapterPosition
+
+                (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(pos)//viewHolder.position)
+                (applicationContext as ApplicationProperty).addedDevices.removeAt(pos)//viewHolder.position)
             }
         }
 
@@ -189,153 +198,57 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
-//        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
-//        val leftView = ll?.findViewById<View>(R.id.leftBorderView)
-//        val rightView = ll?.findViewById<View>(R.id.rightBorderView)
-//
-//        leftView?.setBackgroundColor(getColor(R.color.selectedSeparatorColor))
-//        rightView?.setBackgroundColor(getColor(R.color.selectedSeparatorColor))
-
         setItemColor(index, R.color.selectedSeparatorColor)
 
-        //ll?.setBackgroundColor(getColor(R.color.colorPrimary))
-        //ll?.setBackgroundColor()
-
-        val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+        val intent =
+            Intent(this@MainActivity, LoadingActivity::class.java)
         intent.putExtra("DeviceListIndex", index)
         startActivity(intent)
         //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
-//    fun onReloadImageButtonClick(view: View){
-//
-//        val reloadButton = view as AppCompatImageButton
-//        reloadButton.setImageResource(R.drawable.main_reload_pushed)
-//
-//        this.updateAvailableDevices()
-//
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            reloadButton.setImageResource(R.drawable.main_reload_norm)
-//
-//        },700)
-//
-//    }
-
-//    fun onHelpImageButtonClick(view: View){
-//
-//        this.buttonNormalizationRequired = true
-//        (view as AppCompatImageButton).setImageResource(R.drawable.main_help_pushed)
-//
-//        val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
-//        startActivity(intent)
-//    }
-
-//    fun onInfoImageButtonClick(view: View){
-//
-//        this.buttonNormalizationRequired = true
-//        (view as AppCompatImageButton).setImageResource(R.drawable.main_info_pushed)
-//
-//        val intent = Intent(this@MainActivity, InformationActivity::class.java)
-//        startActivity(intent)
-//    }
-
-//    fun onSettingsImageButtonClick(view: View){
-//
-//        this.buttonNormalizationRequired = true
-//        (view as AppCompatImageButton).setImageResource(R.drawable.main_settings_pushed)
-//
-//        val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
-//        startActivity(intent)
-//    }
-
     @SuppressLint("InflateParams")
     fun onMainActivityMenuButtonClick(view: View) {
 
+        // shade the background
         this.availableDevicesRecyclerView.alpha = 0.2f
         findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_yellow_36dp)
 
 
         val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-        val headerViewPos = intArrayOf(0,0)
+        val headerViewPos = intArrayOf(0, 0)
         this.headerSeparator.getLocationInWindow(headerViewPos)
 
-        val popUpView = layoutInflater.inflate(R.layout.main_activity_popup_flyout, null)
+        val popUpView =
+            layoutInflater.inflate(R.layout.main_activity_popup_flyout, null)
+        this.popUpWindow =
+            PopupWindow(
+                popUpView,
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
 
-        val popupWindow = PopupWindow(popUpView, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT, true)
+        this.popUpWindow.animationStyle = R.style.MainActivityPopUpAnimationStyle
 
-        popupWindow.animationStyle = R.style.MainActivityPopUpAnimationStyle
-
-        popupWindow.setOnDismissListener {
-            this.availableDevicesRecyclerView.alpha = 1f
-            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_white_36dp)
+        this.popUpWindow.setOnDismissListener {
+            // normalize the button and the main activity alpha, but do it with delay (500 ms for the popup animation time!)
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                this.availableDevicesRecyclerView.alpha = 1f
+                findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(
+                    R.drawable.ic_menu_white_36dp
+                )
+            }, 300, TimeUnit.MILLISECONDS)
         }
 
-        popupWindow.showAtLocation(
+        this.popUpWindow.showAtLocation(
             this.availableDevicesRecyclerView,
             Gravity.NO_GRAVITY, 0, headerViewPos.elementAt(1) + 5
         )
-
-
-
-//        this.availableDevicesRecyclerView.alpha = 0.2f
-//        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_yellow_36dp)
-//
-//        val menuBuilder = MenuBuilder(this)
-//        menuBuilder.setCallback(this)
-//
-//        val popupMenu =
-//            PopupMenu(this, view)
-//
-//        if ((applicationContext as ApplicationProperty).loadBooleanData(
-//                R.string.FileKey_AppSettings,
-//                R.string.DataKey_EnableLog
-//            )
-//        ) {
-//            popupMenu.menuInflater.inflate(R.menu.main_activity_popup_menu_withlog, menuBuilder)
-//        } else {
-//            popupMenu.menuInflater.inflate(R.menu.main_activity_popup_menu_nolog, menuBuilder)
-//        }
-//
-//
-//        val menuPopupHelper = MenuPopupHelper(this, menuBuilder, view)
-//        menuPopupHelper.setForceShowIcon(true)
-//        menuPopupHelper.setOnDismissListener {
-//            this.availableDevicesRecyclerView.alpha = 1f
-//            findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_white_36dp)
-//        }
-//        menuPopupHelper.show()
     }
 
-    override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.helpMenuItem -> {
-                val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.settingsMenuItem -> {
-                val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.informationMenuItem -> {
-                val intent = Intent(this@MainActivity, InformationActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.showLogMenuItem -> {
-                val intent = Intent(this@MainActivity, ViewLogActivity::class.java)
-                startActivity(intent)
-            }
-            R.id.reloadListMenuItem -> {
-                updateAvailableDevices()
-            }
-        }
-        return true
-    }
-
-    override fun onMenuModeChange(menu: MenuBuilder) {}
-
-
-    private fun notifyUser(message: String, type: Int){
+    private fun notifyUser(message: String){
 //        val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)
 //        notificationView.text = message
 //
@@ -345,6 +258,17 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 //            INFO_MESSAGE -> notificationView.setTextColor(getColor(R.color.InfoColor))
 //            else -> notificationView.setTextColor(getColor(R.color.InfoColor))
 //        }
+
+        val dialog = AlertDialog.Builder(this)
+        dialog.setMessage(message)
+        dialog.setIcon(R.drawable.ic_announcement_white_36dp)
+        dialog.setTitle(R.string.MA_UserNotificationDialogTitle)
+        dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+            dialogInterface.dismiss()
+        }
+        dialog.create()
+        dialog.show()
+
     }
 
     private fun setItemColor(index: Int, colorID: Int){
@@ -359,42 +283,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         textView?.setTextColor(getColor(colorID))
 
-    }
-
-    private fun updateAvailableDevices(){
-
-        //this.availableDevices = ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices
-
-        //this.availableDevicesViewAdapter = AvailableDevicesListAdapter(this.availableDevices, this)
-
-       //this.availableDevicesViewAdapter.notifyDataSetChanged()
-
-        //this.availableDevices.clear()
-
-//        val devList = ArrayList<LaRoomyDevicePresentationModel>()
-//
-//        for (device in (applicationContext as ApplicationProperty).addedDevices.devices) {
-//            val dev = LaRoomyDevicePresentationModel()
-//            dev.address = device.macAddress
-//            dev.name = device.name
-//
-//            devList.add(dev)
-//        }
-//
-//        this.availableDevices = devList
-
-
-
-        if(this.availableDevices.size == 0){
-            // TODO
-            //findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_NoAvailableDevices)
-        }
-        else {
-            // TODO
-            //findViewById<TextView>(R.id.AvailableDevicesTextView).text = getString(R.string.MA_AvailableDevicesPresentationTextViewText)
-        }
-        //this.availableDevicesViewAdapter.notifyDataSetChanged()
-        this.resetSelectionInDeviceListView()
     }
 
     private fun resetSelectionInDeviceListView(){
@@ -448,7 +336,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     // Interface methods:
     override fun onComponentError(message: String) {
-        notifyUser(message, ERROR_MESSAGE)
+        notifyUser(message)
     }
 
     fun onMainActivityAddDeviceButtonClick(view: View) {
@@ -460,6 +348,30 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         startActivity(intent)
     }
 
-    fun onMainActivityPopUpButtonClick(view: View) {}
+    fun onMainActivityPopUpButtonClick(view: View) {
 
+        (view as ConstraintLayout).background = AppCompatResources.getDrawable(this, R.drawable.main_activity_popup_selected_item_background)
+
+        when (view.id) {
+            R.id.mainActivityPopUpElement_HelpContainer -> {
+                val intent = Intent(this@MainActivity, AppHelpActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.mainActivityPopUpElement_SettingsContainer -> {
+                val intent = Intent(this@MainActivity, AppSettingsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.mainActivityPopUpElement_InfoContainer -> {
+                val intent = Intent(this@MainActivity, InformationActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.mainActivityPopUpElement_ShowLogContainer -> {
+                val intent = Intent(this@MainActivity, ViewLogActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        try {
+            this.popUpWindow.dismiss()
+        } catch(e: Exception){}
+    }
 }

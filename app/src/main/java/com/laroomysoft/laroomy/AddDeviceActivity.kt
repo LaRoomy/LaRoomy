@@ -1,5 +1,6 @@
 package com.laroomysoft.laroomy
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -39,7 +40,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
         // initialize the recycler-view
         bondedDevicesListViewManager = LinearLayoutManager(this)
-        bondedDevicesListAdapter = BondedDevicesListAdapter(this.bondedDevices, this)
+        bondedDevicesListAdapter = BondedDevicesListAdapter(this.bondedDevices, this, applicationContext)
         bondedDevicesListView = findViewById<RecyclerView>(R.id.addDeviceActivityRecyclerView).apply{
             setHasFixedSize(true)
             layoutManager = bondedDevicesListViewManager
@@ -63,7 +64,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
         if(this.listUpdateRequired){
             this.listUpdateRequired = false
-            this.bondedDevicesListView.adapter = BondedDevicesListAdapter(this.bondedDevices, this)
+            this.bondedDevicesListView.adapter = BondedDevicesListAdapter(this.bondedDevices, this, applicationContext)
         }
     }
 
@@ -74,7 +75,8 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
     class BondedDevicesListAdapter(
         private val laRoomyDevListAdapter : ArrayList<LaRoomyDevicePresentationModel>,
-        private val deviceListItemClickListener: OnAddDeviceListItemClickListener
+        private val deviceListItemClickListener: OnAddDeviceListItemClickListener,
+        private val appContext: Context
     ) : RecyclerView.Adapter<BondedDevicesListAdapter.DSLRViewHolder>() {
 
         class DSLRViewHolder(val constraintLayout: ConstraintLayout) :
@@ -98,8 +100,14 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
                 deviceListItemClickListener.onItemClicked(position)
             }
 
-            // TODO: if the device is already in the friendly list, hide the add-button (or change the icon and background)
+            if((this.appContext as ApplicationProperty).addedDevices.isAdded(laRoomyDevListAdapter[position].address)){
 
+                holder.constraintLayout.findViewById<AppCompatImageButton>(R.id.addDeviceListElementAddButton).apply {
+                    //setBackgroundColor(appContext.getColor(R.color.addDeviceListElementBackgroundColor))
+                    setImageResource(R.drawable.ic_done_green_36dp)
+                    isEnabled = false
+                }
+            }
         }
 
         override fun getItemCount(): Int {
@@ -109,26 +117,12 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
     override fun onItemClicked(index: Int) {
 
-        // TODO: check if the device is already added!
-
-
-        // temp
-        val txt = "Element clicked! Index: $index"
-        findViewById<AppCompatTextView>(R.id.addDeviceActivityHeaderTextView).text = txt
-
-
         (applicationContext as ApplicationProperty).addedDevices.add(
             bondedDevices.elementAt(index).address,
             bondedDevices.elementAt(index).name
         )
-
         (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
-
-        // TODO: change the element to indicate that it was added
-
-
-        finish()// not good ???
-
+        finish()
     }
 
 }

@@ -128,4 +128,13 @@ class AddedDevices(private val appContext: Context) {
         }
         return KnownDevices(address, name)
     }
+
+    fun isAdded(macAddress: String) : Boolean{
+        for (device in this.devices) {
+            if(device.macAddress == macAddress){
+                return true
+            }
+        }
+        return false
+    }
 }

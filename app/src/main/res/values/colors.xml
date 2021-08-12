@@ -51,6 +51,7 @@
     <!-- Main Activity PopUp Flyout -->
     <color name="mainActivityPopUpFlyoutBackgroundColor">#FF505050</color>
     <color name="mainActivityPopUpFlyoutSeparatorColor">#FF606060</color>
+    <color name="mainActivityPopUpMenuItemSelectedColor">#FF444444</color>
 
 
 

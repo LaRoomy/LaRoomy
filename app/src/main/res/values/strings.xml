@@ -9,6 +9,7 @@
     <string name="MA_PopUp_HelpTitle">Help Topics</string>
     <string name="MA_PopUp_ShowLogTitle">Show Log</string>
     <string name="MA_PopUp_ReloadList">Reload List</string>
+    <string name="MA_UserNotificationDialogTitle">Notification</string>
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>

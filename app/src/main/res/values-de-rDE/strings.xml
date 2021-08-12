@@ -10,6 +10,8 @@
     <string name="MA_PopUp_HelpTitle">Hilfe Themen</string>
     <string name="MA_PopUp_ShowLogTitle">Protokoll anzeigen</string>
     <string name="MA_PopUp_ReloadList">Liste aktualisieren</string>
+    <string name="MA_UserNotificationDialogTitle">Benachrichtigung</string>
+
 
 
 
