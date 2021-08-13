@@ -10,6 +10,7 @@
     <string name="MA_PopUp_ShowLogTitle">Show Log</string>
     <string name="MA_PopUp_ReloadList">Reload List</string>
     <string name="MA_UserNotificationDialogTitle">Notification</string>
+    <string name="Ma_NoContentUserHintText">Nothing to show.\nAdd your first device.</string>
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
@@ -201,6 +202,9 @@
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profile-Name already exist.</string>
 
     <string name="AddDeviceActivityHeaderText">Add new Device</string>
+    <string name="AddDeviceActivityBondingHintText">Devices must be paired with the system to show up in the list.</string>
+    <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Settings</string>
+    <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
 
     <!-- Image/ImageButton content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
@@ -247,6 +251,7 @@
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
     <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>
     <string name="DataKey_KeepScreenActive" translatable="false">keepScreenActiveKey</string>
+    <string name="DataKey_DoNotShowBondingHint" translatable="false">doNotShowBondingHintAgain</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

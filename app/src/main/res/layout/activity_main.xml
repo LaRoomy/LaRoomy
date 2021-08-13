@@ -22,12 +22,12 @@
             android:id="@+id/mainActivityHamburgerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:minWidth="48dp"
-            android:src="@drawable/ic_menu_white_36dp"
             android:background="@color/transparentViewColor"
-            android:onClick="onMainActivityMenuButtonClick"
             android:contentDescription="@string/MainActivityHamburgerButtonContentDescription"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:onClick="onMainActivityMenuButtonClick"
+            android:src="@drawable/ic_menu_white_36dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -42,191 +42,99 @@
             android:textAlignment="center"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/mainActivityAddDeviceImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:minWidth="48dp"
-            android:id="@+id/mainActivityAddDeviceImageButton"
-            android:src="@drawable/ic_add_white_36dp"
             android:background="@color/transparentViewColor"
             android:contentDescription="@string/MainActivityAddButtonContentDescription"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
             android:onClick="onMainActivityAddDeviceButtonClick"
+            android:src="@drawable/ic_add_white_36dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            />
-
-
-        <!--
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/reloadImageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:onClick="onReloadImageButtonClick"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/main_reload_norm" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/informationImageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/InformationImageDescription"
-                    android:onClick="onInfoImageButtonClick"
-                    android:layout_marginEnd="30dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/helpImageButton"
-                    app:srcCompat="@drawable/main_info_norm" />
-
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/helpImageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:onClick="onHelpImageButtonClick"
-                    android:layout_marginEnd="30dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/generalSettingsButton"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/main_help_norm" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/generalSettingsButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/SettingsImageDescription"
-                    android:onClick="onSettingsImageButtonClick"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/main_settings_norm" />
-        -->
-
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
+        android:id="@+id/mainActivityHeaderSeparatorView"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:id="@+id/mainActivityHeaderSeparatorView"
-        android:background="@color/separatorColor"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_marginStart="5dp"
+        android:background="@color/separatorColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderContainer"
-        />
+        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderContainer" />
 
-<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--        android:id="@+id/mainActivityListSectionContainer"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:layout_marginStart="10dp"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        android:layout_marginEnd="10dp"-->
-<!--        android:layout_marginBottom="10dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/MA_UserNotificationView"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderContainer">-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/AvailableDevicesListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintBottom_toTopOf="@id/mainActivityBottomSeparatorView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderContainer" />
 
-<!--
-        <TextView
-            android:id="@+id/AvailableDevicesTextView"
-            android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainActivityNoContentContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="noMainActivityNoContentContainerClick"
+
+        android:visibility="gone"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderSeparatorView">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/mainActivityNoContentImageView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/MA_AvailableDevicesPresentationTextViewText"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/underlineView"
+            android:src="@drawable/ic_list_add_white_48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:id="@+id/underlineView"
-            android:layout_width="280dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/separatorColor"
-            app:layout_constraintBottom_toTopOf="@id/AvailableDevicesListView"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/mainActivityNoContentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:gravity="center"
+            android:singleLine="false"
+            android:text="@string/Ma_NoContentUserHintText"
+            android:textColor="@color/fullWhiteTextColor"
+            android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/AvailableDevicesTextView" />
--->
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/AvailableDevicesListView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
-            app:layout_constraintBottom_toTopOf="@id/mainActivityBottomSeparatorView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mainActivityHeaderContainer" />
-
-<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/MA_UserNotificationView"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="10dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:layout_marginEnd="10dp"-->
-<!--        android:layout_marginBottom="10dp"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="16sp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/mainActivityListSectionContainer" />-->
-
-
-<!--
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mainActivityFooterImageButtonContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-
+            app:layout_constraintTop_toBottomOf="@id/mainActivityNoContentImageView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
--->
 
     <View
+        android:id="@+id/mainActivityBottomSeparatorView"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:id="@+id/mainActivityBottomSeparatorView"
-        android:background="@color/separatorColor"
-        android:layout_marginEnd="5dp"
         android:layout_marginStart="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginEnd="5dp"
+        android:background="@color/separatorColor"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

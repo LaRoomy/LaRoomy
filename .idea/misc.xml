@@ -3,22 +3,27 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/add_device_activity_bonding_hint_background.xml" value="0.3736111111111111" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/ic_menu_activated_36dp.xml" value="0.38472222222222224" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/mainActivityPopUpBackground.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/main_activity_popup_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/main_activity_popup_selected_item_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/my_devices_list_element_delete_background.xml" value="0.35555555555555557" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable-v24/my_devices_list_element_selected_background.xml" value="0.3736111111111111" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/add_device_list_element_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/help_topic_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_add_yellow_36dp.xml" value="0.37824074074074077" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_block_yellow_48dp.xml" value="0.38425925925925924" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_delete_white_36dp.xml" value="0.38472222222222224" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_done_green_36dp.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_menu_selected_36dp.xml" value="0.38472222222222224" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_menu_white_36dp.xml" value="0.37824074074074077" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_menu_yellow_36dp.xml" value="0.37824074074074077" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_settings_bluetooth_pressed_48dp.xml" value="0.3736111111111111" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_settings_bluetooth_white_48dp.xml" value="0.3736111111111111" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/my_devices_list_element_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout-land/activity_unlock_control.xml" value="0.33" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_add_device.xml" value="0.34120370370370373" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_add_device.xml" value="0.5" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_app_help.xml" value="0.33" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_app_settings.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_bar_graph.xml" value="0.37592592592592594" />
@@ -41,6 +46,7 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/add_new_device_list_element.xml" value="0.38055555555555554" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/available_device_list_item.xml" value="0.37407407407407406" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/main_activity_popup_flyout.xml" value="0.5" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/my_devices_list_element.xml" value="0.3592592592592593" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_nolog.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_withlog.xml" value="0.37592592592592594" />
       </map>

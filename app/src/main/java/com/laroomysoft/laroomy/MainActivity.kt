@@ -12,13 +12,12 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.lang.Exception
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -46,6 +45,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     private lateinit var addDeviceButton: AppCompatImageButton
     private lateinit var bottomSeparator: View
     private lateinit var headerSeparator: View
+    private lateinit var noContentContainer: ConstraintLayout
     private lateinit var popUpWindow: PopupWindow
 
     //private var buttonNormalizationRequired = false
@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         this.addDeviceButton = findViewById(R.id.mainActivityAddDeviceImageButton)
         this.bottomSeparator = findViewById(R.id.mainActivityBottomSeparatorView)
         this.headerSeparator = findViewById(R.id.mainActivityHeaderSeparatorView)
+        this.noContentContainer = findViewById(R.id.mainActivityNoContentContainer)
 
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
@@ -82,18 +83,21 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         val swipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                val pos = viewHolder.absoluteAdapterPosition
+                val pos =
+                    viewHolder.absoluteAdapterPosition
 
                 (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(pos)//viewHolder.position)
                 (applicationContext as ApplicationProperty).addedDevices.removeAt(pos)//viewHolder.position)
+
+                if((applicationContext as ApplicationProperty).addedDevices.devices.isEmpty()){
+                    availableDevicesRecyclerView.visibility = View.GONE
+                    noContentContainer.visibility = View.VISIBLE
+                }
             }
         }
 
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(availableDevicesRecyclerView)
-
-        // TODO: if there are no devices, present the user a call to action (add your first device...!)
-
 
         // save a default passkey if no one is saved (this should only be executed once per installation)
         if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey) == ERROR_NOTFOUND){
@@ -145,73 +149,73 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     override fun onResume() {
         super.onResume()
 
+        // control bottom separator in alignment to the screen orientation
         bottomSeparator.visibility = when(this.resources.configuration.orientation){
             Configuration.ORIENTATION_LANDSCAPE -> View.GONE
             else -> View.VISIBLE
         }
 
-
+        // check if bluetooth is enabled
         ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
 
-//        if(this.buttonNormalizationRequired){
-//
-//            findViewById<AppCompatImageButton>(R.id.generalSettingsButton).setImageResource(R.drawable.main_settings_norm)
-//            findViewById<AppCompatImageButton>(R.id.informationImageButton).setImageResource(R.drawable.main_info_norm)
-//            findViewById<AppCompatImageButton>(R.id.helpImageButton).setImageResource(R.drawable.main_help_norm)
-//
-//            this.buttonNormalizationRequired = false
-//        }
 
+        // normalize controls on back navigation
         if(addButtonNormalizationRequired){
             addButtonNormalizationRequired = false
             addDeviceButton.setImageResource(R.drawable.ic_add_white_36dp)
         }
 
-
-
-        // ! realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
-
+        // realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
         ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@MainActivity, this)
 
-
-        // update the device-list
-        //updateAvailableDevices()
+        // show or hide the no-content hint if the list is empty or not
+        if(this.availableDevices.isEmpty()){
+            this.availableDevicesRecyclerView.visibility = View.GONE
+            this.noContentContainer.visibility = View.VISIBLE
+        } else {
+            this.availableDevicesRecyclerView.visibility = View.VISIBLE
+            this.noContentContainer.visibility = View.GONE
+        }
 
         if((applicationContext as ApplicationProperty).mainActivityListElementWasAdded){
             (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = false
             this.availableDevicesViewAdapter.notifyItemInserted(this.availableDevices.size - 1)
         }
 
+        // reset the selection in the recyclerView
         this.resetSelectionInDeviceListView()
-
-
-        //reset the selected color
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        // TODO: if the loading activity fails, the main activity must be re-initiated
-
-        //finish()// questionable!!!!!!!!!!!!!!!
-    }
+//    override fun onPause() {
+//        super.onPause()
+//
+//        // TODO: if the loading activity fails, the main activity must be re-initiated
+//
+//        //finish()// questionable!!!!!!!!!!!!!!!
+//
+//    }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
-        setItemColor(index, R.color.selectedSeparatorColor)
+        setItemColors(index, R.color.fullWhiteTextColor, R.drawable.my_devices_list_element_selected_background)
+
+
+
 
         val intent =
             Intent(this@MainActivity, LoadingActivity::class.java)
         intent.putExtra("DeviceListIndex", index)
         startActivity(intent)
+
         //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     @SuppressLint("InflateParams")
-    fun onMainActivityMenuButtonClick(view: View) {
+    fun onMainActivityMenuButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         // shade the background
         this.availableDevicesRecyclerView.alpha = 0.2f
+        this.noContentContainer.alpha = 0.2f
         findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_yellow_36dp)
 
 
@@ -235,7 +239,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         this.popUpWindow.setOnDismissListener {
             // normalize the button and the main activity alpha, but do it with delay (500 ms for the popup animation time!)
             Executors.newSingleThreadScheduledExecutor().schedule({
-                this.availableDevicesRecyclerView.alpha = 1f
+                availableDevicesRecyclerView.alpha = 1f
+                noContentContainer.alpha = 1f
                 findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(
                     R.drawable.ic_menu_white_36dp
                 )
@@ -271,23 +276,26 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     }
 
-    private fun setItemColor(index: Int, colorID: Int){
-        val ll = availableDevicesViewManager.findViewByPosition(index) as? LinearLayout
+    private fun setItemColors(index: Int, textColorID: Int, backGroundDrawable: Int){
+        val ll = availableDevicesViewManager.findViewByPosition(index) as? ConstraintLayout
         //val leftView = ll?.findViewById<View>(R.id.leftBorderView)
         //val rightView = ll?.findViewById<View>(R.id.rightBorderView)
 
-        val textView = ll?.findViewById<TextView>(R.id.deviceNameTextView)
+        val textView = ll?.findViewById<AppCompatTextView>(R.id.deviceNameTextView)
 
         //leftView?.setBackgroundColor(getColor(colorID))
         //rightView?.setBackgroundColor(getColor(colorID))
 
-        textView?.setTextColor(getColor(colorID))
+        textView?.setTextColor(getColor(textColorID))
+
+        ll?.background = AppCompatResources.getDrawable(this, backGroundDrawable)
+
 
     }
 
     private fun resetSelectionInDeviceListView(){
         for(x in 0 until this.availableDevices.size){
-            setItemColor(x, R.color.separatorColor)
+            setItemColors(x, R.color.fullWhiteTextColor, R.drawable.my_devices_list_element_background)
         }
     }
 
@@ -339,7 +347,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         notifyUser(message)
     }
 
-    fun onMainActivityAddDeviceButtonClick(view: View) {
+    fun onMainActivityAddDeviceButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         addDeviceButton.setImageResource(R.drawable.ic_add_yellow_36dp)
         addButtonNormalizationRequired = true
@@ -350,7 +358,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     fun onMainActivityPopUpButtonClick(view: View) {
 
-        (view as ConstraintLayout).background = AppCompatResources.getDrawable(this, R.drawable.main_activity_popup_selected_item_background)
+        // the background only changes if the dismiss() method of the popup will be executed async or not in that method!
+        //(view as ConstraintLayout).background = AppCompatResources.getDrawable(this.popUpWindow.contentView.context, R.drawable.main_activity_popup_selected_item_background)
 
         when (view.id) {
             R.id.mainActivityPopUpElement_HelpContainer -> {
@@ -373,5 +382,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         try {
             this.popUpWindow.dismiss()
         } catch(e: Exception){}
+    }
+
+    fun noMainActivityNoContentContainerClick(@Suppress("UNUSED_PARAMETER")view: View) {
+
+        val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
+        startActivity(intent)
     }
 }
