@@ -218,7 +218,7 @@
 
 
     <string name="AddDeviceActivityHeaderText">Neues Gerät hinzufügen</string>
-    <string name="AddDeviceActivityBondingHintText">Nur gekoppelte Geräte werden gelistet.</string>
+    <string name="AddDeviceActivityBondingHintText">Nur gekoppelte Geräte werden in der Liste angezeigt. Geräte können über die Bluetooth Einstellungen gekoppelt werden.</string>
     <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Einstellungen</string>
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Nicht mehr anzeigen</string>
 

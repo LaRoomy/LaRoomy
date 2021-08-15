@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     //private var buttonNormalizationRequired = false
 
     private var addButtonNormalizationRequired = false
+    private var preventListSelection = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -197,17 +198,21 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
-        setItemColors(index, R.color.fullWhiteTextColor, R.drawable.my_devices_list_element_selected_background)
+        if(!preventListSelection) {
 
+            setItemColors(
+                index,
+                R.color.fullWhiteTextColor,
+                R.drawable.my_devices_list_element_selected_background
+            )
 
+            val intent =
+                Intent(this@MainActivity, LoadingActivity::class.java)
+            intent.putExtra("DeviceListIndex", index)
+            startActivity(intent)
 
-
-        val intent =
-            Intent(this@MainActivity, LoadingActivity::class.java)
-        intent.putExtra("DeviceListIndex", index)
-        startActivity(intent)
-
-        //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
     }
 
     @SuppressLint("InflateParams")
@@ -218,6 +223,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         this.noContentContainer.alpha = 0.2f
         findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_yellow_36dp)
 
+        // block the invocation of a list element during the popup lifecycle
+        this.preventListSelection = true
 
         val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -244,6 +251,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
                 findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(
                     R.drawable.ic_menu_white_36dp
                 )
+                preventListSelection = false
             }, 300, TimeUnit.MILLISECONDS)
         }
 

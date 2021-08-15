@@ -1,39 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:orientation="horizontal"
-    tools:ignore="UseCompoundDrawables">
-
-    <ImageView
-        android:id="@+id/deviceImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/AvailableDeviceListImageDescription"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="3dp"
-        android:src="@drawable/bluetooth_green_glow_sq64"
-        />
-
-    <TextView
-        android:id="@+id/deviceNameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textSize="18sp"
-        android:layout_marginEnd="10dp"
-        android:text="@string/UniversalPlaceholderName"
-        android:layout_marginTop="20dp"
-        />
-
-</LinearLayout>-->
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="90dp"
     android:orientation="horizontal"
     android:background="@drawable/my_devices_list_element_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -41,10 +9,12 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="64dp"
+        android:minWidth="64dp"
         android:id="@+id/myDevicesListElementImageView"
         android:contentDescription="@string/AvailableDeviceListImageDescription"
-        android:src="@drawable/bluetooth_green_glow_sq64"
-        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_settings_remote_white_48dp"
+        android:layout_marginStart="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -62,9 +32,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/myDevicesListElementImageView"
         />
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

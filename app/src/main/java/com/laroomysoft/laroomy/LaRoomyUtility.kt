@@ -306,7 +306,7 @@ fun deviceImageFromName(name: String): Int {
     return when {
         (isLaroomyDevice(name)) -> R.drawable.laroomy_icon_sq64
         else -> {
-            R.drawable.bluetooth_green_glow_sq64
+            R.drawable.ic_settings_remote_white_48dp
         }
     }
 }

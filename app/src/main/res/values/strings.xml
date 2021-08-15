@@ -202,7 +202,7 @@
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profile-Name already exist.</string>
 
     <string name="AddDeviceActivityHeaderText">Add new Device</string>
-    <string name="AddDeviceActivityBondingHintText">Devices must be paired with the system to show up in the list.</string>
+    <string name="AddDeviceActivityBondingHintText">Devices must be paired to show up in the list. Go to Bluetooth settings to pair a device.</string>
     <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Settings</string>
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
 

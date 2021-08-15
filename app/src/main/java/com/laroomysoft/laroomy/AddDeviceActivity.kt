@@ -78,6 +78,8 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
         if(this.imageRestoreRequired){
             findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_white_48dp)
+            findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.fullWhiteTextColor))
+
             findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_white_48dp)
         }
     }
@@ -142,6 +144,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
     fun onAddDeviceActivityGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_yellow_48dp)
+        findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.yellowAccentColor))
         this.imageRestoreRequired = true
 
         val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
