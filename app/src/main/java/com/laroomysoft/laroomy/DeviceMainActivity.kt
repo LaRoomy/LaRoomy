@@ -97,7 +97,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyListRecyclerView =
             findViewById<RecyclerView>(R.id.devicePropertyListView)
                 .apply {
-                    //setHasFixedSize(true)// this is not possible since the group and property elements have a different height
+                    setHasFixedSize(true)
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
                 }

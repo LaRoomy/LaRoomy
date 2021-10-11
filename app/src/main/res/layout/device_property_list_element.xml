@@ -3,13 +3,100 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/groupColor"
+    android:orientation="horizontal"
+    android:background="@drawable/single_property_list_element_background"
     android:id="@+id/devicePropertyListRootLinearLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="80dp">
 
-    <View
+  <ImageView
+      android:id="@+id/devicePropertyIdentificationImage"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/image_error_state"
+      android:layout_marginStart="20dp"
+      android:layout_gravity="center_vertical"
+      android:contentDescription="@string/DevicePropertyListElementImageDescription"
+      />
+
+  <!-- android:text="@{listElementData.elementText}" -->
+
+  <TextView
+      android:id="@+id/devicePropertyNameTextView"
+      android:layout_width="0dp"
+
+      android:layout_weight="3"
+
+      android:layout_height="wrap_content"
+      android:layout_marginStart="10dp"
+      android:layout_marginEnd="5dp"
+      android:text="That's a test!"
+      android:textSize="14sp"
+      android:layout_gravity="center_vertical"
+
+      android:visibility="visible"
+
+      />
+
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/elementButton"
+      android:layout_marginStart="10dp"
+      android:layout_gravity="center_vertical"
+
+      android:visibility="gone"
+
+      android:text="button"
+
+      />
+
+  <androidx.appcompat.widget.SwitchCompat
+      android:id="@+id/elementSwitch"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="20dp"
+      android:layout_marginStart="10dp"
+      android:layout_gravity="center_vertical"
+
+      android:visibility="gone"
+
+      />
+
+  <TextView
+      android:id="@+id/levelIndicationTextView"
+      android:layout_width="0dp"
+
+      android:layout_weight="1"
+
+      android:layout_height="wrap_content"
+      android:layout_marginStart="10dp"
+      android:layout_marginEnd="30dp"
+      android:text="@string/LevelIndicationTextPlaceholder"
+      android:textSize="20sp"
+      android:textStyle="bold"
+      android:layout_gravity="center_vertical|end"
+      android:textAlignment="textEnd"
+
+      android:visibility="gone"
+
+      />
+
+  <ImageView
+      android:id="@+id/forwardImage"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical"
+      android:layout_marginEnd="20dp"
+      android:contentDescription="@string/NavigateForwardImageDescription"
+
+      android:visibility="visible"
+
+      app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+
+
+
+  <!--  <View
         android:id="@+id/topSeparator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -25,7 +112,8 @@
         android:orientation="horizontal"
         android:layout_marginTop="5dp">
 
-        <!-- This view has the purpose to expand the height in a group-element: -->
+         This view has the purpose to expand the height in a group-element: -->
+    <!--
         <View
             android:id="@+id/startSeparator"
             android:layout_width="3dp"
@@ -37,8 +125,10 @@
 
              />
 
-        <!--    Do not show an initial image, the image will be set by filling
+           Do not show an initial image, the image will be set by filling
                 the recycler with the appropriate elements: -->
+
+    <!--
         <ImageView
             android:id="@+id/devicePropertyIdentificationImage"
             android:layout_width="wrap_content"
@@ -49,9 +139,11 @@
             android:contentDescription="@string/DevicePropertyListElementImageDescription"
              />
 
-        <!--    The elements TextView and Button must be invisible (Visibility::Gone) and
+            The elements TextView and Button must be invisible (Visibility::Gone) and
                 will be set visible for the corresponding element:
                 -->
+
+    <!--
         <TextView
             android:id="@+id/devicePropertyNameTextView"
             android:layout_width="wrap_content"
@@ -84,9 +176,10 @@
             android:layout_gravity="end"
             >
 
-            <!--    The elements "forwardImage" and "elementSwitch" must be invisible (Visibility::Gone)
+                The elements "forwardImage" and "elementSwitch" must be invisible (Visibility::Gone)
                     and will be set visible for the corresponding element:
                     -->
+    <!--
             <ImageView
                 android:id="@+id/forwardImage"
                 android:layout_width="wrap_content"
@@ -158,5 +251,7 @@
         android:layout_marginTop="5dp"
         android:background="@android:color/transparent"
         />
+
+    -->
 
 </LinearLayout>
