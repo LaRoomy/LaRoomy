@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -291,6 +292,56 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // maybe get the sub holder constraintLayout (ID: contentHolderLayout) ????
     }
 
+    private fun setPropertyToSelectedState(index: Int){
+        val element =
+            this.propertyList.elementAt(index)
+
+        if(element.elementType == PROPERTY_ELEMENT){
+            val rootLayoutElement =
+                this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
+
+            if(element.isGroupMember){
+                if(isElementAtIndexLastGroupElement(index)){
+                    rootLayoutElement?.background =
+                        AppCompatResources.getDrawable(this, R.drawable.inside_group_property_last_list_element_selected_background)
+                } else {
+                    rootLayoutElement?.background =
+                        AppCompatResources.getDrawable(this, R.drawable.inside_group_property_list_element_selected_background)
+                }
+            } else {
+                rootLayoutElement?.background =
+                    AppCompatResources.getDrawable(this, R.drawable.single_property_list_element_selected_background)
+            }
+        }
+    }
+
+    private fun isElementAtIndexLastGroupElement(index: Int) : Boolean {
+
+        var isNotLast = false
+
+        val element = this.propertyList.elementAt(index)
+
+        if (element.isGroupMember) {
+            // this element is part of a group, now check if this is the last in the group
+            val nextIndex =
+                restoreIndex + 1
+
+            if (nextIndex < propertyList.size) {
+                val nextElement =
+                    this.propertyList.elementAt(nextIndex)
+
+                if (nextElement.elementType == PROPERTY_ELEMENT) {
+                    if (!nextElement.isGroupMember) {
+                        isNotLast = true
+                    }
+                }
+            }
+        }
+        return !isNotLast
+    }
+
+    private fun getBackgroundDrawableFromElementIndex(index: Int){}
+
 //    private fun setItemSeparatorViewColors(index: Int, top_colorID: Int, bottom_colorID: Int){
 //        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
 //        val top = linearLayout?.findViewById<View>(R.id.topSeparator)
@@ -305,17 +356,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 //        }
 //    }
 
-    private fun setItemTopSeparatorColor(index: Int, colorID: Int){
-        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
-        val top = linearLayout?.findViewById<View>(R.id.topSeparator)
-        top?.setBackgroundColor(getColor(colorID))
-    }
-
-    private fun setItemBottomSeparatorColor(index: Int, colorID: Int){
-        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
-        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
-        bottom?.setBackgroundColor(getColor(colorID))
-    }
+//    private fun setItemTopSeparatorColor(index: Int, colorID: Int){
+//        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
+//        val top = linearLayout?.findViewById<View>(R.id.topSeparator)
+//        top?.setBackgroundColor(getColor(colorID))
+//    }
+//
+//    private fun setItemBottomSeparatorColor(index: Int, colorID: Int){
+//        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
+//        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
+//        bottom?.setBackgroundColor(getColor(colorID))
+//    }
 
     private fun reloadProperties(){
 
@@ -448,10 +499,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         // set it to selected color
-        setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
+
+        //TODO: set item drawable to selected state
+
+        setPropertyToSelectedState(index)
+
+        //setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
         //setItemSeparatorViewColors(index, R.color.selectedSeparatorColor)
-        setItemTopSeparatorColor(index, R.color.selectedSeparatorColor)
-        setItemBottomSeparatorColor(index, R.color.selectedSeparatorColor)
+        //setItemTopSeparatorColor(index, R.color.selectedSeparatorColor)
+        //setItemBottomSeparatorColor(index, R.color.selectedSeparatorColor)
 
         // save the index of the highlighted item to reset it on back-navigation
         restoreIndex = index
@@ -491,22 +547,22 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 startActivity(intent)
                 overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
-            COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
+            COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
                 // prevent the normal "onPause" execution
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the unlock control page
-                val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
+                // navigate to the time-frame selector page
+                val intent = Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
                 overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
-            COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
+            COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                 // prevent the normal "onPause" execution
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the time-frame selector page
-                val intent = Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
+                // navigate to the unlock control page
+                val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
@@ -542,33 +598,44 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun resetSelectedItemBackground(){
+
+        // TODO: set item drawable to normal state
+
         // reset the selected item background if necessary
         if (restoreIndex >= 0) {
             val element =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(restoreIndex)
+
+            val rootLayoutElement = this.devicePropertyListLayoutManager.findViewByPosition(restoreIndex) as? LinearLayout
+
             // check if the property is part of a group and set the appropriate background-color
             if (element.isGroupMember) {
-                // set group background
-                setItemBackgroundColor(restoreIndex, R.color.groupColor)
-                // set separator colors
-                setItemTopSeparatorColor(restoreIndex, R.color.transparentViewColor)
-                setItemBottomSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+                // this element is part of a group, now check if this is the last in the group
+                val nextIndex =
+                    restoreIndex + 1
 
-            } else {
-                // set default background
-                setItemBackgroundColor(restoreIndex, R.color.groupColor)
+                if(nextIndex < propertyList.size){
+                    var isNotLast = false
+                    val nextElement =
+                        this.propertyList.elementAt(nextIndex)
 
-                if(element.globalIndex == 0){
-                    setItemTopSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
-                } else {
-                    val previousIndex = element.globalIndex - 1
-
-                    if((previousIndex > 0) && (ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(previousIndex).elementType == SEPARATOR_ELEMENT)){
-                        setItemTopSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+                    if(nextElement.elementType == PROPERTY_ELEMENT){
+                        if(!nextElement.isGroupMember){
+                            isNotLast = true
+                        }
+                    }
+                    if(isNotLast){
+                        rootLayoutElement?.background =
+                            AppCompatResources.getDrawable(this, R.drawable.inside_group_property_list_element_background)
+                    } else {
+                        rootLayoutElement?.background =
+                            AppCompatResources.getDrawable(this, R.drawable.inside_group_property_last_list_element_background)
                     }
                 }
-                setItemTopSeparatorColor(restoreIndex, R.color.transparentViewColor)
-                setItemBottomSeparatorColor(restoreIndex, R.color.propertyItemBottomSeparatorColor)
+            } else {
+                // must be a single (group-less) property
+                rootLayoutElement?.background =
+                    AppCompatResources.getDrawable(this, R.drawable.single_property_list_element_background)
             }
         }
     }
@@ -748,9 +815,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     switch?.isChecked = (newState != 0)
                 }
                 PROPERTY_TYPE_LEVEL_SELECTOR -> {
+
+                    // TODO: set textview value to the newState!
+
+                    /*
                     val seekBar =
                         linearLayout?.findViewById<SeekBar>(R.id.elementSeekBar)
                     seekBar?.progress = get8BitValueAsPercent(newState)
+                    */
                 }
                 PROPERTY_TYPE_LEVEL_INDICATOR -> {
                     val textView =
@@ -812,99 +884,70 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
 
             val elementToRender = devicePropertyAdapter.elementAt(position)
+            val rootContentHolder = holder.linearLayout
 
             when(elementToRender.elementType){
                 UNDEFINED_ELEMENT -> {
                     // should not happen
-                    holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.GONE
+                    //holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.GONE// new root: devicePropertyListRootLinearLayout
                 }
                 GROUP_ELEMENT -> {
+                    // This is a Group-Element. Visible Elements: Image, Textview. Background: group element background
+                    // The image and the textview are visible by default, so nothing must be set to visible.
 
-                    // make the top and bottom separator black
-                    holder.linearLayout.findViewById<View>(R.id.bottomSeparator).apply {
-                        //visibility = View.VISIBLE
-                        setBackgroundResource(R.color.groupBottomSeparatorColor)
-                    }
-                    holder.linearLayout.findViewById<View>(R.id.topSeparator).apply {
-                        //visibility = View.VISIBLE
-                        setBackgroundResource(R.color.groupTopSeparatorColor)
-                    }
-
-                    holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.groupHeaderColor))
-
-                    // make sure it is visible (TODO: is this really necessary??)
-                    //holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.VISIBLE
-
-                    // make the element higher by setting the visibility of the group-border-view to: visible
-                    holder.linearLayout.findViewById<View>(R.id.startSeparator).visibility = View.VISIBLE
-
-                    // group elements are for subclassing properties, but cannot navigate forward (by now... ;) )
-                    //holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.GONE
-
-                    // the button mustn't be visible (and isn't by default)
-                    //holder.constraintLayout.findViewById<Button>(R.id.elementButton).visibility = View.GONE
-
-                    // set the image requested by the device (or a placeholder)
-
-                    // test !!!!!!!!!!!!!!!
+                    // set group-header background
+                    rootContentHolder.background = AppCompatResources.getDrawable(activityContext, R.drawable.property_list_group_header_element_background)
+                    // set the image for the element
                     holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).apply {
                         setBackgroundResource(
                             resourceIdForImageId(elementToRender.imageID)
                         )
                     }
-
-                    // set the text for the element and show the textView
+                    // set the text for the element
                     holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                        visibility = View.VISIBLE
+                        //visibility = View.VISIBLE
                         text = elementToRender.elementText
                         textSize = 16F
                         setTypeface(typeface, Typeface.BOLD)
                     }
-
-                    //.visibility = View.VISIBLE
-                    //holder.constraintLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).text = devicePropertyAdapter.elementAt(position).elementText
                 }
                 PROPERTY_ELEMENT -> {
+                    // this is a property element
 
-                    // this is the default color
-                    //holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.groupColor))
-
-                    // get the element
-                    //val element = devicePropertyAdapter.elementAt(position)
-                    // show / hide the navigate-image
-                    if(elementToRender.canNavigateForward)
-                        holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
-                    //else  holder.constraintLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.GONE
-                    // if the property is part of a group -> make the separator-lines transparent
-
-                    // TODO: test this
-                    //holder.constraintLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.transparentViewColor)
-
-                    holder.linearLayout.findViewById<View>(R.id.bottomSeparator).apply {
-                        visibility = View.VISIBLE
-                        setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
+                    // if this is a navigatable property, show the nav-arrow
+                    if(elementToRender.canNavigateForward) {
+                        holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility =
+                            View.VISIBLE
                     }
 
+                    // set the background appropriate to the group-status
                     if (!elementToRender.isGroupMember) {
+                        // this is a single property element
+                        rootContentHolder.background =
+                            AppCompatResources.getDrawable(activityContext, R.drawable.single_property_list_element_background)
+                    } else {
+                        // the element is part of a group, check if this is the last element in the group
+                        // check the next item
+                        var isNotLast = false
+                        val nextIndex =
+                            elementToRender.globalIndex + 1
 
-                        if (elementToRender.globalIndex == 0) {
-                            holder.linearLayout.findViewById<View>(R.id.topSeparator).apply {
-                                visibility = View.VISIBLE
-                                setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
-                            }
-                        } else {
-                            val previousIndex =
-                                elementToRender.globalIndex - 1
+                        if(nextIndex < devicePropertyAdapter.size){
+                            val nextElement =
+                                devicePropertyAdapter.elementAt(nextIndex)
 
-                            if ((previousIndex > 0) && (devicePropertyAdapter.elementAt(
-                                    previousIndex
-                                ).elementType == SEPARATOR_ELEMENT)
-                            ) {
-                                holder.linearLayout.findViewById<View>(R.id.topSeparator).apply {
-                                    visibility = View.VISIBLE
-                                    setBackgroundResource(R.color.propertyItemBottomSeparatorColor)
+                            if(nextElement.elementType == PROPERTY_ELEMENT){
+                                if(!nextElement.isGroupMember){
+                                    isNotLast = true
                                 }
                             }
+                        }
+                        if(isNotLast) {
+                            rootContentHolder.background =
+                                AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_list_element_background)
+                        } else {
+                            rootContentHolder.background =
+                                AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_last_list_element_background)
                         }
                     }
 
@@ -956,35 +999,53 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             textView.text = elementToRender.elementText
                         }
                         PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                            // TODO: show this in a popup!!!
                             // show seek-bar layout container
-                            holder.linearLayout.findViewById<LinearLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
+                            //holder.linearLayout.findViewById<LinearLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
                             // set the handler for the seekBar
-                            elementToRender.handler = callingActivity
+                            //elementToRender.handler = callingActivity
 
 
                             // test!!!!
-                            holder.linearLayout.findViewById<SeekBar>(R.id.elementSeekBar).apply {
+                            /*holder.linearLayout.findViewById<SeekBar>(R.id.elementSeekBar).apply {
                                 this.setOnSeekBarChangeListener(elementToRender)
                                 this.progress =
                                     get8BitValueAsPercent(elementToRender.simplePropertyState)
-                            }
+                            }*/
 
-                            // show the text-view
+                            // show the property text-view
                             holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                visibility = View.VISIBLE
+                                //visibility = View.VISIBLE
                                 // set the text
                                 text = elementToRender.elementText
                             }
+                            // show the level in the button
+                            val percentageLevelPropertyGenerator =
+                                PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
+
+                            // TODO: add the possibility for the user to display other values than percentage values!?
+
+                            // show the level text-view
+                            holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
+                                visibility = View.VISIBLE
+                                text = percentageLevelPropertyGenerator.percentageString
+
+                                //setTextColor(percentageLevelPropertyGenerator.colorID)
+
+                            }
+
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
                             holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                visibility = View.VISIBLE
+                                // set visibility
+                                //visibility = View.VISIBLE
                                 // set the text
                                 text = elementToRender.elementText
                             }
 
                             // show a level indication e.g. "96%"
-                            val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
+                            val percentageLevelPropertyGenerator =
+                                PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
 
                             holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView).apply {
                                 visibility = View.VISIBLE
@@ -998,12 +1059,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                             // show the textView
                             holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                visibility = View.VISIBLE
+                                //visibility = View.VISIBLE
                                 // set the text
                                 text = elementToRender.elementText
                             }
-
-                            //holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView).visibility = View.GONE
                         }
                         else -> {
                             // must be complex type!
@@ -1018,7 +1077,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                             // show the textView
                             holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                visibility = View.VISIBLE
+                                //visibility = View.VISIBLE
                                 // set the text
                                 text = elementToRender.elementText
                             }
@@ -1027,6 +1086,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                     }
                 }
+                /*
                 SEPARATOR_ELEMENT -> {
                     // for the separator element, the only necessary elements are the top and/or bottom separator
                     holder.linearLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.separatorColor)
@@ -1034,10 +1094,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                     holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.transparentViewColor))
                 }
+
+
                 else -> {
                     // should not happen
                     holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.GONE
                 }
+
+                 */
             }
             // bind it!
             //holder.bind(elementToRender, itemClickListener, position)
@@ -1053,6 +1117,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         override fun getItemViewType(position: Int): Int {
             return position
+        }
+
+        fun getElementAt(index: Int) : DevicePropertyListContentInformation{
+            return devicePropertyAdapter.elementAt(index)
         }
     }
 

@@ -347,7 +347,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
 
     var canNavigateForward = false
     var isGroupMember = false
-    var elementType = SEPARATOR_ELEMENT
+    var elementType = -1 //SEPARATOR_ELEMENT
     var indexInsideGroup = -1
     var globalIndex = -1
     var elementText = ""
@@ -2658,7 +2658,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                     // separate the groups
-                    val dpl2 = DevicePropertyListContentInformation()
+                    /*val dpl2 = DevicePropertyListContentInformation()
                     dpl2.elementType = SEPARATOR_ELEMENT
                     dpl2.canNavigateForward = false
                     // set globalIndex
@@ -2670,6 +2670,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2) //TODO
 
                     //Thread.sleep(100)
+
+                     */
                 }
             }
             // now add the properties which are not part of a group

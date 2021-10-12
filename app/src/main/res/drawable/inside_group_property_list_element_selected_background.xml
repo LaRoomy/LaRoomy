@@ -8,7 +8,7 @@
         android:right="4dp" >
         <shape android:shape="rectangle">
             <stroke android:color="@color/groupBorderColor" android:width="2dp"/>
-            <solid android:color="@color/propertyListElementBackgroundColor"/>
+            <solid android:color="@color/propertyListElementSelectedBackgroundColor"/>
         </shape>
     </item>
 </layer-list>

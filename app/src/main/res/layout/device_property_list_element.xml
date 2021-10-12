@@ -30,7 +30,7 @@
       android:layout_height="wrap_content"
       android:layout_marginStart="10dp"
       android:layout_marginEnd="5dp"
-      android:text="That's a test!"
+      android:text="Wert Einstellen:"
       android:textSize="14sp"
       android:layout_gravity="center_vertical"
 
@@ -43,11 +43,12 @@
       android:layout_height="wrap_content"
       android:id="@+id/elementButton"
       android:layout_marginStart="10dp"
+      android:layout_marginEnd="20dp"
       android:layout_gravity="center_vertical"
 
       android:visibility="gone"
 
-      android:text="button"
+      android:text="58%"
 
       />
 
@@ -71,9 +72,9 @@
 
       android:layout_height="wrap_content"
       android:layout_marginStart="10dp"
-      android:layout_marginEnd="30dp"
+      android:layout_marginEnd="20dp"
       android:text="@string/LevelIndicationTextPlaceholder"
-      android:textSize="20sp"
+      android:textSize="22sp"
       android:textStyle="bold"
       android:layout_gravity="center_vertical|end"
       android:textAlignment="textEnd"
@@ -90,7 +91,7 @@
       android:layout_marginEnd="20dp"
       android:contentDescription="@string/NavigateForwardImageDescription"
 
-      android:visibility="visible"
+      android:visibility="gone"
 
       app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
 
