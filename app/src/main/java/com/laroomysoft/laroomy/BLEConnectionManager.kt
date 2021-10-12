@@ -347,6 +347,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
 
     var canNavigateForward = false
     var isGroupMember = false
+    var isLastInGroup = false
     var elementType = -1 //SEPARATOR_ELEMENT
     var indexInsideGroup = -1
     var globalIndex = -1
@@ -2657,6 +2658,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             }
                         }
                     }
+
+                    // mark the last element in the group
+                    this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
+
                     // separate the groups
                     /*val dpl2 = DevicePropertyListContentInformation()
                     dpl2.elementType = SEPARATOR_ELEMENT
@@ -2737,7 +2742,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         cancel()
                     }
                 }
-            }, (0).toLong(), (210).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
+            }, (0).toLong(), (150).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
         }
     }
 

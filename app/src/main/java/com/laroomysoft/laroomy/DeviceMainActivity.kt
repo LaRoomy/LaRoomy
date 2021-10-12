@@ -301,7 +301,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
 
             if(element.isGroupMember){
-                if(isElementAtIndexLastGroupElement(index)){
+                if(element.isLastInGroup){
                     rootLayoutElement?.background =
                         AppCompatResources.getDrawable(this, R.drawable.inside_group_property_last_list_element_selected_background)
                 } else {
@@ -313,31 +313,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     AppCompatResources.getDrawable(this, R.drawable.single_property_list_element_selected_background)
             }
         }
-    }
-
-    private fun isElementAtIndexLastGroupElement(index: Int) : Boolean {
-
-        var isNotLast = false
-
-        val element = this.propertyList.elementAt(index)
-
-        if (element.isGroupMember) {
-            // this element is part of a group, now check if this is the last in the group
-            val nextIndex =
-                restoreIndex + 1
-
-            if (nextIndex < propertyList.size) {
-                val nextElement =
-                    this.propertyList.elementAt(nextIndex)
-
-                if (nextElement.elementType == PROPERTY_ELEMENT) {
-                    if (!nextElement.isGroupMember) {
-                        isNotLast = true
-                    }
-                }
-            }
-        }
-        return !isNotLast
     }
 
     private fun getBackgroundDrawableFromElementIndex(index: Int){}
@@ -606,36 +581,33 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             val element =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(restoreIndex)
 
-            val rootLayoutElement = this.devicePropertyListLayoutManager.findViewByPosition(restoreIndex) as? LinearLayout
+            val rootLayoutElement =
+                this.devicePropertyListLayoutManager.findViewByPosition(restoreIndex) as? LinearLayout
 
             // check if the property is part of a group and set the appropriate background-color
             if (element.isGroupMember) {
                 // this element is part of a group, now check if this is the last in the group
-                val nextIndex =
-                    restoreIndex + 1
-
-                if(nextIndex < propertyList.size){
-                    var isNotLast = false
-                    val nextElement =
-                        this.propertyList.elementAt(nextIndex)
-
-                    if(nextElement.elementType == PROPERTY_ELEMENT){
-                        if(!nextElement.isGroupMember){
-                            isNotLast = true
-                        }
-                    }
-                    if(isNotLast){
-                        rootLayoutElement?.background =
-                            AppCompatResources.getDrawable(this, R.drawable.inside_group_property_list_element_background)
-                    } else {
-                        rootLayoutElement?.background =
-                            AppCompatResources.getDrawable(this, R.drawable.inside_group_property_last_list_element_background)
-                    }
+                if (element.isLastInGroup) {
+                    rootLayoutElement?.background =
+                        AppCompatResources.getDrawable(
+                            this,
+                            R.drawable.inside_group_property_last_list_element_background
+                        )
+                } else {
+                    rootLayoutElement?.background =
+                        AppCompatResources.getDrawable(
+                            this,
+                            R.drawable.inside_group_property_list_element_background
+                        )
                 }
+
             } else {
                 // must be a single (group-less) property
                 rootLayoutElement?.background =
-                    AppCompatResources.getDrawable(this, R.drawable.single_property_list_element_background)
+                    AppCompatResources.getDrawable(
+                        this,
+                        R.drawable.single_property_list_element_background
+                    )
             }
         }
     }
@@ -928,26 +900,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     } else {
                         // the element is part of a group, check if this is the last element in the group
                         // check the next item
-                        var isNotLast = false
-                        val nextIndex =
-                            elementToRender.globalIndex + 1
-
-                        if(nextIndex < devicePropertyAdapter.size){
-                            val nextElement =
-                                devicePropertyAdapter.elementAt(nextIndex)
-
-                            if(nextElement.elementType == PROPERTY_ELEMENT){
-                                if(!nextElement.isGroupMember){
-                                    isNotLast = true
-                                }
-                            }
-                        }
-                        if(isNotLast) {
-                            rootContentHolder.background =
-                                AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_list_element_background)
-                        } else {
+                        if(elementToRender.isLastInGroup) {
                             rootContentHolder.background =
                                 AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_last_list_element_background)
+                        } else {
+                            rootContentHolder.background =
+                                AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_list_element_background)
                         }
                     }
 
@@ -965,6 +923,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         -1 -> return // must be error
                         0 -> return // must be error
                         PROPERTY_TYPE_BUTTON -> {
+
+                            // TODO: no description??
+
                             // apply to the button
                             holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
                                 // show the button
