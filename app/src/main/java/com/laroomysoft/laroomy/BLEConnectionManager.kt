@@ -40,262 +40,15 @@ const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHA
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = "unable to resume connection - invalid address"
 
 
-class LaRoomyDeviceProperty{
 
-    var propertyIndex: Int = -1 // invalid marker == -1
-    var propertyID: Int = -1
-    var propertyType: Int = -1
-    var propertyDescriptor: String = "unset"
-    var isGroupMember = false
-    var groupID = -1
-    var imageID = -1
-    var hasChanged = false
-    var propertyState = -1
-    var complexPropertyState = ComplexPropertyState()
-    var isEnabled = true
 
-    override fun equals(other: Any?): Boolean {
-        // check if this is the same reference
-        if(this === other)return true
-        // check if other is an invalid type
-        if(other !is LaRoomyDeviceProperty)return false
-        // check data equality
-        if(other.propertyIndex != this.propertyIndex)return false
-        if(other.propertyID != this.propertyID)return false
-        if(other.propertyType != this.propertyType)return false
-        //if(other.propertyDescriptor != this.propertyDescriptor)return false // the comparison of this member is not reasonable, because the element is not defined in the property-string
-        if(other.isGroupMember != this.isGroupMember)return false
-        if(other.groupID != this.groupID)return false
-        if(other.imageID != this.imageID)return false
-        // all is the same so return true
-        return true
-    }
-
-    fun needNavigation() : Boolean{
-        // if the property-type does not need navigation -> return false
-        return when(this.propertyType){
-            PROPERTY_TYPE_BUTTON -> false
-            PROPERTY_TYPE_SWITCH -> false
-            PROPERTY_TYPE_LEVEL_SELECTOR -> false
-            PROPERTY_TYPE_LEVEL_INDICATOR -> false
-            PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> false
-            else -> true
-        }
-    }
-
-    fun fromString(string: String){
-        // generate member content from string:
-        try {
-            if (string.isNotEmpty()) {
-                var propID = ""
-                var propType = ""
-                var propIndex = ""
-                var grID = ""
-                var imgID = ""
-
-                string.forEachIndexed { index, c ->
-                    when (index) {
-                        0 -> if (c != 'I') return
-                        1 -> if (c != 'P') return
-                        2 -> if (c != 'R') return
-                        3 -> propID += c
-                        4 -> propID += c
-                        5 -> propID += c
-                        6 -> propType += c
-                        7 -> propType += c
-                        8 -> propType += c
-                        9 -> propIndex += c
-                        10 -> propIndex += c
-                        11 -> propIndex += c
-                        12 -> if(isNumber(c)) grID += c
-                        13 -> if(isNumber(c)) grID += c
-                        14 -> if(isNumber(c)) grID += c
-                        15 -> imgID += c
-                        16 -> imgID += c
-                        17 -> imgID += c
-                    }
-                }
-                if(verboseLog) {
-                    Log.d("M:DevProp:fromString", "Data Recorded - Results:")
-                    Log.d("M:DevProp:fromString", "PropertyID: $propID")
-                    Log.d("M:DevProp:fromString", "PropertyType: $propType")
-                    Log.d("M:DevProp:fromString", "PropertyIndex: $propIndex")
-                    Log.d("M:DevProp:fromString", "PropertyImageID: $imgID")
-                }
-
-                this.propertyID = propID.toInt()
-                this.propertyType = propType.toInt()
-                this.propertyIndex = propIndex.toInt()
-                this.imageID = imgID.toInt()
-
-                if(grID.isNotEmpty()){
-                    this.groupID = grID.toInt()
-                    this.isGroupMember = true
-
-                    if(verboseLog) {
-                        Log.d(
-                            "M:DevProp:fromString",
-                            "isGroupMember: $isGroupMember -- GroupID: $groupID"
-                        )
-                    }
-                }
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:LRDevice:FromString",
-                    "LaRoomy device property string read:\n -PropertyID: ${this.propertyID}\n -PropertyType: ${this.propertyType}\n - PropertyIndex: ${this.propertyIndex}\n - PropertyImageID: ${this.imageID}"
-                )
-            }
-        }
-        catch(except: Exception){
-            Log.e("M:LDP:Prop:fromString", "Exception occurred: ${except.message}")
-        }
-     }
-
-    fun checkRawEquality(ldp:LaRoomyDeviceProperty) :Boolean {
-        return ((ldp.propertyType == this.propertyType)&&(ldp.propertyID == this.propertyID)&&(ldp.propertyIndex == this.propertyIndex)&&(ldp.imageID == this.imageID))
-    }
-
-    private fun isNumber(char: Char): Boolean {
-        return when(char){
-            '0' -> true
-            '1' -> true
-            '2' -> true
-            '3' -> true
-            '4' -> true
-            '5' -> true
-            '6' -> true
-            '7' -> true
-            '8' -> true
-            '9' -> true
-            else -> false
-        }
-    }
-
-    override fun hashCode(): Int {
-        var result = propertyIndex
-        result = 31 * result + propertyID
-        result = 31 * result + propertyType
-        result = 31 * result + propertyDescriptor.hashCode()
-        result = 31 * result + isGroupMember.hashCode()
-        result = 31 * result + groupID
-        result = 31 * result + imageID
-        result = 32 * result + hasChanged.hashCode()
-        return result
-    }
-}
-
-class LaRoomyDevicePropertyGroup{
-
-    var groupIndex = -1
-    var groupID = -1
-    var groupName = "unset"
-    var memberCount = 0
-    var memberIDs = ArrayList<Int>()
-    var imageID = -1
-    var hasChanged = false
-
-    override fun equals(other: Any?): Boolean {
-        // check reference equality
-        if(other === this)return true
-        // check for invalid type
-        if(other !is LaRoomyDevicePropertyGroup)return false
-        // check data
-        if(other.groupIndex != this.groupIndex)return false
-        if(other.groupID != this.groupID)return false
-        //if(other.groupName != this.groupName)return false // the comparison of this member is not reasonable, because the element is not defined in the group-string
-        if(other.memberCount != this.memberCount)return false
-        if(other.memberIDs != this.memberIDs)return false
-        if(other.imageID != this.imageID)return false
-        // all data is the same -> return true
-        return true
-    }
-
-    fun fromString(groupString: String){
-        // generate member content from string:
-        try {
-            if (groupString.isNotEmpty()) {
-                var localGroupID = ""
-                var localGroupIndex = ""
-                var memberAmount = ""
-                var imgID = ""
-
-                groupString.forEachIndexed { index, c ->
-                    when (index) {
-                        0 -> if (c != 'I') return
-                        1 -> if (c != 'P') return
-                        2 -> if (c != 'G') return
-                        3 -> localGroupID += c
-                        4 -> localGroupID += c
-                        5 -> localGroupID += c
-                        6 -> localGroupIndex += c
-                        7 -> localGroupIndex += c
-                        8 -> localGroupIndex += c
-                        9 -> memberAmount += c
-                        10 -> memberAmount += c
-                        11 -> memberAmount += c
-                        12 -> imgID += c
-                        13 -> imgID += c
-                        14 -> imgID += c
-                    }
-                }
-                if(verboseLog) {
-                    Log.d("M:PropGroup:fromString", "Data Recorded - Results:")
-                    Log.d("M:PropGroup:fromString", "GroupID: $localGroupID")
-                    Log.d("M:PropGroup:fromString", "GroupIndex: $localGroupIndex")
-                    Log.d("M:PropGroup:fromString", "MemberAmount: $memberAmount")
-                    Log.d("M:PropGroup:fromString", "GroupImageID: $imgID")
-                }
-
-                this.groupID = localGroupID.toInt()
-                this.groupIndex = localGroupIndex.toInt()
-                this.memberCount = memberAmount.toInt()
-                this.imageID = imgID.toInt()
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:PropGroup:fromString",
-                    "LaRoomy device property GROUP string read:\n -GroupID: ${this.groupID}\n -GroupIndex: ${this.groupIndex}\n - MemberAmount: ${this.memberCount}\n - GroupImageID: ${this.imageID}"
-                )
-            }
-        }
-        catch(except: Exception){
-            Log.e("M:LDP:Group:fromString", "Exception occurred: ${except.message}")
-        }
-    }
-
-    fun checkRawEquality(ldpg: LaRoomyDevicePropertyGroup) : Boolean {
-        return ((this.groupIndex == ldpg.groupIndex)&&(this.groupID == ldpg.groupID)&&(this.imageID == ldpg.imageID)&&(this.memberCount == ldpg.memberCount))
-    }
-
-    fun setMemberIDs(id1: Int, id2: Int, id3: Int, id4: Int, id5: Int){
-        this.memberIDs.clear()
-        this.memberIDs.add(id1)
-        this.memberIDs.add(id2)
-        this.memberIDs.add(id3)
-        this.memberIDs.add(id4)
-        this.memberIDs.add(id5)
-    }
-
-    override fun hashCode(): Int {
-        var result = groupIndex
-        result = 31 * result + groupID
-        result = 31 * result + groupName.hashCode()
-        result = 31 * result + memberCount
-        result = 31 * result + memberIDs.hashCode()
-        result = 31 * result + imageID
-        result = 31 * result + hasChanged.hashCode()
-        return result
-    }
-}
-
-class LaRoomyDevicePresentationModel {
-    // NOTE: This is the data-model for the DeviceListItem in the main-activity
-    var name = ""
-    var address = ""
-    //var type = 0
-    var image = 0
-}
+//class LaRoomyDevicePresentationModel {
+//    // NOTE: This is the data-model for the DeviceListItem in the main-activity
+//    var name = ""
+//    var address = ""
+//    //var type = 0
+//    var image = 0
+//}
 
 class ComplexPropertyState {
     // shared state values (multi-purpose)
@@ -314,65 +67,264 @@ class ComplexPropertyState {
     var timeSetterIndex = -1        // Value to identify the time setter type
 }
 
-class DeviceInfoHeaderData {
-    var message = ""
-    var imageID = -1
-    var valid = false
-
-    fun clear(){
-        this.message = ""
-        this.imageID = -1
-        this.valid = false
-    }
-}
-
-class ElementUpdateInfo{
-    var elementID = -1
-    var elementIndex = -1
-    var elementType = -1
-    var updateType = -1
-}
-
-class MultiComplexPropertyData{
-    var dataIndex = -1
-    var dataName = ""
-    var dataValue = -1
-    var isName = false
-}
-
-class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
-    // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
-
-    var handler: OnPropertyClickListener? = null
-
-    var canNavigateForward = false
-    var isGroupMember = false
-    var isLastInGroup = false
-    var elementType = -1 //SEPARATOR_ELEMENT
-    var indexInsideGroup = -1
-    var globalIndex = -1
-    var elementText = ""
-    var elementID = -1
-    var imageID = -1
-    var propertyType = -1
-    //var initialElementValue = -1
-    var simplePropertyState = -1
-    var complexPropertyState = ComplexPropertyState()
-
-    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEK_BAR_PROGRESS_CHANGING)
-    }
-
-    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_START_TRACK)
-    }
-
-    override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
-    }
-}
+//class DeviceInfoHeaderData {
+//    var message = ""
+//    var imageID = -1
+//    var valid = false
+//
+//    fun clear(){
+//        this.message = ""
+//        this.imageID = -1
+//        this.valid = false
+//    }
+//}
+//
+//class ElementUpdateInfo{
+//    var elementID = -1
+//    var elementIndex = -1
+//    var elementType = -1
+//    var updateType = -1
+//}
+//
+//class MultiComplexPropertyData{
+//    var dataIndex = -1
+//    var dataName = ""
+//    var dataValue = -1
+//    var isName = false
+//}
+//
+//class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
+//    // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
+//
+//    var handler: OnPropertyClickListener? = null
+//
+//    var canNavigateForward = false
+//    var isGroupMember = false
+//    var isLastInGroup = false
+//    var elementType = -1 //SEPARATOR_ELEMENT
+//    var indexInsideGroup = -1
+//    var globalIndex = -1
+//    var elementText = ""
+//    var elementID = -1
+//    var imageID = -1
+//    var propertyType = -1
+//    //var initialElementValue = -1
+//    var simplePropertyState = -1
+//    var complexPropertyState = ComplexPropertyState()
+//
+//    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//        this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEK_BAR_PROGRESS_CHANGING)
+//    }
+//
+//    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+//        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_START_TRACK)
+//    }
+//
+//    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+//        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
+//    }
+//}
 
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
+
+    // constant properties (regarding the device!) ////////////////////////
+    //private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
+    //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
+    private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+    private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
+    private val testCommand = "vXtest385_26$"// outgoing
+    val authenticationResponse = "Auth:rsp:true"// incoming
+    val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"// incoming
+    val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"// incoming
+    private val propertyLoopEndIndication = "RSP:A:PEND"// incoming
+    private val groupLoopEndIndication = "RSP:E:PGEND"// incoming
+    private val propertyStringPrefix = "IPR" // incoming -prefix
+    private val groupStringPrefix = "IPG"// incoming -prefix
+    private val groupMemberStringPrefix = "mI%"
+    private val propertyNameStartIndicator = "PD:S"// incoming -prefix
+    private val propertyNameEndIndicator = "PD:E"// incoming
+    private val groupInfoStartIndicator = "GI:S"//incoming -prefix
+    private val groupInfoEndIndicator = "GI:E"// incoming
+    private val complexDataStateTransmissionEntry = "PSC"
+    private val simpleDataStateTransmissionEntry = "PSS"
+    private val propertyChangedNotificationEntry = "DnPcx1="
+    private val propertyGroupChangedNotificationEntry = "DnPGc=t"
+    private val deviceHeaderStartEntry = "DnDIHs7"
+    private val deviceHeaderCloseMessage = "DnDIHe+"
+    private val deviceReconnectedNotification = "yDnRcon=t$"
+    private val navigatedToDeviceMainPageNotification = "yDnNavM=5$"
+    private val multiComplexPropertyPageInvokedStartEntry = "yDnMCIv-X"
+    private val multiComplexPropertyNameSetterEntry = "MCN&"
+    private val multiComplexPropertyDataSetterEntry = "MCD&"
+    private val enableBindingSetterCommandEntry = "SeB:"
+    private val releaseDeviceBindingCommand = "SrB>$"
+    private val propertyRetrievalCompleteNotification = "yDnPRf-P!$"// outgoing
+    private val requestLocalTimeCommand = "RqLcTime"// incoming
+    private val bindingNotSupportedNotification = "DnBNS=x"// incoming
+    private val bindingSuccessNotification = "DnBNS=y"// incoming
+    private val bindingErrorNotification = "DnBNS=e"// incoming
+
+    // new ones:
+    private val bleDeviceData = BLEDeviceData()
+
+    /////////////////////////////////////////////////
+
+    var isConnected:Boolean = false
+        private set
+    var authenticationSuccess = false
+        private set
+    var isBindingRequired = false
+        private set
+    var connectionTestSucceeded = false
+        private set
+    var connectionSuspended = false
+        private set
+
+    var isCurrentConnectionDoneWithSharedBindingKey = false
+
+    private var authRequired = true
+    private var propertyLoopActive = false
+    private var propertyNameResolveLoopActive = false
+    private var passKeySecondTryOut = false
+    private var groupLoopActive = false
+    private var groupInfoLoopActive = false
+    private var propertyConfirmationModeActive = false
+    private var propertyNameResolveSingleAction = false
+    private var propertyGroupNameResolveSingleAction = false
+    private var singlePropertyRetrievingAction = false
+    private var singlePropertyDetailRetrievingAction = false
+    private var singleGroupRetrievingAction = false
+    private var singleGroupDetailRetrievingAction = false
+    private var isResumeConnectionAttempt = false
+    private var propertyUpToDate = false
+    private var dataReadyToShow = false
+    private var complexStateLoopActive = false
+    private var deviceHeaderRecordingActive = false
+    private var updateStackProcessActive = false
+    private var multiComplexPropertyPageOpen = false
+    private var suspendedDeviceAddress = ""
+    private var currentPropertyResolveID = -1 // initialize with invalid marker
+    private var currentPropertyResolveIndex = -1 // initialize with invalid marker
+    private var currentGroupResolveID = -1 // initialize with invalid marker
+    private var currentGroupResolveIndex = -1 // initialize with invalid marker
+    private var currentStateRetrievingIndex = -1 // initialize with invalid marker
+    private var multiComplexPageID = -1 // initialize with invalid marker
+    private var multiComplexTypeID = -1 // initialize with invalid marker
+    private lateinit var activityContext: Context
+    //private lateinit var callingActivity: Activity
+    private lateinit var callback: BleEventCallback
+    private lateinit var propertyCallback: PropertyCallback
+    var currentDevice: BluetoothDevice? = null
+    private var bluetoothGatt: BluetoothGatt? = null
+    lateinit var gattCharacteristic: BluetoothGattCharacteristic
+    var deviceInfoHeaderData = DeviceInfoHeaderData()
+
+    var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
+    var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
+    var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
+    var elementUpdateList = ArrayList<ElementUpdateInfo>()
+
+    var complexStatePropertyIDs = ArrayList<Int>()
+
+    var currentUsedServiceUUID = ""
+        // used to cache the current service uuid
+        private set
+
+    val currentUsedCharacteristicUUID: String
+        get() = this.gattCharacteristic.uuid.toString()
+
+
+    //private val scanResultList: MutableList<ScanResult?> = ArrayList()
+
+    private lateinit var mHandler: Handler
+
+    val isPropertyUpToDate: Boolean
+        get() = this.propertyUpToDate
+
+    val isUIDataReady: Boolean
+        get() = this.dataReadyToShow
+
+    val isLastAddressValid: Boolean
+        get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
+
+    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
+        this.bleAdapter?.bondedDevices
+    }
+
+    var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
+        get() {
+            // clear the list:
+            field.clear()
+            // check if the user wants to list all bonded devices
+            val listAllDevices =
+                (activityContext.applicationContext as ApplicationProperty).loadBooleanData(
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_ListAllDevices
+                )
+            // fill the list with all bonded devices
+            if (listAllDevices) {
+
+                var imageIndex = 0
+
+                this.bleAdapter?.bondedDevices?.forEach {
+                    val device = LaRoomyDevicePresentationModel()
+                    device.name = it.name
+                    device.address = it.address
+
+                    //device.type = laRoomyDeviceTypeFromName(it.name)
+
+                    if(device.name.contains("laroomy", true)||(device.name.contains("lry", true))){
+                        device.image = R.drawable.laroomy_icon_sq64
+                    } else {
+                        device.image = imageFromIndexCounter(imageIndex)
+                        imageIndex++
+                    }
+                    field.add(device)
+                }
+            } else {
+                // fill the list only with laroomy devices (or devices which follow the laroomy-name guidelines)
+                this.bleAdapter?.bondedDevices?.forEach {
+                    // It is not possible to get the uuids from the device here
+                    // -> so the name must be the criteria to identify a laroomy device!
+                    if (it.name.startsWith("Laroomy") || it.name.contains("LRY", true) || it.name.contains("laroomy", true)) {
+                        val device = LaRoomyDevicePresentationModel()
+                        device.name = it.name
+                        device.address = it.address
+                        device.image = R.drawable.laroomy_icon_sq64
+                        //device.type = laRoomyDeviceTypeFromName(it.name)
+                        field.add(device)
+                    }
+                }
+            }
+            return field
+        }
+
+    private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
+
+        val bluetoothManager =
+            activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothManager.adapter
+    }
+
+    private val BluetoothAdapter.isDisabled: Boolean
+        get() = !isEnabled
+
+    private val requestEnableBT: Int = 13
+
+    private var propertyDetailChangedOnConfirmation = false
+    private var groupDetailChangedOnConfirmation = false
+
+    private var mScanning: Boolean = false
+
+    //private var preselectIndex: Int = -1
+
+    private var connectionAttemptCounter = 0// remove!
+
+    private var propertyRequestIndexCounter = 0
+    private var groupRequestIndexCounter = 0
+
+    private var itemAddCounter = -1
+
 
     // callback implementation for BluetoothGatt
     private val gattCallback = object : BluetoothGattCallback() {
@@ -381,6 +333,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             when(newState){
                 BluetoothProfile.STATE_CONNECTED -> {
+
+                    // if successful connected reset the device-data
+                    bleDeviceData.clear()
 
                     isConnected = true
 
@@ -537,7 +492,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             applicationProperty.logControl("I: Characteristic changed: $dataAsString")
 
+            if(!dispatchTransmission(dataAsString ?: "")){
+                callback.onDataReceived(dataAsString ?: "")
+            }
+
             // check authentication
+            /*
             if(authRequired){
 
                 if(verboseLog) {
@@ -708,8 +668,105 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(!dataProcessed){
                     callback.onDataReceived(dataAsString)
                 }
+            }*/
+        }
+    }
+
+    fun dispatchTransmission(data: String): Boolean {
+        // validate transmission length
+        if(data.length < 8){
+            //invalid transmission length
+            if(verboseLog){
+                Log.e("M:CB:Dispatcher", "Invalid transmission length. Transmission-length was: ${data.length} > minimum header-length is 8!")
+            }
+            applicationProperty.logControl("Invalid transmission length. Transmission-length was: ${data.length} > minimum header-length is 8!")
+            return false
+        } else {
+            var dataProcessed = false
+
+            // evaluate transmission type
+            when(data[0]){
+                '1' -> {
+                    // property definition data
+                }
+                '2' -> {
+                    // group definition data
+                }
+                '3' -> {
+                    // property state data
+                }
+                '4' -> {
+                    // property execution command (only response)
+                }
+                '5' -> {
+                    // device to app notification
+                }
+                '6' -> {
+                    // binding response
+                }
+                '7' -> {
+                    // init transmission string
+                    dataProcessed = readInitTransmission(data)
+                }
+                '8' -> {
+                    // data-setter string
+                }
+            }
+
+
+            // return true if the data is fully handled, otherwise it will be forwarded to the callback
+            return dataProcessed
+        }
+    }
+
+    private fun readInitTransmission(data: String) : Boolean {
+
+        // first read data size
+        var strDataSize = "0x"
+        strDataSize += data[4]
+        strDataSize += data[5]
+
+        // convert to integer
+        var dataSize =
+            Integer.decode(strDataSize)
+        // add the header length
+        dataSize += 8
+
+        // check if the length of the transmission is valid
+        if(dataSize < 13){
+            //invalid data size
+            if(verboseLog){
+                Log.e("readInitTransmission", "Invalid data size. Data-Size was: $dataSize > minimum is 7!")
+            }
+            applicationProperty.logControl("Invalid data size of init-transmission. Data-Size was: $dataSize > minimum is 7!")
+            return false
+        } else {
+            // save device data:
+            var hexString = "0x"
+            hexString += data[8]
+            hexString += data[9]
+
+            bleDeviceData.propertyCount = Integer.decode(hexString)
+
+            hexString = "0x"
+            hexString += data[10]
+            hexString += data[11]
+
+            bleDeviceData.groupCount = Integer.decode(hexString)
+
+            if (data[12] == '1') {
+                bleDeviceData.hasCachingPermission = true
+            }
+
+            // check if binding is required
+            if (data[13] == '1') {
+                this.bleDeviceData.isBindingRequired = true
+
+                // TODO: send binding request
             }
         }
+
+        return true
     }
 
     fun reAlignContextReferences(cContext: Context, eventHandlerObject: BleEventCallback){
@@ -748,200 +805,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    // constant properties (regarding the device!) ////////////////////////
-    //private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
-    //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
-    private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-    private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
-    private val testCommand = "vXtest385_26$"// outgoing
-    val authenticationResponse = "Auth:rsp:true"// incoming
-    val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"// incoming
-    val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"// incoming
-    private val propertyLoopEndIndication = "RSP:A:PEND"// incoming
-    private val groupLoopEndIndication = "RSP:E:PGEND"// incoming
-    private val propertyStringPrefix = "IPR" // incoming -prefix
-    private val groupStringPrefix = "IPG"// incoming -prefix
-    private val groupMemberStringPrefix = "mI%"
-    private val propertyNameStartIndicator = "PD:S"// incoming -prefix
-    private val propertyNameEndIndicator = "PD:E"// incoming
-    private val groupInfoStartIndicator = "GI:S"//incoming -prefix
-    private val groupInfoEndIndicator = "GI:E"// incoming
-    private val complexDataStateTransmissionEntry = "PSC"
-    private val simpleDataStateTransmissionEntry = "PSS"
-    private val propertyChangedNotificationEntry = "DnPcx1="
-    private val propertyGroupChangedNotificationEntry = "DnPGc=t"
-    private val deviceHeaderStartEntry = "DnDIHs7"
-    private val deviceHeaderCloseMessage = "DnDIHe+"
-    private val deviceReconnectedNotification = "yDnRcon=t$"
-    private val navigatedToDeviceMainPageNotification = "yDnNavM=5$"
-    private val multiComplexPropertyPageInvokedStartEntry = "yDnMCIv-X"
-    private val multiComplexPropertyNameSetterEntry = "MCN&"
-    private val multiComplexPropertyDataSetterEntry = "MCD&"
-    private val enableBindingSetterCommandEntry = "SeB:"
-    private val releaseDeviceBindingCommand = "SrB>$"
-    private val propertyRetrievalCompleteNotification = "yDnPRf-P!$"// outgoing
-    private val requestLocalTimeCommand = "RqLcTime"// incoming
-    private val bindingNotSupportedNotification = "DnBNS=x"// incoming
-    private val bindingSuccessNotification = "DnBNS=y"// incoming
-    private val bindingErrorNotification = "DnBNS=e"// incoming
-
-    /////////////////////////////////////////////////
-
-    var isConnected:Boolean = false
-        private set
-    var authenticationSuccess = false
-        private set
-    var isBindingRequired = false
-        private set
-    var connectionTestSucceeded = false
-        private set
-    var connectionSuspended = false
-        private set
-
-    var isCurrentConnectionDoneWithSharedBindingKey = false
-
-    private var authRequired = true
-    private var propertyLoopActive = false
-    private var propertyNameResolveLoopActive = false
-    private var passKeySecondTryOut = false
-    private var groupLoopActive = false
-    private var groupInfoLoopActive = false
-    private var propertyConfirmationModeActive = false
-    private var propertyNameResolveSingleAction = false
-    private var propertyGroupNameResolveSingleAction = false
-    private var singlePropertyRetrievingAction = false
-    private var singlePropertyDetailRetrievingAction = false
-    private var singleGroupRetrievingAction = false
-    private var singleGroupDetailRetrievingAction = false
-    private var isResumeConnectionAttempt = false
-    private var propertyUpToDate = false
-    private var dataReadyToShow = false
-    private var complexStateLoopActive = false
-    private var deviceHeaderRecordingActive = false
-    private var updateStackProcessActive = false
-    private var multiComplexPropertyPageOpen = false
-    private var suspendedDeviceAddress = ""
-    private var currentPropertyResolveID = -1 // initialize with invalid marker
-    private var currentPropertyResolveIndex = -1 // initialize with invalid marker
-    private var currentGroupResolveID = -1 // initialize with invalid marker
-    private var currentGroupResolveIndex = -1 // initialize with invalid marker
-    private var currentStateRetrievingIndex = -1 // initialize with invalid marker
-    private var multiComplexPageID = -1 // initialize with invalid marker
-    private var multiComplexTypeID = -1 // initialize with invalid marker
-    private lateinit var activityContext: Context
-    //private lateinit var callingActivity: Activity
-    private lateinit var callback: BleEventCallback
-    private lateinit var propertyCallback: PropertyCallback
-    var currentDevice: BluetoothDevice? = null
-    private var bluetoothGatt: BluetoothGatt? = null
-    lateinit var gattCharacteristic: BluetoothGattCharacteristic
-    var deviceInfoHeaderData = DeviceInfoHeaderData()
-
-    var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
-    var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
-    var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
-    var elementUpdateList = ArrayList<ElementUpdateInfo>()
-
-    var complexStatePropertyIDs = ArrayList<Int>()
-
-    var currentUsedServiceUUID = ""
-        // used to cache the current service uuid
-        private set
-
-    val currentUsedCharacteristicUUID: String
-    get() = this.gattCharacteristic.uuid.toString()
-
-
-    //private val scanResultList: MutableList<ScanResult?> = ArrayList()
-
-    private lateinit var mHandler: Handler
-
-    val isPropertyUpToDate: Boolean
-    get() = this.propertyUpToDate
-
-    val isUIDataReady: Boolean
-    get() = this.dataReadyToShow
-
-    val isLastAddressValid: Boolean
-    get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
-
-    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
-        this.bleAdapter?.bondedDevices
-    }
-
-    var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
-        get() {
-            // clear the list:
-            field.clear()
-            // check if the user wants to list all bonded devices
-            val listAllDevices =
-                (activityContext.applicationContext as ApplicationProperty).loadBooleanData(
-                    R.string.FileKey_AppSettings,
-                    R.string.DataKey_ListAllDevices
-                )
-            // fill the list with all bonded devices
-            if (listAllDevices) {
-
-                var imageIndex = 0
-
-                this.bleAdapter?.bondedDevices?.forEach {
-                    val device = LaRoomyDevicePresentationModel()
-                    device.name = it.name
-                    device.address = it.address
-
-                    //device.type = laRoomyDeviceTypeFromName(it.name)
-
-                    if(device.name.contains("laroomy", true)||(device.name.contains("lry", true))){
-                        device.image = R.drawable.laroomy_icon_sq64
-                    } else {
-                        device.image = imageFromIndexCounter(imageIndex)
-                        imageIndex++
-                    }
-                    field.add(device)
-                }
-            } else {
-                // fill the list only with laroomy devices (or devices which follow the laroomy-name guidelines)
-                this.bleAdapter?.bondedDevices?.forEach {
-                    // It is not possible to get the uuids from the device here
-                    // -> so the name must be the criteria to identify a laroomy device!
-                    if (it.name.startsWith("Laroomy") || it.name.contains("LRY", true) || it.name.contains("laroomy", true)) {
-                        val device = LaRoomyDevicePresentationModel()
-                        device.name = it.name
-                        device.address = it.address
-                        device.image = R.drawable.laroomy_icon_sq64
-                        //device.type = laRoomyDeviceTypeFromName(it.name)
-                        field.add(device)
-                    }
-                }
-            }
-            return field
-        }
-
-    private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
-
-        val bluetoothManager =
-            activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
-    }
-
-    private val BluetoothAdapter.isDisabled: Boolean
-        get() = !isEnabled
-
-    private val requestEnableBT: Int = 13
-
-    private var propertyDetailChangedOnConfirmation = false
-    private var groupDetailChangedOnConfirmation = false
-
-    private var mScanning: Boolean = false
-
-    //private var preselectIndex: Int = -1
-
-    private var connectionAttemptCounter = 0// remove!
-
-    private var propertyRequestIndexCounter = 0
-    private var groupRequestIndexCounter = 0
-
-    private var itemAddCounter = -1
 
     fun clear(){
         this.bluetoothGatt?.close()
@@ -2721,8 +2584,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             Timer().scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     try {
-
-
                         propertyCallback.onUIAdaptableArrayListItemAdded(
                             uIAdapterList.elementAt(
                                 itemAddCounter
