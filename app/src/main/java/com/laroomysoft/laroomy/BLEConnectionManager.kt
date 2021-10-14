@@ -679,6 +679,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             applicationProperty.logControl("E: Invalid transmission length. Transmission-length was: ${data.length} > minimum header-length is 8!")
             return false
         } else {
+            // first read data size
+            var strDataSize = "0x"
+            strDataSize += data[4]
+            strDataSize += data[5]
+
+            // convert to integer
+            var dataSize =
+                Integer.decode(strDataSize)
+            // add the header length
+            dataSize += 8
+
 
             // TODO: check error flag(s)
 
@@ -688,10 +699,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             when(data[0]){
                 '1' -> {
                     // property definition data
-                    dataProcessed = readPropertyString(data)
+                    dataProcessed = readPropertyString(data, dataSize)
                 }
                 '2' -> {
                     // group definition data
+                    dataProcessed = readGroupString(data, dataSize)
                 }
                 '3' -> {
                     // property state data
@@ -704,11 +716,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '6' -> {
                     // binding response
-                    dataProcessed = readBindingResponse(data)
+                    dataProcessed = readBindingResponse(data, dataSize)
                 }
                 '7' -> {
                     // init transmission string
-                    dataProcessed = readInitTransmission(data)
+                    dataProcessed = readInitTransmission(data, dataSize)
                 }
                 '8' -> {
                     // data-setter string
@@ -721,23 +733,44 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun readPropertyString(data: String) : Boolean {
+    private fun readGroupString(data: String, dataSize: Int) : Boolean {
+
+        // TODO: next action!
 
         return true
     }
 
-    private fun readInitTransmission(data: String) : Boolean {
+    private fun readPropertyString(data: String, dataSize: Int) : Boolean {
 
-        // first read data size
-        var strDataSize = "0x"
-        strDataSize += data[4]
-        strDataSize += data[5]
+        // check if the length of the transmission is valid
+        if(dataSize < 18){
+            //invalid data size
+            if(verboseLog){
+                Log.e("readPropertyString", "Invalid data size. Data-Size was: $dataSize > minimum is 18!")
+            }
+            applicationProperty.logControl("E: Invalid data size of property transmission. Data-Size was: $dataSize > minimum is 18!")
+            return false
+        } else {
+            // decode property string to class
+            val laRoomyDeviceProperty = LaRoomyDeviceProperty()
+            laRoomyDeviceProperty.fromString(data)
 
-        // convert to integer
-        var dataSize =
-            Integer.decode(strDataSize)
-        // add the header length
-        dataSize += 8
+            // add property and request next property if the loop is active
+            if(this.propertyLoopActive){
+                this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
+                this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
+            } else {
+                // if the loop is not active, this must be an update-transmission, so replace the property
+                if (this.laRoomyDevicePropertyList.size > laRoomyDeviceProperty.propertyIndex) {
+                    this.laRoomyDevicePropertyList[laRoomyDeviceProperty.propertyIndex] =
+                        laRoomyDeviceProperty
+                }
+            }
+            return true
+        }
+    }
+
+    private fun readInitTransmission(data: String, dataSize: Int) : Boolean {
 
         // check if the length of the transmission is valid
         if(dataSize < 13){
@@ -790,18 +823,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return true
     }
 
-    private fun readBindingResponse(data: String) : Boolean {
-
-        // first read data size
-        var strDataSize = "0x"
-        strDataSize += data[4]
-        strDataSize += data[5]
-
-        // convert to integer
-        var dataSize =
-            Integer.decode(strDataSize)
-        // add the header length
-        dataSize += 8
+    private fun readBindingResponse(data: String, dataSize: Int) : Boolean {
 
         if(dataSize < 9){
             if(verboseLog){
@@ -875,6 +897,66 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
     }
+
+    fun startPropertyListing(){
+        if(verboseLog){
+            Log.d("startPropList", "Starting property listing...")
+        }
+        applicationProperty.logControl("I: Starting property listing...")
+
+        this.propertyLoopActive = true
+        this.sendNextPropertyRequest(-1)
+    }
+
+    private fun sendNextPropertyRequest(currentIndex: Int){
+
+        // increase index
+        val newIndex = currentIndex + 1
+
+        // check for the end of the property count
+        if(newIndex < this.bleDeviceData.propertyCount){
+            // build request string
+            var rqString = "11"
+
+            // add property-index as hex string
+            val hexStr = Integer.toHexString(newIndex)
+            if(hexStr.length <= 1){
+                rqString += '0'
+                rqString += hexStr
+            } else {
+                rqString += hexStr
+            }
+
+            //add data-size + flag values
+            rqString += "0300"
+
+            // add language identifier
+            val languageIdentificationString =
+                when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
+                    "Deutsch" -> "de\r"
+                    else -> "en\r"
+                }
+            rqString += languageIdentificationString
+
+            sendData(rqString)
+        } else {
+
+            this.propertyLoopActive = false
+
+            if(verboseLog){
+                Log.d("sendNextPropRQ", "Final property count reached. Max property value is: ${this.bleDeviceData.propertyCount}")
+            }
+            applicationProperty.logControl("I: Final property count reached. Max property value is: ${this.bleDeviceData.propertyCount}")
+
+            // the property loop is complete, check if there are groups and request them
+            if(this.bleDeviceData.groupCount > 0){
+
+                // TODO: start group loop
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////// section!
 
     fun reAlignContextReferences(cContext: Context, eventHandlerObject: BleEventCallback){
         this.activityContext = cContext
@@ -1116,7 +1198,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             // make sure the passkey is hidden in the connection log
-            // TODO: let the user decide if the passkey should be hidden or not
+
+            // TODO: UPDATE!!!
 
             if(data.elementAt(0) == 'r'){
                 // must be the binding request -> hide passkey
@@ -1325,12 +1408,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             .checkRawEquality(laRoomyDeviceProperty)
                     ) {
                         // log:
-                        if (verboseLog) {
-                            Log.d(
-                                "M:addDeviceProperty",
-                                "Confirmation-Process active: This property data does not confirm with the saved structure.\nPropertyID: ${laRoomyDeviceProperty.propertyID}\nPropertyIndex: ${laRoomyDeviceProperty.propertyIndex}"
-                            )
-                        }
                         // the element does not confirm
                         // invalidate all property
                         this.stopAllPendingLoopsAndResetParameter()
@@ -1379,7 +1456,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     "Deutsch" -> '1'
                     else -> '0'
                 }
-                var id = this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyID
+                var id = this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyIndex
                 var hundred = 0
                 var tenth = 0
                 val single: Int
@@ -1480,7 +1557,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     )
                 }
                 // it's a finalization string -> check for loop end
-                if(this.laRoomyDevicePropertyList.last().propertyID == currentPropertyResolveID){
+                if(this.laRoomyDevicePropertyList.last().propertyIndex == currentPropertyResolveID){
                     if(verboseLog) {
                         Log.d(
                             "M:resolvePropNames",
@@ -1597,7 +1674,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     else -> '0'
                 }
             var id =
-                this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyID
+                this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyIndex
             var hundred = 0
             var tenth = 0
             val single: Int
@@ -2017,7 +2094,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun setPropertyDescriptionForID(id:Int, description: String){
         laRoomyDevicePropertyList.forEach {
-            if(it.propertyID == id){
+            if(it.propertyIndex == id){
                 if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
                     it.propertyDescriptor =
                         encodeGermanString(description)
@@ -2601,7 +2678,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // add the device properties to the group by their IDs
                     for (ID in laRoomyDevicePropertyGroup.memberIDs) {
                         this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-                            if (laRoomyDeviceProperty.propertyID == ID) {
+                            if (laRoomyDeviceProperty.propertyIndex == ID) {
                                 // ID found -> add property to list
                                 val propertyEntry = DevicePropertyListContentInformation()
                                 propertyEntry.elementType = PROPERTY_ELEMENT
@@ -2610,7 +2687,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 propertyEntry.isGroupMember = true
                                 propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                                 propertyEntry.imageID = laRoomyDeviceProperty.imageID
-                                propertyEntry.elementID = laRoomyDeviceProperty.propertyID
+                                propertyEntry.elementID = laRoomyDeviceProperty.propertyIndex
                                 propertyEntry.indexInsideGroup = index
                                 propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
                                 propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
@@ -2658,7 +2735,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     val propertyEntry = DevicePropertyListContentInformation()
                     propertyEntry.elementType = PROPERTY_ELEMENT
                     propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
-                    propertyEntry.elementID = laRoomyDeviceProperty.propertyID
+                    propertyEntry.elementID = laRoomyDeviceProperty.propertyIndex
                     propertyEntry.imageID = laRoomyDeviceProperty.imageID
                     propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                     propertyEntry.indexInsideGroup = index
@@ -2745,7 +2822,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // search the property ID in the list
                 this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-                    if(laRoomyDeviceProperty.propertyID == updatedLaRoomyDeviceProperty.propertyID){
+                    if(laRoomyDeviceProperty.propertyIndex == updatedLaRoomyDeviceProperty.propertyIndex){
                         updateIndex = index
                         return@forEachIndexed
                     }
@@ -2766,7 +2843,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // set the possible new values
                     laroomyDeviceProperty.imageID = updatedLaRoomyDeviceProperty.imageID
                     laroomyDeviceProperty.propertyType = updatedLaRoomyDeviceProperty.propertyType
-                    laroomyDeviceProperty.groupID = updatedLaRoomyDeviceProperty.groupID
+                    laroomyDeviceProperty.groupIndex = updatedLaRoomyDeviceProperty.groupIndex
 
                     // override the existing entry (reset)
                     this.laRoomyDevicePropertyList[updateIndex] = laroomyDeviceProperty
@@ -2775,7 +2852,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // search the appropriate element in the UI-Adapter-List and save the index
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if((devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyID)
+                    if((devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyIndex)
                         && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
                         updateIndex = index
                         return@forEachIndexed
@@ -2849,7 +2926,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // must be the name for the property
                         // search the element in the property-list
                         this.laRoomyDevicePropertyList.forEach {
-                            if(it.propertyID == this.currentPropertyResolveID){
+                            if(it.propertyIndex == this.currentPropertyResolveID){
                                 it.propertyDescriptor = data
                                 return@forEach
                             }
@@ -3024,9 +3101,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun setPropertyStateForId(propertyID: Int, propertyState: Int, enabled: Boolean){
         this.laRoomyDevicePropertyList.forEach {
-            if(it.propertyID == propertyID){
+            if(it.propertyIndex == propertyID){
                 it.propertyState = propertyState
-                it.isEnabled = enabled
                 return@forEach
             }
         }
@@ -3067,7 +3143,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 var changedIndex = -1
 
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if (devicePropertyListContentInformation.elementID == propertyElement.propertyID) {
+                    if (devicePropertyListContentInformation.elementID == propertyElement.propertyIndex) {
                         devicePropertyListContentInformation.simplePropertyState = newState
                         changedIndex = index
                     }
@@ -3157,7 +3233,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     var changedIndex = -1
 
                     this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                        if (devicePropertyListContentInformation.elementID == propertyElement.propertyID) {
+                        if (devicePropertyListContentInformation.elementID == propertyElement.propertyIndex) {
                             devicePropertyListContentInformation.complexPropertyState =
                                 laRoomyDevicePropertyList.elementAt(propertyElement.propertyIndex).complexPropertyState
                             changedIndex = index
@@ -3301,7 +3377,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun propertyTypeFromID(ID: Int) : Int {
         this.laRoomyDevicePropertyList.forEach {
-            if(ID == it.propertyID){
+            if(ID == it.propertyIndex){
                 return it.propertyType
             }
         }
@@ -3310,7 +3386,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun propertyElementFromID(ID: Int): LaRoomyDeviceProperty {
         this.laRoomyDevicePropertyList.forEach {
-            if(ID == it.propertyID){
+            if(ID == it.propertyIndex){
                 return it
             }
         }
@@ -3507,7 +3583,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.laRoomyDevicePropertyList.forEach {
             // The type 6 (RGB Selector) is the first type with complex state data
             if(it.propertyType >= COMPLEX_PROPERTY_START_INDEX){
-                this.complexStatePropertyIDs.add(it.propertyID)
+                this.complexStatePropertyIDs.add(it.propertyIndex)
             }
         }
 

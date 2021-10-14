@@ -116,29 +116,30 @@ class BLEDeviceData {
 class LaRoomyDeviceProperty{
 
     var propertyIndex: Int = -1 // invalid marker == -1
-    var propertyID: Int = -1
     var propertyType: Int = -1
     var propertyDescriptor: String = "unset"
     var isGroupMember = false
-    var groupID = -1
+    var groupIndex = -1
     var imageID = -1
     var hasChanged = false
     var propertyState = -1
+    var flags = -1
     var complexPropertyState = ComplexPropertyState()
-    var isEnabled = true
 
     override fun equals(other: Any?): Boolean {
+
+        // TODO: update
+
         // check if this is the same reference
         if(this === other)return true
         // check if other is an invalid type
         if(other !is LaRoomyDeviceProperty)return false
         // check data equality
         if(other.propertyIndex != this.propertyIndex)return false
-        if(other.propertyID != this.propertyID)return false
         if(other.propertyType != this.propertyType)return false
         //if(other.propertyDescriptor != this.propertyDescriptor)return false // the comparison of this member is not reasonable, because the element is not defined in the property-string
         if(other.isGroupMember != this.isGroupMember)return false
-        if(other.groupID != this.groupID)return false
+        if(other.groupIndex != this.groupIndex)return false
         if(other.imageID != this.imageID)return false
         // all is the same so return true
         return true
@@ -152,6 +153,7 @@ class LaRoomyDeviceProperty{
             PROPERTY_TYPE_LEVEL_SELECTOR -> false
             PROPERTY_TYPE_LEVEL_INDICATOR -> false
             PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> false
+            PROPERTY_TYPE_OPTION_SELECTOR -> false
             else -> true
         }
     }
@@ -160,64 +162,56 @@ class LaRoomyDeviceProperty{
         // generate member content from string:
         try {
             if (string.isNotEmpty()) {
-                var propID = ""
-                var propType = ""
-                var propIndex = ""
-                var grID = ""
-                var imgID = ""
+                var propType = "0x"
+                var propIndex = "0x"
+                var propState = "0x"
+                var grID = "0x"
+                var imgID = "0x"
+                var fgs = "0x"
 
                 string.forEachIndexed { index, c ->
                     when (index) {
-                        0 -> if (c != 'I') return
-                        1 -> if (c != 'P') return
-                        2 -> if (c != 'R') return
-                        3 -> propID += c
-                        4 -> propID += c
-                        5 -> propID += c
-                        6 -> propType += c
-                        7 -> propType += c
+                        2 -> propIndex += c
+                        3 -> propIndex += c
                         8 -> propType += c
-                        9 -> propIndex += c
-                        10 -> propIndex += c
-                        11 -> propIndex += c
-                        12 -> if(isNumber(c)) grID += c
-                        13 -> if(isNumber(c)) grID += c
-                        14 -> if(isNumber(c)) grID += c
-                        15 -> imgID += c
-                        16 -> imgID += c
-                        17 -> imgID += c
+                        9 -> propType += c
+                        10 -> imgID += c
+                        11 -> imgID += c
+                        12 -> grID += c
+                        13 -> grID += c
+                        14 -> fgs += c
+                        15 -> fgs += c
+                        16 -> propState += c
+                        17 -> propState += c
+                        18 -> return@forEachIndexed
                     }
                 }
+                // save descriptor
+                string.removeRange(0, 17)
+                string.removeSuffix("\r")
+                this.propertyDescriptor = string
+
+                // decode hex values
+                this.propertyIndex = Integer.decode(propIndex)
+                this.propertyType = Integer.decode(propType)
+                this.imageID = Integer.decode(imgID)
+                this.groupIndex = Integer.decode(grID)
+                this.flags = Integer.decode(fgs)
+                this.propertyState = Integer.decode(propState)
+
+                if(this.groupIndex != 0){
+                    this.isGroupMember = true
+                }
+
                 if(verboseLog) {
                     Log.d("M:DevProp:fromString", "Data Recorded - Results:")
-                    Log.d("M:DevProp:fromString", "PropertyID: $propID")
-                    Log.d("M:DevProp:fromString", "PropertyType: $propType")
-                    Log.d("M:DevProp:fromString", "PropertyIndex: $propIndex")
-                    Log.d("M:DevProp:fromString", "PropertyImageID: $imgID")
+                    Log.d("M:DevProp:fromString", "PropertyIndex: ${this.propertyIndex}")
+                    Log.d("M:DevProp:fromString", "PropertyType: ${this.propertyType}")
+                    Log.d("M:DevProp:fromString", "GroupIndex: ${this.groupIndex}")
+                    Log.d("M:DevProp:fromString", "PropertyImageID: ${this.imageID}")
+                    Log.d("M:DevProp:fromString", "PropertyState: ${this.propertyState}")
+                    Log.d("M:DevProp:fromString", "Descriptor: ${this.propertyDescriptor}")
                 }
-
-                this.propertyID = propID.toInt()
-                this.propertyType = propType.toInt()
-                this.propertyIndex = propIndex.toInt()
-                this.imageID = imgID.toInt()
-
-                if(grID.isNotEmpty()){
-                    this.groupID = grID.toInt()
-                    this.isGroupMember = true
-
-                    if(verboseLog) {
-                        Log.d(
-                            "M:DevProp:fromString",
-                            "isGroupMember: $isGroupMember -- GroupID: $groupID"
-                        )
-                    }
-                }
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:LRDevice:FromString",
-                    "LaRoomy device property string read:\n -PropertyID: ${this.propertyID}\n -PropertyType: ${this.propertyType}\n - PropertyIndex: ${this.propertyIndex}\n - PropertyImageID: ${this.imageID}"
-                )
             }
         }
         catch(except: Exception){
@@ -226,7 +220,7 @@ class LaRoomyDeviceProperty{
     }
 
     fun checkRawEquality(ldp:LaRoomyDeviceProperty) :Boolean {
-        return ((ldp.propertyType == this.propertyType)&&(ldp.propertyID == this.propertyID)&&(ldp.propertyIndex == this.propertyIndex)&&(ldp.imageID == this.imageID))
+        return ((ldp.propertyType == this.propertyType)&&(ldp.propertyIndex == this.propertyIndex)&&(ldp.imageID == this.imageID))
     }
 
     private fun isNumber(char: Char): Boolean {
@@ -247,11 +241,10 @@ class LaRoomyDeviceProperty{
 
     override fun hashCode(): Int {
         var result = propertyIndex
-        result = 31 * result + propertyID
         result = 31 * result + propertyType
         result = 31 * result + propertyDescriptor.hashCode()
         result = 31 * result + isGroupMember.hashCode()
-        result = 31 * result + groupID
+        result = 31 * result + groupIndex
         result = 31 * result + imageID
         result = 32 * result + hasChanged.hashCode()
         return result

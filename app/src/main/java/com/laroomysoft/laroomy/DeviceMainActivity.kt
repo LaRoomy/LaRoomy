@@ -272,7 +272,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             } else {
                 // must be the creation process -> start property listing
-                ApplicationProperty.bluetoothConnectionManager.startDevicePropertyListing()
+                ApplicationProperty.bluetoothConnectionManager.startPropertyListing()
             }
 
             // TODO: how to confirm the device-properties
