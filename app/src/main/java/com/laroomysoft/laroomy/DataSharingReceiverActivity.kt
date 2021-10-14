@@ -37,22 +37,34 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                 )
             }
 
-            if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
-                // data valid: save the data
-                val pair = BindingPair()
-                pair.macAddress = macReformatted
-                pair.passKey = passKeyDecrypted
-                val bindingPairManager = BindingPairManager(applicationContext)
-                bindingPairManager.add(pair)
-                // notify user
-                notifyUser(
-                    getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),
-                    R.color.normalTextColor
-                )
-
+            if((applicationContext as ApplicationProperty).getCurrentUsedPasskey() == passKeyDecrypted){
+                // the executor of the sharing link is the originator, so do not save the passkey as shared passkey, since it equals the main-key
+                if(verboseLog){
+                    Log.w("KeySharing", "The shared passkey was not saved, because it equals the key in use")
+                }
+                (applicationContext as ApplicationProperty).logControl("W: The shared passkey was NOT saved, because it equals the key in use.")
             } else {
-                // error: notify user
-                notifyUser(getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat), R.color.ErrorColor)
+
+                if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
+                    // data valid: save the data
+                    val pair = BindingPair()
+                    pair.macAddress = macReformatted
+                    pair.passKey = passKeyDecrypted
+                    val bindingPairManager = BindingPairManager(applicationContext)
+                    bindingPairManager.add(pair)
+                    // notify user
+                    notifyUser(
+                        getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),
+                        R.color.normalTextColor
+                    )
+
+                } else {
+                    // error: notify user
+                    notifyUser(
+                        getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat),
+                        R.color.ErrorColor
+                    )
+                }
             }
         }
     }

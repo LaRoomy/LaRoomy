@@ -3,6 +3,13 @@ package com.laroomysoft.laroomy
 import android.util.Log
 import android.widget.SeekBar
 
+const val UNDEFINED = -1
+
+const val PASSKEY_TYPE_NONE = 0
+const val PASSKEY_TYPE_SHARED = 1
+const val PASSKEY_TYPE_CUSTOM = 2
+const val PASSKEY_TYPE_NORM = 3
+
 class LaRoomyDevicePresentationModel {
     // NOTE: This is the data-model for the DeviceListItem in the main-activity
     var name = ""
@@ -35,6 +42,23 @@ class MultiComplexPropertyData{
     var dataName = ""
     var dataValue = -1
     var isName = false
+}
+
+class ComplexPropertyState {
+    // shared state values (multi-purpose)
+    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)        // (number of bars in bar-graph activity)
+    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)      // (use value as bar-descriptor in bar-graph activity)
+    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)       // (fixed maximum value in bar-graph activity)
+    var valueFour = -1     // general use                   // flag-value in simple Navigator
+    var valueFive = -1     // general use                   // flag value in simple Navigator
+    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
+    var enabledState = true// at this time only a placeholder (not implemented yet)
+    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
+    var strValue = ""
+
+    // single used values (only valid in specific complex states)
+    var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
+    var timeSetterIndex = -1        // Value to identify the time setter type
 }
 
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
@@ -72,16 +96,20 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
 class BLEDeviceData {
     var isBindingRequired = false
     var hasCachingPermission = false
+    var authenticationSuccess = false
 
     var propertyCount = 0
     var groupCount = 0
+    var passKeyTypeUsed = PASSKEY_TYPE_NONE
 
     fun clear(){
         isBindingRequired = false
         hasCachingPermission = false
+        authenticationSuccess = false
 
         propertyCount = 0
         groupCount = 0
+        passKeyTypeUsed = PASSKEY_TYPE_NONE
     }
 }
 

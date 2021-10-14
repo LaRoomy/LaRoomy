@@ -127,6 +127,24 @@ class ApplicationProperty : Application() {
         }
     }
 
+    fun getCurrentUsedPasskey() : String {
+
+        val useCustomKey =
+            this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
+
+        return if(useCustomKey){
+            this.loadSavedStringData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_CustomBindingPasskey
+            )
+        } else {
+            this.loadSavedStringData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_DefaultRandomBindingPasskey
+            )
+        }
+    }
+
     fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int) : String {
 
         if(verboseLog) {

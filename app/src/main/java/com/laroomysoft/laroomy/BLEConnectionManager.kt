@@ -5,14 +5,11 @@ import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.app.Activity
 import android.bluetooth.*
-import android.bluetooth.le.ScanResult
 import android.os.*
 import android.util.Log
-import android.widget.SeekBar
 import java.io.Serializable
 import java.lang.IndexOutOfBoundsException
 import java.util.*
-import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -50,22 +47,22 @@ const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = "unab
 //    var image = 0
 //}
 
-class ComplexPropertyState {
-    // shared state values (multi-purpose)
-    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)        // (number of bars in bar-graph activity)
-    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)      // (use value as bar-descriptor in bar-graph activity)
-    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)       // (fixed maximum value in bar-graph activity)
-    var valueFour = -1     // general use                   // flag-value in simple Navigator
-    var valueFive = -1     // general use                   // flag value in simple Navigator
-    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
-    var enabledState = true// at this time only a placeholder (not implemented yet)
-    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
-    var strValue = ""
-
-    // single used values (only valid in specific complex states)
-    var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
-    var timeSetterIndex = -1        // Value to identify the time setter type
-}
+//class ComplexPropertyState {
+//    // shared state values (multi-purpose)
+//    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)        // (number of bars in bar-graph activity)
+//    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)      // (use value as bar-descriptor in bar-graph activity)
+//    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)       // (fixed maximum value in bar-graph activity)
+//    var valueFour = -1     // general use                   // flag-value in simple Navigator
+//    var valueFive = -1     // general use                   // flag value in simple Navigator
+//    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
+//    var enabledState = true// at this time only a placeholder (not implemented yet)
+//    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
+//    var strValue = ""
+//
+//    // single used values (only valid in specific complex states)
+//    var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
+//    var timeSetterIndex = -1        // Value to identify the time setter type
+//}
 
 //class DeviceInfoHeaderData {
 //    var message = ""
@@ -679,15 +676,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(verboseLog){
                 Log.e("M:CB:Dispatcher", "Invalid transmission length. Transmission-length was: ${data.length} > minimum header-length is 8!")
             }
-            applicationProperty.logControl("Invalid transmission length. Transmission-length was: ${data.length} > minimum header-length is 8!")
+            applicationProperty.logControl("E: Invalid transmission length. Transmission-length was: ${data.length} > minimum header-length is 8!")
             return false
         } else {
+
+            // TODO: check error flag(s)
+
             var dataProcessed = false
 
             // evaluate transmission type
             when(data[0]){
                 '1' -> {
                     // property definition data
+                    dataProcessed = readPropertyString(data)
                 }
                 '2' -> {
                     // group definition data
@@ -703,6 +704,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '6' -> {
                     // binding response
+                    dataProcessed = readBindingResponse(data)
                 }
                 '7' -> {
                     // init transmission string
@@ -717,6 +719,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
             return dataProcessed
         }
+    }
+
+    private fun readPropertyString(data: String) : Boolean {
+
+        return true
     }
 
     private fun readInitTransmission(data: String) : Boolean {
@@ -738,7 +745,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(verboseLog){
                 Log.e("readInitTransmission", "Invalid data size. Data-Size was: $dataSize > minimum is 7!")
             }
-            applicationProperty.logControl("Invalid data size of init-transmission. Data-Size was: $dataSize > minimum is 7!")
+            applicationProperty.logControl("E: Invalid data size of init-transmission. Data-Size was: $dataSize > minimum is 7!")
             return false
         } else {
             // save device data:
@@ -759,14 +766,114 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             // check if binding is required
-            if (data[13] == '1') {
-                this.bleDeviceData.isBindingRequired = true
+            when {
+                (data[13] == '1') -> {
+                    this.bleDeviceData.isBindingRequired = true
 
-                // TODO: send binding request
+                    // binding is required, so send the binding request on basis of the passkey setup
+                    val useCustomKeyForBinding =
+                        (activityContext.applicationContext as ApplicationProperty).loadBooleanData(
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_UseCustomBindingKey
+                        )
+
+                    sendBindingRequest(useCustomKeyForBinding)
+                }
+                else -> {
+                    // no binding is required, so notify the subscriber of the callback
+                    saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
+                    bleDeviceData.authenticationSuccess = true
+                    callback.onAuthenticationSuccessful()
+                }
             }
         }
-
         return true
+    }
+
+    private fun readBindingResponse(data: String) : Boolean {
+
+        // first read data size
+        var strDataSize = "0x"
+        strDataSize += data[4]
+        strDataSize += data[5]
+
+        // convert to integer
+        var dataSize =
+            Integer.decode(strDataSize)
+        // add the header length
+        dataSize += 8
+
+        if(dataSize < 9){
+            if(verboseLog){
+                Log.e("BindingResponse", "Invalid data size. Data size was $dataSize - Required: 9")
+            }
+            applicationProperty.logControl("Invalid data size. Data size was $dataSize - Required: 9")
+            return false
+        } else {
+            when {
+                (data[8] == '2') -> {
+                    // this is an authentication response
+                    // check binding rejected flag
+                    return if (data[7] == '2') {
+                        // binding was rejected
+                        if (verboseLog) {
+                            Log.e("BindingResponse", "Binding passkey was rejected from device")
+                        }
+                        applicationProperty.logControl("E: Binding passkey was rejected from device")
+                        callback.onBindingPasskeyRejected()
+                        true
+                    } else {
+                        // binding success
+                        saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
+                        bleDeviceData.authenticationSuccess = true
+                        callback.onAuthenticationSuccessful()
+                        true
+                    }
+                }
+                (data[8] == '1') -> {
+                    // this is an enable binding response
+                    if(data[7] == '0'){
+                        // enable binding failed
+                        if(verboseLog){
+                            Log.e("EnableBinding", "Enable-Binding Response: FAILED.")
+                        }
+                        applicationProperty.logControl("E: Received Binding-Failed response from the device.")
+                    } else {
+                        // enable binding success
+                        if(verboseLog){
+                            Log.d("EnableBinding", "Enable-Binding Response: SUCCESS.")
+                        }
+                        applicationProperty.logControl("I: Received Enable-Binding-Success response from the device.")
+                    }
+                    return true
+                }
+                (data[8] == '0') -> {
+                    // this is an release binding response
+                    if(data[7] == '0'){
+                        // release binding failed
+                        if(verboseLog){
+                            Log.e("ReleaseBinding", "Release-Binding Response: FAILED.")
+                        }
+                        applicationProperty.logControl("E: Received Release-Failed response from the device.")
+                    } else {
+                        // release binding success
+                        if(verboseLog){
+                            Log.d("ReleaseBinding", "Release-Binding Response: SUCCESS.")
+                        }
+                        applicationProperty.logControl("I: Received Release-Binding-Success response from the device.")
+                    }
+                    return true
+                }
+                else -> {
+                    // invalid data
+                    if(verboseLog){
+                        Log.e("BindingData", "Invalid Binding Transmission Data!")
+                    }
+                    applicationProperty.logControl("E: Invalid Binding Transmission Data!")
+                    return true
+                }
+            }
+        }
     }
 
     fun reAlignContextReferences(cContext: Context, eventHandlerObject: BleEventCallback){
@@ -848,6 +955,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.deviceHeaderRecordingActive = false
 
         this.laRoomyDevicePropertyList.clear()
+        this.bleDeviceData.clear()
     }
 
     fun clearPropertyRelatedParameter(){
@@ -3514,31 +3622,62 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData("D$str$")
     }
 
-    fun sendBindingRequest(useCustomKey: Boolean){
-        val passkey = if(useCustomKey){
-            (applicationProperty.loadSavedStringData(
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_CustomBindingPasskey
-            ))
+    private fun sendBindingRequest(useCustomKey: Boolean){
+
+        val passKey: String
+
+        // at first look for a shared key for the device
+        val bindingPairManager = BindingPairManager(this.activityContext)
+        val sharedKey = bindingPairManager.lookUpForPassKeyWithMacAddress(this.currentDevice?.address ?: "")
+
+        // if a shared binding key for the mac address exists, the key is preferred,
+        // because a key from a sharing link will only be saved if it defers from the main key
+
+        passKey = if (sharedKey.isNotEmpty()) {
+            bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_SHARED
+            sharedKey
         } else {
-            (applicationProperty.loadSavedStringData(
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_DefaultRandomBindingPasskey
-            ))
+            if (useCustomKey) {
+                bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_CUSTOM
+                (applicationProperty.loadSavedStringData(
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_CustomBindingPasskey
+                ))
+            } else {
+                bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_NORM
+                (applicationProperty.loadSavedStringData(
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_DefaultRandomBindingPasskey
+                ))
+            }
         }
-        if(passkey == ERROR_NOTFOUND){
+        if(passKey == ERROR_NOTFOUND){
             // critical error (should not happen)
             this.callback.onComponentError(this.activityContext.getString(R.string.Error_SavedBindingKeyIsEmpty))
         } else {
-            this.sendData("r$passkey>$")
+            // at first, build the request-string
+            var bindingRequestString = "6100"
+            val dataSize = 2 + passKey.length
+            val hexString = Integer.toHexString(dataSize)
+
+            if(hexString.length == 1){
+                bindingRequestString += '0'
+                bindingRequestString += hexString
+            } else {
+                bindingRequestString += hexString
+            }
+            bindingRequestString += "002$passKey\r"
+
+            // send the request
+            sendData(bindingRequestString)
         }
     }
 
-    fun sendBindingRequest(passKey: String){
-        if(this.isConnected){
-            this.sendData("r$passKey>$")
-        }
-    }
+//    fun sendBindingRequest(passKey: String){
+//        if(this.isConnected){
+//            this.sendData("r$passKey>$")
+//        }
+//    }
 
     private fun testConnection(){
         // reset test indicator and send test command
