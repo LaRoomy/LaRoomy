@@ -130,11 +130,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
     private val testCommand = "vXtest385_26$"// outgoing
-    val authenticationResponse = "Auth:rsp:true"// incoming
-    val authenticationResponseBindingPasskeyRequired = "Auth:rsp:bind"// incoming
-    val authenticationResponseBindingPasskeyInvalid = "Auth:rsp:pkerr"// incoming
-    private val propertyLoopEndIndication = "RSP:A:PEND"// incoming
-    private val groupLoopEndIndication = "RSP:E:PGEND"// incoming
     private val propertyStringPrefix = "IPR" // incoming -prefix
     private val groupStringPrefix = "IPG"// incoming -prefix
     private val groupMemberStringPrefix = "mI%"
@@ -691,7 +686,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             dataSize += 8
 
 
-            // TODO: check error flag(s)
+            // TODO: check error flag(s)!
 
             var dataProcessed = false
 
@@ -726,8 +721,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // data-setter string
                 }
             }
-
-
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
             return dataProcessed
         }
@@ -735,9 +728,32 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun readGroupString(data: String, dataSize: Int) : Boolean {
 
-        // TODO: next action!
+        // check if the length of the transmission is valid
+        if(dataSize < 12){
+            // invalid data size
+            if(verboseLog){
+                Log.e("readGroupString", "Invalid data size. Data-size was: $dataSize - minimum is 12!")
+            }
+            applicationProperty.logControl("E: Invalid data size. Data-size was: $dataSize - minimum is 12!")
+            return false
+        } else {
+            // decode group string to class
+            val laRoomyDevicePropertyGroup = LaRoomyDevicePropertyGroup()
+            laRoomyDevicePropertyGroup.fromString(data)
 
-        return true
+            // add group and request next group if the loop is active
+            if(this.groupLoopActive){
+                this.laRoomyPropertyGroupList.add(laRoomyDevicePropertyGroup)
+                this.sendNextGroupRequest(laRoomyDevicePropertyGroup.groupIndex)
+            } else {
+                // if the loop is not active this must be an update-transmission, so replace the group
+                if(this.laRoomyPropertyGroupList.size > laRoomyDevicePropertyGroup.groupIndex){
+                    this.laRoomyPropertyGroupList[laRoomyDevicePropertyGroup.groupIndex] =
+                        laRoomyDevicePropertyGroup
+                }
+            }
+            return true
+        }
     }
 
     private fun readPropertyString(data: String, dataSize: Int) : Boolean {
@@ -944,15 +960,75 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.propertyLoopActive = false
 
             if(verboseLog){
-                Log.d("sendNextPropRQ", "Final property count reached. Max property value is: ${this.bleDeviceData.propertyCount}")
+                Log.d("sendNextPropRQ", "Final property count reached. Property count is: ${this.bleDeviceData.propertyCount}")
             }
-            applicationProperty.logControl("I: Final property count reached. Max property value is: ${this.bleDeviceData.propertyCount}")
+            applicationProperty.logControl("I: Final property count reached. Property-count is: ${this.bleDeviceData.propertyCount}")
 
             // the property loop is complete, check if there are groups and request them
             if(this.bleDeviceData.groupCount > 0){
-
-                // TODO: start group loop
+                this.startGroupListing()
             }
+        }
+    }
+
+    private fun startGroupListing(){
+        if(verboseLog){
+            Log.d("startGroupList", "Starting group listing...")
+        }
+        applicationProperty.logControl("I: Starting group listing...")
+
+        this.groupLoopActive = true
+        this.sendNextGroupRequest(-1)
+    }
+
+    private fun sendNextGroupRequest(currentIndex: Int){
+
+        // increase index
+        val newIndex = currentIndex + 1
+
+        // check for the end of the group count
+        if(newIndex < this.bleDeviceData.groupCount){
+
+            // build request string
+            var rqString = "21"
+
+            // add property-index as hex string
+            val hexStr = Integer.toHexString(newIndex)
+            if(hexStr.length <= 1){
+                rqString += '0'
+                rqString += hexStr
+            } else {
+                rqString += hexStr
+            }
+
+            //add data-size + flag values
+            rqString += "0300"
+
+            // add language identifier
+            val languageIdentificationString =
+                when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
+                    "Deutsch" -> "de\r"
+                    else -> "en\r"
+                }
+            rqString += languageIdentificationString
+
+            sendData(rqString)
+        } else {
+            // end of loop
+            this.groupLoopActive = false
+
+            if(verboseLog){
+                Log.d("sendNextGroupRQ", "Final group count reached. Group-count is: ${this.bleDeviceData.groupCount}")
+            }
+            applicationProperty.logControl("I: Final group count reached. Group-count is: ${this.bleDeviceData.groupCount}")
+
+            // generate UI-data
+            this.generateUIAdaptableArrayListFromDeviceProperties()
+
+            // start retrieving the complex property states
+            Handler(Looper.getMainLooper()).postDelayed({
+                this.startComplexStateDataLoop()
+            }, 1000)
         }
     }
 
@@ -1371,6 +1447,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     }
 
+/*
     fun addDeviceProperty(property: String) :Boolean {
         var stringProcessed = false
 
@@ -1777,7 +1854,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         if (verboseLog) {
                             Log.d(
                                 "M:AddPropGroup",
-                                "Confirmation-Mode active: The element differs from the saved one:\nGroupID: ${propertyGroup.groupID}\nGroupIndex: ${propertyGroup.groupIndex}"
+                                "Confirmation-Mode active: The element differs from the saved one:\nGroupIndex: ${propertyGroup.groupIndex}"
                             )
                         }
                         // the group element differs from the saved element
@@ -1829,7 +1906,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     "de" -> 1
                     else -> 0
                 }
-                var id = this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupID
+                var id = this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupIndex
                 var hundred = 0
                 var tenth = 0
                 val single: Int
@@ -1916,7 +1993,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     )
                 }
                 // it's a finalization string -> check for loop end
-                if(this.laRoomyPropertyGroupList.last().groupID == currentGroupResolveID){
+                if(this.laRoomyPropertyGroupList.last().groupIndex == currentGroupResolveID){
                     if(verboseLog) {
                         Log.d(
                             "M:resolveGroupInfo",
@@ -2062,7 +2139,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     else -> '0'
                 }
             var id =
-                this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupID
+                this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupIndex
             var hundred = 0
             var tenth = 0
             val single: Int
@@ -2091,6 +2168,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             propertyConfirmationModeActive = false
         }
     }
+*/
 
     private fun setPropertyDescriptionForID(id:Int, description: String){
         laRoomyDevicePropertyList.forEach {
@@ -2138,25 +2216,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                 }
                 laRoomyPropertyGroupList.forEach {
-                    if(it.groupID == id){
-                        it.setMemberIDs(
-                            if(str1.isNotEmpty())
-                                str1.toInt()
-                            else 0,
-                            if(str2.isNotEmpty())
-                                str2.toInt()
-                            else 0,
-                            if(str3.isNotEmpty())
-                                str3.toInt()
-                            else 0,
-                            if(str4.isNotEmpty())
-                                str4.toInt()
-                            else 0,
-                            if(str5.isNotEmpty())
-                                str5.toInt()
-                            else 0
-                        )
-                    }
+//                    if(it.groupIndex == id){
+//                        it.setMemberIDs(
+//                            if(str1.isNotEmpty())
+//                                str1.toInt()
+//                            else 0,
+//                            if(str2.isNotEmpty())
+//                                str2.toInt()
+//                            else 0,
+//                            if(str3.isNotEmpty())
+//                                str3.toInt()
+//                            else 0,
+//                            if(str4.isNotEmpty())
+//                                str4.toInt()
+//                            else 0,
+//                            if(str5.isNotEmpty())
+//                                str5.toInt()
+//                            else 0
+//                        )
+//                    }
                 }
                 return true
             } else
@@ -2214,7 +2292,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun setGroupName(id: Int, data: String){
         laRoomyPropertyGroupList.forEach {
-            if(it.groupID == id){
+            if(it.groupIndex == id){
                 it.groupName = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
                     "Deutsch" -> encodeGermanString(data)
                     else -> data
@@ -2453,7 +2531,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(entireDetail){
                 // TODO: this must be checked
                 this.propertyNameResolveSingleAction = true
-                startRetrievingPropertyNames()
+
+                //startRetrievingPropertyNames()
+
             }
             if(thisProperty){
                 val updateInfo = ElementUpdateInfo()
@@ -2526,7 +2606,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(entireGroupDetail){
                 // TODO: check if this works!
                 this.propertyGroupNameResolveSingleAction = true
-                startDetailedGroupInfoLoop()
+
+
+
+                //startDetailedGroupInfoLoop()
+
+
             }
             if(thisGroup){
                 val updateInfo = ElementUpdateInfo()
@@ -2662,7 +2747,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     val dpl = DevicePropertyListContentInformation()
                     dpl.elementType = GROUP_ELEMENT
                     dpl.canNavigateForward = false
-                    dpl.elementID = laRoomyDevicePropertyGroup.groupID
+                    dpl.elementID = laRoomyDevicePropertyGroup.groupIndex
                     dpl.elementText = laRoomyDevicePropertyGroup.groupName
                     dpl.imageID = laRoomyDevicePropertyGroup.imageID
                     // add the global index of the position in the array
@@ -2966,7 +3051,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // search the element in the groupList
                 this.laRoomyPropertyGroupList.forEachIndexed { index, laroomyDevicePropertyGroup ->
-                    if(laroomyDevicePropertyGroup.groupID == updatedGroup.groupID){
+                    if(laroomyDevicePropertyGroup.groupIndex == updatedGroup.groupIndex){
                         updateIndex = index
                         return@forEachIndexed
                     }
@@ -2995,7 +3080,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // update the UI-Adapter
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                     if((devicePropertyListContentInformation.elementType == GROUP_ELEMENT)
-                    && (devicePropertyListContentInformation.elementID == updatedGroup.groupID)){
+                    && (devicePropertyListContentInformation.elementID == updatedGroup.groupIndex)){
                         updateIndex = index
                         return@forEachIndexed
                     }
@@ -3073,7 +3158,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                            // must be the name for the group
                            // search the element in the groupList
                            this.laRoomyPropertyGroupList.forEach {
-                               if(it.groupID == this.currentGroupResolveID){
+                               if(it.groupIndex == this.currentGroupResolveID){
                                    it.groupName = data
                                    return@forEach
                                }

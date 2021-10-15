@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.util.Log
 import android.widget.SeekBar
+import kotlin.math.min
 
 const val UNDEFINED = -1
 
@@ -254,7 +255,6 @@ class LaRoomyDeviceProperty{
 class LaRoomyDevicePropertyGroup{
 
     var groupIndex = -1
-    var groupID = -1
     var groupName = "unset"
     var memberCount = 0
     var memberIDs = ArrayList<Int>()
@@ -268,7 +268,6 @@ class LaRoomyDevicePropertyGroup{
         if(other !is LaRoomyDevicePropertyGroup)return false
         // check data
         if(other.groupIndex != this.groupIndex)return false
-        if(other.groupID != this.groupID)return false
         //if(other.groupName != this.groupName)return false // the comparison of this member is not reasonable, because the element is not defined in the group-string
         if(other.memberCount != this.memberCount)return false
         if(other.memberIDs != this.memberIDs)return false
@@ -281,48 +280,58 @@ class LaRoomyDevicePropertyGroup{
         // generate member content from string:
         try {
             if (groupString.isNotEmpty()) {
-                var localGroupID = ""
-                var localGroupIndex = ""
-                var memberAmount = ""
-                var imgID = ""
+                var localGroupIndex = "0x"
+                var localMemberCount = "0x"
+                var imgID = "0x"
 
                 groupString.forEachIndexed { index, c ->
                     when (index) {
-                        0 -> if (c != 'I') return
-                        1 -> if (c != 'P') return
-                        2 -> if (c != 'G') return
-                        3 -> localGroupID += c
-                        4 -> localGroupID += c
-                        5 -> localGroupID += c
-                        6 -> localGroupIndex += c
-                        7 -> localGroupIndex += c
-                        8 -> localGroupIndex += c
-                        9 -> memberAmount += c
-                        10 -> memberAmount += c
-                        11 -> memberAmount += c
-                        12 -> imgID += c
-                        13 -> imgID += c
-                        14 -> imgID += c
+                        2 -> localGroupIndex += c
+                        3 -> localGroupIndex += c
+                        8 -> localMemberCount += c
+                        9 -> localMemberCount += c
+                        10 -> imgID += c
+                        11 -> imgID += c
+                        12 -> return@forEachIndexed
                     }
                 }
+                this.groupIndex = Integer.decode(localGroupIndex)
+                this.memberCount = Integer.decode(localMemberCount)
+                this.imageID = Integer.decode(imgID)
+
+
+                // make sure the string is long enough for all members
+                val minLength = 11 + (2 * this.memberCount)
+
+                // extract member id's
+                if(groupString.length <= minLength){
+
+                    var hexVal = "0x"
+
+                    for(i in 0 .. this.memberCount){
+                        val index = 12 + (i * 2)
+                        hexVal += groupString[index]
+                        hexVal += groupString[index + 1]
+                        this.memberIDs.add(Integer.decode(hexVal))
+                        hexVal = "0x"
+                    }
+                }
+                // get the descriptor
+                groupString.removeRange(0, minLength)
+                groupString.removeSuffix("\r")
+
+                this.groupName = groupString
+
                 if(verboseLog) {
                     Log.d("M:PropGroup:fromString", "Data Recorded - Results:")
-                    Log.d("M:PropGroup:fromString", "GroupID: $localGroupID")
                     Log.d("M:PropGroup:fromString", "GroupIndex: $localGroupIndex")
-                    Log.d("M:PropGroup:fromString", "MemberAmount: $memberAmount")
+                    Log.d("M:PropGroup:fromString", "MemberAmount: $localMemberCount")
                     Log.d("M:PropGroup:fromString", "GroupImageID: $imgID")
+                    Log.d("M:PropGroup:fromString", "Member IDs:")
+                    this.memberIDs.forEachIndexed { index, i ->
+                        Log.d("M:PropGroup:fromString", "Index: $index ID: $i")
+                    }
                 }
-
-                this.groupID = localGroupID.toInt()
-                this.groupIndex = localGroupIndex.toInt()
-                this.memberCount = memberAmount.toInt()
-                this.imageID = imgID.toInt()
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:PropGroup:fromString",
-                    "LaRoomy device property GROUP string read:\n -GroupID: ${this.groupID}\n -GroupIndex: ${this.groupIndex}\n - MemberAmount: ${this.memberCount}\n - GroupImageID: ${this.imageID}"
-                )
             }
         }
         catch(except: Exception){
@@ -331,21 +340,20 @@ class LaRoomyDevicePropertyGroup{
     }
 
     fun checkRawEquality(ldpg: LaRoomyDevicePropertyGroup) : Boolean {
-        return ((this.groupIndex == ldpg.groupIndex)&&(this.groupID == ldpg.groupID)&&(this.imageID == ldpg.imageID)&&(this.memberCount == ldpg.memberCount))
+        return ((this.groupIndex == ldpg.groupIndex)&&(this.imageID == ldpg.imageID)&&(this.memberCount == ldpg.memberCount))
     }
 
-    fun setMemberIDs(id1: Int, id2: Int, id3: Int, id4: Int, id5: Int){
-        this.memberIDs.clear()
-        this.memberIDs.add(id1)
-        this.memberIDs.add(id2)
-        this.memberIDs.add(id3)
-        this.memberIDs.add(id4)
-        this.memberIDs.add(id5)
-    }
+//    fun setMemberIDs(id1: Int, id2: Int, id3: Int, id4: Int, id5: Int){
+//        this.memberIDs.clear()
+//        this.memberIDs.add(id1)
+//        this.memberIDs.add(id2)
+//        this.memberIDs.add(id3)
+//        this.memberIDs.add(id4)
+//        this.memberIDs.add(id5)
+//    }
 
     override fun hashCode(): Int {
         var result = groupIndex
-        result = 31 * result + groupID
         result = 31 * result + groupName.hashCode()
         result = 31 * result + memberCount
         result = 31 * result + memberIDs.hashCode()
