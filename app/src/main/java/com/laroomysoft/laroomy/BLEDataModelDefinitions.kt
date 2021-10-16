@@ -74,7 +74,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     var indexInsideGroup = -1
     var globalIndex = -1
     var elementText = ""
-    var elementID = -1
+    var internalElementIndex = -1
     var imageID = -1
     var propertyType = -1
     //var initialElementValue = -1

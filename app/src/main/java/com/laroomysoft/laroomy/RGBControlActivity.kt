@@ -226,7 +226,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         val greenValueAsString = a8BitValueToString(greenValue)
         val blueValueAsString = a8BitValueToString(blueValue)
 
-        val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
+        val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).internalElementIndex)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
 
         ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
     }
@@ -414,7 +414,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val g = Color.green(selectedColor)
             val b = Color.blue(selectedColor)
             val elID = a8BitValueToString(
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).internalElementIndex
             )
             val instruction =
                 "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
@@ -439,7 +439,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             val g = Color.green(selectedColor)
             val b = Color.blue(selectedColor)
             val elID = a8BitValueToString(
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).elementID
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).internalElementIndex
             )
             val instruction =
                 "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
@@ -514,7 +514,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.elementID == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementID){
             if(verboseLog) {
                 Log.d(
                     "M:CB:RGBPage:ComplexPCg",

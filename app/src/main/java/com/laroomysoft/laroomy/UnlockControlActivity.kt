@@ -239,7 +239,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.elementID == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementID){
             if(verboseLog) {
                 Log.d(
                     "M:CB:UCA:ComplexPCg",

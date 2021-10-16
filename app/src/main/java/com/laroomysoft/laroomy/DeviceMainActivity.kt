@@ -390,12 +390,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
                         "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
         // NOTE: the button has no state the execution command contains always "1"
-        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}1$")
+        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.internalElementIndex)}1$")
     }
 
     override fun onPropertyElementSwitchClick(
@@ -409,7 +409,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
                         "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
@@ -419,7 +419,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             true -> '1'
             else -> '0'
         }
-        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}$c$")
+        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.internalElementIndex)}$c$")
     }
 
     override fun onSeekBarPositionChange(
@@ -435,7 +435,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
                         "Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
                         "SeekBar specific values:\n" +
                         "New Value: $newValue\n" +
@@ -454,7 +454,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             val bitValue =
                 percentTo8Bit(newValue)
 
-            ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.elementID)}${a8BitValueToString(bitValue)}$")
+            ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.internalElementIndex)}${a8BitValueToString(bitValue)}$")
         }
     }
 
@@ -468,7 +468,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is Complex/Navigate forward at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.elementID}\n" +
+                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
                         "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
@@ -494,7 +494,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the RGB Page
                 val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
@@ -505,7 +505,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the extended level selector page
                 val intent = Intent(this@DeviceMainActivity, ExtendedLevelSelectorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
@@ -516,7 +516,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the time selector page with single-select-mode
                 val intent = Intent(this@DeviceMainActivity, SimpleTimeSelectorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
@@ -527,7 +527,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the time-frame selector page
                 val intent = Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
@@ -538,7 +538,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the unlock control page
                 val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
@@ -549,7 +549,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the navigator page
                 val intent = Intent(this@DeviceMainActivity, NavigatorControlActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)
@@ -560,7 +560,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the navigator page
                 val intent = Intent(this@DeviceMainActivity, BarGraphActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.elementID)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)
                 startActivity(intent)

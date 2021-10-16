@@ -261,7 +261,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.elementID == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementID){
             if(verboseLog) {
                 Log.d(
                     "M:CB:NavCon:ComplexPCg",

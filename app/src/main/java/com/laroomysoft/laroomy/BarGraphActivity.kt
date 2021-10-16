@@ -240,7 +240,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.elementID == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementID){
             if(verboseLog) {
                 Log.d(
                     "M:CB:BGD:ComplexPCg",

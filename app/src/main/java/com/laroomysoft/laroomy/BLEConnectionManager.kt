@@ -702,6 +702,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '3' -> {
                     // property state data
+                    dataProcessed = dispatchPropertyStateTransmission(data, dataSize)
                 }
                 '4' -> {
                     // property execution command (only response)
@@ -724,6 +725,71 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
             return dataProcessed
         }
+    }
+
+    private fun dispatchPropertyStateTransmission(data: String, dataSize: Int) : Boolean {
+
+        // at first retrieve the property-index
+        var propIndex = "0x"
+        propIndex += data[2]
+        propIndex += data[3]
+        val pIndex = Integer.decode(propIndex)
+
+        // get property type
+        val pType =
+            this.propertyTypeFromIndex(pIndex)
+
+        return if(pType != -1){
+            if(pType < COMPLEX_PROPERTY_START_INDEX){
+                // must be simple state data
+                this.readSimpleStateData(pIndex, data, dataSize)
+            } else {
+                // must be complex state data
+                this.readComplexStateData(pIndex, pType, data, dataSize)
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun readSimpleStateData(propertyIndex: Int, data: String, dataSize: Int){
+        if(dataSize < 10){
+            // invalid data size
+            if(verboseLog){
+                Log.e("readSimpleStateData", "Invalid transmission size. Data-size was: $dataSize. Minimum is: 10")
+            }
+            applicationProperty.logControl("E: Invalid simple-state transmission size. Data-size was: $dataSize. Minimum is: 10")
+        } else {
+            var uiChangeIndex = -1// the index for the callback, the callback needs the UI-Adapter-Index
+
+            // read state
+            var hexState = "0x"
+            hexState += data[8]
+            hexState += data[9]
+            val newState = Integer.decode(hexState)
+
+            // update internal property list
+            this.laRoomyDevicePropertyList[propertyIndex].propertyState = newState
+
+            // update UI-Adapter-list
+            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                if (devicePropertyListContentInformation.internalElementIndex == propertyIndex) {
+                    devicePropertyListContentInformation.simplePropertyState = newState
+                    uiChangeIndex = index
+                }
+            }
+
+            // launch property changed event
+            this.propertyCallback.onSimplePropertyStateChanged(
+                uiChangeIndex,
+                newState
+            )
+        }
+    }
+
+    private fun readComplexStateData(propertyIndex: Int, propertyType: Int, data: String, dataSize: Int){
+
     }
 
     private fun readGroupString(data: String, dataSize: Int) : Boolean {
@@ -2747,7 +2813,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     val dpl = DevicePropertyListContentInformation()
                     dpl.elementType = GROUP_ELEMENT
                     dpl.canNavigateForward = false
-                    dpl.elementID = laRoomyDevicePropertyGroup.groupIndex
+                    dpl.internalElementIndex = laRoomyDevicePropertyGroup.groupIndex
                     dpl.elementText = laRoomyDevicePropertyGroup.groupName
                     dpl.imageID = laRoomyDevicePropertyGroup.imageID
                     // add the global index of the position in the array
@@ -2772,7 +2838,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 propertyEntry.isGroupMember = true
                                 propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                                 propertyEntry.imageID = laRoomyDeviceProperty.imageID
-                                propertyEntry.elementID = laRoomyDeviceProperty.propertyIndex
+                                propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
                                 propertyEntry.indexInsideGroup = index
                                 propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
                                 propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
@@ -2820,7 +2886,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     val propertyEntry = DevicePropertyListContentInformation()
                     propertyEntry.elementType = PROPERTY_ELEMENT
                     propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
-                    propertyEntry.elementID = laRoomyDeviceProperty.propertyIndex
+                    propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
                     propertyEntry.imageID = laRoomyDeviceProperty.imageID
                     propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
                     propertyEntry.indexInsideGroup = index
@@ -2937,7 +3003,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // search the appropriate element in the UI-Adapter-List and save the index
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if((devicePropertyListContentInformation.elementID == updatedLaRoomyDeviceProperty.propertyIndex)
+                    if((devicePropertyListContentInformation.internalElementIndex == updatedLaRoomyDeviceProperty.propertyIndex)
                         && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
                         updateIndex = index
                         return@forEachIndexed
@@ -3018,7 +3084,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         // find the element in the UI-Adapter
                         this.uIAdapterList.forEach {
-                            if((it.elementType == PROPERTY_ELEMENT) && (it.elementID == this.currentPropertyResolveID)){
+                            if((it.elementType == PROPERTY_ELEMENT) && (it.internalElementIndex == this.currentPropertyResolveID)){
                                 it.elementText = data
                                 updateIndex = it.globalIndex
                                 return@forEach
@@ -3080,7 +3146,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // update the UI-Adapter
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                     if((devicePropertyListContentInformation.elementType == GROUP_ELEMENT)
-                    && (devicePropertyListContentInformation.elementID == updatedGroup.groupIndex)){
+                    && (devicePropertyListContentInformation.internalElementIndex == updatedGroup.groupIndex)){
                         updateIndex = index
                         return@forEachIndexed
                     }
@@ -3167,7 +3233,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                            // find the element in the UI-Adapter
                            this.uIAdapterList.forEach {
-                               if((it.elementID == this.currentGroupResolveID) && (it.elementType == GROUP_ELEMENT)){
+                               if((it.internalElementIndex == this.currentGroupResolveID) && (it.elementType == GROUP_ELEMENT)){
                                    it.elementText = data
                                    updateIndex = it.globalIndex
                                    return@forEach
@@ -3228,7 +3294,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 var changedIndex = -1
 
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if (devicePropertyListContentInformation.elementID == propertyElement.propertyIndex) {
+                    if (devicePropertyListContentInformation.internalElementIndex == propertyElement.propertyIndex) {
                         devicePropertyListContentInformation.simplePropertyState = newState
                         changedIndex = index
                     }
@@ -3318,7 +3384,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     var changedIndex = -1
 
                     this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                        if (devicePropertyListContentInformation.elementID == propertyElement.propertyIndex) {
+                        if (devicePropertyListContentInformation.internalElementIndex == propertyElement.propertyIndex) {
                             devicePropertyListContentInformation.complexPropertyState =
                                 laRoomyDevicePropertyList.elementAt(propertyElement.propertyIndex).complexPropertyState
                             changedIndex = index
@@ -4044,6 +4110,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.propertyDetailChangedOnConfirmation = false
         this.propertyUpToDate = false // TODO: is this right???
     }
+
+    // new helpers
+
+    private fun propertyTypeFromIndex(propertyIndex: Int) : Int {
+        return if(propertyIndex < this.laRoomyDevicePropertyList.size){
+            this.laRoomyDevicePropertyList.elementAt(propertyIndex).propertyType
+        } else {
+            Log.e("propTypeFromIndex", "Invalid index. Size of array is: ${this.laRoomyDevicePropertyList.size}. Index was: $propertyIndex")
+            -1
+        }
+    }
+
+
 
     // the callback definition for the event handling in the calling class
     interface BleEventCallback : Serializable{
