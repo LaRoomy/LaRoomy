@@ -685,8 +685,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // add the header length
             dataSize += 8
 
-
-            // TODO: check error flag(s)!
+            // check error flag
+            if(data[6] != '0'){
+                this.onErrorFlag(data[6])
+            }
 
             var dataProcessed = false
 
@@ -706,9 +708,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '4' -> {
                     // property execution command (only response)
+                    dataProcessed = readPropertyExecutionResponse(data, dataSize)
                 }
                 '5' -> {
                     // device to app notification
+                    dataProcessed = readDeviceNotification(data, dataSize)
                 }
                 '6' -> {
                     // binding response
@@ -720,11 +724,85 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '8' -> {
                     // data-setter string
+                    // TODO: !
                 }
             }
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
             return dataProcessed
         }
+    }
+
+    private fun readDeviceNotification(data: String, dataSize: Int) : Boolean {
+
+        if(dataSize < 9){
+            //invalid transmission length
+            if(verboseLog){
+                Log.e("readDevNotification", "Invalid transmission length. Transmission-length was: ${data.length} > minimum transmission-length is 9!")
+            }
+            applicationProperty.logControl("E: Invalid transmission length. Transmission-length was: ${data.length} > minimum transmission-length is 9!")
+            return false
+        } else {
+            // get ID
+
+            var hexString = "0x"
+            hexString += data[2]
+            hexString += data[3]
+            val elementIndex =
+                Integer.decode(hexString)
+
+            when(data[9]){
+                '1' -> {
+                    // property state changed notification
+                    sendPropertyStateRequest(elementIndex)
+                }
+                '2' -> {
+                    // property element changed notification
+                    sendSinglePropertyRequest(elementIndex)
+                }
+                '3' -> {
+                    // group element changed notification
+                    sendSingleGroupRequest(elementIndex)
+                }
+                '4' -> {
+                    // device-header / user-message notification
+                    handleUserMessage(data, dataSize)
+                }
+                else -> {
+                    if(verboseLog){
+                        Log.e("readDeviceNotification", "Unknown device notification type")
+                    }
+                    applicationProperty.logControl("E: Unknown device notification type")
+                }
+            }
+            return true
+        }
+    }
+
+    private fun handleUserMessage(data: String, dataSize: Int){
+
+        // check transmission length
+        if(dataSize > 9) {
+            // get image id (transferred in the id fields)
+            var hexString = "0x"
+            hexString += data[2]
+            hexString += data[3]
+            this.deviceInfoHeaderData.imageID = Integer.decode(hexString)
+
+            data.removeRange(0, 8)
+
+            this.deviceInfoHeaderData.message = data
+            this.deviceInfoHeaderData.valid = true
+            this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
+        } else {
+            // no notification data
+            // TODO!
+        }
+    }
+
+    private fun readPropertyExecutionResponse(data: String, dataSize: Int) : Boolean {
+        // FIXME: what to do here?
+        // if a property was executed and no response is received, send a state-update to verify the user-interface??
+        return true
     }
 
     private fun dispatchPropertyStateTransmission(data: String, dataSize: Int) : Boolean {
@@ -789,7 +867,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun readComplexStateData(propertyIndex: Int, propertyType: Int, data: String, dataSize: Int){
-
+        when(propertyType){
+            COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
+                this.processRGBSelectorData(propertyIndex, data, dataSize)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
+                this.processEXLevelSelectorData(propertyIndex, data, dataSize)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
+                this.processTimeSelectorData(propertyIndex, data, dataSize)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
+                this.processTimeFrameSelectorData(propertyIndex, data, dataSize)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
+                this.processUnlockControlData(propertyIndex, data, dataSize)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
+                this.processNavigatorData(propertyIndex, data, dataSize)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
+                this.processBarGraphData(propertyIndex, data, dataSize)
+            }
+        }
     }
 
     private fun readGroupString(data: String, dataSize: Int) : Boolean {
@@ -907,7 +1007,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun readBindingResponse(data: String, dataSize: Int) : Boolean {
 
-        if(dataSize < 9){
+        if(dataSize < 10){
             if(verboseLog){
                 Log.e("BindingResponse", "Invalid data size. Data size was $dataSize - Required: 9")
             }
@@ -918,13 +1018,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 (data[8] == '2') -> {
                     // this is an authentication response
                     // check binding rejected flag
-                    return if (data[7] == '2') {
+                    return if (data[9] != '0') {
                         // binding was rejected
-                        if (verboseLog) {
-                            Log.e("BindingResponse", "Binding passkey was rejected from device")
-                        }
-                        applicationProperty.logControl("E: Binding passkey was rejected from device")
-                        callback.onBindingPasskeyRejected()
+                            when(data[9]){
+                                '1' -> {
+                                    if (verboseLog) {
+                                        Log.e(
+                                            "BindingResponse",
+                                            "Binding passkey was rejected from device"
+                                        )
+                                    }
+                                    applicationProperty.logControl("E: Binding passkey was rejected from device")
+                                    callback.onBindingPasskeyRejected()
+                                }
+                                '2' -> {
+                                    // TODO: binding not supported
+                                }
+                                else -> {
+                                    // TODO: unknown error
+                                }
+                            }
                         true
                     } else {
                         // binding success
@@ -936,12 +1049,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 (data[8] == '1') -> {
                     // this is an enable binding response
-                    if(data[7] == '0'){
+                    if (data[9] != '0') {
                         // enable binding failed
-                        if(verboseLog){
-                            Log.e("EnableBinding", "Enable-Binding Response: FAILED.")
+                        when (data[9]) {
+                            '2' -> {
+                                if (verboseLog) {
+                                    Log.e("EnableBinding", "Enable-Binding Response: FAILED. Binding not supported!")
+                                }
+                                applicationProperty.logControl("E: Received Binding-Failed response from the device. -Binding not supported")
+                            }
+                            else -> {
+                                if (verboseLog) {
+                                    Log.e("EnableBinding", "Enable-Binding Response: FAILED. -Unknown error")
+                                }
+                                applicationProperty.logControl("E: Received Binding-Failed response from the device. -Unknown error")
+                            }
                         }
-                        applicationProperty.logControl("E: Received Binding-Failed response from the device.")
                     } else {
                         // enable binding success
                         if(verboseLog){
@@ -953,12 +1076,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 (data[8] == '0') -> {
                     // this is an release binding response
-                    if(data[7] == '0'){
+                    if (data[9] != '0') {
                         // release binding failed
-                        if(verboseLog){
-                            Log.e("ReleaseBinding", "Release-Binding Response: FAILED.")
+                        when (data[9]) {
+                            '3' -> {
+                                if (verboseLog) {
+                                    Log.e("ReleaseBinding", "Release-Binding Response: FAILED. -wrong passkey")
+                                }
+                                applicationProperty.logControl("E: Received Release-Failed response from the device. -wrong passkey")
+                            }
+                            else -> {
+                                if (verboseLog) {
+                                    Log.e("ReleaseBinding", "Release-Binding Response: FAILED. -Unknown error")
+                                }
+                                applicationProperty.logControl("E: Received Release-Failed response from the device. -Unknown error")
+                            }
                         }
-                        applicationProperty.logControl("E: Received Release-Failed response from the device.")
                     } else {
                         // release binding success
                         if(verboseLog){
@@ -1096,6 +1229,64 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.startComplexStateDataLoop()
             }, 1000)
         }
+    }
+
+    private fun processRGBSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun processEXLevelSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun processTimeSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun processTimeFrameSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun processUnlockControlData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun processNavigatorData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun processBarGraphData(propertyIndex: Int, data: String, dataSize: Int){
+
+    }
+
+    private fun sendPropertyStateRequest(propertyIndex: Int){
+        var rqString = "31"
+        val hexString = Integer.toHexString(propertyIndex)
+        if(hexString.length < 2){
+            rqString += '0'
+            rqString += hexString
+        } else {
+            rqString += hexString
+        }
+        rqString += "0000\r"
+        this.sendData(rqString)
+    }
+
+    private fun sendSinglePropertyRequest(propertyIndex: Int){
+
+        // if the loop is not active, the property will be updated, not added
+
+        //this.singlePropertyRetrievingAction = true
+
+        // invalidate parameter???
+
+        // TODO!
+    }
+
+    private fun sendSingleGroupRequest(groupIndex: Int){
+        //this.singleGroupRetrievingAction = true
+
+        // TODO!
     }
 
     ///////////////////////////////////////////////////////////////// section!
@@ -2712,43 +2903,43 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun sendSinglePropertyRequest(propertyIndex: Int){
-        if(verboseLog) {
-            Log.d("M:SendRequest", "SendSinglePropertyRequest: Invoked")
-        }
-        if(this.isConnected) {
-            // set marker
-            this.singlePropertyRetrievingAction = true
-            // build string
-            val data =
-                when {
-                    (propertyIndex < 10) -> "A00$propertyIndex$"
-                    ((propertyIndex > 9) && (propertyIndex < 100)) -> "A0$propertyIndex$"
-                    else -> "A$propertyIndex$"
-                }
-            // send request
-            this.sendData(data)
-        }
-    }
+//    private fun sendSinglePropertyRequest(propertyIndex: Int){
+//        if(verboseLog) {
+//            Log.d("M:SendRequest", "SendSinglePropertyRequest: Invoked")
+//        }
+//        if(this.isConnected) {
+//            // set marker
+//            this.singlePropertyRetrievingAction = true
+//            // build string
+//            val data =
+//                when {
+//                    (propertyIndex < 10) -> "A00$propertyIndex$"
+//                    ((propertyIndex > 9) && (propertyIndex < 100)) -> "A0$propertyIndex$"
+//                    else -> "A$propertyIndex$"
+//                }
+//            // send request
+//            this.sendData(data)
+//        }
+//    }
 
-    private fun sendSinglePropertyGroupRequest(groupIndex: Int){
-        if(verboseLog) {
-            Log.d("M:SendRequest", "SendSinglePropertyGroupRequest: Invoked")
-        }
-        if(this.isConnected) {
-            // set marker
-            this.singleGroupRetrievingAction = true
-            // build string
-            val data =
-                when {
-                    (groupIndex < 10) -> "E00$groupIndex$"
-                    ((groupIndex > 9) && (groupIndex < 100)) -> "E0$groupIndex$"
-                    else -> "E$groupIndex$"
-                }
-            // send request
-            this.sendData(data)
-        }
-    }
+//    private fun sendSinglePropertyGroupRequest(groupIndex: Int){
+//        if(verboseLog) {
+//            Log.d("M:SendRequest", "SendSinglePropertyGroupRequest: Invoked")
+//        }
+//        if(this.isConnected) {
+//            // set marker
+//            this.singleGroupRetrievingAction = true
+//            // build string
+//            val data =
+//                when {
+//                    (groupIndex < 10) -> "E00$groupIndex$"
+//                    ((groupIndex > 9) && (groupIndex < 100)) -> "E0$groupIndex$"
+//                    else -> "E$groupIndex$"
+//                }
+//            // send request
+//            this.sendData(data)
+//        }
+//    }
 
     private fun sendSinglePropertyResolveRequest(propertyID: Int){
         if(verboseLog) {
@@ -3900,23 +4091,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    fun sendBindingRequest(passKey: String){
-//        if(this.isConnected){
-//            this.sendData("r$passKey>$")
-//        }
-//    }
-
-    private fun testConnection(){
-        // reset test indicator and send test command
-        this.connectionTestSucceeded = false
-        this.sendData(this.testCommand)
-    }
-
-    fun testConnection(delayTimeMs: Long){
-        Handler(Looper.getMainLooper()).postDelayed({
-            this.testConnection()
-        }, delayTimeMs)
-    }
 
     private fun startUpdateStackProcessing(){
         if(this.elementUpdateList.isNotEmpty()) {
@@ -3943,7 +4117,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     GROUP_ELEMENT -> {
                         when (updateElement.updateType) {
                             UPDATE_TYPE_ELEMENT_DEFINITION -> {
-                                sendSinglePropertyGroupRequest(updateElement.elementIndex)
+                                //sendSinglePropertyGroupRequest(updateElement.elementIndex)
                             }
                             UPDATE_TYPE_DETAIL_DEFINITION -> {
                                 sendSingleGroupDetailRequest(updateElement.elementID)
@@ -4003,7 +4177,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         GROUP_ELEMENT -> {
                             when (updateElement.updateType) {
                                 UPDATE_TYPE_ELEMENT_DEFINITION -> {
-                                    sendSinglePropertyGroupRequest(updateElement.elementIndex)
+ //                                   sendSinglePropertyGroupRequest(updateElement.elementIndex)
                                 }
                                 UPDATE_TYPE_DETAIL_DEFINITION -> {
                                     sendSingleGroupDetailRequest(updateElement.elementID)
@@ -4119,6 +4293,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             Log.e("propTypeFromIndex", "Invalid index. Size of array is: ${this.laRoomyDevicePropertyList.size}. Index was: $propertyIndex")
             -1
+        }
+    }
+
+    private fun onErrorFlag(c: Char){
+        if(verboseLog){
+            Log.e("onErrorFlag", "Transmission-error flag was set!")
+        }
+        applicationProperty.logControl("E: Transmission-error flag was set!")
+
+        when(c){
+            '1' -> {
+                Log.e("onErrorFlag", "Error was: unknown")
+            }
+            '2' -> {
+                Log.e("onErrorFlag", "Error was: Transmission undeliverable")
+            }
+            else -> {
+                Log.e("onErrorFlag", "Error was: undefined flag value")
+            }
         }
     }
 
