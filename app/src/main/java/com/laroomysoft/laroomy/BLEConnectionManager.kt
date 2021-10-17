@@ -163,8 +163,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     var isConnected:Boolean = false
         private set
-    var authenticationSuccess = false
-        private set
+
+    val initializationSuccess : Boolean
+        get() {
+        return this.bleDeviceData.authenticationSuccess
+    }
+
     var isBindingRequired = false
         private set
     var connectionTestSucceeded = false
@@ -1296,34 +1300,37 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.callback = eventHandlerObject
     }
 
-    private fun groupRequestLoopRequired():Boolean{
-        var ret = false
-        if(this.laRoomyDevicePropertyList.isNotEmpty()){
-            this.laRoomyDevicePropertyList.forEach {
-                if(it.isGroupMember){
-                    ret = true
-                }
-            }
-        }
-        return ret
-    }
+//    private fun groupRequestLoopRequired():Boolean{
+//        var ret = false
+//        if(this.laRoomyDevicePropertyList.isNotEmpty()){
+//            this.laRoomyDevicePropertyList.forEach {
+//                if(it.isGroupMember){
+//                    ret = true
+//                }
+//            }
+//        }
+//        return ret
+//    }
 
     fun setPropertyEventHandler(pEvents: PropertyCallback){
         this.propertyCallback = pEvents
     }
 
-    fun authenticate(){
+    fun initDeviceTransmission(){
         if(verboseLog) {
-            Log.d("M:BLE:Authenticate", "Sending authentication string")
+            Log.d("initDeviceTransmsn", "Sending initialization string")
         }
+        applicationProperty.logControl("I: Sending initialization string...")
         if(this.isConnected){
-            this.authRequired = true
-            this.sendData(this.authenticationString)
+
+            val initString = "71000000\r"
+            sendData(initString)
+
         } else {
             if(verboseLog){
-                Log.e("M:authenticate", "Cannot Authenticate - no connection/ dev-info: address: ${this.currentDevice?.address} dev-type: ${this.currentDevice?.type} ?: ${this.currentDevice}")
-                Log.e("M:authenticate", "Cannot Authenticate - no connection/ gatt-info: ${this.bluetoothGatt}")
+                Log.e("initDeviceTransmsn", "Init failed - no connection/ dev-info: address: ${this.currentDevice?.address} dev-type: ${this.currentDevice?.type} ?: ${this.currentDevice}")
             }
+            applicationProperty.logControl("E: Init failed - no connection")
         }
     }
 
@@ -1340,7 +1347,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isConnected = false
         this.authRequired = true
         this.propertyUpToDate = false
-        this.authenticationSuccess = false
         this.connectionTestSucceeded = false
         this.connectionSuspended = false
         this.isResumeConnectionAttempt = false
@@ -1500,14 +1506,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
     }
 
-    fun connectToCurrentDevice(){
-        // TODO: This is a mark for the use of this method in another app: checking the bond state is not necessary, so this method is obsolete
-        if(this.currentDevice?.bondState == BluetoothDevice.BOND_NONE){
-            // device is not bonded, the connection attempt will raise an prompt for the user to connect
-            checkBondingStateWithDelay()
-        }
-        this.connect()
-    }
+//    fun connectToCurrentDevice(){
+//        // TODO: This is a mark for the use of this method in another app: checking the bond state is not necessary, so this method is obsolete
+//        if(this.currentDevice?.bondState == BluetoothDevice.BOND_NONE){
+//            // device is not bonded, the connection attempt will raise an prompt for the user to connect
+//            checkBondingStateWithDelay()
+//        }
+//        this.connect()
+//    }
 
     private fun connect(){
         if(this.currentDevice != null) {
@@ -1557,24 +1563,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun checkBondingStateWithDelay(){
-        if(this.connectionAttemptCounter < MAX_CONNECTION_ATTEMPTS) {
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                // check if device is bonded now
-                if ((this.currentDevice?.bondState == BluetoothDevice.BOND_NONE)
-                    || (this.currentDevice?.bondState == BluetoothDevice.BOND_BONDING)
-                ) {
-                    // count the number of attempts
-                    this.connectionAttemptCounter++
-                    // call the delay again
-                    checkBondingStateWithDelay()
-                } else {
-                    connect()
-                }
-            }, 4000)
-        }
-    }
+//    private fun checkBondingStateWithDelay(){
+//        if(this.connectionAttemptCounter < MAX_CONNECTION_ATTEMPTS) {
+//
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                // check if device is bonded now
+//                if ((this.currentDevice?.bondState == BluetoothDevice.BOND_NONE)
+//                    || (this.currentDevice?.bondState == BluetoothDevice.BOND_BONDING)
+//                ) {
+//                    // count the number of attempts
+//                    this.connectionAttemptCounter++
+//                    // call the delay again
+//                    checkBondingStateWithDelay()
+//                } else {
+//                    connect()
+//                }
+//            }, 4000)
+//        }
+//    }
 
 //    fun selectCurrentDeviceFromInternalList(index: Int){
 //
@@ -1668,31 +1674,31 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.applicationProperty.saveStringData(address, R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
     }
 
-    fun startDevicePropertyListing(){
-
-        // TODO: what is if the property array is already filled? Init the confirm process! Or erase????
-
-        if(this.isConnected){
-            // only start if there is no pending process/loop
-            if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
-                if(verboseLog) {
-                    Log.d("M:StartPropListing", "Device property listing started.")
-                }
-                this.propertyRequestIndexCounter = 0
-                this.propertyLoopActive = true
-                this.propertyUpToDate = false
-
-                // only clear the list if this is not the confirmation mode
-                if(!this.propertyConfirmationModeActive) {
-                    this.dataReadyToShow = false
-                    this.laRoomyDevicePropertyList.clear()
-                    this.uIAdapterList.clear()
-                }
-                // start:
-                this.sendData("A000$")// request first index (0)
-            }
-        }
-    }
+//    fun startDevicePropertyListing(){
+//
+//        // TODO: what is if the property array is already filled? Init the confirm process! Or erase????
+//
+//        if(this.isConnected){
+//            // only start if there is no pending process/loop
+//            if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
+//                if(verboseLog) {
+//                    Log.d("M:StartPropListing", "Device property listing started.")
+//                }
+//                this.propertyRequestIndexCounter = 0
+//                this.propertyLoopActive = true
+//                this.propertyUpToDate = false
+//
+//                // only clear the list if this is not the confirmation mode
+//                if(!this.propertyConfirmationModeActive) {
+//                    this.dataReadyToShow = false
+//                    this.laRoomyDevicePropertyList.clear()
+//                    this.uIAdapterList.clear()
+//                }
+//                // start:
+//                this.sendData("A000$")// request first index (0)
+//            }
+//        }
+//    }
 
     fun reloadProperties(){
 
@@ -1700,7 +1706,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // something is reset in "startDevicePropertyListing":
 
         this.clearPropertyRelatedParameter()
-        this.startDevicePropertyListing()
+
+        //this.startDevicePropertyListing()
 
     }
 
@@ -2431,8 +2438,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         laRoomyDevicePropertyList.forEach {
             if(it.propertyIndex == id){
                 if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
-                    it.propertyDescriptor =
-                        encodeGermanString(description)
+//                    it.propertyDescriptor =
+//                        encodeGermanString(description)
                 } else {
                     it.propertyDescriptor = description
                 }
@@ -2547,40 +2554,40 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun setGroupName(id: Int, data: String){
-        laRoomyPropertyGroupList.forEach {
-            if(it.groupIndex == id){
-                it.groupName = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                    "Deutsch" -> encodeGermanString(data)
-                    else -> data
-                }
-            }
-        }
-    }
+//    private fun setGroupName(id: Int, data: String){
+//        laRoomyPropertyGroupList.forEach {
+//            if(it.groupIndex == id){
+//                it.groupName = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
+//                    "Deutsch" -> encodeGermanString(data)
+//                    else -> data
+//                }
+//            }
+//        }
+//    }
 
-    fun startPropertyConfirmationProcess(){
-        // log:
-        if(verboseLog) {
-            Log.d("M:StartConfirmation", "Property Listing started in Confirmation-Mode")
-        }
-        // start the confirmation process (!!but only if there is no pending retrieving process!!)
-        if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
-            if(this.laRoomyDevicePropertyList.isNotEmpty()) {
-                this.propertyConfirmationModeActive = true
-                this.propertyDetailChangedOnConfirmation = false
-                this.groupDetailChangedOnConfirmation = false
-                this.startDevicePropertyListing()
-            } else {
-                // there are no properties to confirm!
-                if (verboseLog) {
-                    Log.d(
-                        "M:StartConfirmation",
-                        "Property List empty - confirmation not possible"
-                    )
-                }
-            }
-        }
-    }
+//    fun startPropertyConfirmationProcess(){
+//        // log:
+//        if(verboseLog) {
+//            Log.d("M:StartConfirmation", "Property Listing started in Confirmation-Mode")
+//        }
+//        // start the confirmation process (!!but only if there is no pending retrieving process!!)
+//        if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
+//            if(this.laRoomyDevicePropertyList.isNotEmpty()) {
+//                this.propertyConfirmationModeActive = true
+//                this.propertyDetailChangedOnConfirmation = false
+//                this.groupDetailChangedOnConfirmation = false
+//                this.startDevicePropertyListing()
+//            } else {
+//                // there are no properties to confirm!
+//                if (verboseLog) {
+//                    Log.d(
+//                        "M:StartConfirmation",
+//                        "Property List empty - confirmation not possible"
+//                    )
+//                }
+//            }
+//        }
+//    }
 
     private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
         var dataProcessed = false
@@ -2659,7 +2666,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             "DeviceHeader start notification detected -> start recording"
                         )
                     }
-                    this.startDeviceHeaderRecording(data)
+                    //this.startDeviceHeaderRecording(data)
                     dataProcessed = true
                 }
                 data == this.deviceHeaderCloseMessage -> {
@@ -2669,7 +2676,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             "DeviceHeader end notification detected -> reset parameter and trigger event"
                         )
                     }
-                    this.endDeviceHeaderRecording()
+                    //this.endDeviceHeaderRecording()
                     dataProcessed = true
                 }
                 data == this.testCommand -> {
@@ -2725,31 +2732,31 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return dataProcessed
     }
 
-    private fun startDeviceHeaderRecording(data: String){
-        if(data.length > 9) {
+//    private fun startDeviceHeaderRecording(data: String){
+//        if(data.length > 9) {
+//
+//            this.deviceInfoHeaderData.clear()
+//
+//            var imageID = ""
+//            imageID += data.elementAt(7)
+//            imageID += data.elementAt(8)
+//            imageID += data.elementAt(9)
+//
+//            this.deviceInfoHeaderData.imageID = imageID.toInt()
+//            this.deviceHeaderRecordingActive = true
+//        }
+//    }
 
-            this.deviceInfoHeaderData.clear()
-
-            var imageID = ""
-            imageID += data.elementAt(7)
-            imageID += data.elementAt(8)
-            imageID += data.elementAt(9)
-
-            this.deviceInfoHeaderData.imageID = imageID.toInt()
-            this.deviceHeaderRecordingActive = true
-        }
-    }
-
-    private fun endDeviceHeaderRecording(){
-        this.deviceInfoHeaderData.valid = true
-        this.deviceHeaderRecordingActive = false
-
-        if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
-            this.deviceInfoHeaderData.message =
-                encodeGermanString(this.deviceInfoHeaderData.message)
-        }
-        this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
-    }
+//    private fun endDeviceHeaderRecording(){
+//        this.deviceInfoHeaderData.valid = true
+//        this.deviceHeaderRecordingActive = false
+//
+//        if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
+//            this.deviceInfoHeaderData.message =
+//                encodeGermanString(this.deviceInfoHeaderData.message)
+//        }
+//        this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
+//    }
 
     private fun updateProperty(data: String){
         if(data.length < 19){
@@ -3479,7 +3486,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 val newState = state.toInt()
 
                 // apply new state to property-array
-                setPropertyStateForId(propertyID, newState, (data.elementAt(9) == '1'))
+                //setPropertyStateForId(propertyID, newState, (data.elementAt(9) == '1'))
 
                 // apply new state to uIAdapter
                 var changedIndex = -1
@@ -3923,7 +3930,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.complexStatePropertyIDs.clear()
         // loop the properties and save the ones with complex state
         this.laRoomyDevicePropertyList.forEach {
-            // The type 6 (RGB Selector) is the first type with complex state data
+            // start with the first complex state data element
             if(it.propertyType >= COMPLEX_PROPERTY_START_INDEX){
                 this.complexStatePropertyIDs.add(it.propertyIndex)
             }
@@ -3998,25 +4005,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             propertyID.toInt()
 
         return if (id < 256 && id > -1) { id } else -1
-    }
-
-    private fun encodeGermanString(string: String) : String {
-
-        var encodedString = ""
-
-        string.forEach {
-            encodedString += when(it){
-                '^' -> 'ä'
-                '[' -> 'ö'
-                ']' -> 'ü'
-                '{' -> 'ß'
-                '}' -> 'Ä'
-                '|' -> 'Ö'
-                '~' -> 'Ü'
-                else -> it
-            }
-        }
-        return encodedString
     }
 
     private fun setDeviceTime(){
@@ -4215,6 +4203,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.multiComplexPageID = -1
         this.multiComplexPropertyPageOpen = false
         sendData(this.navigatedToDeviceMainPageNotification)
+        // TODO: !!
     }
 
     fun notifyMultiComplexPropertyPageInvoked(propertyID: Int) {
@@ -4241,10 +4230,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isBindingRequired = false
     }
 
-    private fun tryUseSavedPassKeyForSpecificMacAddress(macAddress: String) : String {
-        val bindingPairManager = BindingPairManager(this.activityContext)
-        return bindingPairManager.lookUpForPassKeyWithMacAddress(macAddress)
-    }
+//    private fun tryUseSavedPassKeyForSpecificMacAddress(macAddress: String) : String {
+//        val bindingPairManager = BindingPairManager(this.activityContext)
+//        return bindingPairManager.lookUpForPassKeyWithMacAddress(macAddress)
+//    }
 
 //    fun formatIncomingData(data: String) : String {
 //

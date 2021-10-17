@@ -292,17 +292,17 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // device ready -> send authentication
         runOnUiThread {
             setProgressText(getString(R.string.CA_Connected))
-            // send authentication request
+            // send init request
             Handler(Looper.getMainLooper()).postDelayed({
-                ApplicationProperty.bluetoothConnectionManager.authenticate()
+                ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
 
-                // check the authentication with delay an try again if it is false
+                // check the init with delay an try again if it is false
                 Handler(Looper.getMainLooper()).postDelayed({
 
                     // TODO: maybe check here if the device is disconnected and try to reconnect
 
-                    if(!ApplicationProperty.bluetoothConnectionManager.authenticationSuccess){
-                        ApplicationProperty.bluetoothConnectionManager.authenticate()
+                    if(!ApplicationProperty.bluetoothConnectionManager.initializationSuccess){
+                        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
                     }
                 },2000)// FIXME: what is the right time interval??
                 
@@ -320,6 +320,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     fun onLoadingStringClick(view: View) {
 
         // FIXME: maybe temp, this has no effect, the problem is/was that there is no connection
-        ApplicationProperty.bluetoothConnectionManager.authenticate()
+        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
     }
 }
