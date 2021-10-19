@@ -1537,24 +1537,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             // make sure the passkey is hidden in the connection log
-
-            // TODO: UPDATE!!!
-
-            if(data.elementAt(0) == 'r'){
-                // must be the binding request -> hide passkey
-                applicationProperty.logControl("I: Send Data: r*****>$")
-            } else {
-                if(data.startsWith("SeB:", false)){
-                    applicationProperty.logControl("I: Send Data: SeB:*****$")
-                } else {
-                    applicationProperty.logControl("I: Send Data: $data")
+            if (data.elementAt(0) == '6') {
+                // must be a binding transmission -> hide passkey (if there is one)
+                var logData = data
+                if (logData.length > 9) {
+                    logData = logData.removeRange(9, logData.length - 1)
                 }
+                applicationProperty.logControl("I: Send Data: $logData")
+            } else {
+                applicationProperty.logControl("I: Send Data: $data")
             }
 
             this.gattCharacteristic.setValue(data)
 
-            if (this.bluetoothGatt == null)
+            if (this.bluetoothGatt == null) {
                 Log.e("M:sendData", "Member bluetoothGatt was null!")
+            }
 
             this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
 

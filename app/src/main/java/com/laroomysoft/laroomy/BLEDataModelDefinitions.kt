@@ -188,9 +188,8 @@ class LaRoomyDeviceProperty{
                     }
                 }
                 // save descriptor
-                string.removeRange(0, 17)
-                string.removeSuffix("\r")
-                this.propertyDescriptor = string
+                this.propertyDescriptor = string.removeRange(0, 17)
+                this.propertyDescriptor = this.propertyDescriptor.removeSuffix("\r")
 
                 // decode hex values
                 this.propertyIndex = Integer.decode(propIndex)
@@ -317,10 +316,8 @@ class LaRoomyDevicePropertyGroup{
                     }
                 }
                 // get the descriptor
-                groupString.removeRange(0, minLength)
-                groupString.removeSuffix("\r")
-
-                this.groupName = groupString
+                this.groupName = groupString.removeRange(0, minLength)
+                this.groupName = this.groupName.removeSuffix("\r")
 
                 if(verboseLog) {
                     Log.d("M:PropGroup:fromString", "Data Recorded - Results:")
