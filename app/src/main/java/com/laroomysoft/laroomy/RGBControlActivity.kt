@@ -458,7 +458,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
         if(state){
             // test the connection
-            ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
+            //ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
             // set UI-State
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
             showDualContainer(true)

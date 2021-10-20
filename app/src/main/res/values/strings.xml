@@ -14,8 +14,11 @@
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
-    <string name="CA_Authenticate">Authenticate..</string>
+    <string name="CA_Initialize">Initialize..</string>
+
+    <!-- check if this is really necessary??? -->
     <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
+
     <string name="CA_BindingPasskeyRejected">Wrong binding-passkey: connection rejected</string>
     <string name="CA_BindingNotActivated">Binding required but not activated in App-Settings</string>
     <string name="CA_TimeoutForConnection">Timeout - Device not reachable</string>

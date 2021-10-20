@@ -188,7 +188,7 @@ class LaRoomyDeviceProperty{
                     }
                 }
                 // save descriptor
-                this.propertyDescriptor = string.removeRange(0, 17)
+                this.propertyDescriptor = string.removeRange(0, 18)
                 this.propertyDescriptor = this.propertyDescriptor.removeSuffix("\r")
 
                 // decode hex values

@@ -307,7 +307,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 },2000)// FIXME: what is the right time interval??
                 
                 // notify User:
-                setProgressText(getString(R.string.CA_Authenticate))
+                setProgressText(getString(R.string.CA_Initialize))
             }, 1500) // FIXME: what is the right time interval??
         }
     }

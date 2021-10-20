@@ -18,7 +18,7 @@
 
     <string name="CA_Connecting">Verbinde..</string>
     <string name="CA_Connected">Verbunden</string>
-    <string name="CA_Authenticate">Authentifiziere..</string>
+    <string name="CA_Initialize">Initialisiere..</string>
     <string name="CA_AuthSuccess">Authentifikation erfolgreich - Suche nach Geräte-Eigenschaften</string>
     <string name="CA_BindingPasskeyRejected">Falscher Bindungs-Code: Verbindung abgelehnt</string>
     <string name="CA_BindingNotActivated">Geräte-Bindung ist erforderlich, aber deaktiviert in App-Einstellungen</string>

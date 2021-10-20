@@ -1170,6 +1170,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // the property loop is complete, check if there are groups and request them
             if(this.bleDeviceData.groupCount > 0){
                 this.startGroupListing()
+            } else {
+
+                // TODO: there are no groups, so proceed without
+
+                // generate UI-data
+                this.generateUIAdaptableArrayListFromDeviceProperties()
+
+                // start retrieving the complex property states
+                Handler(Looper.getMainLooper()).postDelayed({
+                    this.startComplexStateDataLoop()
+                }, 1000)
+
+
             }
         }
     }
@@ -3093,8 +3106,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     globalIndex++
                     // add it to the list
                     this.uIAdapterList.add(propertyEntry)
+
                     // notify activity
-                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) TODO
+                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) // TODO !
 
                     //Thread.sleep(100)
                 }
@@ -3102,7 +3116,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             //this.dataReadyToShow = true // TODO
             //this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList) // TODO
 
-            // notify finalization of the process
+
+
+            // TODO: notify finalization of the process
             Handler(Looper.getMainLooper()).postDelayed({
                 this.sendData(propertyRetrievalCompleteNotification)
             }, 700)

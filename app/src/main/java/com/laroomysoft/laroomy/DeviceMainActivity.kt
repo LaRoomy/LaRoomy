@@ -758,10 +758,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // add the data to the UI-List
         this.propertyList.add(item)
+
+
         // notify the UI to change
-        runOnUiThread {
-            this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
-        }
+        // FIXME: not necessary due to data-binding!!!!
+//        runOnUiThread {
+//            this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
+//        }
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
