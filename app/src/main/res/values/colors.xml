@@ -59,6 +59,9 @@
     <color name="mainActivityPopUpFlyoutSeparatorColor">#FF606060</color>
     <color name="mainActivityPopUpMenuItemSelectedColor">#FF606060</color>
 
+    <!-- Device Main Activity PopUp Colors -->
+    <color name="deviceMainActivityPopUpBackgroundColor">#FF505050</color>
+
 
     <color name="addDeviceActivityBondingHintBackgroundColor">#FF202020</color>
 

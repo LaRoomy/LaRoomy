@@ -22,6 +22,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -246,6 +247,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // make sure to set the right Name and image for the device
             this.deviceTypeHeaderTextView.text =
                 ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+
             // TODO: reactivate!:
             //this.deviceTypeHeaderImageView.setImageResource(this.deviceImageResourceId)
 
@@ -390,12 +392,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
-                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
         // NOTE: the button has no state the execution command contains always "1"
-        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.internalElementIndex)}1$")
+
+        // send execution command
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            makeSimplePropertyExecutionString(index, 0)
+        )
     }
 
     override fun onPropertyElementSwitchClick(
@@ -409,17 +415,36 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
-                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
         // TODO: check if the newState comes with the right terminology
 
         val c = when(switch.isChecked){
-            true -> '1'
-            else -> '0'
+            true -> 1
+            else -> 0
         }
-        ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.internalElementIndex)}$c$")
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            makeSimplePropertyExecutionString(index, c)
+        )
+    }
+
+    override fun onPropertyLevelSelectButtonClick(
+        index: Int,
+        devicePropertyListContentInformation: DevicePropertyListContentInformation
+    ) {
+        if(verboseLog) {
+            Log.d(
+                "M:CB:onPropLevelSelClk",
+                "Property element was clicked. Element-Type is LEVEL-SELECTOR at index: $index\n\nData is:\n" +
+                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+            )
+        }
+        // TODO: open a popup!
     }
 
     override fun onSeekBarPositionChange(
@@ -435,8 +460,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
-                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
+                        "Property-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
                         "SeekBar specific values:\n" +
                         "New Value: $newValue\n" +
                         "Change-Type: ${
@@ -454,7 +479,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             val bitValue =
                 percentTo8Bit(newValue)
 
-            ApplicationProperty.bluetoothConnectionManager.sendData("C${a8BitValueToString(devicePropertyListContentInformation.internalElementIndex)}${a8BitValueToString(bitValue)}$")
+            ApplicationProperty.bluetoothConnectionManager.sendData(
+                makeSimplePropertyExecutionString(index, bitValue)
+            )
         }
     }
 
@@ -759,12 +786,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // add the data to the UI-List
         this.propertyList.add(item)
 
-
         // notify the UI to change
-        // FIXME: not necessary due to data-binding!!!!
-//        runOnUiThread {
-//            this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
-//        }
+        // FIXME: not necessary due to data-binding?????????
+        // FIXME: here is a problem, should this not be called from the ui-thread?? If I do so, there is an exception
+        //runOnUiThread {
+            //this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
+
+        try {
+            this.devicePropertyListViewAdapter.notifyItemInserted(item.globalIndex)
+        }
+        catch (e: Exception){
+            Log.e("onUIAddItem", "Error while adding an item to property list: ${e.message}")
+        }
+
+        //}
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
@@ -855,42 +890,54 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return DPLViewHolder(linearLayout)
         }
 
-        @SuppressLint("CutPasteId")
+        //@SuppressLint("CutPasteId")
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
 
             val elementToRender = devicePropertyAdapter.elementAt(position)
             val rootContentHolder = holder.linearLayout
 
-            when(elementToRender.elementType){
+            when(elementToRender.elementType) {
                 UNDEFINED_ELEMENT -> {
                     // should not happen
-                    //holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.GONE// new root: devicePropertyListRootLinearLayout
+                    // set the text for the element
+                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                        .apply {
+                            //visibility = View.VISIBLE
+                            text = activityContext.getString(R.string.DMA_ErrorElementText)
+                            textSize = 16F
+                            setTypeface(typeface, Typeface.BOLD)
+                        }
                 }
                 GROUP_ELEMENT -> {
                     // This is a Group-Element. Visible Elements: Image, Textview. Background: group element background
                     // The image and the textview are visible by default, so nothing must be set to visible.
 
                     // set group-header background
-                    rootContentHolder.background = AppCompatResources.getDrawable(activityContext, R.drawable.property_list_group_header_element_background)
+                    rootContentHolder.background = AppCompatResources.getDrawable(
+                        activityContext,
+                        R.drawable.property_list_group_header_element_background
+                    )
                     // set the image for the element
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).apply {
-                        setBackgroundResource(
-                            resourceIdForImageId(elementToRender.imageID)
-                        )
-                    }
+                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage)
+                        .apply {
+                            setBackgroundResource(
+                                resourceIdForImageId(elementToRender.imageID)
+                            )
+                        }
                     // set the text for the element
-                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                        //visibility = View.VISIBLE
-                        text = elementToRender.elementText
-                        textSize = 16F
-                        setTypeface(typeface, Typeface.BOLD)
-                    }
+                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                        .apply {
+                            //visibility = View.VISIBLE
+                            text = elementToRender.elementText
+                            textSize = 16F
+                            setTypeface(typeface, Typeface.BOLD)
+                        }
                 }
                 PROPERTY_ELEMENT -> {
                     // this is a property element
 
                     // if this is a navigatable property, show the nav-arrow
-                    if(elementToRender.canNavigateForward) {
+                    if (elementToRender.canNavigateForward) {
                         holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility =
                             View.VISIBLE
                     }
@@ -899,46 +946,67 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     if (!elementToRender.isGroupMember) {
                         // this is a single property element
                         rootContentHolder.background =
-                            AppCompatResources.getDrawable(activityContext, R.drawable.single_property_list_element_background)
+                            AppCompatResources.getDrawable(
+                                activityContext,
+                                R.drawable.single_property_list_element_background
+                            )
                     } else {
                         // the element is part of a group, check if this is the last element in the group
                         // check the next item
-                        if(elementToRender.isLastInGroup) {
+                        if (elementToRender.isLastInGroup) {
                             rootContentHolder.background =
-                                AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_last_list_element_background)
+                                AppCompatResources.getDrawable(
+                                    activityContext,
+                                    R.drawable.inside_group_property_last_list_element_background
+                                )
                         } else {
                             rootContentHolder.background =
-                                AppCompatResources.getDrawable(activityContext, R.drawable.inside_group_property_list_element_background)
+                                AppCompatResources.getDrawable(
+                                    activityContext,
+                                    R.drawable.inside_group_property_list_element_background
+                                )
                         }
                     }
 
                     // set the appropriate image for the imageID
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage).apply {
-                        setBackgroundResource(
-                            resourceIdForImageId(elementToRender.imageID)
-                        )
-                    }
+                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage)
+                        .apply {
+                            setBackgroundResource(
+                                resourceIdForImageId(elementToRender.imageID)
+                            )
+                        }
 
-                    // TODO: hide the image-view if the imageID is not set???
+                    // TODO: hide the image-view if the imageID is not set or show default???
 
                     // set the appropriate elements for the type of the property:
-                    when(elementToRender.propertyType){
+                    when (elementToRender.propertyType) {
                         -1 -> return // must be error
                         0 -> return // must be error
                         PROPERTY_TYPE_BUTTON -> {
 
-                            // TODO: no description??
+                            // check if dual description is required
+                            val dualDescription = checkForDualDescriptor(elementToRender.elementText)
+
+                            if(dualDescription.isDual){
+                                val textView =
+                                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                                textView.text = dualDescription.elementText
+                            }
 
                             // apply to the button
                             holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
                                 // show the button
                                 visibility = View.VISIBLE
                                 // set the text of the button
-                                text = elementToRender.elementText
+                                text = if(dualDescription.isDual){
+                                    dualDescription.actionText
+                                } else {
+                                    elementToRender.elementText
+                                }
                                 // set the onClick handler
                                 setOnClickListener {
                                     itemClickListener.onPropertyElementButtonClick(
-                                        position,
+                                        elementToRender.internalElementIndex,
                                         elementToRender
                                     )
                                 }
@@ -946,19 +1014,26 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                         PROPERTY_TYPE_SWITCH -> {
                             // get the switch
-                            val switch = holder.linearLayout.findViewById<SwitchCompat>(R.id.elementSwitch)
+                            val switch =
+                                holder.linearLayout.findViewById<SwitchCompat>(R.id.elementSwitch)
                             // show the switch
                             switch.visibility = View.VISIBLE
                             // set the onClick handler
-                            switch.setOnClickListener{
-                                itemClickListener.onPropertyElementSwitchClick(position, elementToRender, switch)
+                            switch.setOnClickListener {
+                                itemClickListener.onPropertyElementSwitchClick(
+                                    elementToRender.internalElementIndex,
+                                    elementToRender,
+                                    switch
+                                )
                             }
-                            if(elementToRender.simplePropertyState > 0){
+                            if (elementToRender.simplePropertyState > 0) {
                                 switch.isChecked = true
                             }
+
                             // show the text-view
-                            val textView = holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                            textView.visibility = View.VISIBLE
+                            val textView =
+                                holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+//                            textView.visibility = View.VISIBLE
                             // set the text
                             textView.text = elementToRender.elementText
                         }
@@ -977,12 +1052,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                     get8BitValueAsPercent(elementToRender.simplePropertyState)
                             }*/
 
+                            // TODO: show the button and display the value as button-text!
+
+
                             // show the property text-view
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                //visibility = View.VISIBLE
-                                // set the text
-                                text = elementToRender.elementText
-                            }
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                                .apply {
+                                    //visibility = View.VISIBLE
+                                    // set the text
+                                    text = elementToRender.elementText
+                                }
                             // show the level in the button
                             val percentageLevelPropertyGenerator =
                                 PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
@@ -999,34 +1078,43 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             }
 
                         }
+                        PROPERTY_TYPE_OPTION_SELECTOR -> {
+
+                            // TODO !!!!!!!!!!!!
+
+
+                        }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                // set visibility
-                                //visibility = View.VISIBLE
-                                // set the text
-                                text = elementToRender.elementText
-                            }
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                                .apply {
+                                    // set visibility
+                                    //visibility = View.VISIBLE
+                                    // set the text
+                                    text = elementToRender.elementText
+                                }
 
                             // show a level indication e.g. "96%"
                             val percentageLevelPropertyGenerator =
                                 PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
 
-                            holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView).apply {
-                                visibility = View.VISIBLE
-                                text = percentageLevelPropertyGenerator.percentageString
-                                setTextColor(percentageLevelPropertyGenerator.colorID)
-                            }
+                            holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView)
+                                .apply {
+                                    visibility = View.VISIBLE
+                                    text = percentageLevelPropertyGenerator.percentageString
+                                    setTextColor(percentageLevelPropertyGenerator.colorID)
+                                }
                         }
                         PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
 
                             // TODO: integrate textcolor???
 
                             // show the textView
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                //visibility = View.VISIBLE
-                                // set the text
-                                text = elementToRender.elementText
-                            }
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                                .apply {
+                                    //visibility = View.VISIBLE
+                                    // set the text
+                                    text = elementToRender.elementText
+                                }
                         }
                         else -> {
                             // must be complex type!
@@ -1040,32 +1128,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             }
 
                             // show the textView
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView).apply {
-                                //visibility = View.VISIBLE
-                                // set the text
-                                text = elementToRender.elementText
-                            }
+                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                                .apply {
+                                    //visibility = View.VISIBLE
+                                    // set the text
+                                    text = elementToRender.elementText
+                                }
                             // show the navigate arrow
-                            holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility = View.VISIBLE
+                            holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility =
+                                View.VISIBLE
                         }
                     }
                 }
-                /*
-                SEPARATOR_ELEMENT -> {
-                    // for the separator element, the only necessary elements are the top and/or bottom separator
-                    holder.linearLayout.findViewById<View>(R.id.topSeparator).setBackgroundResource(R.color.separatorColor)
-                    //holder.linearLayout.findViewById<View>(R.id.bottomSeparator).setBackgroundResource(R.color.separatorColor)
-
-                    holder.linearLayout.setBackgroundColor(activityContext.getColor(R.color.transparentViewColor))
-                }
-
-
-                else -> {
-                    // should not happen
-                    holder.linearLayout.findViewById<LinearLayout>(R.id.contentHolderLayout).visibility = View.GONE
-                }
-
-                 */
             }
             // bind it!
             //holder.bind(elementToRender, itemClickListener, position)
@@ -1087,57 +1161,4 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return devicePropertyAdapter.elementAt(index)
         }
     }
-
-//    private fun handleAddedItem(index: Int) {
-//        if (this.timerIsOnline) {
-//
-//            this.maxExecutionIndex = index
-//
-//        } else {
-//            this.timerIsOnline = true
-//
-////            // when this is a already
-////            if(this.curExecutionIndex == -1) {
-////                this.curExecutionIndex = 0
-////            }
-//             this.curExecutionIndex = 0
-//
-//            this.maxExecutionIndex = index
-//
-//            // start timer
-//            Timer().scheduleAtFixedRate(
-//                object : TimerTask() {
-//                    override fun run() {
-//
-//                        if ((curExecutionIndex != -1) && (maxExecutionIndex != -1)) {
-//                            if (curExecutionIndex < maxExecutionIndex) {
-//
-//                                runOnUiThread {
-//                                    devicePropertyListViewAdapter.notifyItemInserted(
-//                                        curExecutionIndex
-//                                    )
-//                                }
-//                                curExecutionIndex++
-//                            } else {
-//
-//                                runOnUiThread {
-//                                    devicePropertyListViewAdapter.notifyItemInserted(
-//                                        curExecutionIndex
-//                                    )
-//                                }
-//
-//                                cancel()
-//                                timerIsOnline = false
-//                                curExecutionIndex = -1
-//                                maxExecutionIndex = -1
-//                            }
-//                        } else {
-//                            cancel()
-//                            timerIsOnline = false
-//                        }
-//                    }
-//                }, 0, (50).toLong()
-//            )
-//        }
-//    }
 }

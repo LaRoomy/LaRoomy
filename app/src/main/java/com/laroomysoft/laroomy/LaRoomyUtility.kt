@@ -311,6 +311,66 @@ fun deviceImageFromName(name: String): Int {
     }
 }
 
+fun makeSimplePropertyExecutionString(propertyIndex: Int, stateVal: Int) : String {
+    // static part
+    var executionString = "41"
+
+    // add property id as hex string
+    val propId =
+        Integer.toHexString(propertyIndex)
+
+    if(propId.length < 2){
+        executionString += '0'
+        executionString += propId
+    } else {
+        executionString += propId
+    }
+    // add data size and empty flag values
+    executionString += "0300"
+
+    // add the state
+    val stateString =
+        Integer.toHexString(stateVal)
+    if(stateString.length < 2){
+        executionString += '0'
+        executionString += stateString
+    } else {
+        executionString += stateString
+    }
+
+    // add the delimiter
+    executionString += '\r'
+
+    return executionString
+}
+
+fun checkForDualDescriptor(descriptor: String) : DualDescriptor {
+    val dualDescriptor = DualDescriptor()
+    var firstSectionProcessing = true
+    var secondSectionStartIndex = 0
+
+    descriptor.forEachIndexed { index, c ->
+        if(firstSectionProcessing){
+            if((c == ';')&&(descriptor.elementAt(index + 1) == ';')){
+                firstSectionProcessing = false
+                secondSectionStartIndex = index + 2
+                dualDescriptor.isDual = true
+            } else {
+                if(c != '\r') {
+                    dualDescriptor.elementText += c
+                }
+            }
+        } else {
+            if(index >= secondSectionStartIndex){
+                if(c != '\r'){
+                    dualDescriptor.actionText += c
+                }
+            }
+        }
+    }
+    return dualDescriptor
+}
+
 fun createRandomPasskey(keyLength: Int): String {
 
     var realKeyLength = keyLength - 1

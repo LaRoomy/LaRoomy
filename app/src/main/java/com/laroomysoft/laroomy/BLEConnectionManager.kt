@@ -127,6 +127,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     // constant properties (regarding the device!) ////////////////////////
     //private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
+
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
     private val testCommand = "vXtest385_26$"// outgoing
@@ -143,7 +144,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val propertyGroupChangedNotificationEntry = "DnPGc=t"
     private val deviceHeaderStartEntry = "DnDIHs7"
     private val deviceHeaderCloseMessage = "DnDIHe+"
-    private val deviceReconnectedNotification = "yDnRcon=t$"
+
+    private val deviceReconnectedNotification = "500002002\r"
+
     private val navigatedToDeviceMainPageNotification = "yDnNavM=5$"
     private val multiComplexPropertyPageInvokedStartEntry = "yDnMCIv-X"
     private val multiComplexPropertyNameSetterEntry = "MCN&"
@@ -155,6 +158,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val bindingNotSupportedNotification = "DnBNS=x"// incoming
     private val bindingSuccessNotification = "DnBNS=y"// incoming
     private val bindingErrorNotification = "DnBNS=e"// incoming
+
+    // static notifications
+    private val propertyLoadingCompleteNotification = "500002001\r"
 
     // new ones:
     private val bleDeviceData = BLEDeviceData()
@@ -331,7 +337,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 BluetoothProfile.STATE_CONNECTED -> {
 
                     // if successful connected reset the device-data
-                    bleDeviceData.clear()
+                    //bleDeviceData.clear()
 
                     isConnected = true
 
@@ -364,6 +370,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         applicationProperty.logControl("I: Connection restored")
 
+                        // re-init the descriptor to establish a stream!
+                        val descriptor = gattCharacteristic.getDescriptor(clientCharacteristicConfig)
+                            .apply {
+                                value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            }
+                        gatt?.writeDescriptor(descriptor)
+
+                        // notify the remote device
                         Handler(Looper.getMainLooper()).postDelayed({
                             sendData(deviceReconnectedNotification)
                         }, 200)
@@ -2565,41 +2579,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    private fun setGroupName(id: Int, data: String){
-//        laRoomyPropertyGroupList.forEach {
-//            if(it.groupIndex == id){
-//                it.groupName = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-//                    "Deutsch" -> encodeGermanString(data)
-//                    else -> data
-//                }
-//            }
-//        }
-//    }
-
-//    fun startPropertyConfirmationProcess(){
-//        // log:
-//        if(verboseLog) {
-//            Log.d("M:StartConfirmation", "Property Listing started in Confirmation-Mode")
-//        }
-//        // start the confirmation process (!!but only if there is no pending retrieving process!!)
-//        if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
-//            if(this.laRoomyDevicePropertyList.isNotEmpty()) {
-//                this.propertyConfirmationModeActive = true
-//                this.propertyDetailChangedOnConfirmation = false
-//                this.groupDetailChangedOnConfirmation = false
-//                this.startDevicePropertyListing()
-//            } else {
-//                // there are no properties to confirm!
-//                if (verboseLog) {
-//                    Log.d(
-//                        "M:StartConfirmation",
-//                        "Property List empty - confirmation not possible"
-//                    )
-//                }
-//            }
-//        }
-//    }
-
     private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
         var dataProcessed = false
         // log:
@@ -2742,32 +2721,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         return dataProcessed
     }
-
-//    private fun startDeviceHeaderRecording(data: String){
-//        if(data.length > 9) {
-//
-//            this.deviceInfoHeaderData.clear()
-//
-//            var imageID = ""
-//            imageID += data.elementAt(7)
-//            imageID += data.elementAt(8)
-//            imageID += data.elementAt(9)
-//
-//            this.deviceInfoHeaderData.imageID = imageID.toInt()
-//            this.deviceHeaderRecordingActive = true
-//        }
-//    }
-
-//    private fun endDeviceHeaderRecording(){
-//        this.deviceInfoHeaderData.valid = true
-//        this.deviceHeaderRecordingActive = false
-//
-//        if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
-//            this.deviceInfoHeaderData.message =
-//                encodeGermanString(this.deviceInfoHeaderData.message)
-//        }
-//        this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
-//    }
 
     private fun updateProperty(data: String){
         if(data.length < 19){
@@ -2921,44 +2874,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    private fun sendSinglePropertyRequest(propertyIndex: Int){
-//        if(verboseLog) {
-//            Log.d("M:SendRequest", "SendSinglePropertyRequest: Invoked")
-//        }
-//        if(this.isConnected) {
-//            // set marker
-//            this.singlePropertyRetrievingAction = true
-//            // build string
-//            val data =
-//                when {
-//                    (propertyIndex < 10) -> "A00$propertyIndex$"
-//                    ((propertyIndex > 9) && (propertyIndex < 100)) -> "A0$propertyIndex$"
-//                    else -> "A$propertyIndex$"
-//                }
-//            // send request
-//            this.sendData(data)
-//        }
-//    }
-
-//    private fun sendSinglePropertyGroupRequest(groupIndex: Int){
-//        if(verboseLog) {
-//            Log.d("M:SendRequest", "SendSinglePropertyGroupRequest: Invoked")
-//        }
-//        if(this.isConnected) {
-//            // set marker
-//            this.singleGroupRetrievingAction = true
-//            // build string
-//            val data =
-//                when {
-//                    (groupIndex < 10) -> "E00$groupIndex$"
-//                    ((groupIndex > 9) && (groupIndex < 100)) -> "E0$groupIndex$"
-//                    else -> "E$groupIndex$"
-//                }
-//            // send request
-//            this.sendData(data)
-//        }
-//    }
-
     private fun sendSinglePropertyResolveRequest(propertyID: Int){
         if(verboseLog) {
             Log.d("M:SendRequest", "SendSinglePropertyResolveRequest: Invoked")
@@ -3030,10 +2945,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     globalIndex++
                     // add the group to the list
                     this.uIAdapterList.add(dpl)
-                    // notify activity
-                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl) //TODO
-
-                    //Thread.sleep(100)
 
                     // add the device properties to the group by their IDs
                     for (ID in laRoomyDevicePropertyGroup.memberIDs) {
@@ -3056,11 +2967,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 globalIndex++
                                 // add it to the list
                                 this.uIAdapterList.add(propertyEntry)
-                                // notify activity
-                                //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) // TODO
-
-                                //Thread.sleep(100)
-
                                 // ID found -> further processing not necessary -> break the loop
                                 return@forEachIndexed
                             }
@@ -3069,22 +2975,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     // mark the last element in the group
                     this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
-
-                    // separate the groups
-                    /*val dpl2 = DevicePropertyListContentInformation()
-                    dpl2.elementType = SEPARATOR_ELEMENT
-                    dpl2.canNavigateForward = false
-                    // set globalIndex
-                    dpl2.globalIndex = globalIndex
-                    globalIndex++
-                    // add the separator to the array
-                    this.uIAdapterList.add(dpl2)
-                    // notify activity
-                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(dpl2) //TODO
-
-                    //Thread.sleep(100)
-
-                     */
                 }
             }
             // now add the properties which are not part of a group
@@ -3106,27 +2996,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     globalIndex++
                     // add it to the list
                     this.uIAdapterList.add(propertyEntry)
-
-                    // notify activity
-                    //this.propertyCallback.onUIAdaptableArrayListItemAdded(propertyEntry) // TODO !
-
-                    //Thread.sleep(100)
                 }
             }
-            //this.dataReadyToShow = true // TODO
-            //this.propertyCallback.onUIAdaptableArrayListGenerationComplete(this.uIAdapterList) // TODO
 
-
-
-            // TODO: notify finalization of the process
+            // notify finalization of the process
             Handler(Looper.getMainLooper()).postDelayed({
-                this.sendData(propertyRetrievalCompleteNotification)
+                this.sendData(propertyLoadingCompleteNotification)
             }, 700)
 
 
-            // temp!!!!
-
-
+            // add the elements with a timer-delay
             itemAddCounter = 0
 
             Timer().scheduleAtFixedRate(object : TimerTask() {

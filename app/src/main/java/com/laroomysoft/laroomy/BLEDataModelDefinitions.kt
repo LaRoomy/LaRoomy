@@ -359,3 +359,9 @@ class LaRoomyDevicePropertyGroup{
         return result
     }
 }
+
+class DualDescriptor{
+    var elementText = ""
+    var actionText = ""
+    var isDual = false
+}
