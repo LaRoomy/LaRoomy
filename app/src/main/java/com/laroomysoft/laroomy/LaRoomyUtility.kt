@@ -31,7 +31,10 @@ fun get8BitValueAsPercent(value: Int) : Int {
 
     if(value in 0..255){
         ret = when {
-            value > 0 -> ((value*100)/255)
+            value > 0 -> {
+                val floatVar = value.toFloat()
+                ((floatVar*100f)/255f).toInt()
+            }
             value == 0 -> 0
             else -> ret -1
         }
@@ -49,9 +52,9 @@ fun get8BitValueAsPartOfOne(value: Int) : Float {
 }
 
 fun percentTo8Bit(percent: Int) : Int {
-    val value = 255*percent
-    return if(value == 0) 0
-    else value/100
+    val value = 255f*percent
+    return if(value == 0f) 0
+    else (value/100f).toInt()
 }
 
 fun a8BitValueToString(value: Int) : String {
@@ -407,6 +410,9 @@ fun validatePassKey(key: String) : Boolean{
 class PercentageLevelPropertyGenerator(E8bit_level: Int){
 
     private val percentAsInt = get8BitValueAsPercent(E8bit_level)
+
+    val percentageValue : Int
+    get() = percentAsInt
 
     val percentageString: String? by lazy (LazyThreadSafetyMode.NONE){
         "$percentAsInt%"

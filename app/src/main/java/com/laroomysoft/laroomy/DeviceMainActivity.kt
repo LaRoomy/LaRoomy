@@ -9,16 +9,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
@@ -41,12 +39,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var deviceHeaderNotificationImageView: AppCompatImageView
     private lateinit var deviceHeaderNotificationTextView: AppCompatTextView
     private lateinit var deviceSettingsButton: AppCompatImageButton
+    private lateinit var popUpWindow: PopupWindow
+
 
     private var activityWasSuspended = false
     private var buttonRecoveryRequired = false
     private var restoreIndex = -1
     private var deviceImageResourceId = -1
     private var propertyLoadingFinished = false
+    private var levelSelectorPopUpOpen = false
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -430,6 +431,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         )
     }
 
+    @SuppressLint("InflateParams")
     override fun onPropertyLevelSelectButtonClick(
         index: Int,
         devicePropertyListContentInformation: DevicePropertyListContentInformation
@@ -444,7 +446,54 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
-        // TODO: open a popup!
+        // return if popup is open
+        if(this.levelSelectorPopUpOpen){
+            return
+        }
+
+        // shade the background
+        this.devicePropertyListRecyclerView.alpha = 0.2f
+
+        // TODO: block the activation of background (list) elements during popup-lifecycle
+        this.levelSelectorPopUpOpen = true
+
+        val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val popUpView =
+            layoutInflater.inflate(R.layout.device_main_level_selector_popup, null)
+
+        this.popUpWindow =
+            PopupWindow(
+                popUpView,
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+        this.popUpWindow.setOnDismissListener {
+            devicePropertyListRecyclerView.alpha = 1f
+            levelSelectorPopUpOpen = false
+        }
+
+        this.popUpWindow.showAtLocation(this.devicePropertyListRecyclerView, Gravity.CENTER, 0, 0)
+
+        // set the appropriate image and seekbar position
+        this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.levelSelectorPopUpImageView).setImageResource(
+            resourceIdForImageId(devicePropertyListContentInformation.imageID)
+        )
+        val percentageLevelPropertyGenerator =
+            PercentageLevelPropertyGenerator(devicePropertyListContentInformation.simplePropertyState)
+        this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text =
+            percentageLevelPropertyGenerator.percentageString
+
+        // add the handler to the element
+        devicePropertyListContentInformation.handler = this
+        // set seekbar properties
+        this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).apply {
+            this.setOnSeekBarChangeListener(devicePropertyListContentInformation)
+            this.progress = percentageLevelPropertyGenerator.percentageValue
+        }
+
     }
 
     override fun onSeekBarPositionChange(
@@ -452,15 +501,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         newValue: Int,
         changeType: Int
     ) {
-        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
-
         if(verboseLog) {
+            val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+
             Log.d(
                 "M:CB:onSeekBarChange",
                 "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
                         "Type: ${devicePropertyListContentInformation.propertyType}\n" +
                         "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Property-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
                         "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
                         "SeekBar specific values:\n" +
                         "New Value: $newValue\n" +
@@ -476,8 +525,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         if(changeType == SEEK_BAR_PROGRESS_CHANGING){
+            // calculate bit-value
             val bitValue =
                 percentTo8Bit(newValue)
+
+            // update list element
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).simplePropertyState = bitValue
+            this.devicePropertyListViewAdapter.notifyItemChanged(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).globalIndex)
+
+            if(levelSelectorPopUpOpen){
+                val seekBarText =  "$newValue%"
+                // set the seekbar and textview properties
+                this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text = seekBarText
+                this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).progress = newValue
+            }
 
             ApplicationProperty.bluetoothConnectionManager.sendData(
                 makeSimplePropertyExecutionString(index, bitValue)
@@ -1072,6 +1133,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
                                 visibility = View.VISIBLE
                                 text = percentageLevelPropertyGenerator.percentageString
+
+                                setOnClickListener {
+                                    itemClickListener.onPropertyLevelSelectButtonClick(
+                                        elementToRender.internalElementIndex,
+                                        elementToRender
+                                    )
+                                }
 
                                 //setTextColor(percentageLevelPropertyGenerator.colorID)
 

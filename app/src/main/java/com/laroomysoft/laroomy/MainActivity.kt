@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
     private var addButtonNormalizationRequired = false
     private var preventListSelection = false
+    private var preventMenuButtonDoubleExecution = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -218,6 +219,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
     @SuppressLint("InflateParams")
     fun onMainActivityMenuButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
+        // if the popup is open, exit
+        if(preventMenuButtonDoubleExecution){
+            return
+        }
+
         // shade the background
         this.availableDevicesRecyclerView.alpha = 0.2f
         this.noContentContainer.alpha = 0.2f
@@ -225,6 +231,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
 
         // block the invocation of a list element during the popup lifecycle
         this.preventListSelection = true
+        // block the double execution of the menu button
+        this.preventMenuButtonDoubleExecution = true
 
         val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -252,6 +260,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
                     R.drawable.ic_menu_white_36dp
                 )
                 preventListSelection = false
+                preventMenuButtonDoubleExecution = false
             }, 300, TimeUnit.MILLISECONDS)
         }
 
