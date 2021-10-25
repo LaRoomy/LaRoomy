@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.graphics.Color
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 const val COMMON_PASSKEY_LENGTH = 10
 
@@ -33,7 +34,7 @@ fun get8BitValueAsPercent(value: Int) : Int {
         ret = when {
             value > 0 -> {
                 val floatVar = value.toFloat()
-                ((floatVar*100f)/255f).toInt()
+                ((floatVar*100f)/255f).roundToInt()
             }
             value == 0 -> 0
             else -> ret -1
@@ -54,7 +55,7 @@ fun get8BitValueAsPartOfOne(value: Int) : Float {
 fun percentTo8Bit(percent: Int) : Int {
     val value = 255f*percent
     return if(value == 0f) 0
-    else (value/100f).toInt()
+    else (value/100f).roundToInt()
 }
 
 fun a8BitValueToString(value: Int) : String {

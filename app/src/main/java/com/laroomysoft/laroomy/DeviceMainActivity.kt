@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
 import java.lang.Exception
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 
@@ -103,6 +105,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     setHasFixedSize(true)
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
+                    itemAnimator = null
                 }
     }
 
@@ -490,8 +493,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         devicePropertyListContentInformation.handler = this
         // set seekbar properties
         this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).apply {
-            this.setOnSeekBarChangeListener(devicePropertyListContentInformation)
             this.progress = percentageLevelPropertyGenerator.percentageValue
+            this.setOnSeekBarChangeListener(devicePropertyListContentInformation)
         }
 
     }
@@ -847,20 +850,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // add the data to the UI-List
         this.propertyList.add(item)
 
-        // notify the UI to change
-        // FIXME: not necessary due to data-binding?????????
-        // FIXME: here is a problem, should this not be called from the ui-thread?? If I do so, there is an exception
-        //runOnUiThread {
-            //this.devicePropertyListViewAdapter.notifyItemInserted(this.propertyList.size - 1)
-
         try {
-            this.devicePropertyListViewAdapter.notifyItemInserted(item.globalIndex)
+            runOnUiThread {
+                this.devicePropertyListViewAdapter.notifyItemInserted(item.globalIndex)
+            }
         }
         catch (e: Exception){
             Log.e("onUIAddItem", "Error while adding an item to property list: ${e.message}")
-        }
 
-        //}
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                this.devicePropertyListViewAdapter.notifyItemInserted(item.globalIndex)
+            }, 500, TimeUnit.MILLISECONDS)
+        }
     }
 
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {

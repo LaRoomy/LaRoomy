@@ -502,8 +502,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             applicationProperty.logControl("I: Characteristic changed: $dataAsString")
 
-            if(!dispatchTransmission(dataAsString ?: "")){
-                callback.onDataReceived(dataAsString ?: "")
+            try {
+                if (!dispatchTransmission(dataAsString ?: "")) {
+                    callback.onDataReceived(dataAsString ?: "")
+                }
+            } catch (e:Exception){
+                if(verboseLog){
+                    Log.e("onCharacteristicChanged", "Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
+                }
+                applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
             }
 
             // check authentication
