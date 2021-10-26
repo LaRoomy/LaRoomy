@@ -366,6 +366,7 @@ interface OnPropertyClickListener {
     fun onPropertyElementButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
     fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation, switch: SwitchCompat)
     fun onPropertyLevelSelectButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
+    fun onPropertyOptionSelectButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
     fun onSeekBarPositionChange(index: Int, newValue: Int, changeType: Int)
     fun onNavigatableElementClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
 }

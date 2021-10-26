@@ -50,6 +50,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var deviceImageResourceId = -1
     private var propertyLoadingFinished = false
     private var levelSelectorPopUpOpen = false
+    private var optionSelectorPopUpOpen = false
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -496,6 +497,86 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.progress = percentageLevelPropertyGenerator.percentageValue
             this.setOnSeekBarChangeListener(devicePropertyListContentInformation)
         }
+
+    }
+
+    @SuppressLint("InflateParams")
+    override fun onPropertyOptionSelectButtonClick(
+        index: Int,
+        devicePropertyListContentInformation: DevicePropertyListContentInformation
+    ) {
+        if(verboseLog) {
+            Log.d(
+                "M:CB:onPropOptionSelClk",
+                "Property element was clicked. Element-Type is OPTION-SELECTOR at index: $index\n\nData is:\n" +
+                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+            )
+        }
+        // return if popup is open
+        if(this.optionSelectorPopUpOpen){
+            return
+        }
+
+        // get the options array
+        val options =
+            decryptOptionSelectorString(devicePropertyListContentInformation.elementText)
+
+        if(options.isEmpty()){
+            return
+        }
+
+        // shade the background
+        this.devicePropertyListRecyclerView.alpha = 0.2f
+
+        // TODO: block the activation of background (list) elements during popup-lifecycle
+        this.levelSelectorPopUpOpen = true
+
+        val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val popUpView =
+            layoutInflater.inflate(R.layout.device_main_option_selector_popup, null)
+
+        this.popUpWindow =
+            PopupWindow(
+                popUpView,
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+        this.popUpWindow.setOnDismissListener {
+            devicePropertyListRecyclerView.alpha = 1f
+            optionSelectorPopUpOpen = false
+        }
+
+        this.popUpWindow.showAtLocation(this.devicePropertyListRecyclerView, Gravity.CENTER, 0, 0)
+
+        // set the appropriate image and option selection
+        this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.optionSelectorPopUpImageView).setImageResource(
+            resourceIdForImageId(devicePropertyListContentInformation.imageID)
+        )
+
+        this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.optionSelectorPopUpTextView).text =
+            options.elementAt(0)
+
+        options.removeAt(0)
+
+        // set picker values
+        this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker).apply {
+            minValue = 0
+            maxValue = options.size - 1
+            value = devicePropertyListContentInformation.simplePropertyState
+            setFormatter {
+                options.elementAt(it)
+            }
+        }
+
+        // TODO: add number-picker selection handler !!!!!!!!!!!!!!!!!
+
+        // TODO: there is on string missing in the list???
 
     }
 
@@ -1149,9 +1230,37 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                         PROPERTY_TYPE_OPTION_SELECTOR -> {
 
-                            // TODO !!!!!!!!!!!!
+                            val optionSelectorStrings =
+                                decryptOptionSelectorString(elementToRender.elementText)
 
+                            // NOTE: the first string is the element description!
 
+                            if (optionSelectorStrings.isNotEmpty()) {
+
+                                val textView =
+                                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
+                                textView.text = optionSelectorStrings.elementAt(0)
+
+                                // apply to the button
+                                holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
+                                    // show the button
+                                    visibility = View.VISIBLE
+
+                                    // set the text of the button (if valid)
+                                    if (elementToRender.simplePropertyState < optionSelectorStrings.size) {
+                                        text =
+                                            optionSelectorStrings.elementAt(elementToRender.simplePropertyState)
+
+                                        // set the onClick handler
+                                        setOnClickListener {
+                                            itemClickListener.onPropertyOptionSelectButtonClick(
+                                                elementToRender.internalElementIndex,
+                                                elementToRender
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
                             holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)

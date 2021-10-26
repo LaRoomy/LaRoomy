@@ -967,10 +967,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
                 this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
             } else {
+                if(verboseLog){
+                    Log.d("readPropertyString", "Property-Transmission received. Loop not active. Update the element with index: ${laRoomyDeviceProperty.propertyIndex}")
+                }
+                applicationProperty.logControl("I: Property-Transmission received. Loop not active. Update the element with index: ${laRoomyDeviceProperty.propertyIndex}")
+
                 // if the loop is not active, this must be an update-transmission, so replace the property
                 if (this.laRoomyDevicePropertyList.size > laRoomyDeviceProperty.propertyIndex) {
+                    // update internal array-list
                     this.laRoomyDevicePropertyList[laRoomyDeviceProperty.propertyIndex] =
                         laRoomyDeviceProperty
+                    // update ui-adapter-list
+                    this.updatePropertyElementInUIList(laRoomyDeviceProperty)
                 }
             }
             return true
@@ -4200,6 +4208,28 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             else -> {
                 Log.e("onErrorFlag", "Error was: undefined flag value")
+            }
+        }
+    }
+
+    private fun updatePropertyElementInUIList(laRoomyDeviceProperty: LaRoomyDeviceProperty){
+
+        this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+
+            if(laRoomyDeviceProperty.propertyIndex == devicePropertyListContentInformation.internalElementIndex){
+
+                devicePropertyListContentInformation.elementText = laRoomyDeviceProperty.propertyDescriptor
+                devicePropertyListContentInformation.canNavigateForward = laRoomyDeviceProperty.needNavigation()
+                //devicePropertyListContentInformation.complexPropertyState = laRoomyDeviceProperty.complexPropertyState// the complex state is not included in the transmission, so it is not initialized, yet
+                devicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
+                devicePropertyListContentInformation.isGroupMember = laRoomyDeviceProperty.isGroupMember
+                devicePropertyListContentInformation.imageID = laRoomyDeviceProperty.imageID
+                devicePropertyListContentInformation.internalElementIndex = laRoomyDeviceProperty.propertyIndex
+                devicePropertyListContentInformation.propertyType = laRoomyDeviceProperty.propertyType
+                devicePropertyListContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
+
+                this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                return@forEachIndexed
             }
         }
     }

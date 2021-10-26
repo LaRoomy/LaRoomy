@@ -92,6 +92,22 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
         this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
     }
+
+    fun clear(){
+        this.handler = null
+        this.canNavigateForward = false
+        this.isGroupMember = false
+        this.isLastInGroup = false
+        this.elementType = -1
+        this.indexInsideGroup = -1
+        this.globalIndex = -1
+        this.elementText = ""
+        this.internalElementIndex = -1
+        this.imageID = -1
+        this.propertyType = -1
+        this.simplePropertyState = -1
+        this.complexPropertyState = ComplexPropertyState()
+    }
 }
 
 class BLEDeviceData {

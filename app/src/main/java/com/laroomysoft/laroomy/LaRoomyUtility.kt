@@ -375,6 +375,37 @@ fun checkForDualDescriptor(descriptor: String) : DualDescriptor {
     return dualDescriptor
 }
 
+fun decryptOptionSelectorString(data: String) : ArrayList<String> {
+    val list = ArrayList<String>()
+
+    var str = ""
+    var nextIndex = 0
+
+    data.forEachIndexed { index, c ->
+
+        when(c){
+            ';' -> {
+                if (index < (data.length - 1)) {
+                    if (data.elementAt(index + 1) == ';') {
+                        list.add(str)
+                        str = ""
+                        nextIndex = index + 2
+                    }
+                }
+            }
+            '\r' -> {
+                return@forEachIndexed
+            }
+            else -> {
+                if(index >= nextIndex){
+                    str += c
+                }
+            }
+        }
+    }
+    return list
+}
+
 fun createRandomPasskey(keyLength: Int): String {
 
     var realKeyLength = keyLength - 1

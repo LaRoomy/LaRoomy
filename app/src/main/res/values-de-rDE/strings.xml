@@ -34,6 +34,7 @@
     <string name="DMA_ErrorElementText">error:type !</string>
 
 
+
     <string name="RGB_HeaderText">RGB Steuerung</string>
     <string name="RGB_OnOff">An / Aus</string>
     <string name="RGB_SingleColorModeButtonText">Einzelfarbe</string>
