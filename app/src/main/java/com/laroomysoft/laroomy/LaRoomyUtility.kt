@@ -393,18 +393,15 @@ fun decryptOptionSelectorString(data: String) : ArrayList<String> {
                     }
                 }
             }
-            '\r' -> {
-                if(str.isNotEmpty()){
-                    list.add(str)
-                }
-                return@forEachIndexed
-            }
             else -> {
                 if(index >= nextIndex){
                     str += c
                 }
             }
         }
+    }
+    if(str.isNotEmpty()){
+        list.add(str)
     }
     return list
 }

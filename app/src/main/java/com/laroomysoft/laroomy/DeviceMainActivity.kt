@@ -532,7 +532,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyListRecyclerView.alpha = 0.2f
 
         // TODO: block the activation of background (list) elements during popup-lifecycle
-        this.levelSelectorPopUpOpen = true
+        this.optionSelectorPopUpOpen = true
 
         val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -564,20 +564,38 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         options.removeAt(0)
 
+        var strArray = arrayOf<String>()
+        options.forEach {
+            strArray += it
+        }
+
         // set picker values
         this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker).apply {
             minValue = 0
             maxValue = options.size - 1
-            value = devicePropertyListContentInformation.simplePropertyState
-            setFormatter {
-                options.elementAt(it)
+
+            displayedValues = strArray
+
+//            setFormatter {
+//                options.elementAt(it)
+//            }
+
+            if(devicePropertyListContentInformation.simplePropertyState < options.size) {
+                value = devicePropertyListContentInformation.simplePropertyState
+            }
+
+            setOnValueChangedListener { _, _, newVal ->
+
+                // send execution command
+                ApplicationProperty.bluetoothConnectionManager.sendData(
+                    makeSimplePropertyExecutionString(devicePropertyListContentInformation.internalElementIndex, newVal)
+                )
+
+                // update list element
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).simplePropertyState = newVal
+                devicePropertyListViewAdapter.notifyItemChanged(index)
             }
         }
-
-        // TODO: add number-picker selection handler !!!!!!!!!!!!!!!!!
-
-        // TODO: there is on string missing in the list???
-
     }
 
     override fun onSeekBarPositionChange(
@@ -615,7 +633,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // update list element
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).simplePropertyState = bitValue
-            this.devicePropertyListViewAdapter.notifyItemChanged(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).globalIndex)
+            this.devicePropertyListViewAdapter.notifyItemChanged(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).globalIndex)// TODO: index is enough??
 
             if(levelSelectorPopUpOpen){
                 val seekBarText =  "$newValue%"
@@ -1240,6 +1258,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                 val textView =
                                     holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
                                 textView.text = optionSelectorStrings.elementAt(0)
+
+                                // remove the first element, since this is the descriptor-text
+                                optionSelectorStrings.removeAt(0)
 
                                 // apply to the button
                                 holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
