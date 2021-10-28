@@ -511,6 +511,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     Log.e("onCharacteristicChanged", "Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
                 }
                 applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
+
+
+                // TODO: notify user and navigate back, however respond to the error
             }
 
             // check authentication
@@ -1418,6 +1421,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.deviceHeaderRecordingActive = false
 
         this.laRoomyDevicePropertyList.clear()
+        this.laRoomyPropertyGroupList.clear()
         this.bleDeviceData.clear()
     }
 
@@ -1445,6 +1449,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.deviceHeaderRecordingActive = false
 
         this.laRoomyDevicePropertyList.clear()
+        this.laRoomyPropertyGroupList.clear()
     }
 
     private fun imageFromIndexCounter(indexCounter: Int) : Int {

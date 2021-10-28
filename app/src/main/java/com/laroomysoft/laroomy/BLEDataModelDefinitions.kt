@@ -215,7 +215,7 @@ class LaRoomyDeviceProperty{
                 this.flags = Integer.decode(fgs)
                 this.propertyState = Integer.decode(propState)
 
-                if(this.groupIndex != 0){
+                if((this.flags and 0x01) != 0){
                     this.isGroupMember = true
                 }
 
@@ -316,14 +316,14 @@ class LaRoomyDevicePropertyGroup{
 
 
                 // make sure the string is long enough for all members
-                val minLength = 11 + (2 * this.memberCount)
+                val minLength = 12 + (2 * this.memberCount)
 
                 // extract member id's
-                if(groupString.length <= minLength){
+                if(groupString.length >= minLength){
 
                     var hexVal = "0x"
 
-                    for(i in 0 .. this.memberCount){
+                    for(i in 0 until this.memberCount){
                         val index = 12 + (i * 2)
                         hexVal += groupString[index]
                         hexVal += groupString[index + 1]
@@ -337,9 +337,9 @@ class LaRoomyDevicePropertyGroup{
 
                 if(verboseLog) {
                     Log.d("M:PropGroup:fromString", "Data Recorded - Results:")
-                    Log.d("M:PropGroup:fromString", "GroupIndex: $localGroupIndex")
-                    Log.d("M:PropGroup:fromString", "MemberAmount: $localMemberCount")
-                    Log.d("M:PropGroup:fromString", "GroupImageID: $imgID")
+                    Log.d("M:PropGroup:fromString", "GroupIndex: ${this.groupIndex}")
+                    Log.d("M:PropGroup:fromString", "MemberAmount: ${this.memberCount}")
+                    Log.d("M:PropGroup:fromString", "GroupImageID: ${this.imageID}")
                     Log.d("M:PropGroup:fromString", "Member IDs:")
                     this.memberIDs.forEachIndexed { index, i ->
                         Log.d("M:PropGroup:fromString", "Index: $index ID: $i")

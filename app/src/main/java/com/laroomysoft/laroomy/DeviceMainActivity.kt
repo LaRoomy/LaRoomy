@@ -633,7 +633,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // update list element
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).simplePropertyState = bitValue
-            this.devicePropertyListViewAdapter.notifyItemChanged(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).globalIndex)// TODO: index is enough??
+            this.devicePropertyListViewAdapter.notifyItemChanged(index)
 
             if(levelSelectorPopUpOpen){
                 val seekBarText =  "$newValue%"
@@ -643,7 +643,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             }
 
             ApplicationProperty.bluetoothConnectionManager.sendData(
-                makeSimplePropertyExecutionString(index, bitValue)
+                makeSimplePropertyExecutionString(
+                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
+                    bitValue
+                )
             )
         }
     }
@@ -1090,7 +1093,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         .apply {
                             //visibility = View.VISIBLE
                             text = elementToRender.elementText
-                            textSize = 16F
+                            textSize = 18F
                             setTypeface(typeface, Typeface.BOLD)
                         }
                 }
