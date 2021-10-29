@@ -969,49 +969,75 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
 
-        runOnUiThread {
-            val uIElement =
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    UIAdapterElementIndex
-                )
 
-            val linearLayout =
-                this.devicePropertyListLayoutManager.findViewByPosition(UIAdapterElementIndex) as? LinearLayout
 
-            // update the appropriate element
-            when (uIElement.propertyType) {
-                PROPERTY_TYPE_BUTTON -> {
-                    // NOTE: this is not used, because the button has no state (by now)
-                }
-                PROPERTY_TYPE_SWITCH -> {
-                    val switch =
-                        linearLayout?.findViewById<SwitchCompat>(R.id.elementSwitch)
-                    switch?.isChecked = (newState != 0)
-                }
-                PROPERTY_TYPE_LEVEL_SELECTOR -> {
+            runOnUiThread {
+                try {
+                    val uIElement =
+                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                            UIAdapterElementIndex
+                        )
 
-                    // TODO: set textview value to the newState!
+                    // temp:
+                    Log.e("onSimpleStateChanged", "Callback invoked: type is: ${uIElement.propertyType}")
 
-                    /*
+
+                    val linearLayout =
+                        this.devicePropertyListLayoutManager.findViewByPosition(
+                            UIAdapterElementIndex
+                        ) as? LinearLayout
+
+                    // update the appropriate element
+                    when (uIElement.propertyType) {
+                        PROPERTY_TYPE_BUTTON -> {
+                            // NOTE: this is not used, because the button has no state (by now)
+                        }
+                        PROPERTY_TYPE_SWITCH -> {
+//                    val switch =
+//                        linearLayout?.findViewById<SwitchCompat>(R.id.elementSwitch)
+//                    switch?.isChecked = (newState != 0)
+
+                            // TODO: why the fuck is the property-type -1 ????
+
+                            devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
+                        }
+                        PROPERTY_TYPE_LEVEL_SELECTOR -> {
+
+                            // TODO: set textview value to the newState!
+
+                            devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
+
+                            /*
                     val seekBar =
                         linearLayout?.findViewById<SeekBar>(R.id.elementSeekBar)
                     seekBar?.progress = get8BitValueAsPercent(newState)
                     */
-                }
-                PROPERTY_TYPE_LEVEL_INDICATOR -> {
-                    val textView =
-                        linearLayout?.findViewById<TextView>(R.id.levelIndicationTextView)
-                    val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
-                        get8BitValueAsPercent(newState)
+                        }
+                        PROPERTY_TYPE_LEVEL_INDICATOR -> {
+//                    val textView =
+//                        linearLayout?.findViewById<TextView>(R.id.levelIndicationTextView)
+//                    val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
+//                        get8BitValueAsPercent(newState)
+//                    )
+//                    textView?.setTextColor(percentageLevelPropertyGenerator.colorID)
+//                    textView?.text = percentageLevelPropertyGenerator.percentageString
+                            devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
+                        }
+                        PROPERTY_TYPE_OPTION_SELECTOR -> {
+                            devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
+                        }
+                        else -> {
+                            // nothing by now
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(
+                        "DMA:onSimplePropState",
+                        "DeviceMainActivity - onSimplePropertyState changed. Exception: $e"
                     )
-                    textView?.setTextColor(percentageLevelPropertyGenerator.colorID)
-                    textView?.text = percentageLevelPropertyGenerator.percentageString
-                }
-                else -> {
-                    // nothing by now
                 }
             }
-        }
     }
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
@@ -1190,9 +1216,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                     switch
                                 )
                             }
-                            if (elementToRender.simplePropertyState > 0) {
-                                switch.isChecked = true
-                            }
+                            switch.isChecked = elementToRender.simplePropertyState > 0
 
                             // show the text-view
                             val textView =

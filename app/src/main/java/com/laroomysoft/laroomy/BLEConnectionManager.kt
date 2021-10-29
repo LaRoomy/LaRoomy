@@ -886,11 +886,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             }
 
+            // log
+            if(verboseLog){
+                Log.d("readSimpleStateData", "Simple State Data read: PropertyIndex: $propertyIndex  newState: $newState")
+            }
+            applicationProperty.logControl("I: Simple State Data read: PropertyIndex: $propertyIndex  newState: $newState")
+
             // launch property changed event
-            this.propertyCallback.onSimplePropertyStateChanged(
-                uiChangeIndex,
-                newState
-            )
+            if(uiChangeIndex != -1) {
+                this.propertyCallback.onSimplePropertyStateChanged(
+                    uiChangeIndex,
+                    newState
+                )
+            } else {
+                Log.e("readSimpleStateData", "UI-Element was not found, PropertyIndex: $propertyIndex")
+            }
         }
     }
 
