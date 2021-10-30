@@ -71,7 +71,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     var isGroupMember = false
     var isLastInGroup = false
     var elementType = -1 //SEPARATOR_ELEMENT
-    var indexInsideGroup = -1
+    //var indexInsideGroup = -1
     var globalIndex = -1
     var elementText = ""
     var internalElementIndex = -1
@@ -99,7 +99,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
         this.isGroupMember = false
         this.isLastInGroup = false
         this.elementType = -1
-        this.indexInsideGroup = -1
+        //this.indexInsideGroup = -1
         this.globalIndex = -1
         this.elementText = ""
         this.internalElementIndex = -1

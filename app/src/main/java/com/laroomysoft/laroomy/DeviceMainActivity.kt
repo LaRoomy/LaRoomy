@@ -1027,7 +1027,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
                         }
                         else -> {
-                            // nothing by now
+                            if(verboseLog){
+                                Log.e("onSimpleStateChanged", "Callback invoked. Invalid propertyType detected.\nType was: ${uIElement.propertyType}\nUIElementIndex: $UIAdapterElementIndex")
+                            }
+                            (applicationContext as ApplicationProperty).logControl("E: Simple Property State changed. Invalid property type detected. - Type was: ${uIElement.propertyType} - UIElementIndex: $UIAdapterElementIndex")
                         }
                     }
 
