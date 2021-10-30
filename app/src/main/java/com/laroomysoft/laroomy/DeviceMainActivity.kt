@@ -969,8 +969,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
 
-
-
             runOnUiThread {
                 try {
                     val uIElement =
@@ -979,7 +977,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         )
 
                     // temp:
-                    Log.e("onSimpleStateChanged", "Callback invoked: type is: ${uIElement.propertyType}")
+                    //Log.e("onSimpleStateChanged", "Callback invoked: type is: ${uIElement.propertyType}")
 
 
                     val linearLayout =
@@ -997,7 +995,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 //                        linearLayout?.findViewById<SwitchCompat>(R.id.elementSwitch)
 //                    switch?.isChecked = (newState != 0)
 
-                            // TODO: why the fuck is the property-type -1 ????
 
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
                         }
@@ -1305,7 +1302,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                         // set the onClick handler
                                         setOnClickListener {
                                             itemClickListener.onPropertyOptionSelectButtonClick(
-                                                elementToRender.internalElementIndex,
+                                                elementToRender.globalIndex,
                                                 elementToRender
                                             )
                                         }

@@ -36,92 +36,6 @@ const val DEVICE_NOTIFICATION_BINDING_ERROR = 3
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE = "unable to resume connection - device not reachable"
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = "unable to resume connection - invalid address"
 
-
-
-
-//class LaRoomyDevicePresentationModel {
-//    // NOTE: This is the data-model for the DeviceListItem in the main-activity
-//    var name = ""
-//    var address = ""
-//    //var type = 0
-//    var image = 0
-//}
-
-//class ComplexPropertyState {
-//    // shared state values (multi-purpose)
-//    var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)        // (number of bars in bar-graph activity)
-//    var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)      // (use value as bar-descriptor in bar-graph activity)
-//    var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)       // (fixed maximum value in bar-graph activity)
-//    var valueFour = -1     // general use                   // flag-value in simple Navigator
-//    var valueFive = -1     // general use                   // flag value in simple Navigator
-//    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
-//    var enabledState = true// at this time only a placeholder (not implemented yet)
-//    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
-//    var strValue = ""
-//
-//    // single used values (only valid in specific complex states)
-//    var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
-//    var timeSetterIndex = -1        // Value to identify the time setter type
-//}
-
-//class DeviceInfoHeaderData {
-//    var message = ""
-//    var imageID = -1
-//    var valid = false
-//
-//    fun clear(){
-//        this.message = ""
-//        this.imageID = -1
-//        this.valid = false
-//    }
-//}
-//
-//class ElementUpdateInfo{
-//    var elementID = -1
-//    var elementIndex = -1
-//    var elementType = -1
-//    var updateType = -1
-//}
-//
-//class MultiComplexPropertyData{
-//    var dataIndex = -1
-//    var dataName = ""
-//    var dataValue = -1
-//    var isName = false
-//}
-//
-//class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
-//    // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
-//
-//    var handler: OnPropertyClickListener? = null
-//
-//    var canNavigateForward = false
-//    var isGroupMember = false
-//    var isLastInGroup = false
-//    var elementType = -1 //SEPARATOR_ELEMENT
-//    var indexInsideGroup = -1
-//    var globalIndex = -1
-//    var elementText = ""
-//    var elementID = -1
-//    var imageID = -1
-//    var propertyType = -1
-//    //var initialElementValue = -1
-//    var simplePropertyState = -1
-//    var complexPropertyState = ComplexPropertyState()
-//
-//    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//        this.handler?.onSeekBarPositionChange(this.globalIndex, progress, SEEK_BAR_PROGRESS_CHANGING)
-//    }
-//
-//    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-//        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_START_TRACK)
-//    }
-//
-//    override fun onStopTrackingTouch(seekBar: SeekBar?) {
-//        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
-//    }
-//}
-
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
     // constant properties (regarding the device!) ////////////////////////
@@ -129,6 +43,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
 
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+
     private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
     private val testCommand = "vXtest385_26$"// outgoing
     private val propertyStringPrefix = "IPR" // incoming -prefix
@@ -235,17 +150,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val currentUsedCharacteristicUUID: String
         get() = this.gattCharacteristic.uuid.toString()
 
-
-    //private val scanResultList: MutableList<ScanResult?> = ArrayList()
-
-    private lateinit var mHandler: Handler
-
-    val isPropertyUpToDate: Boolean
-        get() = this.propertyUpToDate
-
-    val isUIDataReady: Boolean
-        get() = this.dataReadyToShow
-
     val isLastAddressValid: Boolean
         get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
 
@@ -302,7 +206,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
     private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
-
         val bluetoothManager =
             activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
@@ -315,10 +218,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private var propertyDetailChangedOnConfirmation = false
     private var groupDetailChangedOnConfirmation = false
-
-    private var mScanning: Boolean = false
-
-    //private var preselectIndex: Int = -1
 
     private var connectionAttemptCounter = 0// remove!
 
@@ -1359,18 +1258,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.callback = eventHandlerObject
     }
 
-//    private fun groupRequestLoopRequired():Boolean{
-//        var ret = false
-//        if(this.laRoomyDevicePropertyList.isNotEmpty()){
-//            this.laRoomyDevicePropertyList.forEach {
-//                if(it.isGroupMember){
-//                    ret = true
-//                }
-//            }
-//        }
-//        return ret
-//    }
-
     fun setPropertyEventHandler(pEvents: PropertyCallback){
         this.propertyCallback = pEvents
     }
@@ -1510,29 +1397,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    fun connectToDeviceWithInternalScanList(macAddress: String?){
-//
-//        var i: Int = -1
-//        // search for the mac-address in the result list and try to connect
-//        this.scanResultList.forEachIndexed { index, scanResult ->
-//
-//            if(scanResult?.device?.address == macAddress){
-//                i = index
-//            }
-//        }
-//        when(i){
-//            -1 -> return
-//            else -> {
-//                this.currentDevice = scanResultList[i]?.device
-//
-//                this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
-//
-//            }
-//        }
-//    }
-
     fun getLastConnectedDeviceAddress() : String {
-
         val address =
             this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
 
@@ -1541,7 +1406,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun connectToLastSuccessfulConnectedDevice() {
-
         val address =
             this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
 
@@ -1558,7 +1422,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun connectToBondedDeviceWithMacAddress(macAddress: String?){
-
         this.bondedList?.forEach {
             if(it.address == macAddress){
                 this.currentDevice = it
@@ -1566,15 +1429,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
     }
-
-//    fun connectToCurrentDevice(){
-//        // TODO: This is a mark for the use of this method in another app: checking the bond state is not necessary, so this method is obsolete
-//        if(this.currentDevice?.bondState == BluetoothDevice.BOND_NONE){
-//            // device is not bonded, the connection attempt will raise an prompt for the user to connect
-//            checkBondingStateWithDelay()
-//        }
-//        this.connect()
-//    }
 
     private fun connect(){
         if(this.currentDevice != null) {
@@ -1622,41 +1476,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    private fun checkBondingStateWithDelay(){
-//        if(this.connectionAttemptCounter < MAX_CONNECTION_ATTEMPTS) {
-//
-//            Handler(Looper.getMainLooper()).postDelayed({
-//                // check if device is bonded now
-//                if ((this.currentDevice?.bondState == BluetoothDevice.BOND_NONE)
-//                    || (this.currentDevice?.bondState == BluetoothDevice.BOND_BONDING)
-//                ) {
-//                    // count the number of attempts
-//                    this.connectionAttemptCounter++
-//                    // call the delay again
-//                    checkBondingStateWithDelay()
-//                } else {
-//                    connect()
-//                }
-//            }, 4000)
-//        }
-//    }
-
-//    fun selectCurrentDeviceFromInternalList(index: Int){
-//
-//        if(this.scanResultList.isNotEmpty())
-//            this.currentDevice = this.scanResultList[index]?.device
-//        else
-//            this.currentDevice = this.bondedList?.elementAt(index)
-//    }
-
     fun checkBluetoothEnabled(caller: Activity){
-
-        // TODO: check if this function works!
-
         if(verboseLog) {
             Log.d("M:bluetoothEnabled?", "Check if bluetooth is enabled")
         }
-
         bleAdapter?.takeIf{it.isDisabled}?.apply{
             // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -1697,6 +1520,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     "BluetoothManager: resumeConnection: Internal Device Address: ${this.suspendedDeviceAddress}"
                 )
             }
+            applicationProperty.logControl("I: Connection was suspended: trying to resume connection")
+
             this.bluetoothGatt?.connect()
 
             // set up a handler to check if the connection works
@@ -1714,16 +1539,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    private fun laRoomyDeviceTypeFromName(name: String): Int {
-//        return when(name){
-//            "LaRoomy XNG" -> LAROOMYDEVICETYPE_XNG
-//            "LaRoomy CTX" -> LAROOMYDEVICETYPE_CTX
-//            "LaRoomy TVM" -> LAROOMYDEVICETYPE_TVM
-//            else -> UNKNOWN_DEVICETYPE
-//        }
-//    }
-
-    fun saveLastSuccessfulConnectedDeviceAddress(address: String){
+    private fun saveLastSuccessfulConnectedDeviceAddress(address: String){
         if(verboseLog) {
             Log.d(
                 "M:SaveAddress",
@@ -1732,32 +1548,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         this.applicationProperty.saveStringData(address, R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
     }
-
-//    fun startDevicePropertyListing(){
-//
-//        // TODO: what is if the property array is already filled? Init the confirm process! Or erase????
-//
-//        if(this.isConnected){
-//            // only start if there is no pending process/loop
-//            if(!(this.propertyLoopActive || this.propertyNameResolveLoopActive || this.groupLoopActive || this.groupInfoLoopActive)) {
-//                if(verboseLog) {
-//                    Log.d("M:StartPropListing", "Device property listing started.")
-//                }
-//                this.propertyRequestIndexCounter = 0
-//                this.propertyLoopActive = true
-//                this.propertyUpToDate = false
-//
-//                // only clear the list if this is not the confirmation mode
-//                if(!this.propertyConfirmationModeActive) {
-//                    this.dataReadyToShow = false
-//                    this.laRoomyDevicePropertyList.clear()
-//                    this.uIAdapterList.clear()
-//                }
-//                // start:
-//                this.sendData("A000$")// request first index (0)
-//            }
-//        }
-//    }
 
     fun reloadProperties(){
 
@@ -1770,848 +1560,125 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     }
 
-/*
-    fun addDeviceProperty(property: String) :Boolean {
-        var stringProcessed = false
+//    private fun setPropertyDescriptionForID(id:Int, description: String){
+//        laRoomyDevicePropertyList.forEach {
+//            if(it.propertyIndex == id){
+//                if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
+////                    it.propertyDescriptor =
+////                        encodeGermanString(description)
+//                } else {
+//                    it.propertyDescriptor = description
+//                }
+//            }
+//        }
+//    }
 
-        if (property == this.propertyLoopEndIndication) {
-            // log
-            if (verboseLog) {
-                Log.d(
-                    "M:addDeviceProperty",
-                    "Device property loop end received - stopping loop."
-                )
-            }
-            applicationProperty.logControl("I: Property-Loop END mark received - stopping loop")
-
-            this.propertyLoopActive = false
-            // set return value
-            stringProcessed = true
-            // start resolve loop
-            this.startRetrievingPropertyNames()
-        }
-        else {
-            if(property.startsWith("IPR")){
-                // log
-                if (verboseLog) {
-                    Log.d("M:addDeviceProperty", "Device property string received: $property")
-                }
-                applicationProperty.logControl("I: Property-String received: $property")
-                // add the element (only if the confirmation-mode is inactive)
-                val laRoomyDeviceProperty = LaRoomyDeviceProperty()
-                laRoomyDeviceProperty.fromString(property)
-                if(this.propertyConfirmationModeActive){
-                    // confirmation mode active: compare the property but note: at this point we can not use
-                    // the overridden member "equals(...)" to compare, because only the raw data is recorded to the class
-                    // -> so use the .checkRawEquality(...) member!
-                    if (!this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex)
-                            .checkRawEquality(laRoomyDeviceProperty)
-                    ) {
-                        // log:
-                        // the element does not confirm
-                        // invalidate all property
-                        this.stopAllPendingLoopsAndResetParameter()
-                        this.propertyCallback.onCompletePropertyInvalidated()
-                        return true
-                    }
-                }
-                else this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
-                // set return value
-                stringProcessed = true
-
-                this.requestNextProperty()
-            }
-        }
-        return stringProcessed
-    }
-
-    private fun requestNextProperty(){
-        // increase index counter
-        this.propertyRequestIndexCounter++
-        // generate request string
-        val data =
-            when {
-                (propertyRequestIndexCounter < 10) -> "A00${this.propertyRequestIndexCounter}$"
-                ((propertyRequestIndexCounter > 9) && (propertyRequestIndexCounter < 100)) -> "A0${this.propertyRequestIndexCounter}$"
-                else -> "A${this.propertyRequestIndexCounter}$"
-            }
-        // log:
-        if(verboseLog) {
-            Log.d("M:requestNextProperty", "Send next request index - message: $data")
-        }
-        // send the string
-        this.sendData(data)
-    }
-
-    private fun startRetrievingPropertyNames(){
-        if(verboseLog) {
-            Log.d("M:RetrievingPropNames", "Starting to resolve the property descriptions")
-        }
-        if(this.isConnected){
-            if(this.laRoomyDevicePropertyList.isNotEmpty()) {
-
-                this.currentPropertyResolveIndex = 0
-
-                val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                    "Deutsch" -> '1'
-                    else -> '0'
-                }
-                var id = this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyIndex
-                var hundred = 0
-                var tenth = 0
-                val single: Int
-
-                if(id > 100) hundred = (id / 100)
-                id -= (hundred*100)
-                if(id > 10) tenth = (id / 10)
-                id -= (tenth*10)
-                single = id
-
-                val requestString = "B$languageIdentificationChar$hundred$tenth$single$"
-
-                if(verboseLog) {
-                    Log.d(
-                        "M:RetrievingPropNames",
-                        "Sending Request String for the first element: $requestString"
-                    )
-                }
-                this.propertyNameResolveLoopActive = true
-                this.sendData(requestString)
-            }
-        }
-    }
-
-    fun resolvePropertyName(propertyName: String) :Boolean {
-
-        var stringProcessed = false
-
-        if(verboseLog) {
-            Log.d(
-                "M:resolvePropNames",
-                "Task: trying to resolve the received string to property name"
-            )
-        }
-
-        if(currentPropertyResolveID == -1) {
-
-            if(verboseLog) {
-                Log.d(
-                    "M:resolvePropNames",
-                    "The resolve-ID was invalidated, look if this is a description-name start indicator"
-                )
-            }
-
-            var propertyID = ""
-            var propertyState = ""
-
-            propertyName.forEachIndexed { index, c ->
-                when (index) {
-                    0 -> if (c != 'P')return false
-                    1 -> if (c != 'D')return false
-                    2 -> if (c != ':')return false
-                    3 -> if (c != 'S')return false
-                    4 -> propertyID += c
-                    5 -> propertyID += c
-                    6 -> propertyID += c
-                    7 -> propertyState += c
-                    8 -> propertyState += c
-                    9 -> propertyState += c
-                }
-            }
-            // convert property ID to Int and check the value
-            val id =
-                propertyID.toInt()
-
-            if(id < 256 && id > -1){
-                // set ID
-                this.currentPropertyResolveID = id
-                // mark the string as processed
-                stringProcessed = true
-
-                // set the state in the appropriate deviceProperty
-                val state =
-                    propertyState.toInt()
-
-                if(state < 256 && state > -1){
-                    this.setPropertyStateForId(id, state, true)
-                }
-            }
-
-            if(verboseLog) {
-                Log.d(
-                    "M:resolvePropNames",
-                    "This was a start indicator. The next received string should be the name for the property with ID: $propertyID"
-                )
-            }
-        }
-        else {
-            if(verboseLog) {
-                Log.d("M:resolvePropNames", "This must be the name string or a end indicator")
-            }
-            // must be the name-string or the finalization-string
-            if(propertyName == propertyNameEndIndicator){
-                if(verboseLog) {
-                    Log.d(
-                        "M:resolvePropNames",
-                        "It's a finalization string: reset necessary parameter"
-                    )
-                }
-                // it's a finalization string -> check for loop end
-                if(this.laRoomyDevicePropertyList.last().propertyIndex == currentPropertyResolveID){
-                    if(verboseLog) {
-                        Log.d(
-                            "M:resolvePropNames",
-                            "This was the last property name to resolve: close loop and reset parameter"
-                        )
-                    }
-                    // it's the last index, close loop
-                    propertyNameResolveLoopActive = false
-                    // invalidate the index
-                    this.currentPropertyResolveIndex = -1
-                    // raise event (but only in retrieving-mode, not in confirmation mode)
-                    if(!this.propertyConfirmationModeActive)
-                        this.propertyCallback.onPropertyDataRetrievalCompleted(this.laRoomyDevicePropertyList)
-                    // check if one of the device-properties is part of a Group -> if so, start group-retrieving loop
-                    if(verboseLog) {
-                        Log.d("M:resolvePropNames", "Check if some properties are part of a group")
-                    }
-                    if(this.groupRequestLoopRequired()){
-                        if(!this.propertyNameResolveSingleAction) {
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:resolvePropNames",
-                                    "This checkup was true. A group retrieval is required: start loop!"
-                                )
-                            }
-                            // start retrieving
-                            this.startGroupIndexingLoop()
-                        }
-                        else {
-                            // this was a single retrieving action, do not proceed with the group request
-                            // reset parameter:
-                            this.propertyNameResolveSingleAction = false
-                            this.propertyCallback.onPropertyDataChanged(-1, 0)
-                        }
-                    }
-                    else{
-                        // the retrieving process is finished at this point, so if this was a confirmation mode, reset parameter here and raise event if necessary
-                        if(this.propertyConfirmationModeActive) {
-                            this.propertyConfirmationModeActive = false
-
-                            if(this.propertyDetailChangedOnConfirmation){
-                                this.propertyDetailChangedOnConfirmation = false
-                                this.propertyCallback.onPropertyDataChanged(-1, 0)
-                            }
-                        }
-                        // set property up to date
-                        this.propertyUpToDate = true
-                        this.generateUIAdaptableArrayListFromDeviceProperties()
-
-                        // TODO: start retrieving the complex property states
-
-                        this.startComplexStateDataLoop()
-                    }
-                }
-                else {
-                    if(verboseLog) {
-                        Log.d(
-                            "M:resolvePropNames",
-                            "This was not the last property index: send next request"
-                        )
-                    }
-                    // it's not the last index, request next propertyName
-                    requestNextPropertyDescription()
-                }
-                // invalidate the resolve id
-                this.currentPropertyResolveID = -1
-                // mark the string as processed
-                stringProcessed = true
-            }
-            else {
-                if(verboseLog) {
-                    Log.d(
-                        "M:resolvePropNames",
-                        "This must be the name string for the property with ID: $currentPropertyResolveID"
-                    )
-                }
-                // must be a name-string
-                if(this.propertyConfirmationModeActive){
-                    // confirmation mode active: compare the property name
-                    if (propertyName != this.laRoomyDevicePropertyList.elementAt(this.currentPropertyResolveIndex).propertyDescriptor) {
-                        // log:
-                        if (verboseLog) {
-                            Log.d(
-                                "M:resolvePropNames",
-                                "Confirmation-Mode active: this propertyName does not equal to the saved one.\nPropertyID: $currentPropertyResolveID\nPropertyIndex: $currentGroupResolveIndex"
-                            )
-                        }
-                        // the property-name has changed
-                        this.laRoomyDevicePropertyList.elementAt(this.currentPropertyResolveIndex).hasChanged = true
-                        this.propertyDetailChangedOnConfirmation = true
-                    }
-                }
-                else setPropertyDescriptionForID(currentPropertyResolveID, propertyName)
-
-                // TODO: the string should be marked as processed, but are you sure at this point??
-                //stringProcessed = true
-            }
-        }
-        return stringProcessed
-    }
-
-    private fun requestNextPropertyDescription(){
-        if(verboseLog) {
-            Log.d("M:RQNextPropNames", "Requesting next property description")
-        }
-        // increment the property counter and send next request
-        currentPropertyResolveIndex++
-
-        if(currentPropertyResolveIndex < laRoomyDevicePropertyList.size) {
-
-            val languageIdentificationChar =
-                when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
-                    "Deutsch" -> '1'
-                    else -> '0'
-                }
-            var id =
-                this.laRoomyDevicePropertyList.elementAt(currentPropertyResolveIndex).propertyIndex
-            var hundred = 0
-            var tenth = 0
-            val single: Int
-
-            if (id > 100) hundred = (id / 100)
-            id -= (hundred*100)
-            if (id > 10) tenth = (id / 10)
-            id -= (tenth*10)
-            single = id
-
-            val requestString = "B$languageIdentificationChar$hundred$tenth$single$"
-
-            if(verboseLog) {
-                Log.d("M:RQNextPropNames", "Sending next request: $requestString")
-            }
-            this.sendData(requestString)
-        }
-        else {
-            Log.w("M:RQNextPropNames", "!! unexpected end of property array found, this should not happen, because the preliminary executed method \"resolvePropertyName\" is expected to close the retrieving loop")
-            // !! unexpected end of property array found, this should not happen, because the preliminary executed method "resolvePropertyName" is expected to close the retrieving loop
-            // be that as it may. Force loop closing:
-            propertyNameResolveLoopActive = false
-            currentPropertyResolveID = -1
-            currentPropertyResolveIndex = -1
-            propertyConfirmationModeActive = false
-        }
-    }
-
-    private fun startGroupIndexingLoop(){
-
-        // TODO: what is if the group array is already filled? Init the confirm process?? Or erase????
-
-        // TODO: make sure there is no possibility of a double execution
-
-        if(this.isConnected){
-            if(verboseLog) {
-                Log.d("M:StartGroupListing", "Device property GROUP listing started.")
-            }
-            this.groupRequestIndexCounter = 0
-            this.groupLoopActive = true
-            // only clear the list if this is not the confirmation mode
-            if(!this.propertyConfirmationModeActive)
-                this.laRoomyPropertyGroupList.clear()
-            // start:
-            this.sendData("E000$")// request first group index (0)
-        }
-    }
-
-    private fun addPropertyGroup(group: String) : Boolean {
-        var stringProcessed = false
-        // log:
-        if(verboseLog) {
-            Log.d("M:AddPropGroup", "Add Property Group Invoked - check for type of data")
-        }
-        // check type of data
-        if(group == this.groupLoopEndIndication){
-            // log:
-            if (verboseLog) {
-                Log.d(
-                    "M:AddPropGroup",
-                    "This was the finalization indicator - close loop, reset parameter and start detailed-info-loop"
-                )
-            }
-            applicationProperty.logControl("I: Group-Loop END marker received")
-
-            // reset params:
-            this.groupLoopActive = false
-            this.groupRequestIndexCounter = 0
-            // start detailed info loop:
-            startDetailedGroupInfoLoop()
-            // mark string as processed
-            stringProcessed = true
-        }
-        else{
-            // log:
-            if (verboseLog) {
-                Log.d(
-                    "M:AddPropGroup",
-                    "This could be a property-group-definition string - check this!"
-                )
-            }
-
-            // check start-character to identify the group-string
-            if(group.startsWith(groupStringPrefix, false)){
-                // log:
-                if (verboseLog) {
-                    Log.d("M:AddPropGroup", "It is a group string - add to collection")
-                }
-                applicationProperty.logControl("I: Group-String received: $group")
-                // add group to collection
-                val propertyGroup = LaRoomyDevicePropertyGroup()
-                propertyGroup.fromString(group)
-
-                if(this.propertyConfirmationModeActive){
-                    // confirmation mode active: compare the groups but note: at this point we can not use
-                    // the overridden member "equals(...)" to compare, because only the raw data is recorded to the class
-                    // -> so use the .checkRawEquality(...) member!
-                    if(this.laRoomyPropertyGroupList.elementAt(propertyGroup.groupIndex).checkRawEquality(propertyGroup)){
-                        // log:
-                        if (verboseLog) {
-                            Log.d(
-                                "M:AddPropGroup",
-                                "Confirmation-Mode active: The element differs from the saved one:\nGroupIndex: ${propertyGroup.groupIndex}"
-                            )
-                        }
-                        // the group element differs from the saved element
-                        // the proceeding of this process is not necessary
-                        // -> invalidate all property data!
-                        this.stopAllPendingLoopsAndResetParameter()
-                        this.propertyCallback.onCompletePropertyInvalidated()
-                        return true
-                    }
-                }
-                else this.laRoomyPropertyGroupList.add(propertyGroup)
-                // mark string as processed
-                stringProcessed = true
-                // proceed with retrieving loop:
-                this.requestNextPropertyGroup()
-            }
-        }
-        return stringProcessed
-    }
-
-    private fun requestNextPropertyGroup(){
-        // increase the group index counter
-        this.groupRequestIndexCounter++
-        // generate request string
-        val data =
-            when {
-                (groupRequestIndexCounter < 10) -> "E00${this.groupRequestIndexCounter}$"
-                ((groupRequestIndexCounter > 9) && (groupRequestIndexCounter < 100)) -> "E0${this.groupRequestIndexCounter}$"
-                else -> "E${this.groupRequestIndexCounter}$"
-            }
-        // log:
-        if(verboseLog) {
-            Log.d("M:requestNextGroup", "Send next property-group request index - message: $data")
-        }
-        // send the string
-        this.sendData(data)
-    }
-
-    private fun startDetailedGroupInfoLoop(){
-        if(verboseLog) {
-            Log.d("M:RetrievingGroupNames", "Starting to resolve the detailed group info")
-        }
-        if(this.isConnected){
-            if(this.laRoomyPropertyGroupList.isNotEmpty()) {
-
-                this.currentGroupResolveIndex = 0
-
-                val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                    "de" -> 1
-                    else -> 0
-                }
-                var id = this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupIndex
-                var hundred = 0
-                var tenth = 0
-                val single: Int
-
-                if(id > 100) hundred = (id / 100)
-                id -= (hundred*100)
-                if(id > 10) tenth = (id / 10)
-                id -= (tenth*10)
-                single = id
-
-                val requestString = "F$languageIdentificationChar$hundred$tenth$single$"
-
-                if(verboseLog) {
-                    Log.d(
-                        "M:RetrievingGroupInfo",
-                        "Sending Group-Info Request String for the first element: $requestString"
-                    )
-                }
-                this.groupInfoLoopActive = true
-                this.sendData(requestString)
-            }
-        }
-    }
-
-    private fun resolveGroupInfo(groupInfoData: String) : Boolean {
-        var stringProcessed = false
-        // log:
-        if(verboseLog) {
-            Log.d(
-                "M:resolveGroupInfo",
-                "Task: trying to resolve the received string to group info data"
-            )
-        }
-        // check invalidated condition
-        if(currentGroupResolveID == -1) {
-
-            if(verboseLog) {
-                Log.d(
-                    "M:resolveGroupInfo",
-                    "The resolve-ID was invalidated, look if this is a group-info start indicator"
-                )
-            }
-
-            var groupID = ""
-
-            groupInfoData.forEachIndexed { index, c ->
-                when (index) {
-                    0 -> if (c != 'G')return false
-                    1 -> if (c != 'I')return false
-                    2 -> if (c != ':')return false
-                    3 -> if (c != 'S')return false
-                    4 -> groupID += c
-                    5 -> groupID += c
-                    6 -> groupID += c
-                }
-            }
-            // convert group ID to Int and check the value
-            val id =
-                groupID.toInt()
-
-            if(id < 256 && id > -1){
-                // set ID
-                this.currentGroupResolveID = id
-                // mark the string as processed
-                stringProcessed = true
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:resolveGroupInfo",
-                    "This was a start indicator. The next received string should be some data for the group with ID: $groupID"
-                )
-            }
-        }
-        else {
-            if(verboseLog) {
-                Log.d("M:resolveGroupInfo", "This must be the group-info or a end indicator")
-            }
-            // must be the name-string or the finalization-string
-            if(groupInfoData == groupInfoEndIndicator){
-                if(verboseLog) {
-                    Log.d(
-                        "M:resolveGroupInfo",
-                        "It's a finalization string: reset necessary parameter"
-                    )
-                }
-                // it's a finalization string -> check for loop end
-                if(this.laRoomyPropertyGroupList.last().groupIndex == currentGroupResolveID){
-                    if(verboseLog) {
-                        Log.d(
-                            "M:resolveGroupInfo",
-                            "This was the last group-info to resolve: close loop and reset parameter"
-                        )
-                    }
-                    // it's the last index, close loop
-                    groupInfoLoopActive = false
-                    this.propertyUpToDate = true
-                    // invalidate the index
-                    this.currentGroupResolveIndex = -1
-                    // check if this was a confirmation process
-                    if(this.propertyConfirmationModeActive){
-                        // reset the confirmation parameter
-                        this.propertyConfirmationModeActive = false
-
-                        if(this.groupDetailChangedOnConfirmation){
-                            this.groupDetailChangedOnConfirmation = false
-                            this.propertyCallback.onPropertyGroupDataChanged(-1, 0)
-                        }
-                    }
-                    else {
-                        // raise event
-                        if(this.propertyGroupNameResolveSingleAction){
-                            this.propertyGroupNameResolveSingleAction = false
-                            // trigger changed event (-1 means all entries!)
-                            this.propertyCallback.onPropertyGroupDataChanged(-1, 0)
-                        }
-                        else {
-                            // trigger retrieval event
-                            this.propertyCallback.onGroupDataRetrievalCompleted(this.laRoomyPropertyGroupList)// TODO: this is not used - delete??
-
-                            this.generateUIAdaptableArrayListFromDeviceProperties()
-
-                            // TODO: start retrieving the complex property states
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                this.startComplexStateDataLoop()
-                            }, 2000)// TODO: no delay???
-                        }
-                    }
-                }
-                else {
-                    if(verboseLog) {
-                        Log.d(
-                            "M:resolveGroupInfo",
-                            "This was not the last group index: send next request"
-                        )
-                    }
-                    // it's not the last index, request next propertyName
-                    requestNextGroupInfo()
-                }
-                // invalidate the resolve id
-                this.currentGroupResolveID = -1
-                // mark the string as processed
-                stringProcessed = true
-            }
-            else {
-                if(verboseLog) {
-                    Log.d(
-                        "M:resolveGroupInfo",
-                        "This must be the data for the group with ID: $currentGroupResolveID"
-                    )
-                }
-                // must be group data:
-                // check the type of data:
-                if (groupInfoData.startsWith(groupMemberStringPrefix, false)) {
-                    // log
-                    if (verboseLog) {
-                        Log.d(
-                            "M:resolveGroupInfo",
-                            "This must be the member IDs for the group with ID: $currentGroupResolveID"
-                        )
-                    }
-                    // this was the member id identification, so set the member IDs
-                    return if (this.propertyConfirmationModeActive) {
-                        // confirmation mode is active so check the element
-                        if (!this.compareMemberIDStringWithIntegerArrayList(
-                                groupInfoData,
-                                this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).memberIDs
-                            )
-                        ) {
-                            // log:
-                            if (verboseLog) {
-                                Log.d(
-                                    "M:resolveGroupInfo",
-                                    "Confirmation-Mode active: The received member IDs differ from the saved ones.\nGroupID: $currentGroupResolveID"
-                                )
-                            }
-                            // the member ids differ from the save ones
-                            this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).hasChanged =
-                                true
-                            this.groupDetailChangedOnConfirmation = true
-                        }
-                        true
-                    }
-                    else setGroupMemberIDArrayForGroupID(this.currentGroupResolveID, groupInfoData)
-                } else {
-                    // log
-                    if (verboseLog) {
-                        Log.d(
-                            "M:resolveGroupInfo",
-                            "This must be the name-string for the group with ID: $currentGroupResolveID"
-                        )
-                    }
-                    // this should be the name of the group, so set the group name
-                    if (this.propertyConfirmationModeActive) {
-                        // confirmation mode active: check for changes in the group-name
-                        if (groupInfoData != this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).groupName) {
-                            // log:
-                            if (verboseLog) {
-                                Log.d(
-                                    "M:resolveGroupInfo",
-                                    "Confirmation-Mode active: detected changed group-name.\nGroupID: $currentGroupResolveID"
-                                )
-                            }
-                            // the group-name changed
-                            this.laRoomyPropertyGroupList.elementAt(this.currentGroupResolveIndex).hasChanged =
-                                true
-                            this.groupDetailChangedOnConfirmation = true
-                        }
-                    } else setGroupName(this.currentGroupResolveID, groupInfoData)
-                }
-                // TODO: the string should be marked as processed, but are you sure at this point??
-                //stringProcessed = true
-            }
-        }
-        return stringProcessed
-    }
-
-    private fun requestNextGroupInfo(){
-        // log
-        if(verboseLog) {
-            Log.d("M:RQNextGroupInfo", "Requesting next group info")
-        }
-        // increment the group index counter and send next request
-        currentGroupResolveIndex++
-        // check if the index is inside the valid scope
-        if(currentGroupResolveIndex < laRoomyPropertyGroupList.size) {
-
-            val languageIdentificationChar =
-                when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
-                    "Deutsch" -> '1'
-                    else -> '0'
-                }
-            var id =
-                this.laRoomyPropertyGroupList.elementAt(currentGroupResolveIndex).groupIndex
-            var hundred = 0
-            var tenth = 0
-            val single: Int
-
-            if (id > 100) hundred = (id / 100)
-            id -= (hundred*100)
-            if (id > 10) tenth = (id / 10)
-            id -= (tenth*10)
-            single = id
-            // create the request string
-            val requestString = "F$languageIdentificationChar$hundred$tenth$single$"
-            // log:
-            if(verboseLog) {
-                Log.d("M:RQNextGroup", "Sending next request: $requestString")
-            }
-            // send data:
-            this.sendData(requestString)
-        }
-        else {
-            Log.e("M:RQNextGroupInfo", "!! unexpected end of group array found, this should not happen, because the preliminary executed method \"resolveGroupInfo\" is expected to close the retrieving loop")
-            // !! unexpected end of group array found, this should not happen, because the preliminary executed method "resolveGroupInfo" is expected to close the retrieving loop
-            // be that as it may. Force loop closing:
-            groupInfoLoopActive = false
-            currentGroupResolveID = -1
-            currentGroupResolveIndex = -1
-            propertyConfirmationModeActive = false
-        }
-    }
-*/
-
-    private fun setPropertyDescriptionForID(id:Int, description: String){
-        laRoomyDevicePropertyList.forEach {
-            if(it.propertyIndex == id){
-                if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
-//                    it.propertyDescriptor =
-//                        encodeGermanString(description)
-                } else {
-                    it.propertyDescriptor = description
-                }
-            }
-        }
-    }
-
-    private fun setGroupMemberIDArrayForGroupID(id: Int, data: String) : Boolean {
-        try {
-
-            // TODO: add logs
-
-            var str1 = ""
-            var str2 = ""
-            var str3 = ""
-            var str4 = ""
-            var str5 = ""
-
-            if (data.length >= 17) {
-
-                data.forEachIndexed { index, c ->
-                    when (index) {
-                        3 -> str1 += c
-                        4 -> str1 += c
-                        5 -> str1 += c
-                        6 -> str2 += c
-                        7 -> str2 += c
-                        8 -> str2 += c
-                        9 -> str3 += c
-                        10 -> str3 += c
-                        11 -> str3 += c
-                        12 -> str4 += c
-                        13 -> str4 += c
-                        14 -> str4 += c
-                        15 -> str5 += c
-                        16 -> str5 += c
-                        17 -> str5 += c
-                    }
-                }
-                laRoomyPropertyGroupList.forEach {
-//                    if(it.groupIndex == id){
-//                        it.setMemberIDs(
-//                            if(str1.isNotEmpty())
-//                                str1.toInt()
-//                            else 0,
-//                            if(str2.isNotEmpty())
-//                                str2.toInt()
-//                            else 0,
-//                            if(str3.isNotEmpty())
-//                                str3.toInt()
-//                            else 0,
-//                            if(str4.isNotEmpty())
-//                                str4.toInt()
-//                            else 0,
-//                            if(str5.isNotEmpty())
-//                                str5.toInt()
-//                            else 0
-//                        )
+//    private fun setGroupMemberIDArrayForGroupID(id: Int, data: String) : Boolean {
+//        try {
+//
+//            // TODO: add logs
+//
+//            var str1 = ""
+//            var str2 = ""
+//            var str3 = ""
+//            var str4 = ""
+//            var str5 = ""
+//
+//            if (data.length >= 17) {
+//
+//                data.forEachIndexed { index, c ->
+//                    when (index) {
+//                        3 -> str1 += c
+//                        4 -> str1 += c
+//                        5 -> str1 += c
+//                        6 -> str2 += c
+//                        7 -> str2 += c
+//                        8 -> str2 += c
+//                        9 -> str3 += c
+//                        10 -> str3 += c
+//                        11 -> str3 += c
+//                        12 -> str4 += c
+//                        13 -> str4 += c
+//                        14 -> str4 += c
+//                        15 -> str5 += c
+//                        16 -> str5 += c
+//                        17 -> str5 += c
 //                    }
-                }
-                return true
-            } else
-                return false
-        }
-        catch(except: Exception){
-            return false
-        }
-    }
-
-    private fun compareMemberIDStringWithIntegerArrayList(data: String, ids: ArrayList<Int>) :Boolean {
-        try {
-            if(ids.size < 4)return false    // 5 ??? no index ???
-
-            var str1 = ""
-            var str2 = ""
-            var str3 = ""
-            var str4 = ""
-            var str5 = ""
-
-            if (data.length >= 17) {
-
-                data.forEachIndexed { index, c ->
-                    when (index) {
-                        3 -> str1 += c
-                        4 -> str1 += c
-                        5 -> str1 += c
-                        6 -> str2 += c
-                        7 -> str2 += c
-                        8 -> str2 += c
-                        9 -> str3 += c
-                        10 -> str3 += c
-                        11 -> str3 += c
-                        12 -> str4 += c
-                        13 -> str4 += c
-                        14 -> str4 += c
-                        15 -> str5 += c
-                        16 -> str5 += c
-                        17 -> str5 += c
-                    }
-                }
-                if(ids.elementAt(0) != str1.toInt())return false
-                if(ids.elementAt(1) != str2.toInt())return false
-                if(ids.elementAt(2) != str3.toInt())return false
-                if(ids.elementAt(3) != str4.toInt())return false
-                if(ids.elementAt(4) != str5.toInt())return false
-                return true
-            } else
-                return false
-        }
-        catch(except: Exception){
-            return false
-        }
-    }
+//                }
+//                laRoomyPropertyGroupList.forEach {
+////                    if(it.groupIndex == id){
+////                        it.setMemberIDs(
+////                            if(str1.isNotEmpty())
+////                                str1.toInt()
+////                            else 0,
+////                            if(str2.isNotEmpty())
+////                                str2.toInt()
+////                            else 0,
+////                            if(str3.isNotEmpty())
+////                                str3.toInt()
+////                            else 0,
+////                            if(str4.isNotEmpty())
+////                                str4.toInt()
+////                            else 0,
+////                            if(str5.isNotEmpty())
+////                                str5.toInt()
+////                            else 0
+////                        )
+////                    }
+//                }
+//                return true
+//            } else
+//                return false
+//        }
+//        catch(except: Exception){
+//            return false
+//        }
+//    }
+//
+//    private fun compareMemberIDStringWithIntegerArrayList(data: String, ids: ArrayList<Int>) :Boolean {
+//        try {
+//            if(ids.size < 4)return false    // 5 ??? no index ???
+//
+//            var str1 = ""
+//            var str2 = ""
+//            var str3 = ""
+//            var str4 = ""
+//            var str5 = ""
+//
+//            if (data.length >= 17) {
+//
+//                data.forEachIndexed { index, c ->
+//                    when (index) {
+//                        3 -> str1 += c
+//                        4 -> str1 += c
+//                        5 -> str1 += c
+//                        6 -> str2 += c
+//                        7 -> str2 += c
+//                        8 -> str2 += c
+//                        9 -> str3 += c
+//                        10 -> str3 += c
+//                        11 -> str3 += c
+//                        12 -> str4 += c
+//                        13 -> str4 += c
+//                        14 -> str4 += c
+//                        15 -> str5 += c
+//                        16 -> str5 += c
+//                        17 -> str5 += c
+//                    }
+//                }
+//                if(ids.elementAt(0) != str1.toInt())return false
+//                if(ids.elementAt(1) != str2.toInt())return false
+//                if(ids.elementAt(2) != str3.toInt())return false
+//                if(ids.elementAt(3) != str4.toInt())return false
+//                if(ids.elementAt(4) != str5.toInt())return false
+//                return true
+//            } else
+//                return false
+//        }
+//        catch(except: Exception){
+//            return false
+//        }
+//    }
 
 //    private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
 //        var dataProcessed = false
@@ -2756,157 +1823,157 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //        return dataProcessed
 //    }
 
-    private fun updateProperty(data: String){
-        if(data.length < 19){
-            var entireProperty = false
-            var entireDetail = false
-            var thisProperty = false
-            var thisPropertyDetail = false
-            var propID = ""
-            var propIndex = ""
-
-            data.forEachIndexed { index, c ->
-                when(index){
-                    7 -> propID += c
-                    8 -> propID += c
-                    9 -> propID += c
-                    10 -> propIndex += c
-                    11 -> propIndex += c
-                    12 -> propIndex += c
-                    13 -> if(c != '0')entireProperty = true
-                    14 -> if(c != '0')entireDetail = true
-                    15 -> if(c != '0')thisProperty = true
-                    16 -> if(c != '0')thisPropertyDetail = true
-                }
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:updateProperty",
-                    "Recording of Property-Update String complete:\nUpdate: entireProperty = $entireProperty\nUpdate: entireDetail = $entireDetail\nUpdate: thisProperty = $thisProperty\nUpdate: thisPropertyDetail = $thisPropertyDetail"
-                )
-            }
-            if(entireProperty){
-                // TODO: this must be checked
-                this.propertyCallback.onCompletePropertyInvalidated()
-                return
-            }
-            if(entireDetail){
-                // TODO: this must be checked
-                this.propertyNameResolveSingleAction = true
-
-                //startRetrievingPropertyNames()
-
-            }
-            if(thisProperty){
-                val updateInfo = ElementUpdateInfo()
-                updateInfo.elementID = propID.toInt()
-                updateInfo.elementIndex = propIndex.toInt()
-                updateInfo.elementType = PROPERTY_ELEMENT
-                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
-
-                this.elementUpdateList.add(updateInfo)
-
-                this.startUpdateStackProcessing()
-
-                //this.sendSinglePropertyRequest(propIndex.toInt())
-            }
-            if(thisPropertyDetail){
-                val updateInfo = ElementUpdateInfo()
-                updateInfo.elementID = propID.toInt()
-                updateInfo.elementIndex = propIndex.toInt()
-                updateInfo.elementType = PROPERTY_ELEMENT
-                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
-
-                this.elementUpdateList.add(updateInfo)
-
-                this.startUpdateStackProcessing()
-
-                //this.sendSinglePropertyResolveRequest(propID.toInt())
-            }
-
-        }
-        else {
-            Log.e("M:updateProperty", "Error: insufficient string length")
-        }
-    }
-
-    private fun updatePropertyGroup(data: String){
-        if(data.length < 19){
-            var entirePropertyGroup = false
-            var entireGroupDetail = false
-            var thisGroup = false
-            var thisGroupDetail = false
-            var groupID = ""
-            var groupIndex = ""
-
-            data.forEachIndexed { index, c ->
-                when(index){
-                    7 -> groupID += c
-                    8 -> groupID += c
-                    9 -> groupID += c
-                    10 -> groupIndex += c
-                    11 -> groupIndex += c
-                    12 -> groupIndex += c
-                    13 -> if(c != '0')entirePropertyGroup = true
-                    14 -> if(c != '0')entireGroupDetail = true
-                    15 -> if(c != '0')thisGroup = true
-                    16 -> if(c != '0')thisGroupDetail = true
-                }
-            }
-            if(verboseLog) {
-                Log.d(
-                    "M:updatePropGroup",
-                    "Recording of Property Group Update String complete:\nUpdate: entirePropertyGroup = $entirePropertyGroup\nUpdate: entireGroupDetail = $entireGroupDetail\nUpdate: thisgroup = $thisGroup\nUpdate: thisGroupDetail = $thisGroupDetail"
-                )
-            }
-
-            if(entirePropertyGroup){
-                // TODO: check if this works!
-                this.propertyCallback.onCompletePropertyInvalidated()
-                return
-            }
-            if(entireGroupDetail){
-                // TODO: check if this works!
-                this.propertyGroupNameResolveSingleAction = true
-
-
-
-                //startDetailedGroupInfoLoop()
-
-
-            }
-            if(thisGroup){
-                val updateInfo = ElementUpdateInfo()
-                updateInfo.elementID = groupID.toInt()
-                updateInfo.elementIndex = groupIndex.toInt()
-                updateInfo.elementType = GROUP_ELEMENT
-                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
-
-                this.elementUpdateList.add(updateInfo)
-
-                this.startUpdateStackProcessing()
-
-                //this.sendSinglePropertyGroupRequest(groupIndex.toInt())
-            }
-            if(thisGroupDetail){
-                val updateInfo = ElementUpdateInfo()
-                updateInfo.elementID = groupID.toInt()
-                updateInfo.elementIndex = groupIndex.toInt()
-                updateInfo.elementType = GROUP_ELEMENT
-                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
-
-                this.elementUpdateList.add(updateInfo)
-
-                this.startUpdateStackProcessing()
-
-                //this.sendSingleGroupDetailRequest(groupID.toInt())
-            }
-
-        }
-        else {
-            Log.e("M:updatePropGroup", "Error: insufficient string length")
-        }
-    }
+//    private fun updateProperty(data: String){
+//        if(data.length < 19){
+//            var entireProperty = false
+//            var entireDetail = false
+//            var thisProperty = false
+//            var thisPropertyDetail = false
+//            var propID = ""
+//            var propIndex = ""
+//
+//            data.forEachIndexed { index, c ->
+//                when(index){
+//                    7 -> propID += c
+//                    8 -> propID += c
+//                    9 -> propID += c
+//                    10 -> propIndex += c
+//                    11 -> propIndex += c
+//                    12 -> propIndex += c
+//                    13 -> if(c != '0')entireProperty = true
+//                    14 -> if(c != '0')entireDetail = true
+//                    15 -> if(c != '0')thisProperty = true
+//                    16 -> if(c != '0')thisPropertyDetail = true
+//                }
+//            }
+//            if(verboseLog) {
+//                Log.d(
+//                    "M:updateProperty",
+//                    "Recording of Property-Update String complete:\nUpdate: entireProperty = $entireProperty\nUpdate: entireDetail = $entireDetail\nUpdate: thisProperty = $thisProperty\nUpdate: thisPropertyDetail = $thisPropertyDetail"
+//                )
+//            }
+//            if(entireProperty){
+//                // TODO: this must be checked
+//                this.propertyCallback.onCompletePropertyInvalidated()
+//                return
+//            }
+//            if(entireDetail){
+//                // TODO: this must be checked
+//                this.propertyNameResolveSingleAction = true
+//
+//                //startRetrievingPropertyNames()
+//
+//            }
+//            if(thisProperty){
+//                val updateInfo = ElementUpdateInfo()
+//                updateInfo.elementID = propID.toInt()
+//                updateInfo.elementIndex = propIndex.toInt()
+//                updateInfo.elementType = PROPERTY_ELEMENT
+//                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
+//
+//                this.elementUpdateList.add(updateInfo)
+//
+//                this.startUpdateStackProcessing()
+//
+//                //this.sendSinglePropertyRequest(propIndex.toInt())
+//            }
+//            if(thisPropertyDetail){
+//                val updateInfo = ElementUpdateInfo()
+//                updateInfo.elementID = propID.toInt()
+//                updateInfo.elementIndex = propIndex.toInt()
+//                updateInfo.elementType = PROPERTY_ELEMENT
+//                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
+//
+//                this.elementUpdateList.add(updateInfo)
+//
+//                this.startUpdateStackProcessing()
+//
+//                //this.sendSinglePropertyResolveRequest(propID.toInt())
+//            }
+//
+//        }
+//        else {
+//            Log.e("M:updateProperty", "Error: insufficient string length")
+//        }
+//    }
+//
+//    private fun updatePropertyGroup(data: String){
+//        if(data.length < 19){
+//            var entirePropertyGroup = false
+//            var entireGroupDetail = false
+//            var thisGroup = false
+//            var thisGroupDetail = false
+//            var groupID = ""
+//            var groupIndex = ""
+//
+//            data.forEachIndexed { index, c ->
+//                when(index){
+//                    7 -> groupID += c
+//                    8 -> groupID += c
+//                    9 -> groupID += c
+//                    10 -> groupIndex += c
+//                    11 -> groupIndex += c
+//                    12 -> groupIndex += c
+//                    13 -> if(c != '0')entirePropertyGroup = true
+//                    14 -> if(c != '0')entireGroupDetail = true
+//                    15 -> if(c != '0')thisGroup = true
+//                    16 -> if(c != '0')thisGroupDetail = true
+//                }
+//            }
+//            if(verboseLog) {
+//                Log.d(
+//                    "M:updatePropGroup",
+//                    "Recording of Property Group Update String complete:\nUpdate: entirePropertyGroup = $entirePropertyGroup\nUpdate: entireGroupDetail = $entireGroupDetail\nUpdate: thisgroup = $thisGroup\nUpdate: thisGroupDetail = $thisGroupDetail"
+//                )
+//            }
+//
+//            if(entirePropertyGroup){
+//                // TODO: check if this works!
+//                this.propertyCallback.onCompletePropertyInvalidated()
+//                return
+//            }
+//            if(entireGroupDetail){
+//                // TODO: check if this works!
+//                this.propertyGroupNameResolveSingleAction = true
+//
+//
+//
+//                //startDetailedGroupInfoLoop()
+//
+//
+//            }
+//            if(thisGroup){
+//                val updateInfo = ElementUpdateInfo()
+//                updateInfo.elementID = groupID.toInt()
+//                updateInfo.elementIndex = groupIndex.toInt()
+//                updateInfo.elementType = GROUP_ELEMENT
+//                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
+//
+//                this.elementUpdateList.add(updateInfo)
+//
+//                this.startUpdateStackProcessing()
+//
+//                //this.sendSinglePropertyGroupRequest(groupIndex.toInt())
+//            }
+//            if(thisGroupDetail){
+//                val updateInfo = ElementUpdateInfo()
+//                updateInfo.elementID = groupID.toInt()
+//                updateInfo.elementIndex = groupIndex.toInt()
+//                updateInfo.elementType = GROUP_ELEMENT
+//                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
+//
+//                this.elementUpdateList.add(updateInfo)
+//
+//                this.startUpdateStackProcessing()
+//
+//                //this.sendSingleGroupDetailRequest(groupID.toInt())
+//            }
+//
+//        }
+//        else {
+//            Log.e("M:updatePropGroup", "Error: insufficient string length")
+//        }
+//    }
 
     private fun sendSinglePropertyResolveRequest(propertyID: Int){
         if(verboseLog) {
@@ -2976,8 +2043,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if (laRoomyDeviceProperty.isGroupMember) {
                         // element is part of a group, add the group first (if it isn't already)
 
-                            // FIXME: the element is a group-member, but of the next group????????????
-
                         // perform error checkup
                         if ((laRoomyDeviceProperty.groupIndex != expectedGroupIndex)&&(currentGroup == -1)) {
                             // the group-index has not the expected value, there must be a missing or duplicate index
@@ -2992,7 +2057,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         "Group Index was: ${laRoomyDeviceProperty.groupIndex} - Expected index: $expectedGroupIndex - " +
                                         "The visual state may not be as expected!"
                             )
-
                             // TODO: maybe fix the inconsistency?? laRoomyDeviceProperty.groupIndex = expectedGroupIndex ???
                         }
 
@@ -3000,15 +2064,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         if((laRoomyDeviceProperty.groupIndex > expectedGroupIndex)&&(currentGroup != -1)){
                             currentGroup = -1
                             expectedGroupIndex++
+                            // the last element must have been the last in group
+                            this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
                         }
 
                         // add the group element
                         if (currentGroup == -1) {
                             currentGroup = laRoomyDeviceProperty.groupIndex
 
-                            // make sure the group exist
+                            // make sure the group exists
                             if (expectedGroupIndex < laRoomyPropertyGroupList.size) {
-
                                 // get the element
                                 val laRoomyDevicePropertyGroup =
                                     this.laRoomyPropertyGroupList.elementAt(expectedGroupIndex)
@@ -3026,7 +2091,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 // add the group to the list
                                 this.uIAdapterList.add(dpl)
                             } else {
-                                // TODO: log: group not found
+                                if(verboseLog){
+                                    Log.e("generateUIArray", "Error group index out of range")
+                                }
+                                applicationProperty.logControl("E: Group index out of range!")
                             }
                         }
 
@@ -3055,7 +2123,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             applicationProperty.logControl("W: Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
                         }
 
-
                     } else {
                         // element is not part of a group, add it raw
 
@@ -3063,6 +2130,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         if (currentGroup != -1) {
                             currentGroup = -1
                             expectedGroupIndex++
+                            // the last element must have been the last in group
+                            this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
                         }
 
                         // create the entry
@@ -3081,11 +2150,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // add it to the list
                         this.uIAdapterList.add(propertyEntry)
                     }
-
-
                 }
-
-
             } else {
                 if (verboseLog) {
                     Log.e(
@@ -3096,9 +2161,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 return
             }
         } catch (e: Exception) {
-
-            // TODO: log critical error!!!!!!!!!!
-
+            Log.e("generateUIArray", "Fatal error while generating the UI-Adapter Array. Exception: $e")
+            applicationProperty.logControl("E: Fatal error while generating the UIAdapter data. Exception: $e")
             return
         }
 
