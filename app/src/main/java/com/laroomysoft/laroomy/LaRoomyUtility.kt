@@ -406,6 +406,22 @@ fun decryptOptionSelectorString(data: String) : ArrayList<String> {
     return list
 }
 
+fun a8bitValueTo2CharHexValue(bVal: Int) : String {
+    return if(bVal > 255){
+        "EE"
+    } else {
+        var resultString = ""
+        val hexStr = Integer.toHexString(bVal)
+        if (hexStr.length > 1) {
+            resultString = hexStr
+        } else {
+            resultString += '0'
+            resultString += hexStr
+        }
+        resultString
+    }
+}
+
 fun createRandomPasskey(keyLength: Int): String {
 
     var realKeyLength = keyLength - 1

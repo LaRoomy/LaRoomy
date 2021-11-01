@@ -1,8 +1,8 @@
 package com.laroomysoft.laroomy
 
+import android.graphics.Color
 import android.util.Log
 import android.widget.SeekBar
-import kotlin.math.min
 
 const val UNDEFINED = -1
 
@@ -54,12 +54,198 @@ class ComplexPropertyState {
     var valueFive = -1     // general use                   // flag value in simple Navigator
     var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
     var enabledState = true// at this time only a placeholder (not implemented yet)
-    var onOffState = false // (not used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
+    var onOffState = false // (used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
     var strValue = ""
+    var flags = 0           // Flag-Value in RGB Selector
 
     // single used values (only valid in specific complex states)
     var hardTransitionFlag = false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
     var timeSetterIndex = -1        // Value to identify the time setter type
+}
+
+abstract class IComplexPropertySubTypeProtocolClass{
+    abstract fun fromString(data: String) : Boolean
+    abstract fun toComplexPropertyState() : ComplexPropertyState
+    abstract fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState)
+    abstract fun isValid() : Boolean
+    abstract fun toExecutionString(propertyIndex: Int) : String
+}
+
+class RGBSelectorState : IComplexPropertySubTypeProtocolClass() {
+
+    // visibility values
+    var onOffButtonVisibility = true
+    var singleOrTransitionButtonVisibility = true
+    var intensitySliderVisibility = true
+    var softOrHardTransitionSwitchVisibility = true
+
+    var redValue = -1
+    var greenValue = -1
+    var blueValue = -1
+
+    var colorTransitionValue = -1
+    var hardTransitionFlag = false
+    var onOffState = false
+
+    fun getColor() : Int {
+        return if((redValue >= 0)&&(greenValue >= 0)&&(blueValue >= 0)){
+            Color.rgb(redValue, greenValue, blueValue)
+        } else {
+            Color.WHITE
+        }
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += "0d00"
+
+        // add rgb specific data
+        executionString +=
+            if(this.onOffState){
+                '1'
+            } else {
+                '0'
+            }
+        var flags = 0
+        if(!this.onOffButtonVisibility){
+            flags = flags or 0x01
+        }
+        if(!this.singleOrTransitionButtonVisibility){
+            flags = flags or 0x02
+        }
+        if(!this.intensitySliderVisibility){
+            flags = flags or 0x04
+        }
+        if(!this.softOrHardTransitionSwitchVisibility){
+            flags = flags or 0x08
+        }
+        executionString += a8bitValueTo2CharHexValue(flags)
+        executionString += a8bitValueTo2CharHexValue(this.colorTransitionValue)
+        executionString += a8bitValueTo2CharHexValue(this.redValue)
+        executionString += a8bitValueTo2CharHexValue(this.greenValue)
+        executionString += a8bitValueTo2CharHexValue(this.blueValue)
+        executionString +=
+            if(this.hardTransitionFlag){
+                "1\r"
+            } else {
+                "0\r"
+            }
+        return executionString
+    }
+
+    override fun isValid(): Boolean {
+        return (redValue >= 0)&&(greenValue >= 0)&&(blueValue >= 0)&&(colorTransitionValue >= 0)
+    }
+
+    override fun toComplexPropertyState() : ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.valueOne = this.redValue
+        cState.valueTwo = this.greenValue
+        cState.valueThree = this.blueValue
+        cState.commandValue = this.colorTransitionValue
+        cState.hardTransitionFlag = this.hardTransitionFlag
+        cState.onOffState = this.onOffState
+        cState.flags = 0
+        if(!this.onOffButtonVisibility){
+            cState.flags = cState.flags or 0x01
+        }
+        if(!this.singleOrTransitionButtonVisibility){
+            cState.flags = cState.flags or 0x02
+        }
+        if(!this.intensitySliderVisibility){
+            cState.flags = cState.flags or 0x04
+        }
+        if(!this.softOrHardTransitionSwitchVisibility){
+            cState.flags = cState.flags or 0x08
+        }
+        return cState
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.onOffButtonVisibility = (complexPropertyState.flags and 0x01) == 0
+        this.singleOrTransitionButtonVisibility = (complexPropertyState.flags and 0x02) == 0
+        this.intensitySliderVisibility = (complexPropertyState.flags and 0x04) == 0
+        this.softOrHardTransitionSwitchVisibility = (complexPropertyState.flags and 0x08) == 0
+
+        this.redValue = complexPropertyState.valueOne
+        this.greenValue = complexPropertyState.valueTwo
+        this.blueValue = complexPropertyState.valueThree
+
+        this.colorTransitionValue = complexPropertyState.commandValue
+        this.hardTransitionFlag = complexPropertyState.hardTransitionFlag
+        this.onOffState = complexPropertyState.onOffState
+    }
+
+    override fun fromString(data: String): Boolean {
+        try {
+            // 8 on-off state
+            // 9+10 flag value
+            // 11+12 command value
+            // 13+14 red value
+            // 15+16 green value
+            // 17+18 blue value
+            // 19 transition flag
+
+            if (data.length < 20) {
+                if (verboseLog) {
+                    Log.e(
+                        "RGBData:fromString",
+                        "Error reading Data from RGB Selector Data Transmission. Data-length too short: Length was: ${data.length}"
+                    )
+                }
+            }
+            var valueStr = "0x"
+
+            // read on-off state
+            this.onOffState = data[8] == '1'
+            // read flag value
+            valueStr += data[9]
+            valueStr += data[10]
+            val flagV = Integer.decode(valueStr)
+            // set boolean values from flag value
+            this.onOffButtonVisibility = (flagV and 0x01) == 0
+            this.singleOrTransitionButtonVisibility = (flagV and 0x02) == 0
+            this.intensitySliderVisibility = (flagV and 0x04) == 0
+            this.softOrHardTransitionSwitchVisibility = (flagV and 0x08) == 0
+
+            // read command value
+            valueStr = "0x"// reset string
+            valueStr += data[11]
+            valueStr += data[12]
+            this.colorTransitionValue = Integer.decode(valueStr)
+
+            // read red value
+            valueStr = "0x"
+            valueStr += data[13]
+            valueStr += data[14]
+            this.redValue = Integer.decode(valueStr)
+
+            // read green value
+            valueStr = "0x"
+            valueStr += data[15]
+            valueStr += data[16]
+            this.greenValue = Integer.decode(valueStr)
+
+            // read blue value
+            valueStr = "0x"
+            valueStr += data[17]
+            valueStr += data[18]
+            this.blueValue = Integer.decode(valueStr)
+
+            // read transition flag
+            this.hardTransitionFlag = (data[19] == '1')
+
+            return true
+        } catch (e: Exception) {
+            Log.e(
+                "RGBData:fromString",
+                "Exception occurred while reading the RGB data from string. Exception: $e"
+            )
+            return false
+        }
+    }
 }
 
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{

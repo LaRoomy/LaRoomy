@@ -75,7 +75,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val bindingErrorNotification = "DnBNS=e"// incoming
 
     // static notifications
-    private val propertyLoadingCompleteNotification = "500002001\r"
+    private val propertyLoadingCompleteNotification = "5000030010\r"
+    //private val propertyLoadedFromCacheCompleteNotification = "5000030011\r"
 
     // new ones:
     private val bleDeviceData = BLEDeviceData()
@@ -115,16 +116,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var isResumeConnectionAttempt = false
     private var propertyUpToDate = false
     private var dataReadyToShow = false
-    private var complexStateLoopActive = false
     private var deviceHeaderRecordingActive = false
     private var updateStackProcessActive = false
     private var multiComplexPropertyPageOpen = false
+
     private var suspendedDeviceAddress = ""
+
     private var currentPropertyResolveID = -1 // initialize with invalid marker
     private var currentPropertyResolveIndex = -1 // initialize with invalid marker
     private var currentGroupResolveID = -1 // initialize with invalid marker
     private var currentGroupResolveIndex = -1 // initialize with invalid marker
-    private var currentStateRetrievingIndex = -1 // initialize with invalid marker
+
+    // parameter regarding the complex state loop
+    private var currentComplexStateRetrievingIndex = -1 // initialize with invalid marker
+    private var complexStateLoopActive = false
+    private var complexStatePropertyIndexes = ArrayList<Int>()
+
+
+
     private var multiComplexPageID = -1 // initialize with invalid marker
     private var multiComplexTypeID = -1 // initialize with invalid marker
     private lateinit var activityContext: Context
@@ -134,6 +143,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var currentDevice: BluetoothDevice? = null
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
+
     var deviceInfoHeaderData = DeviceInfoHeaderData()
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
@@ -141,7 +151,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
     var elementUpdateList = ArrayList<ElementUpdateInfo>()
 
-    var complexStatePropertyIDs = ArrayList<Int>()
 
     var currentUsedServiceUUID = ""
         // used to cache the current service uuid
@@ -808,9 +817,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun readComplexStateData(propertyIndex: Int, propertyType: Int, data: String, dataSize: Int){
+        // forward the data regarding to the type
         when(propertyType){
             COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
-                this.processRGBSelectorData(propertyIndex, data, dataSize)
+                this.processRGBSelectorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
                 this.processEXLevelSelectorData(propertyIndex, data, dataSize)
@@ -829,6 +839,38 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
                 this.processBarGraphData(propertyIndex, data, dataSize)
+            }
+        }
+        // check if the loop is active and send the next request if necessary
+        if(this.complexStateLoopActive){
+
+            // increase retrieving index
+            this.currentComplexStateRetrievingIndex++
+
+            // check if the loop is finished
+            if(this.currentComplexStateRetrievingIndex >= this.complexStatePropertyIndexes.size){
+                val finalCount = this.currentComplexStateRetrievingIndex
+
+                // the complex state data loop is finished
+                this.currentComplexStateRetrievingIndex = -1
+                this.complexStatePropertyIndexes.clear()
+                this.complexStateLoopActive = false
+
+                if(verboseLog){
+                    Log.d("readComplexStateData", "Complex property state loop finished: Count is: $finalCount")
+                }
+                applicationProperty.logControl("I: Complex property state loop finished: Count is: $finalCount")
+            } else {
+                // request next complex property state
+                if (verboseLog) {
+                    Log.d(
+                        "readComplexStateData",
+                        "Complex Property Loop active. Requesting next state"
+                    )
+                }
+                this.sendComplexPropertyStateRequest(this.currentComplexStateRetrievingIndex)
+
+                // TODO: renew the timeout, to detect if the device is responding
             }
         }
     }
@@ -1193,8 +1235,42 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun processRGBSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+    private fun processRGBSelectorData(propertyIndex: Int, data: String){
 
+        val rgbSelectorState = RGBSelectorState()
+        // retrieve the rgb element data
+        if(!rgbSelectorState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from RGB Selector data transmission.")
+            return
+        } else {
+            val cState = rgbSelectorState.toComplexPropertyState()
+
+            // update the internal property array
+            if(propertyIndex < this.laRoomyDevicePropertyList.size){
+                this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
+            }
+
+            var uIElementIndex = -1
+
+            // update the UI-Array
+            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
+                    uIElementIndex = index
+                    devicePropertyListContentInformation.complexPropertyState = cState
+                }
+            }
+
+            // if the current open page index is equivalent to the property index, the callback must be invoked to update the UI
+            if(uIElementIndex != -1){
+                val complexPagePropIndex =
+                    propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+
+                if(complexPagePropIndex == propertyIndex){
+                    propertyCallback.onComplexPropertyStateChanged(uIElementIndex, cState)
+                }
+            }
+        }
     }
 
     private fun processEXLevelSelectorData(propertyIndex: Int, data: String, dataSize: Int){
@@ -1457,6 +1533,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 var logData = data
                 if (logData.length > 9) {
                     logData = logData.removeRange(9, logData.length - 1)
+                    logData += "<passkey hidden!>"
                 }
                 applicationProperty.logControl("I: Send Data: $logData")
             } else {
@@ -1559,126 +1636,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         //this.startDevicePropertyListing()
 
     }
-
-//    private fun setPropertyDescriptionForID(id:Int, description: String){
-//        laRoomyDevicePropertyList.forEach {
-//            if(it.propertyIndex == id){
-//                if((this.activityContext.applicationContext as ApplicationProperty).systemLanguage == "Deutsch"){
-////                    it.propertyDescriptor =
-////                        encodeGermanString(description)
-//                } else {
-//                    it.propertyDescriptor = description
-//                }
-//            }
-//        }
-//    }
-
-//    private fun setGroupMemberIDArrayForGroupID(id: Int, data: String) : Boolean {
-//        try {
-//
-//            // TODO: add logs
-//
-//            var str1 = ""
-//            var str2 = ""
-//            var str3 = ""
-//            var str4 = ""
-//            var str5 = ""
-//
-//            if (data.length >= 17) {
-//
-//                data.forEachIndexed { index, c ->
-//                    when (index) {
-//                        3 -> str1 += c
-//                        4 -> str1 += c
-//                        5 -> str1 += c
-//                        6 -> str2 += c
-//                        7 -> str2 += c
-//                        8 -> str2 += c
-//                        9 -> str3 += c
-//                        10 -> str3 += c
-//                        11 -> str3 += c
-//                        12 -> str4 += c
-//                        13 -> str4 += c
-//                        14 -> str4 += c
-//                        15 -> str5 += c
-//                        16 -> str5 += c
-//                        17 -> str5 += c
-//                    }
-//                }
-//                laRoomyPropertyGroupList.forEach {
-////                    if(it.groupIndex == id){
-////                        it.setMemberIDs(
-////                            if(str1.isNotEmpty())
-////                                str1.toInt()
-////                            else 0,
-////                            if(str2.isNotEmpty())
-////                                str2.toInt()
-////                            else 0,
-////                            if(str3.isNotEmpty())
-////                                str3.toInt()
-////                            else 0,
-////                            if(str4.isNotEmpty())
-////                                str4.toInt()
-////                            else 0,
-////                            if(str5.isNotEmpty())
-////                                str5.toInt()
-////                            else 0
-////                        )
-////                    }
-//                }
-//                return true
-//            } else
-//                return false
-//        }
-//        catch(except: Exception){
-//            return false
-//        }
-//    }
-//
-//    private fun compareMemberIDStringWithIntegerArrayList(data: String, ids: ArrayList<Int>) :Boolean {
-//        try {
-//            if(ids.size < 4)return false    // 5 ??? no index ???
-//
-//            var str1 = ""
-//            var str2 = ""
-//            var str3 = ""
-//            var str4 = ""
-//            var str5 = ""
-//
-//            if (data.length >= 17) {
-//
-//                data.forEachIndexed { index, c ->
-//                    when (index) {
-//                        3 -> str1 += c
-//                        4 -> str1 += c
-//                        5 -> str1 += c
-//                        6 -> str2 += c
-//                        7 -> str2 += c
-//                        8 -> str2 += c
-//                        9 -> str3 += c
-//                        10 -> str3 += c
-//                        11 -> str3 += c
-//                        12 -> str4 += c
-//                        13 -> str4 += c
-//                        14 -> str4 += c
-//                        15 -> str5 += c
-//                        16 -> str5 += c
-//                        17 -> str5 += c
-//                    }
-//                }
-//                if(ids.elementAt(0) != str1.toInt())return false
-//                if(ids.elementAt(1) != str2.toInt())return false
-//                if(ids.elementAt(2) != str3.toInt())return false
-//                if(ids.elementAt(3) != str4.toInt())return false
-//                if(ids.elementAt(4) != str5.toInt())return false
-//                return true
-//            } else
-//                return false
-//        }
-//        catch(except: Exception){
-//            return false
-//        }
-//    }
 
 //    private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
 //        var dataProcessed = false
@@ -2275,6 +2232,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
                         }
                     } catch (e: IndexOutOfBoundsException){
+                        if(verboseLog){
+                            Log.e("generateUIArray", "Error while adding the Elements to the view. Exception: $e")
+                        }
+                        applicationProperty.logControl("E: Error while adding the elements to the view. Exception: $e")
                         // FIXME: reset the whole???
                         cancel()
                     }
@@ -3069,64 +3030,54 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             )
         }
         // clear the ID-Array
-        this.complexStatePropertyIDs.clear()
+        this.complexStatePropertyIndexes.clear()
         // loop the properties and save the ones with complex state
         this.laRoomyDevicePropertyList.forEach {
             // start with the first complex state data element
             if(it.propertyType >= COMPLEX_PROPERTY_START_INDEX){
-                this.complexStatePropertyIDs.add(it.propertyIndex)
+                this.complexStatePropertyIndexes.add(it.propertyIndex)
             }
         }
 
-
-        if(this.complexStatePropertyIDs.isNotEmpty()) {
+        if(this.complexStatePropertyIndexes.isNotEmpty()) {
             if(verboseLog) {
                 Log.d(
                     "M:startCompDataLoop",
-                    "Found ${this.complexStatePropertyIDs.size} Elements with ComplexStateData -> start collecting from device"
+                    "Found ${this.complexStatePropertyIndexes.size} Elements with ComplexStateData -> start collecting from device"
                 )
             }
+            applicationProperty.logControl("I: Starting complex state data loop. Elements with complex state: ${this.complexStatePropertyIndexes.size}")
 
-            this.currentStateRetrievingIndex = 0
+            this.currentComplexStateRetrievingIndex = 0
             this.complexStateLoopActive = true
 
-            this.requestPropertyState(
-                this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
+            this.sendComplexPropertyStateRequest(
+                this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex)
             )
-            this.currentStateRetrievingIndex++
-        }
-        else {
-            // if there are no complex types, the retrieving-process is finished here, so set the device time, otherwise it must be done at the end of the complex-state-loop
-            //this.setDeviceTime()
+
+            // TODO: setup a timeout, to recognize if the remote device is not responding
         }
     }
 
-    private fun requestPropertyState(ID: Int){
-        val value = a8BitValueToString(ID)
-        val requestString = "D$value$"
+    private fun sendComplexPropertyStateRequest(propertyIndex: Int){
+
+        val hexIndex = Integer.toHexString(propertyIndex)
+        var requestString = "31"
+
+        if(hexIndex.length > 1){
+            requestString += hexIndex
+        } else {
+            requestString += '0'
+            requestString += hexIndex
+        }
+
+        requestString += "0000\r"
+
         this.sendData(requestString)
+
+        // TODO: setup a timeout, to recognize if the device is responding
     }
 
-    private fun groupIDFromStartEntry(data: String) : Int {
-        var groupID = ""
-
-        data.forEachIndexed { index, c ->
-            when (index) {
-                0 -> if (c != 'G')return -1
-                1 -> if (c != 'I')return -1
-                2 -> if (c != ':')return -1
-                3 -> if (c != 'S')return -1
-                4 -> groupID += c
-                5 -> groupID += c
-                6 -> groupID += c
-            }
-        }
-        // convert group ID to Int and check the value
-        val id =
-            groupID.toInt()
-
-        return if(id < 256 && id > -1) { id } else -1
-    }
 
     private fun propertyIDFromStartEntry(data: String) : Int {
         var propertyID = ""
@@ -3165,9 +3116,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData(outString)
     }
 
-    fun doComplexPropertyStateRequestForID(ID: Int) {
-        val str = a8BitValueToString(ID)
-        this.sendData("D$str$")
+    fun doComplexPropertyStateRequestForPropertyIndex(propertyIndex: Int) {
+        this.sendComplexPropertyStateRequest(propertyIndex)
     }
 
     private fun sendBindingRequest(useCustomKey: Boolean){
@@ -3400,13 +3350,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.complexStateLoopActive = false
         this.deviceHeaderRecordingActive = false
 
-        this.complexStatePropertyIDs.clear()
+        this.complexStatePropertyIndexes.clear()
         this.deviceInfoHeaderData.clear()
 
         this.currentPropertyResolveID = -1
         this.currentGroupResolveIndex = -1
         this.groupRequestIndexCounter = -1
-        this.currentStateRetrievingIndex = -1
+        this.currentComplexStateRetrievingIndex = -1
 
         this.propertyNameResolveSingleAction = false
         this.propertyGroupNameResolveSingleAction = false
@@ -3484,8 +3434,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     interface PropertyCallback: Serializable {
-        fun onPropertyDataRetrievalCompleted(properties: ArrayList<LaRoomyDeviceProperty>){}
-        fun onGroupDataRetrievalCompleted(groups: ArrayList<LaRoomyDevicePropertyGroup>){}
         fun onPropertyDataChanged(propertyIndex: Int, propertyID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
         fun onPropertyGroupDataChanged(groupIndex: Int, groupID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
         fun onCompletePropertyInvalidated(){}
@@ -3497,5 +3445,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData){}
         fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
         fun onDeviceNotification(notificationID: Int){}
+        fun getCurrentOpenComplexPropPagePropertyIndex() : Int {
+            // if overwritten, do not return the super method!
+            return -1
+        }
     }
 }

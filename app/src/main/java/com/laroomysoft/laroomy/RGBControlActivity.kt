@@ -27,12 +27,18 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
 
+    private lateinit var onOffSwitchContainer: ConstraintLayout
+    private lateinit var modeSelectorContainer: ConstraintLayout
+    private lateinit var transitionTypeSetupContainer: ConstraintLayout
+
     private var mustReconnect = false
-    private var relatedElementID = -1
+    private var relatedElementIndex = -1
     private var relatedGlobalElementIndex = -1
     private var currentColor = Color.WHITE
-    private var currentProgram = 12
+    private var currentColorTransitionProgram = 12
     private var currentMode = RGB_MODE_SINGLE_COLOR
+    private var currentHardTransitionFlagValue = false
+    private var onOffState = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,11 +51,16 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
 
         // get the element ID
-        relatedElementID = intent.getIntExtra("elementID", -1)
+        relatedElementIndex = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
+
+        // get container elements
+        onOffSwitchContainer = findViewById(R.id.rgbSwitchContainer)
+        modeSelectorContainer = findViewById(R.id.modeSelectorContainer)
+        transitionTypeSetupContainer = findViewById(R.id.transitionTypeSetupContainer)
 
         // get color picker
         colorPickerView = findViewById(R.id.color_picker_view)
@@ -63,12 +74,27 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         colorPickerView.addOnColorChangedListener(this)
 
         // get the state for this RGB control
-        val colorState = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        val rgbState = RGBSelectorState()
+        rgbState.fromComplexPropertyState(
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
-        // get the current color (if all values are zero, set the default color)
-        val actualColor =
-            if((colorState.valueOne == 0)&&(colorState.valueTwo == 0)&&(colorState.valueThree == 0)) currentColor
-            else Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
+        // set the visibility state of elements
+        if(!rgbState.onOffButtonVisibility){
+            this.onOffSwitchContainer.visibility = View.GONE
+        }
+        if(!rgbState.singleOrTransitionButtonVisibility){
+            this.modeSelectorContainer.visibility = View.GONE
+        }
+        if(!rgbState.intensitySliderVisibility){
+            this.lightnessSliderView.visibility = View.GONE
+        }
+        if(!rgbState.softOrHardTransitionSwitchVisibility){
+            this.transitionTypeSetupContainer.visibility = View.GONE
+        }
+
+        // get the current color
+        val actualColor = rgbState.getColor()
 
         if(actualColor != currentColor)
             currentColor = actualColor
@@ -91,35 +117,40 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // if a program is active -> set the view to transition-view and set the right value in the slider
         val programStatus =
-            this.transitionSpeedSliderPositionFromCommandValue(colorState.commandValue)
+            rgbState.colorTransitionValue - 1
         if(programStatus != -1){
             // program must be active
-            this.currentProgram = colorState.commandValue
+            this.currentColorTransitionProgram = rgbState.colorTransitionValue
             programSpeedSeekBar.progress = programStatus
             setPageSelectorModeState(RGB_MODE_TRANSITION)
         }
         // set program-speed seekBar changeListener
         programSpeedSeekBar.setOnSeekBarChangeListener(this)
 
-        // set on/off Switch-state changeListener and state
+        // set on/off Switch-state changeListener and state params
         onOffSwitch = findViewById(R.id.rgbSwitch)
-        onOffSwitch.isChecked = when(colorState.commandValue){
-            0 -> false
-            else -> true
-        }
-        onOffSwitch.setOnClickListener{
-            if(verboseLog) {
-                Log.d(
-                    "M:RGB:OnOffSwitchClick",
-                    "On / Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
-                )
+        onOffSwitch.isChecked = rgbState.onOffState
+
+        this.currentHardTransitionFlagValue = rgbState.hardTransitionFlag
+
+        this.onOffState = rgbState.onOffState
+
+        onOffSwitch.apply {
+            isChecked = rgbState.onOffState
+            setOnClickListener {
+                if (verboseLog) {
+                    Log.d(
+                        "M:RGB:OnOffSwitchClick",
+                        "On / Off Switch was clicked. New state is: ${(it as SwitchCompat).isChecked}"
+                    )
+                }
+                onMainOnOffSwitchClick(it)
             }
-            onMainOnOffSwitchClick(it)
         }
 
         // set transition switch condition and onClick-Listener
         transitionSwitch = findViewById(R.id.transitionTypeSwitch)
-        transitionSwitch.isChecked = !colorState.hardTransitionFlag
+        transitionSwitch.isChecked = !rgbState.hardTransitionFlag
         transitionSwitch.setOnClickListener{
             if(verboseLog) {
                 Log.d(
@@ -137,7 +168,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementIndex
         // close activity
         finish()
         if(!isStandAlonePropertyMode) {
@@ -197,61 +228,50 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        this.currentProgram = 11 + progress
-        this.sendInstruction(11 + progress, 0, 0,0)
+        this.currentColorTransitionProgram = progress + 1
+        this.collectRGBStateAndSendCommand()
     }
     override fun onStartTrackingTouch(seekBar: SeekBar?) {}
     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 
     fun onSingleColorModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
-
-        if(onOffSwitch.isChecked){
-            this.setCurrentSingleColor()
-        }
+        this.setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+        this.collectRGBStateAndSendCommand()
     }
 
     fun onTransitionModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        setPageSelectorModeState(RGB_MODE_TRANSITION)
+        this.setPageSelectorModeState(RGB_MODE_TRANSITION)
+        this.collectRGBStateAndSendCommand()
+    }
 
-        if(this.onOffSwitch.isChecked){
-            this.setCurrentProgram()
+    private fun collectRGBStateAndSendCommand(){
+        val rgbSelectorState = RGBSelectorState()
+
+        rgbSelectorState.onOffState = this.onOffState
+
+        if(this.onOffSwitchContainer.visibility == View.GONE){
+            rgbSelectorState.onOffButtonVisibility = false
         }
-    }
-
-    private fun sendInstruction(command: Int, redValue: Int, greenValue: Int, blueValue: Int){
-
-        val commandAsString = a8BitValueToString(command)
-        val redValueAsString = a8BitValueToString(redValue)
-        val greenValueAsString = a8BitValueToString(greenValue)
-        val blueValueAsString = a8BitValueToString(blueValue)
-
-        val instruction = "C${a8BitValueToString(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).internalElementIndex)}${commandAsString}${redValueAsString}${greenValueAsString}${blueValueAsString}$"
-
-        ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
-    }
-
-    private fun transitionSpeedSliderPositionFromCommandValue(commandValue: Int): Int {
-        return when(commandValue){
-            11 -> 0
-            12 -> 1
-            13 -> 2
-            14 -> 3
-            15 -> 4
-            else -> -1
+        if(this.modeSelectorContainer.visibility == View.GONE){
+            rgbSelectorState.singleOrTransitionButtonVisibility = false
         }
-    }
+        if(this.lightnessSliderView.visibility == View.GONE){
+            rgbSelectorState.intensitySliderVisibility = false
+        }
+        if(this.transitionTypeSetupContainer.visibility == View.GONE){
+            rgbSelectorState.softOrHardTransitionSwitchVisibility = false
+        }
+        if(currentMode == RGB_MODE_SINGLE_COLOR){
+            rgbSelectorState.colorTransitionValue = 0
+        } else {
+            rgbSelectorState.colorTransitionValue = this.currentColorTransitionProgram
+        }
+        rgbSelectorState.redValue = Color.red(this.currentColor)
+        rgbSelectorState.greenValue = Color.green(this.currentColor)
+        rgbSelectorState.blueValue = Color.blue(this.currentColor)
+        rgbSelectorState.hardTransitionFlag = this.currentHardTransitionFlagValue
 
-    private fun setCurrentSingleColor(){
-        this.sendInstruction(8, Color.red(this.currentColor), Color.green(this.currentColor), Color.blue(this.currentColor))
-    }
-
-    private fun setCurrentProgram(){
-        this.sendInstruction(this.currentProgram, 0, 0,0)
-    }
-
-    private fun setAllOff(){
-        this.sendInstruction(0,0,0,0)
+        ApplicationProperty.bluetoothConnectionManager.sendData(rgbSelectorState.toExecutionString(this.relatedElementIndex))
     }
 
     private fun showDualContainer(show: Boolean){
@@ -262,6 +282,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     private fun setPageSelectorModeState(state: Int){
+
+        // TODO: handle rgb-mode off!!
 
         runOnUiThread {
 
@@ -312,78 +334,87 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private fun onMainOnOffSwitchClick(view: View){
 
-        val state = (view as SwitchCompat).isChecked
+        this.onOffState = (view as SwitchCompat).isChecked
 
         runOnUiThread {
-
-            if (state) {
+            if (this.onOffState) {
                 setPageSelectorModeState(this.currentMode)
             } else {
                 setPageSelectorModeState(RGB_MODE_OFF)
             }
         }
-
-        // send the on / off command to the device
-        if(state){
-
-            if(this.currentMode == RGB_MODE_SINGLE_COLOR){
-
-                this.setCurrentSingleColor()
-
-            } else if(this.currentMode == RGB_MODE_TRANSITION){
-
-                this.setCurrentProgram()
-            }
-        } else {
-            this.setAllOff()
-        }
+        this.collectRGBStateAndSendCommand()
     }
 
     private fun onTransitionTypeSwitchClicked(view: View){
-        val type = when((view as SwitchCompat).isChecked){
-            true -> 201 // soft transition
-            else -> 200 // hard transition
-        }
-        this.sendInstruction(type, 0,0,0)
+        this.currentHardTransitionFlagValue = ((view as SwitchCompat).isChecked)
+        this.collectRGBStateAndSendCommand()
     }
 
     private fun notifyUser(message: String, colorID: Int){
-
         runOnUiThread {
             notificationTextView.text = message
             notificationTextView.setTextColor(getColor(colorID))
         }
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(colorState: ComplexPropertyState){
+    private fun setCurrentViewStateFromComplexPropertyState(rgbSelectorState: RGBSelectorState){
 
         runOnUiThread {
+            // set the visibility of the elements accordingly to the v-flag definition
+            this.onOffSwitchContainer.visibility =
+                if(rgbSelectorState.onOffButtonVisibility){
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            this.modeSelectorContainer.visibility =
+                if(rgbSelectorState.singleOrTransitionButtonVisibility){
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            this.lightnessSliderView.visibility =
+                if(rgbSelectorState.intensitySliderVisibility){
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            this.transitionTypeSetupContainer.visibility =
+                if(rgbSelectorState.softOrHardTransitionSwitchVisibility){
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+
             // 1. On/Off-State
-            val onOffState =
-                (colorState.commandValue != 0)
-            if (onOffState != this.onOffSwitch.isChecked)
-                this.onOffSwitch.isChecked = onOffState
+            this.onOffState = rgbSelectorState.onOffState
+            if (this.onOffState != this.onOffSwitch.isChecked)
+                this.onOffSwitch.isChecked = this.onOffState
 
             // 2. Transition-Type
-            if (!colorState.hardTransitionFlag != this.transitionSwitch.isChecked)
-                this.transitionSwitch.isChecked = !colorState.hardTransitionFlag
+            if (!rgbSelectorState.hardTransitionFlag != this.transitionSwitch.isChecked)
+                this.transitionSwitch.isChecked = !rgbSelectorState.hardTransitionFlag
 
             // 3. ColorPicker view-color
             val actualColor =
-                Color.rgb(colorState.valueOne, colorState.valueTwo, colorState.valueThree)
+                rgbSelectorState.getColor()
+
             if (actualColor != this.currentColor) {
                 this.currentColor = actualColor
                 colorPickerView.setColor(actualColor, false)
-                lightnessSliderView.setColor(actualColor)
+                if(rgbSelectorState.intensitySliderVisibility) {
+                    lightnessSliderView.setColor(actualColor)
+                }
             }
 
             // 4. Current Mode and Program-Slider Position combined
             val programStatus =
-                this.transitionSpeedSliderPositionFromCommandValue(colorState.commandValue)
+                rgbSelectorState.colorTransitionValue - 1
             if (programStatus != -1) {
                 // program must be active
                 programSpeedSeekBar.progress = programStatus
-                this.currentProgram = colorState.commandValue // TODO: check this!!!
+                this.currentColorTransitionProgram = rgbSelectorState.colorTransitionValue // TODO: check this!!!
 
                 if (this.currentMode != RGB_MODE_TRANSITION)
                     setPageSelectorModeState(RGB_MODE_TRANSITION)
@@ -405,22 +436,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 }"
             )
         }
-
         this.currentColor = selectedColor
-
-        if(findViewById<SwitchCompat>(R.id.rgbSwitch).isChecked) {
-
-            val r = Color.red(selectedColor)
-            val g = Color.green(selectedColor)
-            val b = Color.blue(selectedColor)
-            val elID = a8BitValueToString(
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).internalElementIndex
-            )
-            val instruction =
-                "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
-
-            ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
-        }
+        this.collectRGBStateAndSendCommand()
     }
 
     override fun onColorChanged(selectedColor: Int) {
@@ -432,20 +449,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
 
         this.currentColor = selectedColor
-
-        if(findViewById<SwitchCompat>(R.id.rgbSwitch).isChecked) {
-
-            val r = Color.red(selectedColor)
-            val g = Color.green(selectedColor)
-            val b = Color.blue(selectedColor)
-            val elID = a8BitValueToString(
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).internalElementIndex
-            )
-            val instruction =
-                "C${elID}008${a8BitValueToString(r)}${a8BitValueToString(g)}${a8BitValueToString(b)}$"
-
-            ApplicationProperty.bluetoothConnectionManager.sendData(instruction)
-        }
+        this.collectRGBStateAndSendCommand()
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -457,8 +461,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             )
         }
         if(state){
-            // test the connection
-            //ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
             // set UI-State
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
             showDualContainer(true)
@@ -503,6 +505,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }
 
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        return this.relatedElementIndex
+    }
+
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
@@ -514,14 +520,20 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.internalElementIndex == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementIndex){
+
+
             if(verboseLog) {
                 Log.d(
                     "M:CB:RGBPage:ComplexPCg",
                     "RGB Activity - Complex Property changed - Updating the UI"
                 )
             }
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+
+            val rgbSelectorState = RGBSelectorState().apply {
+                fromComplexPropertyState(newState)
+            }
+            this.setCurrentViewStateFromComplexPropertyState(rgbSelectorState)
         }
     }
 

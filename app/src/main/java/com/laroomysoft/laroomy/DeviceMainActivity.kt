@@ -194,7 +194,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         // delay the complex state update
                         Handler(Looper.getMainLooper()).postDelayed(
                             {
-                                ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForID(
+                                ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForPropertyIndex(
                                     (this.applicationContext as ApplicationProperty).complexUpdateID
                                 )
                                 (this.applicationContext as ApplicationProperty).complexUpdateID =
@@ -204,7 +204,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         )
                     } else {
                         // this is not a multicomplex property, do the complex state update immediately
-                        ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForID(
+                        ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForPropertyIndex(
                             (this.applicationContext as ApplicationProperty).complexUpdateID
                         )
                         (this.applicationContext as ApplicationProperty).complexUpdateID = -1
@@ -1043,6 +1043,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
         super.onDeviceHeaderChanged(deviceHeaderData)
         this.setDeviceInfoHeader(deviceHeaderData.imageID, deviceHeaderData.message)
+    }
+
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        // no complex property page is open
+        return -1
     }
 
     override fun onUIAdaptableArrayItemChanged(index: Int) {
