@@ -1,5 +1,6 @@
 package com.laroomysoft.laroomy
 
+import android.app.ApplicationErrorReport
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -229,22 +230,22 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         this.currentColorTransitionProgram = progress + 1
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
     override fun onStartTrackingTouch(seekBar: SeekBar?) {}
     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 
     fun onSingleColorModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         this.setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
 
     fun onTransitionModeButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         this.setPageSelectorModeState(RGB_MODE_TRANSITION)
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
 
-    private fun collectRGBStateAndSendCommand(){
+    private fun collectDataSendCommandAndUpdateState(){
         val rgbSelectorState = RGBSelectorState()
 
         rgbSelectorState.onOffState = this.onOffState
@@ -271,7 +272,14 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         rgbSelectorState.blueValue = Color.blue(this.currentColor)
         rgbSelectorState.hardTransitionFlag = this.currentHardTransitionFlagValue
 
-        ApplicationProperty.bluetoothConnectionManager.sendData(rgbSelectorState.toExecutionString(this.relatedElementIndex))
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            rgbSelectorState.toExecutionString(this.relatedElementIndex)
+        )
+
+        ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
+            rgbSelectorState.toComplexPropertyState(),
+            this.relatedElementIndex
+        )
     }
 
     private fun showDualContainer(show: Boolean){
@@ -343,12 +351,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 setPageSelectorModeState(RGB_MODE_OFF)
             }
         }
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
 
     private fun onTransitionTypeSwitchClicked(view: View){
         this.currentHardTransitionFlagValue = ((view as SwitchCompat).isChecked)
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -437,7 +445,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             )
         }
         this.currentColor = selectedColor
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
 
     override fun onColorChanged(selectedColor: Int) {
@@ -449,7 +457,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
 
         this.currentColor = selectedColor
-        this.collectRGBStateAndSendCommand()
+        this.collectDataSendCommandAndUpdateState()
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

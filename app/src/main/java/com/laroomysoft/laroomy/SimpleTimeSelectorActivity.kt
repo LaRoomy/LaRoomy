@@ -46,12 +46,14 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         this.notificationTextView = findViewById(R.id.stsUserNotificationTextView)
 
         // get the complex state data for the time selector
-        val timeSelectorState =
+        val timeSelectorState = TimeSelectorState()
+        timeSelectorState.fromComplexPropertyState(
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
         // set the displayed time to the current device setting
-        this.currentHour = timeSelectorState.valueOne
-        this.currentMinute = timeSelectorState.valueTwo
+        this.currentHour = timeSelectorState.hour
+        this.currentMinute = timeSelectorState.minute
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@SimpleTimeSelectorActivity, this)
@@ -60,8 +62,8 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // config timeSelector
         this.simpleTimePicker = findViewById(R.id.simpleTimePicker)
         this.simpleTimePicker.setIs24HourView(true)
-        this.simpleTimePicker.hour = timeSelectorState.valueOne
-        this.simpleTimePicker.minute = timeSelectorState.valueTwo
+        this.simpleTimePicker.hour = timeSelectorState.hour
+        this.simpleTimePicker.minute = timeSelectorState.minute
         this.simpleTimePicker.setOnTimeChangedListener(this)
     }
 
@@ -126,22 +128,19 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         this.currentHour = hourOfDay
         this.currentMinute = minute
-
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            this.generateExecutionString()
-        )
+        this.collectDataSendCommandAndUpdateState()
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
+    private fun setCurrentViewStateFromComplexPropertyState(timeSelectorState: TimeSelectorState){
         // NOTE: do not use this method before the view is retrieved in onCreate
 
         // TODO: check if this works (send property-changed notification from device)
 
-        this.currentHour = complexPropertyState.valueOne
-        this.currentMinute = complexPropertyState.valueTwo
+        this.currentHour = timeSelectorState.hour
+        this.currentMinute = timeSelectorState.minute
 
-        this.simpleTimePicker.hour = complexPropertyState.valueOne
-        this.simpleTimePicker.minute = complexPropertyState.valueTwo
+        this.simpleTimePicker.hour = timeSelectorState.hour
+        this.simpleTimePicker.minute = timeSelectorState.minute
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -151,14 +150,19 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         }
     }
 
-    private fun generateExecutionString() : String {
-        return "C${a8BitValueToString(relatedElementID)}" +
-                "${ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    relatedGlobalElementIndex
-                ).complexPropertyState.timeSetterIndex}" +
-                a8BitValueAsTwoCharString(currentHour) +
-                a8BitValueAsTwoCharString(currentMinute) +
-                "00$"
+    private fun collectDataSendCommandAndUpdateState(){
+        val timeSelectorState = TimeSelectorState()
+        timeSelectorState.hour = this.currentHour
+        timeSelectorState.minute = this.currentMinute
+
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            timeSelectorState.toExecutionString(this.relatedElementID)
+        )
+
+        ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
+            timeSelectorState.toComplexPropertyState(),
+            this.relatedElementID
+        )
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -210,6 +214,10 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }
 
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        return this.relatedElementID
+    }
+
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
@@ -228,7 +236,9 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                     "Simple Time Selector Activity - Complex Property changed - Update the UI"
                 )
             }
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            val timeSelectorState = TimeSelectorState()
+            timeSelectorState.fromComplexPropertyState(newState)
+            this.setCurrentViewStateFromComplexPropertyState(timeSelectorState)
         }
     }
 

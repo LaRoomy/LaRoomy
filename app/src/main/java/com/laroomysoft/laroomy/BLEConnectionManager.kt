@@ -823,13 +823,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.processRGBSelectorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
-                this.processEXLevelSelectorData(propertyIndex, data, dataSize)
+                this.processEXLevelSelectorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
-                this.processTimeSelectorData(propertyIndex, data, dataSize)
+                this.processTimeSelectorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
-                this.processTimeFrameSelectorData(propertyIndex, data, dataSize)
+                this.processTimeFrameSelectorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                 this.processUnlockControlData(propertyIndex, data, dataSize)
@@ -1238,51 +1238,95 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun processRGBSelectorData(propertyIndex: Int, data: String){
 
         val rgbSelectorState = RGBSelectorState()
-        // retrieve the rgb element data
+
+        // extract the rgb element data
         if(!rgbSelectorState.fromString(data)){
             // handle error
             applicationProperty.logControl("E: Error reading data from RGB Selector data transmission.")
             return
         } else {
-            val cState = rgbSelectorState.toComplexPropertyState()
+            val cState =
+                rgbSelectorState.toComplexPropertyState()
 
-            // update the internal property array
-            if(propertyIndex < this.laRoomyDevicePropertyList.size){
-                this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
-            }
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
 
-            var uIElementIndex = -1
-
-            // update the UI-Array
-            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
-                    uIElementIndex = index
-                    devicePropertyListContentInformation.complexPropertyState = cState
-                }
-            }
-
-            // if the current open page index is equivalent to the property index, the callback must be invoked to update the UI
-            if(uIElementIndex != -1){
-                val complexPagePropIndex =
-                    propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
-
-                if(complexPagePropIndex == propertyIndex){
-                    propertyCallback.onComplexPropertyStateChanged(uIElementIndex, cState)
-                }
-            }
+//            // update the internal property array
+//            if(propertyIndex < this.laRoomyDevicePropertyList.size){
+//                this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
+//            }
+//
+//            var uIElementIndex = -1
+//
+//            // update the UI-Array
+//            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+//                if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
+//                    uIElementIndex = index
+//                    devicePropertyListContentInformation.complexPropertyState = cState
+//                }
+//            }
+//
+//            // if the current open page index is equivalent to the property index, the callback must be invoked to update the UI
+//            if(uIElementIndex != -1){
+//                val complexPagePropIndex =
+//                    propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+//
+//                if(complexPagePropIndex == propertyIndex){
+//                    propertyCallback.onComplexPropertyStateChanged(uIElementIndex, cState)
+//                }
+//            }
         }
     }
 
-    private fun processEXLevelSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+    private fun processEXLevelSelectorData(propertyIndex: Int, data: String){
+
+        val exLevelState = ExtendedLevelSelectorState()
+
+        // extract the ex level selector data
+        if(!exLevelState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from Extended Level Selector data transmission.")
+            return
+        } else {
+            val cState =
+                exLevelState.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
+    }
+
+    private fun processTimeSelectorData(propertyIndex: Int, data: String){
+
+        val timeSelectorState = TimeSelectorState()
+
+        // extract the time selector data
+        if(!timeSelectorState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from Time Selector data transmission.")
+            return
+        } else {
+            val cState =
+                timeSelectorState.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
 
     }
 
-    private fun processTimeSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+    private fun processTimeFrameSelectorData(propertyIndex: Int, data: String){
 
-    }
+        val timeFrameSelectorState = TimeFrameSelectorState()
 
-    private fun processTimeFrameSelectorData(propertyIndex: Int, data: String, dataSize: Int){
+        // extract the time-frame selector data
+        if(!timeFrameSelectorState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from Time-Frame Selector data transmission.")
+            return
+        } else {
+            val cState =
+                timeFrameSelectorState.toComplexPropertyState()
 
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
     }
 
     private fun processUnlockControlData(propertyIndex: Int, data: String, dataSize: Int){
@@ -3418,7 +3462,45 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
+    private fun updateInternalComplexPropertyStateDataAndTriggerEvent(cState: ComplexPropertyState, propertyIndex: Int){
+        // update the internal property array
+        if(propertyIndex < this.laRoomyDevicePropertyList.size){
+            this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
+        }
 
+        var uIElementIndex = -1
+
+        // update the UI-Array
+        this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+            if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
+                uIElementIndex = index
+                devicePropertyListContentInformation.complexPropertyState = cState
+            }
+        }
+
+        // if the current open page index is equivalent to the property index, the callback must be invoked to update the UI
+        if(uIElementIndex != -1){
+            val complexPagePropIndex =
+                propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+
+            if(complexPagePropIndex == propertyIndex){
+                propertyCallback.onComplexPropertyStateChanged(uIElementIndex, cState)
+            }
+        }
+    }
+
+    fun updatePropertyStateDataNoEvent(cState: ComplexPropertyState, propertyIndex: Int){
+        // update the internal property array
+        if(propertyIndex < this.laRoomyDevicePropertyList.size){
+            this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
+        }
+        // update the UI-Array
+        this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+            if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
+                devicePropertyListContentInformation.complexPropertyState = cState
+            }
+        }
+    }
 
     // the callback definition for the event handling in the calling class
     interface BleEventCallback : Serializable{
@@ -3430,7 +3512,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onAuthenticationSuccessful(){}
         fun onBindingPasskeyRejected(){}
         fun onDeviceReadyForCommunication(){}
-        fun onConnectionTestSuccess(){}
     }
 
     interface PropertyCallback: Serializable {

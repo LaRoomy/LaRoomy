@@ -47,8 +47,10 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex-state object
-        val timeFrameState =
+        val timeFrameState = TimeFrameSelectorState()
+        timeFrameState.fromComplexPropertyState(
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
         // save reference to UI elements
         this.notificationTextView = findViewById(R.id.tfsNotificationTextView)
@@ -60,10 +62,10 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         this.fromTimePicker.setIs24HourView(true)
 
         // set the initial time of the pickers from the complex-state-data
-        this.fromTimePicker.hour = timeFrameState.valueOne
-        this.fromTimePicker.minute = timeFrameState.valueTwo
-        this.toTimePicker.hour = timeFrameState.valueThree
-        this.toTimePicker.minute = timeFrameState.commandValue
+        this.fromTimePicker.hour = timeFrameState.onTimeHour
+        this.fromTimePicker.minute = timeFrameState.onTimeMinute
+        this.toTimePicker.hour = timeFrameState.offTimeHour
+        this.toTimePicker.minute = timeFrameState.offTimeMinute
 
         // set the time-changed listeners
         this.fromTimePicker.setOnTimeChangedListener(this)
@@ -131,30 +133,31 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
                         "New Time is: $hourOfDay : $minute"
             )
         }
+        collectDataSendCommandAndUpdateState()
+    }
+
+    private fun collectDataSendCommandAndUpdateState(){
+        val timeFrameSelectorState = TimeFrameSelectorState()
+        timeFrameSelectorState.onTimeHour = this.fromTimePicker.hour
+        timeFrameSelectorState.onTimeMinute = this.fromTimePicker.minute
+        timeFrameSelectorState.offTimeHour = this.toTimePicker.hour
+        timeFrameSelectorState.offTimeMinute = this.toTimePicker.minute
+
         ApplicationProperty.bluetoothConnectionManager.sendData(
-            this.generateExecutionString(view?.id ?: 0, hourOfDay, minute)
+            timeFrameSelectorState.toExecutionString(this.relatedElementID)
+        )
+
+        ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
+            timeFrameSelectorState.toComplexPropertyState(),
+            this.relatedElementID
         )
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
-        this.fromTimePicker.hour = complexPropertyState.valueOne
-        this.fromTimePicker.minute = complexPropertyState.valueTwo
-        this.toTimePicker.hour = complexPropertyState.valueThree
-        this.toTimePicker.minute = complexPropertyState.commandValue
-    }
-
-    private fun generateExecutionString(ID: Int, hour: Int, minute: Int): String {
-        if ((ID == R.id.fromTimePicker) || (ID == R.id.toTimePicker)) {
-            val c =
-                if (ID == R.id.fromTimePicker) '1' else '2' // time-setter-index 1 or 2 to identify the on or off time
-            val reserved =
-                "00"                             // reserved at the time, maybe use it later
-
-            return "C${a8BitValueToString(this.relatedElementID)}$c${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(
-                minute
-            )}$reserved$"
-        }
-        return "error$"
+    private fun setCurrentViewStateFromComplexPropertyState(timeFrameSelectorState: TimeFrameSelectorState){
+        this.fromTimePicker.hour = timeFrameSelectorState.onTimeHour
+        this.fromTimePicker.minute = timeFrameSelectorState.onTimeMinute
+        this.toTimePicker.hour = timeFrameSelectorState.offTimeHour
+        this.toTimePicker.minute = timeFrameSelectorState.offTimeMinute
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -213,6 +216,10 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }
 
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        return this.relatedElementID
+    }
+
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
@@ -231,7 +238,9 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
                     "Time-Frame Selector Activity - Complex Property changed - Update the UI"
                 )
             }
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            val timeFrameSelectorState = TimeFrameSelectorState()
+            timeFrameSelectorState.fromComplexPropertyState(newState)
+            this.setCurrentViewStateFromComplexPropertyState(timeFrameSelectorState)
         }
     }
 

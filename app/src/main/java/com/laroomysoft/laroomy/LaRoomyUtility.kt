@@ -422,6 +422,11 @@ fun a8bitValueTo2CharHexValue(bVal: Int) : String {
     }
 }
 
+fun a2CharHexValueToIntValue(c_left: Char, c_right: Char) : Int {
+    val valueStr = "0x$c_left$c_right"
+    return Integer.decode(valueStr)
+}
+
 fun createRandomPasskey(keyLength: Int): String {
 
     var realKeyLength = keyLength - 1

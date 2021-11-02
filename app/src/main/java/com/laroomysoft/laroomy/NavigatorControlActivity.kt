@@ -250,6 +250,10 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }
 
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        return this.relatedElementID
+    }
+
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState

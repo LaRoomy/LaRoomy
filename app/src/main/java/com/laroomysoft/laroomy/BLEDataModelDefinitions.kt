@@ -50,9 +50,9 @@ class ComplexPropertyState {
     var valueOne = -1      // (R-Value in RGB Selector)     // (Level-Value in ExtendedLevelSelector)   // (hour-value in SimpleTimeSelector)       // (on-time hour-value in TimeFrameSelector)        // (number of bars in bar-graph activity)
     var valueTwo = -1      // (G-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (minute-value in SimpleTimeSelector)     // (on-time minute-value in TimeFrameSelector)      // (use value as bar-descriptor in bar-graph activity)
     var valueThree = -1    // (B-Value in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time hour-value in TimeFrameSelector)       // (fixed maximum value in bar-graph activity)
-    var valueFour = -1     // general use                   // flag-value in simple Navigator
+    var valueFour = -1     // general use                   // flag-value in simple Navigator                                                       // (off-time minute-value in TimeFrameSelector)
     var valueFive = -1     // general use                   // flag value in simple Navigator
-    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??                                      // (off-time minute-value in TimeFrameSelector)
+    var commandValue = -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??
     var enabledState = true// at this time only a placeholder (not implemented yet)
     var onOffState = false // (used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
     var strValue = ""
@@ -248,8 +248,181 @@ class RGBSelectorState : IComplexPropertySubTypeProtocolClass() {
     }
 }
 
+class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
+
+    var onOffState = false
+    var levelValue = -1
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.onOffState = complexPropertyState.onOffState
+        this.levelValue = complexPropertyState.valueOne
+    }
+
+    override fun isValid(): Boolean {
+        return levelValue >= 0
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.onOffState = this.onOffState
+        cState.valueOne = this.levelValue
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+        return if(data.length < 12){
+            if (verboseLog) {
+                Log.e(
+                    "ExLevelData:fromString",
+                    "Error reading Data from Extended Selector Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            this.onOffState = (data[8]) == '1'
+            this.levelValue = a2CharHexValueToIntValue(data[9], data[10])
+            true
+        }
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += "0400"
+
+        // add ex level selector specific data
+        executionString +=
+            if(this.onOffState){
+                '1'
+            } else {
+                '0'
+            }
+        executionString += a8bitValueTo2CharHexValue(this.levelValue)
+        executionString += '\r'
+        return executionString
+    }
+}
+
+class TimeSelectorState : IComplexPropertySubTypeProtocolClass() {
+
+    var hour = -1
+    var minute = -1
+
+    override fun isValid(): Boolean {
+        return (hour >= 0)&&(minute >= 0)
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.hour = complexPropertyState.valueOne
+        this.minute = complexPropertyState.valueTwo
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.valueOne = this.hour
+        cState.valueTwo = this.minute
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+        return if(data.length < 13){
+            if (verboseLog) {
+                Log.e(
+                    "TimeSelData:fromString",
+                    "Error reading Data from Time Selector Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            this.hour = a2CharHexValueToIntValue(data[8], data[9])
+            this.minute = a2CharHexValueToIntValue(data[10], data[11])
+            true
+        }
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += "0500"
+
+        // add time selector specific data
+        executionString += a8bitValueTo2CharHexValue(this.hour)
+        executionString += a8bitValueTo2CharHexValue(this.minute)
+        executionString += '\r'
+        return executionString
+    }
+}
+
+class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
+
+    var onTimeHour = -1
+    var onTimeMinute = -1
+    var offTimeHour = -1
+    var offTimeMinute = -1
+
+    override fun isValid(): Boolean {
+        return (onTimeHour >= 0)&&(onTimeMinute >= 0)&&(offTimeHour >= 0)&&(offTimeMinute >= 0)
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.onTimeHour = complexPropertyState.valueOne
+        this.onTimeMinute = complexPropertyState.valueTwo
+        this.offTimeHour = complexPropertyState.valueThree
+        this.offTimeMinute = complexPropertyState.valueFour
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.valueOne = this.onTimeHour
+        cState.valueTwo = this.onTimeMinute
+        cState.valueThree = this.offTimeHour
+        cState.valueFour = this.offTimeMinute
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+        return if(data.length < 17){
+            if (verboseLog) {
+                Log.e(
+                    "TimeFrameData:fromString",
+                    "Error reading Data from Time-Frame Selector Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            this.onTimeHour = a2CharHexValueToIntValue(data[8], data[9])
+            this.onTimeMinute = a2CharHexValueToIntValue(data[10], data[11])
+            this.offTimeHour = a2CharHexValueToIntValue(data[12], data[13])
+            this.offTimeMinute = a2CharHexValueToIntValue(data[14], data[15])
+            true
+        }
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += "0900"
+
+        // add time-frame selector specific data
+        executionString += a8bitValueTo2CharHexValue(this.onTimeHour)
+        executionString += a8bitValueTo2CharHexValue(this.onTimeMinute)
+        executionString += a8bitValueTo2CharHexValue(this.offTimeHour)
+        executionString += a8bitValueTo2CharHexValue(this.offTimeMinute)
+        executionString += '\r'
+        return executionString
+    }
+}
+
+class NavigatorState : IComplexPropertySubTypeProtocolClass() {
+
+
+}
+
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
-    // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivty
+    // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivity
 
     var handler: OnPropertyClickListener? = null
 

@@ -14,6 +14,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var currentLevel = 0
+    private var onOffState = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     private lateinit var onOffSwitch: SwitchCompat
@@ -51,11 +52,14 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex state object
-        val exLevelState =
+        val exLevelState = ExtendedLevelSelectorState()
+        exLevelState.fromComplexPropertyState(
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
-        // save the 8bit level value
-        this.currentLevel = exLevelState.valueOne
+        // save the ex level data
+        this.currentLevel = exLevelState.levelValue
+        this.onOffState = exLevelState.onOffState
 
         // get the uiElements and set the initial values
         this.onOffSwitch = findViewById(R.id.elsSwitch)
@@ -79,7 +83,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             findViewById(R.id.exLevelSlider)
 
         this.fluidLevelSlider.apply {
-            position = get8BitValueAsPartOfOne(exLevelState.valueOne)
+            position = get8BitValueAsPartOfOne(exLevelState.levelValue)
             positionListener = {
                 onSliderPositionChanged(
                     percentTo8Bit(
@@ -143,11 +147,13 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
+    private fun setCurrentViewStateFromComplexPropertyState(extendedLevelSelectorState: ExtendedLevelSelectorState){
         // set slider position
-        this.fluidLevelSlider.position = get8BitValueAsPartOfOne(complexPropertyState.valueOne)
+        this.fluidLevelSlider.position = get8BitValueAsPartOfOne(extendedLevelSelectorState.levelValue)
         // set switch state
-        this.onOffSwitch.isChecked = complexPropertyState.onOffState
+        this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState
+
+        // TODO: check if the onChecked event is triggered by the setting process
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -158,10 +164,8 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     }
 
     private fun onOffSwitchClicked(){
-        // send the instruction to the device
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            generateExecutionString(this.onOffSwitch.isChecked, this.currentLevel)
-        )
+        this.onOffState = this.onOffSwitch.isChecked
+        this.collectDataSendCommandAndUpdateState()
     }
 
     private fun onSliderPositionChanged(value: Int){
@@ -174,18 +178,22 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
         // save the new value
         this.currentLevel = value
-        // send the instruction to the device
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            generateExecutionString(this.onOffSwitch.isChecked, this.currentLevel)
-        )
+        this.collectDataSendCommandAndUpdateState()
     }
 
-    private fun generateExecutionString(onOffState: Boolean, levelValue: Int) : String {
-        val c = when(onOffState){
-            true -> '1'
-            else -> '0'
-        }
-        return "C${a8BitValueToString(this.relatedElementID)}$c${a8BitValueToString(levelValue)}$"
+    private fun collectDataSendCommandAndUpdateState(){
+        val exLevelState = ExtendedLevelSelectorState()
+        exLevelState.levelValue = this.currentLevel
+        exLevelState.onOffState = this.onOffState
+
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            exLevelState.toExecutionString(this.relatedElementID)
+        )
+
+        ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
+            exLevelState.toComplexPropertyState(),
+            this.relatedElementID
+        )
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -236,8 +244,11 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
         super.onDeviceHeaderChanged(deviceHeaderData)
-
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
+    }
+
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        return this.relatedElementID
     }
 
     override fun onComplexPropertyStateChanged(
@@ -258,7 +269,9 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                     "Extended Level Selector Activity - Complex Property changed - Update the UI"
                 )
             }
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            val exLevelState = ExtendedLevelSelectorState()
+            exLevelState.fromComplexPropertyState(newState)
+            this.setCurrentViewStateFromComplexPropertyState(exLevelState)
         }
     }
 
