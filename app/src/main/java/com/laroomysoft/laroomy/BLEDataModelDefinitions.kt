@@ -415,11 +415,11 @@ class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
         return executionString
     }
 }
-
 class NavigatorState : IComplexPropertySubTypeProtocolClass() {
 
 
 }
+
 
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivity

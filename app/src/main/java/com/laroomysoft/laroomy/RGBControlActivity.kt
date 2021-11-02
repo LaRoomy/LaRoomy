@@ -36,7 +36,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private var relatedElementIndex = -1
     private var relatedGlobalElementIndex = -1
     private var currentColor = Color.WHITE
-    private var currentColorTransitionProgram = 12
+    private var currentColorTransitionProgram = -1
     private var currentMode = RGB_MODE_SINGLE_COLOR
     private var currentHardTransitionFlagValue = false
     private var onOffState = false
@@ -117,11 +117,16 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         programSpeedSeekBar = findViewById(R.id.rgbProgramSpeedSeekBar)
 
         // if a program is active -> set the view to transition-view and set the right value in the slider
-        val programStatus =
-            rgbState.colorTransitionValue - 1
+        val programStatus = rgbState.colorTransitionValue - 1
+
+        // save the program
+        this.currentColorTransitionProgram = rgbState.colorTransitionValue
+
         if(programStatus != -1){
             // program must be active
-            this.currentColorTransitionProgram = rgbState.colorTransitionValue
+
+            //this.currentColorTransitionProgram = rgbState.colorTransitionValue
+
             programSpeedSeekBar.progress = programStatus
             setPageSelectorModeState(RGB_MODE_TRANSITION)
         }
@@ -312,6 +317,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     transitionSelectorContainer.visibility = View.GONE
 
                     this.currentMode = RGB_MODE_SINGLE_COLOR
+                    this.currentColorTransitionProgram = 0
                 }
                 RGB_MODE_TRANSITION -> {
                     transButton.setBackgroundColor(getColor(R.color.RGB_SelectedButtonColor))
@@ -322,6 +328,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     transitionSelectorContainer.visibility = View.VISIBLE
 
                     this.currentMode = RGB_MODE_TRANSITION
+                    if(this.currentColorTransitionProgram < 1) {
+                        this.currentColorTransitionProgram = 1
+                    }
                 }
                 else -> {
                     // set to rgb-mode "off" ?
@@ -355,7 +364,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
 
     private fun onTransitionTypeSwitchClicked(view: View){
-        this.currentHardTransitionFlagValue = ((view as SwitchCompat).isChecked)
+        this.currentHardTransitionFlagValue = !((view as SwitchCompat).isChecked)
         this.collectDataSendCommandAndUpdateState()
     }
 
