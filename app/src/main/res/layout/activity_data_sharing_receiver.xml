@@ -35,6 +35,8 @@
         android:id="@+id/dataSharingActivityGoToMainButton"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textAllCaps="false"
+        android:background="@drawable/general_rounded_button_background"
         android:layout_margin="5dp"
         android:text="@string/DataSharingActivity_GoToMainButtonText"
         android:onClick="onDataSharingActivityGoToMainButtonClick"
