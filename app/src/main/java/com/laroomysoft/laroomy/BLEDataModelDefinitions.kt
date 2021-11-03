@@ -415,10 +415,10 @@ class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
         return executionString
     }
 }
-class NavigatorState : IComplexPropertySubTypeProtocolClass() {
-
-
-}
+//class NavigatorState : IComplexPropertySubTypeProtocolClass() {
+//
+//
+//}
 
 
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{

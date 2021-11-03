@@ -181,6 +181,8 @@
                     android:text="@string/AppHelpActivityGotoBluetoothButtonText"
                     android:textAllCaps="false"
                     android:background="@drawable/general_rounded_button_background"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP4" />
