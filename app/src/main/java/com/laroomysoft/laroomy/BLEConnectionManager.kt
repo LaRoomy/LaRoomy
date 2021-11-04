@@ -868,7 +868,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         "Complex Property Loop active. Requesting next state"
                     )
                 }
-                this.sendComplexPropertyStateRequest(this.currentComplexStateRetrievingIndex)
+                this.sendComplexPropertyStateRequest(
+                    this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex)
+                )
 
                 // TODO: renew the timeout, to detect if the device is responding
             }
@@ -1249,31 +1251,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 rgbSelectorState.toComplexPropertyState()
 
             this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
-
-//            // update the internal property array
-//            if(propertyIndex < this.laRoomyDevicePropertyList.size){
-//                this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
-//            }
-//
-//            var uIElementIndex = -1
-//
-//            // update the UI-Array
-//            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-//                if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
-//                    uIElementIndex = index
-//                    devicePropertyListContentInformation.complexPropertyState = cState
-//                }
-//            }
-//
-//            // if the current open page index is equivalent to the property index, the callback must be invoked to update the UI
-//            if(uIElementIndex != -1){
-//                val complexPagePropIndex =
-//                    propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
-//
-//                if(complexPagePropIndex == propertyIndex){
-//                    propertyCallback.onComplexPropertyStateChanged(uIElementIndex, cState)
-//                }
-//            }
         }
     }
 

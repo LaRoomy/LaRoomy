@@ -415,6 +415,7 @@ class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
         return executionString
     }
 }
+
 //class NavigatorState : IComplexPropertySubTypeProtocolClass() {
 //
 //
