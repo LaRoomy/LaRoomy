@@ -835,7 +835,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.processUnlockControlData(propertyIndex, data, dataSize)
             }
             COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
-                this.processNavigatorData(propertyIndex, data, dataSize)
+                this.processNavigatorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
                 this.processBarGraphData(propertyIndex, data, dataSize)
@@ -1310,8 +1310,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     }
 
-    private fun processNavigatorData(propertyIndex: Int, data: String, dataSize: Int){
+    private fun processNavigatorData(propertyIndex: Int, data: String){
 
+        val navigatorStateData = NavigatorState()
+
+        // extract the navigator data
+        if(!navigatorStateData.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from NavigatorState data transmission.")
+            return
+        } else {
+            val cState =
+                navigatorStateData.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
     }
 
     private fun processBarGraphData(propertyIndex: Int, data: String, dataSize: Int){

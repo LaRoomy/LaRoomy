@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -40,8 +41,10 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // get the complex state data for the navigator
-        val navigatorState =
+        val navigatorState = NavigatorState()
+        navigatorState.fromComplexPropertyState(
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
         // get UI-Views
         this.userNotificationTextView = findViewById(R.id.navConUserNotificationTextView)
@@ -119,6 +122,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
         // TODO: what does the return value mean????!
 
+        // TODO: what is with multi-touch, implement this if possible!!!
+        //val isDown = (v as AppCompatButton).isPressed
+
         when(event?.action){
             MotionEvent.ACTION_CANCEL -> {
                 executeButtonCommand(v?.id, false)
@@ -137,40 +143,43 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
     private fun executeButtonCommand(Id: Int?, activate: Boolean){
-        val directionChar = when(Id){
-            R.id.navConNavigateUpButton -> '1'
-            R.id.navConNavigateRightButton -> '2'
-            R.id.navConNavigateDownButton -> '3'
-            R.id.navConNavigateLeftButton -> '4'
-            R.id.navConNavigateMiddleButton -> '5'
-            else -> "0"// zero has no function (error command)
+
+        val navigatorState = NavigatorState()
+
+        when(Id){
+            R.id.navConNavigateUpButton -> navigatorState.upperButton = true
+            R.id.navConNavigateRightButton -> navigatorState.rightButton = true
+            R.id.navConNavigateDownButton -> navigatorState.downButton = true
+            R.id.navConNavigateLeftButton -> navigatorState.leftButton = true
+            R.id.navConNavigateMiddleButton -> navigatorState.midButton = true
         }
-        val touchDownType = when(activate){
-            true -> '1'
-            else -> '2'
+        navigatorState.touchType = when(activate){
+            true -> NAV_TOUCHTYPE_DOWN
+            else -> NAV_TOUCHTYPE_RELEASE
         }
-        val executionString = "C${a8BitValueToString(relatedElementID)}$directionChar$touchDownType$"
-        ApplicationProperty.bluetoothConnectionManager.sendData(executionString)
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            navigatorState.toExecutionString(this.relatedElementID)
+        )
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+    private fun setCurrentViewStateFromComplexPropertyState(navigatorState: NavigatorState) {
         var minHeightVal = 280
 
-        if(complexPropertyState.valueOne != 1){
+        if(navigatorState.upperButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateUpButton).visibility = View.GONE
             minHeightVal -= 70
         }
-        if(complexPropertyState.valueTwo != 1){
+        if(navigatorState.rightButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility = View.GONE
         }
-        if(complexPropertyState.valueThree != 1){
+        if(navigatorState.downButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).visibility = View.GONE
             minHeightVal -= 70
         }
-        if(complexPropertyState.valueFour != 1){
+        if(navigatorState.leftButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility = View.GONE
         }
-        if(complexPropertyState.valueFive != 1){
+        if(navigatorState.midButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility = View.GONE
         }
         if(minHeightVal < 280){
@@ -179,7 +188,6 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
     private fun notifyUser(message: String, colorID: Int){
-
         runOnUiThread {
             this.userNotificationTextView.setTextColor(getColor(colorID))
             this.userNotificationTextView.text = message
@@ -272,8 +280,11 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
                     "Navigator Control Activity - Complex Property changed - Update the UI"
                 )
             }
+            val navState = NavigatorState()
+            navState.fromComplexPropertyState(newState)
+
             runOnUiThread {
-                this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+                this.setCurrentViewStateFromComplexPropertyState(navState)
             }
         }
     }

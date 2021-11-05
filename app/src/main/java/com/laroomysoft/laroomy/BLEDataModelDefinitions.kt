@@ -11,6 +11,11 @@ const val PASSKEY_TYPE_SHARED = 1
 const val PASSKEY_TYPE_CUSTOM = 2
 const val PASSKEY_TYPE_NORM = 3
 
+const val NAV_TOUCHTYPE_INVALID = '0'
+const val NAV_TOUCHTYPE_DOWN = '1'
+const val NAV_TOUCHTYPE_RELEASE = '2'
+
+
 class LaRoomyDevicePresentationModel {
     // NOTE: This is the data-model for the DeviceListItem in the main-activity
     var name = ""
@@ -416,10 +421,169 @@ class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
     }
 }
 
-//class NavigatorState : IComplexPropertySubTypeProtocolClass() {
-//
-//
-//}
+class NavigatorState : IComplexPropertySubTypeProtocolClass() {
+
+    var upperButton = true
+    var midButton = true
+    var downButton = true
+    var leftButton = true
+    var rightButton = true
+
+    var touchType = NAV_TOUCHTYPE_INVALID
+
+    override fun isValid(): Boolean {
+        return true
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.upperButton = (complexPropertyState.valueOne != 0)
+        this.rightButton = (complexPropertyState.valueTwo != 0)
+        this.downButton = (complexPropertyState.valueThree != 0)
+        this.leftButton = (complexPropertyState.valueFour != 0)
+        this.midButton = (complexPropertyState.valueFive != 0)
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.valueOne = if (this.upperButton) {
+            1
+        } else {
+            0
+        }
+        cState.valueTwo = if (this.rightButton) {
+            1
+        } else {
+            0
+        }
+        cState.valueThree = if(this.downButton){
+            1
+        } else {
+            0
+        }
+        cState.valueFour = if(this.rightButton){
+            1
+        } else {
+            0
+        }
+        cState.valueFive = if(this.midButton){
+            1
+        } else {
+            0
+        }
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+        return if(data.length < 15){
+            if (verboseLog) {
+                Log.e(
+                    "NavigatorData:fromString",
+                    "Error reading Data from Simple Navigator Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            this.upperButton = (data[8] == '1')
+            this.rightButton = (data[9] == '1')
+            this.downButton = (data[10] == '1')
+            this.leftButton = (data[11] == '1')
+            this.midButton = (data[12] == '1')
+            true
+        }
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += "0700"
+
+        // add Navigator specific data
+        executionString += if(this.upperButton){
+            '1'
+        } else {
+            '0'
+        }
+        executionString += if(this.rightButton){
+            '1'
+        } else {
+            '0'
+        }
+        executionString += if(this.downButton){
+            '1'
+        } else {
+            '2'
+        }
+        executionString += if(this.leftButton){
+            '1'
+        } else {
+            '0'
+        }
+        executionString += if(this.midButton){
+            '1'
+        } else {
+            '0'
+        }
+        executionString += this.touchType
+        executionString += '\r'
+        return executionString
+    }
+}
+
+class BarGraphState : IComplexPropertySubTypeProtocolClass() {
+
+    var numBars = 0
+    var barValues = ArrayList<Float>()
+    var barNames = ArrayList<String>()
+
+    override fun isValid(): Boolean {
+        return (numBars > 0)&&(barValues.size > 0)// ????
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.numBars = complexPropertyState.valueOne
+        this.fromComplexPropertyString(complexPropertyState.strValue)
+    }
+
+    private fun fromComplexPropertyString(data: String){
+        // TODO: find syntax!
+
+        // "32IDxx00" + "t" (type) + "barIndex::barName::initialBarValue;;"
+        // numBars ?? where?
+        // single name transmission ??? not necessary, could be done trough a complex property state update
+        // pipe: [x]bar-index + [...barValue ... ?
+
+        // the bar-graph-data can be changed by a state-update but this is not efficient
+        // for dynamic data setting the pipe function could be used, this is fast!
+
+    }
+
+    private fun toComplexPropertyString() : String {
+        var cpString = ""
+
+        // TODO!
+
+        return cpString
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.valueOne = this.numBars
+        cState.strValue = this.toComplexPropertyString()
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+
+
+        return true
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // this property type has no execution
+        return "invalid usage"
+    }
+}
 
 
 class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener{
