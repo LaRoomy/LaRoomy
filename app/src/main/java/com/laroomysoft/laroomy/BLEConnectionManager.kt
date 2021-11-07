@@ -2101,6 +2101,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             applicationProperty.logControl("W: Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
                         }
 
+                        // check if this is the last property element
+                        if(laRoomyDevicePropertyList.size == index + 1){
+                            currentGroup = -1
+                            expectedGroupIndex++
+                            // the last element must have been the last in group
+                            this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
+                            return@forEachIndexed // TODO: check if this will work!!!
+                        }
+
                     } else {
                         // element is not part of a group, add it raw
 
