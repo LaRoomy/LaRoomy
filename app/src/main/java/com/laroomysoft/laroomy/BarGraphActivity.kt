@@ -19,6 +19,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     private var barDataList = ArrayList<BarGraphData>()
     private var maxBarIndex = -1
+    private var numBars = -1
 
     private var useValueAsBarDescriptor = false
 
@@ -56,12 +57,18 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // get the bar-graph-view for further usage in this component
         this.barGraph = findViewById(R.id.bgdBarGraphView)
 
-        // get the maximum bar count (zero-based!)
-        this.maxBarIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne - 1
+        // get the maximum bar count (zero-based!) (old)
+        //this.maxBarIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne - 1
+
+        // get the initial bar data
+        val barGraphState = BarGraphState()
+        barGraphState.fromComplexPropertyState(
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
         // create and set the bar-graph data
         this.setCurrentViewStateFromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            barGraphState
         )
     }
 
@@ -158,17 +165,18 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.barGraph.invalidate()
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState){
+    private fun setCurrentViewStateFromComplexPropertyState(barGraphState: BarGraphState){
         // set bar-graph properties
-        this.useValueAsBarDescriptor = when(complexPropertyState.valueTwo) {
-            0 -> false
-            else -> true
-        }
-        if(complexPropertyState.valueThree > 0){
-            this.barGraph.fixedMaximumValue = complexPropertyState.valueThree
+        this.useValueAsBarDescriptor = barGraphState.useValueAsBarDescriptor
+        this.maxBarIndex = barGraphState.numBars - 1
+        this.numBars = barGraphState.numBars
+        this.barDataList = barGraphState.getBarGraphDataList()
+
+        if(barGraphState.useFixedMaximumValue){
+            this.barGraph.fixedMaximumValue = barGraphState.fixedMaximumValue.toInt()
         }
         // update the bar-graph
-        this.initOrAdaptBarGraphDataHolder(complexPropertyState.valueOne)
+        this.initOrAdaptBarGraphDataHolder(barGraphState.numBars)
         this.refreshBarGraph()
     }
 
@@ -251,7 +259,9 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                     "BarGraph Activity - Complex Property changed - Update the UI"
                 )
             }
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            val barGraphState = BarGraphState()
+            barGraphState.fromComplexPropertyState(element.complexPropertyState)
+            this.setCurrentViewStateFromComplexPropertyState(barGraphState)
         }
     }
 

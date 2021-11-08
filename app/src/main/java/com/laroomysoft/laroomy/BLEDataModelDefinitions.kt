@@ -541,12 +541,13 @@ class NavigatorState : IComplexPropertySubTypeProtocolClass() {
 class BarGraphState : IComplexPropertySubTypeProtocolClass() {
 
     var numBars = -1
-    var flagValue = -1
-    var barValues = ArrayList<Float>()
-    var barNames = ArrayList<String>()
+    //var flagValue = -1
+    private var barValues = ArrayList<Float>()
+    private var barNames = ArrayList<String>()
     var errorFlag = false
-
-    //var barData = ArrayList<BarGraphData>()
+    var useValueAsBarDescriptor = false
+    var useFixedMaximumValue = false
+    var fixedMaximumValue = 0f
 
     override fun isValid(): Boolean {
         return (numBars > 0) && (!errorFlag) && (barValues.size == barNames.size)
@@ -554,10 +555,56 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         this.numBars = complexPropertyState.valueOne
-        this.errorFlag = this.fromComplexPropertyString(complexPropertyState.strValue)
+        this.useValueAsBarDescriptor = (complexPropertyState.valueTwo and 0x01) != 0
+        this.useFixedMaximumValue = (complexPropertyState.valueTwo and 0x02) != 0
+        this.errorFlag = this.fromComplexPropertyString(complexPropertyState.strValue, false)
     }
 
-    private fun fromComplexPropertyString(data: String): Boolean {
+    fun updateFromString(data: String) : Boolean {
+        return if (data.length < 10) {
+            if (verboseLog) {
+                Log.e(
+                    "BarGraphData:updateFS",
+                    "Error reading Data from BarGraphState Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            // get the flag values
+            val flags = data[8].toString().toInt()
+            this.useValueAsBarDescriptor = (flags and 0x01) != 0
+            this.useFixedMaximumValue = (flags and 0x02) != 0
+
+            // get the number of bars
+            this.numBars = data[9].toString().toInt()
+
+            val pureData = data.removeRange(0, 9)
+            this.fromComplexPropertyString(pureData, true)
+        }
+    }
+
+    fun getBarGraphDataList() : ArrayList<BarGraphData> {
+
+        val bData = ArrayList<BarGraphData>()
+
+        for(i in 0 until this.numBars){
+            var bText = ""
+            var bVal = 0f
+
+            if(i < this.barNames.size) {
+                bText = this.barNames.elementAt(i)
+            }
+            if(i < this.barValues.size){
+                bVal = this.barValues.elementAt(i)
+            }
+
+            val bgd = BarGraphData(bVal, bText)
+            bData.add(bgd)
+        }
+        return bData
+    }
+
+    private fun fromComplexPropertyString(data: String, isUpdateMode: Boolean): Boolean {
         // TODO: find syntax!
 
         // the transmission data entry must be removed on transmission reception
@@ -576,6 +623,11 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
         }
 
         try {
+            // first clear the data (if mode is initial-mode)
+            if (!isUpdateMode) {
+                this.barValues.clear()
+                this.barNames.clear()
+            }
 
             val strArray = ArrayList<String>()
             var recString = ""
@@ -603,73 +655,119 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                 }
             }
 
-            var barIndex = -1
-            var barName = ""
-            var barValue = ""
+            var barIndex: Int
 
             strArray.forEachIndexed { index, s ->
                 // get the bar index
                 barIndex = s[0].toString().toInt()
 
-                // check validity
-                if ((s.length < 6) || (barIndex != index)) {
-                    return false
-                }
+                // if the index is 9, this must be the fixed value definition
+                if (barIndex == 9) {
+                    if (s.length >= 7) {
+                        if ((s[1] == ':') && (s[2] == ':') && (s[3] == '_') && (s[4] == ':') && (s[5] == ':')) {
+                            var strValue = ""
+                            var counter = 6
 
-                if ((data[1] != ':') && (data[2] != ':')) {
-                    // missing delimiter
-                    return false
-                } else {
-                    if (data[3] == '_') {
-                        // undefined placeholder char
-                        this.barNames.add("_")
-                    } else {
-                        // record the data
-                        nextValidIndex = -1
-                        var dataIndex = 4
-                        var barNameString = ""
-
-                        // record the bar-name
-                        while (dataIndex < s.length) {
-                            if ((s[dataIndex] == ':') && (s[dataIndex + 1] == ':')) {
-                                this.barNames.add(barNameString)
-                                nextValidIndex = dataIndex + 2
-                            } else {
-                                barNameString += data[dataIndex]
-                            }
-                            dataIndex++
-                        }
-
-                        if (nextValidIndex < s.length) {
-
-                            dataIndex = nextValidIndex
-
-                            if (s[dataIndex] == '_') {
-                                // undefined placeholder char -> add value zero
-                                this.barValues.add(0f)
-                            } else {
-                                var barValueString = ""
-
-                                // record the bar-value
-                                while (dataIndex < s.length) {
-                                    if (s[dataIndex] == '\r') {
-                                        break
-                                    }
-                                    barValueString += s[dataIndex]
-                                    dataIndex++
+                            while (counter < s.length) {
+                                if (s[counter] == '\r') {
+                                    break
                                 }
-                                if (barValueString.isNotEmpty()) {
-                                    this.barValues.add(
-                                        barValueString.toFloat()
-                                    )
+                                strValue += s[counter]
+                                counter++
+                            }
+                            this.fixedMaximumValue = strValue.toFloat()
+                        }
+                    }
+                } else {
+                    // check validity
+                    if (s.length < 6) {
+                        return false
+                    }
+                    if (isUpdateMode) {
+                        if ((barIndex >= this.barNames.size) || (barIndex >= this.barValues.size)) {
+                            return false
+                        }
+                    } else {
+                        if (barIndex != index) {
+                            return false
+                        }
+                    }
+
+                    if ((data[1] != ':') && (data[2] != ':')) {
+                        // missing delimiter
+                        return false
+                    } else {
+                        if (data[3] == '_') {
+                            // undefined placeholder char
+                            if (!isUpdateMode) {
+                                // initial mode
+                                this.barNames.add("_")
+                            }
+                        } else {
+                            // record the data
+                            nextValidIndex = -1
+                            var dataIndex = 4
+                            var barNameString = ""
+
+                            // record the bar-name
+                            while (dataIndex < s.length) {
+                                if ((s[dataIndex] == ':') && (s[dataIndex + 1] == ':')) {
+                                    if (!isUpdateMode) {
+                                        // initial mode
+                                        this.barNames.add(barNameString)
+                                    } else {
+                                        // must be update mode, do not add, replace it
+                                        this.barNames[barIndex] = barNameString
+                                    }
+                                    nextValidIndex = dataIndex + 2
                                 } else {
-                                    this.barValues.add(0f)
+                                    barNameString += data[dataIndex]
+                                }
+                                dataIndex++
+                            }
+
+                            if (nextValidIndex < s.length) {
+
+                                dataIndex = nextValidIndex
+
+                                if (s[dataIndex] == '_') {
+                                    // undefined placeholder char -> add value zero
+                                    if (!isUpdateMode) {
+                                        // initial mode
+                                        this.barValues.add(0f)
+                                    } else {
+                                        var barValueString = ""
+
+                                        // record the bar-value
+                                        while (dataIndex < s.length) {
+                                            if (s[dataIndex] == '\r') {
+                                                break
+                                            }
+                                            barValueString += s[dataIndex]
+                                            dataIndex++
+                                        }
+                                        if(!isUpdateMode) {
+                                            // initial mode
+                                            if (barValueString.isNotEmpty()) {
+                                                this.barValues.add(
+                                                    barValueString.toFloat()
+                                                )
+                                            } else {
+                                                this.barValues.add(0f)
+                                                return false
+                                            }
+                                        } else {
+                                            // must be update mode
+                                            if(barValueString.isNotEmpty()){
+                                                this.barValues[barIndex] = barValueString.toFloat()
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // error
                                     return false
                                 }
                             }
-                        } else {
-                            // error
-                            return false
                         }
                     }
                 }
@@ -710,6 +808,16 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     override fun toComplexPropertyState(): ComplexPropertyState {
         val cState = ComplexPropertyState()
         cState.valueOne = this.numBars
+
+        var flags = 0
+        if(this.useValueAsBarDescriptor){
+            flags = flags or 0x01
+        }
+        if(this.useFixedMaximumValue){
+            flags = flags or 0x02
+        }
+
+        cState.valueTwo = flags
         cState.strValue = this.toComplexPropertyString()
         return cState
     }
@@ -724,13 +832,16 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
             }
             false
         } else {
-            // get the flag value
-            this.flagValue = data[8].toString().toInt()
+            // get the flag values
+            val flags = data[8].toString().toInt()
+            this.useValueAsBarDescriptor = (flags and 0x01) != 0
+            this.useFixedMaximumValue = (flags and 0x02) != 0
+
             // get the number of bars
             this.numBars = data[9].toString().toInt()
 
             val pureData = data.removeRange(0, 9)
-            this.fromComplexPropertyString(pureData)
+            this.fromComplexPropertyString(pureData, false)
         }
     }
 

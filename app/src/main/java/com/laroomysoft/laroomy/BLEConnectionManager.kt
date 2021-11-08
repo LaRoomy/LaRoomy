@@ -838,7 +838,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.processNavigatorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
-                this.processBarGraphData(propertyIndex, data, dataSize)
+                this.processBarGraphData(propertyIndex, data)
             }
         }
         // check if the loop is active and send the next request if necessary
@@ -1327,8 +1327,37 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun processBarGraphData(propertyIndex: Int, data: String, dataSize: Int){
+    private fun processBarGraphData(propertyIndex: Int, data: String){
 
+        val barGraphState = BarGraphState()
+
+        // get the existing state
+        if(this.uIAdapterList.size > 0){
+            this.uIAdapterList.forEach {
+                if(it.internalElementIndex == propertyIndex){
+                    barGraphState.fromComplexPropertyState(it.complexPropertyState)
+                }
+            }
+        }
+
+        // validate the existing state and apply the appropriate method
+        val res = if(barGraphState.isValid()){
+            barGraphState.updateFromString(data)
+        } else {
+            barGraphState.fromString(data)
+        }
+
+        // check the result and update the data (or handle error)
+        if(!res){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from BarGraphState data transmission.")
+            return
+        } else {
+            val cState =
+                barGraphState.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
     }
 
     private fun sendPropertyStateRequest(propertyIndex: Int){
