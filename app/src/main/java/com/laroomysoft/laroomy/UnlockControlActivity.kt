@@ -128,10 +128,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
         if(unlockControlState.isValid()) {
             if(unlockControlState.unLocked){
+                this.lockState = UC_STATE_UNLOCKED
                 this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_unlocked_sq128)
                 this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
                 this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Unlocked)
             } else {
+                this.lockState = UC_STATE_LOCKED
                 this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_locked_sq128)
                 this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
                 this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Locked)
@@ -145,6 +147,11 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             val unlockControlState = UnlockControlState()
             unlockControlState.mode = UC_NORMAL_MODE
             unlockControlState.unLocked = false // (unlock == false) = lock command
+
+            if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey) {
+                unlockControlState.flags = unlockControlState.flags or 0x08
+            }
+
             ApplicationProperty.bluetoothConnectionManager.sendData(
                 unlockControlState.toExecutionString(this.relatedElementID)
             )
@@ -192,6 +199,11 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 unlockControlState.pin = this.currentEnteredPin
                 unlockControlState.unLocked = true
                 unlockControlState.mode = UC_NORMAL_MODE
+
+                if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey) {
+                    unlockControlState.flags = unlockControlState.flags or 0x08
+                }
+
                 // send unlock request
                 ApplicationProperty.bluetoothConnectionManager.sendData(
                     unlockControlState.toExecutionString(this.relatedElementID)
@@ -207,16 +219,30 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
         showPin = when(showPin){
             true -> {
-                this.currentPinDisplayTextView.text = this.currentEnteredPin
+
+                if(this.currentEnteredPin.isNotEmpty()) {
+                    var hiddenPin = ""
+                    for (i in 0..this.currentEnteredPin.length) {
+                        hiddenPin += '*'
+                    }
+                    this.currentPinDisplayTextView.text = hiddenPin
+                } else {
+                    this.currentPinDisplayTextView.text = ""
+                }
+
+
+
                 this.showHideButton.text = getString(R.string.UnlockCtrl_ButtonText_Show)
                 false
             }
             else -> {
-                var hiddenPin = ""
-                for(i in 0 .. this.currentEnteredPin.length){
-                    hiddenPin += '*'
+
+                if(this.currentEnteredPin.isNotEmpty()) {
+                    this.currentPinDisplayTextView.text = this.currentEnteredPin
+                } else {
+                    this.currentPinDisplayTextView.text = ""
                 }
-                this.currentPinDisplayTextView.text = hiddenPin
+
                 this.showHideButton.text = getString(R.string.UnlockCtrl_ButtonText_Hide)
                 true
             }
@@ -236,14 +262,19 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     }
 
     private fun updatePinDisplay(){
-        if(this.showPin){
-            this.currentPinDisplayTextView.text = this.currentEnteredPin
-        } else {
-            var hiddenPin = ""
-            for(i in 0 .. this.currentEnteredPin.length){
-                hiddenPin += '*'
+        if(this.currentEnteredPin.isNotEmpty()) {
+            if (this.showPin) {
+                this.currentPinDisplayTextView.text = this.currentEnteredPin
+            } else {
+                var hiddenPin = ""
+                for (i in this.currentEnteredPin.indices) {
+                    hiddenPin += '*'
+                }
+                this.currentPinDisplayTextView.text = hiddenPin
             }
-            this.currentPinDisplayTextView.text = hiddenPin
+        }
+        else {
+            this.currentPinDisplayTextView.text = ""
         }
     }
 

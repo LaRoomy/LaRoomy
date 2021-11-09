@@ -203,19 +203,20 @@
             >
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/resetAppActivityCancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/resetAppActivityCancelButton"
-                android:textSize="20sp"
-                android:text="@string/ResetAppActivity_CancelButtonText"
                 android:background="@drawable/general_rounded_button_background"
                 android:onClick="resetAppActivityOnCancelButtonClick"
-                android:paddingEnd="5dp"
                 android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:text="@string/ResetAppActivity_CancelButtonText"
+                android:textSize="20sp"
+                android:textAllCaps="false"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:layout_constraintVertical_bias="0.0" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="wrap_content"
@@ -225,6 +226,7 @@
                 android:text="@string/ResetAppActivity_ResetButtonText"
                 android:background="@drawable/general_rounded_button_background"
                 android:onClick="resetAppActivityOnResetButtonClick"
+                android:textAllCaps="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

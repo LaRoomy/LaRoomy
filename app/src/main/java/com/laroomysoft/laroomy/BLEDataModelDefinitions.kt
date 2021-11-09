@@ -906,21 +906,35 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
             }
             false
         } else {
-
-            this.flags = 0
-
-            // TODO: !
-                // no password included in incoming transmission !!!
-
+            this.unLocked = (data[8] == '2')
+            this.mode = when(data[9]){
+                '0' -> UC_NORMAL_MODE
+                '1' -> UC_PIN_CHANGE_MODE
+                else -> UC_NORMAL_MODE
+            }
+            this.flags = a2CharHexValueToIntValue(data[10], data[11])
             true
         }
 
     }
 
     override fun toExecutionString(propertyIndex: Int): String {
-        var executionString = ""
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += a8bitValueTo2CharHexValue(5 + this.pin.length)
+        executionString += "00"
 
-        // TODO
+        // add UnlockControl specific data
+        executionString += if(this.unLocked){
+            '2'
+        } else {
+            '1'
+        }
+        executionString += this.mode
+        executionString += a8bitValueTo2CharHexValue(this.flags)
+        executionString += this.pin
+        executionString += '\r'
 
         return executionString
     }
