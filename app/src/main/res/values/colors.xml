@@ -44,6 +44,8 @@
     <color name="warningLightColor">#F99F08</color>
     <color name="successLightColor">#88FFAA</color>
     <color name="fullWhiteTextColor">#FFFFFFFF</color>
+    <color name="unLockCtrlActivityStatusTextColor_Locked">#FFF5CD06</color>
+    <color name="unLockCtrlActivityStatusTextColor_Unlocked">#69D17A</color>
 
     <!-- List Elements -->
     <color name="addDeviceListElementBackgroundColor">#FF444444</color>

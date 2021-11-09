@@ -162,6 +162,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val isLastAddressValid: Boolean
         get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
 
+    val isConnectionDoneWithSharedKey: Boolean
+    get() = (this.bleDeviceData.passKeyTypeUsed == PASSKEY_TYPE_SHARED)
+
     private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
         this.bleAdapter?.bondedDevices
     }
@@ -832,7 +835,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.processTimeFrameSelectorData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
-                this.processUnlockControlData(propertyIndex, data, dataSize)
+                this.processUnlockControlData(propertyIndex, data)
             }
             COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
                 this.processNavigatorData(propertyIndex, data)
@@ -1306,8 +1309,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun processUnlockControlData(propertyIndex: Int, data: String, dataSize: Int){
+    private fun processUnlockControlData(propertyIndex: Int, data: String){
 
+        val unlockControlState = UnlockControlState()
+
+        // extract the data
+        if(!unlockControlState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from UnLockControlState data transmission.")
+            return
+        } else {
+            val cState =
+                unlockControlState.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
     }
 
     private fun processNavigatorData(propertyIndex: Int, data: String){

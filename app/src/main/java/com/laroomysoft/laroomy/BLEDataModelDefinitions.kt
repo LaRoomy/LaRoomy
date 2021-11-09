@@ -11,9 +11,15 @@ const val PASSKEY_TYPE_SHARED = 1
 const val PASSKEY_TYPE_CUSTOM = 2
 const val PASSKEY_TYPE_NORM = 3
 
-const val NAV_TOUCHTYPE_INVALID = '0'
-const val NAV_TOUCHTYPE_DOWN = '1'
-const val NAV_TOUCHTYPE_RELEASE = '2'
+const val NAV_TOUCH_TYPE_INVALID = '0'
+const val NAV_TOUCH_TYPE_DOWN = '1'
+const val NAV_TOUCH_TYPE_RELEASE = '2'
+
+const val UC_STATE_LOCKED = '1'
+const val UC_STATE_UNLOCKED = '0'
+
+const val UC_NORMAL_MODE = '0'
+const val UC_PIN_CHANGE_MODE = '1'
 
 
 class LaRoomyDevicePresentationModel {
@@ -437,7 +443,7 @@ class NavigatorState : IComplexPropertySubTypeProtocolClass() {
     var leftButton = true
     var rightButton = true
 
-    var touchType = NAV_TOUCHTYPE_INVALID
+    var touchType = NAV_TOUCH_TYPE_INVALID
 
     override fun isValid(): Boolean {
         return true
@@ -848,6 +854,75 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     override fun toExecutionString(propertyIndex: Int): String {
         // this property type has no execution
         return "invalid usage"
+    }
+}
+
+class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
+
+    var unLocked = false
+    var mode = UC_NORMAL_MODE
+    var pin = ""
+    var flags = 0
+
+    override fun isValid(): Boolean {
+        return true
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.unLocked = complexPropertyState.valueOne == 1
+        this.mode = if(complexPropertyState.valueTwo == 1){
+            UC_PIN_CHANGE_MODE
+        } else {
+            UC_NORMAL_MODE
+        }
+        this.pin = complexPropertyState.strValue
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+
+        cState.valueOne = if(this.unLocked){
+            1
+        } else {
+            0
+        }
+        cState.valueTwo = if(this.mode == UC_NORMAL_MODE){
+            0
+        } else {
+            1
+        }
+        cState.strValue = this.pin
+
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+        return if (data.length < 13) {
+            if (verboseLog) {
+                Log.e(
+                    "UnlockCTRLData:fromString",
+                    "Error reading Data from Unlock Control Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+
+            this.flags = 0
+
+            // TODO: !
+                // no password included in incoming transmission !!!
+
+            true
+        }
+
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        var executionString = ""
+
+        // TODO
+
+        return executionString
     }
 }
 

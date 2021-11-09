@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 
 class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
@@ -15,14 +16,18 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private var relatedGlobalElementIndex = -1
 
     private var showPin = false
-    private var pinChangeModeActive = false
+    //private var currentMode = UC_NORMAL_MODE
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+    private var currentEnteredPin = ""
+    private var lockState = UC_STATE_LOCKED
 
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
     private lateinit var showHideButton: AppCompatButton
     private lateinit var headerTextView: AppCompatTextView
+    private lateinit var currentPinDisplayTextView: AppCompatTextView
+    private lateinit var lockUnlockImageView: AppCompatImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +43,8 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.lockStatusTextView = findViewById(R.id.ucLockConditionStatusTextView)
         this.showHideButton = findViewById(R.id.ucShowPinButton)
         this.headerTextView = findViewById(R.id.ucHeaderTextView)
+        this.currentPinDisplayTextView = findViewById(R.id.ucCurrentPinDisplayTextView)
+        this.lockUnlockImageView = findViewById(R.id.ucLockConditionImageView)
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -55,8 +62,10 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the related complex state object
-        val lockState =
+        val lockState = UnlockControlState()
+        lockState.fromComplexPropertyState(
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+        )
 
         // set the UI State
         this.setCurrentViewStateFromComplexPropertyState(lockState)
@@ -115,54 +124,103 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         }
     }
 
-    private fun setCurrentViewStateFromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+    private fun setCurrentViewStateFromComplexPropertyState(unlockControlState: UnlockControlState) {
 
+        if(unlockControlState.isValid()) {
+            if(unlockControlState.unLocked){
+                this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_unlocked_sq128)
+                this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
+                this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Unlocked)
+            } else {
+                this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_locked_sq128)
+                this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
+                this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Locked)
+            }
+        }
     }
 
-
-
-
     fun onLockImageClick(@Suppress("UNUSED_PARAMETER") view: View) {
-
-        // TODO: send lock command if unlocked
-
+        // send lock command if unlocked
+        if(this.lockState == UC_STATE_UNLOCKED){
+            val unlockControlState = UnlockControlState()
+            unlockControlState.mode = UC_NORMAL_MODE
+            unlockControlState.unLocked = false // (unlock == false) = lock command
+            ApplicationProperty.bluetoothConnectionManager.sendData(
+                unlockControlState.toExecutionString(this.relatedElementID)
+            )
+        }
     }
 
     fun onNumPadButtonClick(view: View){
-
-        // TODO!
-
         when(view.id){
-            R.id.ucOneButton -> {}
-            R.id.ucTwoButton -> {}
-            else -> {}
+            R.id.ucZeroButton -> {
+                this.currentEnteredPin += '0'
+            }
+            R.id.ucOneButton -> {
+                this.currentEnteredPin += '1'
+            }
+            R.id.ucTwoButton -> {
+                this.currentEnteredPin += '2'
+            }
+            R.id.ucThreeButton -> {
+                this.currentEnteredPin += '3'
+            }
+            R.id.ucFourButton -> {
+                this.currentEnteredPin += '4'
+            }
+            R.id.ucFiveButton -> {
+                this.currentEnteredPin += '5'
+            }
+            R.id.ucSixButton -> {
+                this.currentEnteredPin += '6'
+            }
+            R.id.ucSevenButton -> {
+                this.currentEnteredPin += '7'
+            }
+            R.id.ucEightButton -> {
+                this.currentEnteredPin += '8'
+            }
+            R.id.ucNineButton -> {
+                this.currentEnteredPin += '9'
+            }
+            R.id.clearButton -> {
+                // clear the entered pin
+                this.currentEnteredPin = ""
+            }
+            R.id.OkButton -> {
+                val unlockControlState = UnlockControlState()
+                unlockControlState.pin = this.currentEnteredPin
+                unlockControlState.unLocked = true
+                unlockControlState.mode = UC_NORMAL_MODE
+                // send unlock request
+                ApplicationProperty.bluetoothConnectionManager.sendData(
+                    unlockControlState.toExecutionString(this.relatedElementID)
+                )
+                // clear the entered pin
+                this.currentEnteredPin = ""
+            }
         }
-
+        this.updatePinDisplay()
     }
 
     fun onShowHideButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         showPin = when(showPin){
             true -> {
-
-                // TODO: show the pin
-
+                this.currentPinDisplayTextView.text = this.currentEnteredPin
                 this.showHideButton.text = getString(R.string.UnlockCtrl_ButtonText_Show)
-
-
                 false
-
             }
             else -> {
-
-                // TODO: hide the pin
-
+                var hiddenPin = ""
+                for(i in 0 .. this.currentEnteredPin.length){
+                    hiddenPin += '*'
+                }
+                this.currentPinDisplayTextView.text = hiddenPin
                 this.showHideButton.text = getString(R.string.UnlockCtrl_ButtonText_Hide)
-
                 true
             }
         }
-
     }
 
     fun onChangePinButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -170,7 +228,24 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         //  TODO: in change-pin mode set the image of the button to cancel image and implement the appropriate function
     }
 
+    fun sendPinChangeRequest(oldPin: String, newPin: String){
 
+        if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey){
+            // TODO: add flag!!!
+        }
+    }
+
+    private fun updatePinDisplay(){
+        if(this.showPin){
+            this.currentPinDisplayTextView.text = this.currentEnteredPin
+        } else {
+            var hiddenPin = ""
+            for(i in 0 .. this.currentEnteredPin.length){
+                hiddenPin += '*'
+            }
+            this.currentPinDisplayTextView.text = hiddenPin
+        }
+    }
 
     private fun notifyUser(message: String, colorID: Int){
         runOnUiThread {
@@ -250,7 +325,10 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                     "Unlock Control Activity - Complex Property changed - Update the UI"
                 )
             }
-            this.setCurrentViewStateFromComplexPropertyState(element.complexPropertyState)
+            val unlockControlState = UnlockControlState()
+            unlockControlState.fromComplexPropertyState(newState)
+
+            this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
         }
     }
 

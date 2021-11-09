@@ -62,6 +62,10 @@
     <string name="UnlockCtrl_PinEntryText">PIN:</string>
     <string name="UnlockCtrl_ButtonText_Show">Show</string>
     <string name="UnlockCtrl_ButtonText_Hide">Hide</string>
+    <string name="UnlockCtrl_PopupHeaderText">Change Pin</string>
+    <string name="UnlockCtrl_PopupCurrentPinDescriptorText">Current Pin:</string>
+    <string name="UnlockCtrl_PopupNewPinDescriptorText">New Pin:</string>
+    <string name="UnlockCtrl_PopupRepeatNewPinDescriptorText">Repeat new Pin:</string>
 
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>

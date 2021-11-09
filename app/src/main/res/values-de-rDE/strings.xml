@@ -65,6 +65,11 @@
     <string name="UnlockCtrl_PinEntryText">PIN:</string>
     <string name="UnlockCtrl_ButtonText_Show">Anzeigen</string>
     <string name="UnlockCtrl_ButtonText_Hide">Verbergen</string>
+    <string name="UnlockCtrl_PopupHeaderText">Pin ändern</string>
+    <string name="UnlockCtrl_PopupCurrentPinDescriptorText">Aktuelle Pin:</string>
+    <string name="UnlockCtrl_PopupNewPinDescriptorText">Neue Pin:</string>
+    <string name="UnlockCtrl_PopupRepeatNewPinDescriptorText">Neue Pin wiederholen:</string>
+
 
 
     <string name="GeneralMessage_reconnected">Verbindung wiederhergestellt</string>

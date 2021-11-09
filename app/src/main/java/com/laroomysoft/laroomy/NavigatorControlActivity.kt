@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -154,8 +153,8 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             R.id.navConNavigateMiddleButton -> navigatorState.midButton = true
         }
         navigatorState.touchType = when(activate){
-            true -> NAV_TOUCHTYPE_DOWN
-            else -> NAV_TOUCHTYPE_RELEASE
+            true -> NAV_TOUCH_TYPE_DOWN
+            else -> NAV_TOUCH_TYPE_RELEASE
         }
         ApplicationProperty.bluetoothConnectionManager.sendData(
             navigatorState.toExecutionString(this.relatedElementID)
