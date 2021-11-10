@@ -862,6 +862,7 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
     var unLocked = false
     var mode = UC_NORMAL_MODE
     var pin = ""
+    var newPin = ""
     var flags = 0
 
     override fun isValid(): Boolean {
@@ -933,7 +934,15 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
         }
         executionString += this.mode
         executionString += a8bitValueTo2CharHexValue(this.flags)
-        executionString += this.pin
+
+        if(this.mode == UC_PIN_CHANGE_MODE) {
+            executionString += this.pin
+            executionString += "::"
+            executionString += this.newPin
+        } else {
+            executionString += this.pin
+        }
+
         executionString += '\r'
 
         return executionString

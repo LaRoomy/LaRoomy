@@ -1,13 +1,17 @@
 package com.laroomysoft.laroomy
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
+import android.widget.PopupWindow
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -21,6 +25,8 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private var currentEnteredPin = ""
     private var lockState = UC_STATE_LOCKED
 
+    private var pinChangePopupOpen = false
+
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
@@ -28,6 +34,9 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var currentPinDisplayTextView: AppCompatTextView
     private lateinit var lockUnlockImageView: AppCompatImageView
+    private lateinit var parentContainer: ConstraintLayout
+    private lateinit var popupWindow: PopupWindow
+    private lateinit var lockConditionStatusContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +54,8 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.headerTextView = findViewById(R.id.ucHeaderTextView)
         this.currentPinDisplayTextView = findViewById(R.id.ucCurrentPinDisplayTextView)
         this.lockUnlockImageView = findViewById(R.id.ucLockConditionImageView)
+        this.parentContainer = findViewById(R.id.unLockActivityParentContainer)
+        this.lockConditionStatusContainer = findViewById(R.id.ucLockConditionStatusContainer)
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -249,16 +260,103 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         }
     }
 
+    @SuppressLint("InflateParams")
     fun onChangePinButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
-        //  TODO: in change-pin mode set the image of the button to cancel image and implement the appropriate function
+        // exit if popup is already open
+        if(this.pinChangePopupOpen){
+            return
+        }
+
+        // shade background
+        this.parentContainer.alpha = 0.2f
+
+        // mark the popup as open
+        this.pinChangePopupOpen = true
+
+        val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+        val popupView = layoutInflater.inflate(R.layout.unlock_activity_change_pin_popup, null)
+
+        this.popupWindow =
+            PopupWindow(
+                popupView,
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                true
+            )
+
+        this.popupWindow.setOnDismissListener {
+            this.pinChangePopupOpen = false
+            this.parentContainer.alpha = 1f
+        }
+
+        this.popupWindow.showAtLocation(
+            this.lockConditionStatusContainer,
+            Gravity.CENTER, 0, 0
+        )
+
+        // TODO: test it!!!
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }
 
-    fun sendPinChangeRequest(oldPin: String, newPin: String){
+    fun onPinChangeDialogButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+
+        val curPinInput = popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupCurrentPinInput)
+        val newPinInput = popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupNewPinInput)
+        val repeatedNewPinInput = popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupRepeatNewPinInput)
+
+        val currentPin =
+            curPinInput.text.toString()
+
+        val newPin =
+            newPinInput.text.toString()
+
+        val repeatedNewPin =
+            repeatedNewPinInput.text.toString()
+
+        var goAhead = true
+
+        when {
+            currentPin.isEmpty() -> {
+                curPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
+                goAhead = false
+            }
+            newPin.isEmpty() -> {
+                newPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
+                goAhead = false
+            }
+            repeatedNewPin.isEmpty() -> {
+                repeatedNewPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
+                goAhead = false
+            }
+        }
+
+        if(goAhead){
+            if(newPin != repeatedNewPin){
+                repeatedNewPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
+            } else {
+                sendPinChangeRequest(currentPin, newPin)
+                this.popupWindow.dismiss()
+            }
+        }
+    }
+
+    private fun sendPinChangeRequest(oldPin: String, newPin: String){
+
+        val unlockControlState = UnlockControlState()
+        unlockControlState.unLocked = true
+        unlockControlState.mode = UC_PIN_CHANGE_MODE
+        unlockControlState.pin = oldPin
+        unlockControlState.newPin = newPin
 
         if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey){
-            // TODO: add flag!!!
+            unlockControlState.flags = unlockControlState.flags or 0x08
         }
+
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            unlockControlState.toExecutionString(this.relatedElementID)
+        )
     }
 
     private fun updatePinDisplay(){

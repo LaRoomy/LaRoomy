@@ -458,7 +458,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // shade the background
         this.devicePropertyListRecyclerView.alpha = 0.2f
 
-        // TODO: block the activation of background (list) elements during popup-lifecycle
         this.levelSelectorPopUpOpen = true
 
         val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -497,7 +496,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.progress = percentageLevelPropertyGenerator.percentageValue
             this.setOnSeekBarChangeListener(devicePropertyListContentInformation)
         }
-
     }
 
     @SuppressLint("InflateParams")

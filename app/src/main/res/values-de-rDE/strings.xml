@@ -69,6 +69,8 @@
     <string name="UnlockCtrl_PopupCurrentPinDescriptorText">Aktuelle Pin:</string>
     <string name="UnlockCtrl_PopupNewPinDescriptorText">Neue Pin:</string>
     <string name="UnlockCtrl_PopupRepeatNewPinDescriptorText">Neue Pin wiederholen:</string>
+    <string name="UnlockCtrl_PopupCancelButtonText">Abbrechen</string>
+    <string name="UnlockCtrl_PopupPositiveButtonText">Ändern</string>
 
 
 
