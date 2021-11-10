@@ -14,6 +14,7 @@
     <color name="selectedTextColor">#F5CD06</color>
     <color name="expectedBackground">#222222</color>
     <color name="separatorColor">#777777</color>
+    <color name="transparentColor">#00000000</color>
     <!--<color name="groupBorderColor">#00a1f1</color>-->
     <color name="groupBorderColor">#777777</color>
     <color name="selectedSeparatorColor">#F5CD06</color>

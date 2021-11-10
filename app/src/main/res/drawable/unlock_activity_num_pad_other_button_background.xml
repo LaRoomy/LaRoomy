@@ -2,9 +2,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid
         android:color="@color/numPadOtherButtonColor" />
-    <stroke
-        android:width="5dp"
-        android:color="@color/appBackgroundColor" />
     <corners
         android:radius="10dp" />
     <padding

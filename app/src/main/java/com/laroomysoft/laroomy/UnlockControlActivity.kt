@@ -293,51 +293,68 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
         this.popupWindow.showAtLocation(
             this.lockConditionStatusContainer,
-            Gravity.CENTER, 0, 0
+            Gravity.NO_GRAVITY, 0, 0
         )
-
-        // TODO: test it!!!
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }
 
-    fun onPinChangeDialogButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    fun onPinChangeDialogButtonClick(view: View) {
 
-        val curPinInput = popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupCurrentPinInput)
-        val newPinInput = popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupNewPinInput)
-        val repeatedNewPinInput = popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupRepeatNewPinInput)
+        if(view.id == R.id.unLockActivityPopupCancelButton){
+            this.popupWindow.dismiss()
+        } else {
 
-        val currentPin =
-            curPinInput.text.toString()
+            val curPinInput =
+                popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupCurrentPinInput)
+            val newPinInput =
+                popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupNewPinInput)
+            val repeatedNewPinInput =
+                popupWindow.contentView.findViewById<AppCompatEditText>(R.id.unLockActivityPopupRepeatNewPinInput)
 
-        val newPin =
-            newPinInput.text.toString()
+            val currentPin =
+                curPinInput.text.toString()
 
-        val repeatedNewPin =
-            repeatedNewPinInput.text.toString()
+            val newPin =
+                newPinInput.text.toString()
 
-        var goAhead = true
+            val repeatedNewPin =
+                repeatedNewPinInput.text.toString()
 
-        when {
-            currentPin.isEmpty() -> {
-                curPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
-                goAhead = false
+            var goAhead = true
+
+            when {
+                currentPin.isEmpty() -> {
+                    curPinInput.background = AppCompatResources.getDrawable(
+                        this,
+                        R.drawable.unlock_control_popup_edittext_error_background
+                    )
+                    goAhead = false
+                }
+                newPin.isEmpty() -> {
+                    newPinInput.background = AppCompatResources.getDrawable(
+                        this,
+                        R.drawable.unlock_control_popup_edittext_error_background
+                    )
+                    goAhead = false
+                }
+                repeatedNewPin.isEmpty() -> {
+                    repeatedNewPinInput.background = AppCompatResources.getDrawable(
+                        this,
+                        R.drawable.unlock_control_popup_edittext_error_background
+                    )
+                    goAhead = false
+                }
             }
-            newPin.isEmpty() -> {
-                newPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
-                goAhead = false
-            }
-            repeatedNewPin.isEmpty() -> {
-                repeatedNewPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
-                goAhead = false
-            }
-        }
 
-        if(goAhead){
-            if(newPin != repeatedNewPin){
-                repeatedNewPinInput.background = AppCompatResources.getDrawable(this, R.drawable.unlock_control_popup_edittext_error_background)
-            } else {
-                sendPinChangeRequest(currentPin, newPin)
-                this.popupWindow.dismiss()
+            if (goAhead) {
+                if (newPin != repeatedNewPin) {
+                    repeatedNewPinInput.background = AppCompatResources.getDrawable(
+                        this,
+                        R.drawable.unlock_control_popup_edittext_error_background
+                    )
+                } else {
+                    sendPinChangeRequest(currentPin, newPin)
+                    this.popupWindow.dismiss()
+                }
             }
         }
     }
@@ -457,7 +474,9 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             val unlockControlState = UnlockControlState()
             unlockControlState.fromComplexPropertyState(newState)
 
-            this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
+            runOnUiThread {
+                this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
+            }
         }
     }
 
