@@ -48,6 +48,7 @@
     <color name="unLockCtrlActivityStatusTextColor_Locked">#FFF5CD06</color>
     <color name="unLockCtrlActivityStatusTextColor_Unlocked">#69D17A</color>
     <color name="unLockCtrlActivityPopupEditTextBackground">#555555</color>
+    <color name="unLockCtrlActivityStatusPanelBackgroundColor">#FF222222</color>
 
     <!-- List Elements -->
     <color name="addDeviceListElementBackgroundColor">#FF444444</color>

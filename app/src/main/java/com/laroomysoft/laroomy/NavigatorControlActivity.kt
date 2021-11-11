@@ -252,8 +252,8 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 //        ApplicationProperty.bluetoothConnectionManger.sendData(executionString)
 //    }
 
-    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onDeviceHeaderChanged(deviceHeaderData)
+    override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onRemoteUserMessage(deviceHeaderData)
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }
 

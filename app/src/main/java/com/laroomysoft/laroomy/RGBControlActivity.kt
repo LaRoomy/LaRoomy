@@ -1,6 +1,5 @@
 package com.laroomysoft.laroomy
 
-import android.app.ApplicationErrorReport
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -517,8 +516,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         }
     }
 
-    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onDeviceHeaderChanged(deviceHeaderData)
+    override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onRemoteUserMessage(deviceHeaderData)
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }
 

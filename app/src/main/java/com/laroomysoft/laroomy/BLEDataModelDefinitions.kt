@@ -21,6 +21,13 @@ const val UC_STATE_UNLOCKED = '0'
 const val UC_NORMAL_MODE = '0'
 const val UC_PIN_CHANGE_MODE = '1'
 
+const val USERMESSAGE_TYPE_INFO = '0'
+const val USERMESSAGE_TYPE_WARNING = '1'
+const val USERMESSAGE_TYPE_ERROR = '2'
+
+
+
+
 
 class LaRoomyDevicePresentationModel {
     // NOTE: This is the data-model for the DeviceListItem in the main-activity
@@ -34,12 +41,11 @@ class LaRoomyDevicePresentationModel {
 class DeviceInfoHeaderData {
     var message = ""
     var imageID = -1
-    var valid = false
+    var type = USERMESSAGE_TYPE_INFO
 
     fun clear() {
         this.message = ""
         this.imageID = -1
-        this.valid = false
     }
 }
 

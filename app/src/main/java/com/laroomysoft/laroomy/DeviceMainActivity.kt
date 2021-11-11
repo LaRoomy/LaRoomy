@@ -227,12 +227,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
                 // update info-header and states
-                if (ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.valid) {
-                    setDeviceInfoHeader(
-                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.imageID,
-                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.message
-                    )
-                }
+                // TODO: Reintegrate the info header or remove it!?
+//                if (ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.valid) {
+//                    setDeviceInfoHeader(
+//                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.imageID,
+//                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.message
+//                    )
+//                }
                 if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
                     (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
 
@@ -1038,8 +1039,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             }
     }
 
-    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onDeviceHeaderChanged(deviceHeaderData)
+    override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onRemoteUserMessage(deviceHeaderData)
         this.setDeviceInfoHeader(deviceHeaderData.imageID, deviceHeaderData.message)
     }
 

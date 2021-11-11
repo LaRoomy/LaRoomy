@@ -231,8 +231,8 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         }
     }
 
-    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onDeviceHeaderChanged(deviceHeaderData)
+    override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onRemoteUserMessage(deviceHeaderData)
         // display here as notification
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
     }

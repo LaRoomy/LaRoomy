@@ -270,8 +270,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
     }
 
-    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onDeviceHeaderChanged(deviceHeaderData)
+    override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onRemoteUserMessage(deviceHeaderData)
         notifyUserWithDelayedReset(deviceHeaderData.message, R.color.InfoColor)
     }
 

@@ -444,9 +444,16 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         }
     }
 
-    override fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onDeviceHeaderChanged(deviceHeaderData)
-        notifyUser(deviceHeaderData.message, R.color.InfoColor)
+    override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
+        super.onRemoteUserMessage(deviceHeaderData)
+
+        val cId = when(deviceHeaderData.type){
+            USERMESSAGE_TYPE_ERROR -> R.color.ErrorColor
+            USERMESSAGE_TYPE_WARNING -> R.color.WarningColor
+            USERMESSAGE_TYPE_INFO -> R.color.InfoColor
+            else -> R.color.InfoColor
+        }
+        notifyUser(deviceHeaderData.message, cId)
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {

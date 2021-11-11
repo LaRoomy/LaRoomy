@@ -144,7 +144,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
 
-    var deviceInfoHeaderData = DeviceInfoHeaderData()
+    //var deviceInfoHeaderData = DeviceInfoHeaderData()
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
@@ -689,7 +689,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             val elementIndex =
                 Integer.decode(hexString)
 
-            when(data[9]){
+            when(data[8]){
                 '1' -> {
                     // property state changed notification
                     sendPropertyStateRequest(elementIndex)
@@ -721,20 +721,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         // check transmission length
         if(dataSize > 9) {
+            val deviceInfoHeaderData = DeviceInfoHeaderData()
+
             // get image id (transferred in the id fields)
             var hexString = "0x"
             hexString += data[2]
             hexString += data[3]
-            this.deviceInfoHeaderData.imageID = Integer.decode(hexString)
 
-            data.removeRange(0, 8)
+            deviceInfoHeaderData.imageID = Integer.decode(hexString)
+            deviceInfoHeaderData.type = data[9]
+            deviceInfoHeaderData.message = data.removeRange(0, 10)
 
-            this.deviceInfoHeaderData.message = data
-            this.deviceInfoHeaderData.valid = true
-            this.propertyCallback.onDeviceHeaderChanged(this.deviceInfoHeaderData)
+            this.propertyCallback.onRemoteUserMessage(deviceInfoHeaderData)
         } else {
             // no notification data
-            // TODO!
+            // TODO! error message
         }
     }
 
@@ -3439,7 +3440,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.deviceHeaderRecordingActive = false
 
         this.complexStatePropertyIndexes.clear()
-        this.deviceInfoHeaderData.clear()
 
         this.currentPropertyResolveID = -1
         this.currentGroupResolveIndex = -1
@@ -3567,7 +3567,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onUIAdaptableArrayItemChanged(index: Int){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
-        fun onDeviceHeaderChanged(deviceHeaderData: DeviceInfoHeaderData){}
+        fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}
         fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
         fun onDeviceNotification(notificationID: Int){}
         fun getCurrentOpenComplexPropPagePropertyIndex() : Int {

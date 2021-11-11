@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:context=".UnlockControlActivity">
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/unLockActivityParentContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     tools:context=".UnlockControlActivity">
 <!--
@@ -78,8 +86,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/ucLeftPaneContainer"
+        android:background="@drawable/unlock_activity_status_panel_background"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" >
@@ -218,21 +229,20 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.appcompat.widget.AppCompatButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/ucShowPinButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_marginTop="5dp"
-                    android:textSize="20sp"
-                    android:text="@string/UnlockCtrl_ButtonText_Show"
-                    android:onClick="onShowHideButtonClick"
                     android:background="@drawable/general_rounded_button_background"
-                    android:paddingEnd="8dp"
+                    android:onClick="onShowHideButtonClick"
                     android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="@string/UnlockCtrl_ButtonText_Show"
                     android:textAllCaps="false"
+                    android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ucPinContainer"
-                    />
+                    app:layout_constraintTop_toBottomOf="@id/ucPinContainer" />
 
                 <View
                     android:id="@+id/ucPinDisplayEndSeparator"
@@ -266,17 +276,17 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--
         <View
             android:id="@+id/ucHorizontalSeparator"
             android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
+            android:layout_height="330dp"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:background="@color/separatorColor"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/ucLeftPaneContainer"
             app:layout_constraintTop_toTopOf="parent" />
+-->
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -286,7 +296,7 @@
             android:layout_marginStart="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ucHorizontalSeparator"
+            app:layout_constraintStart_toEndOf="@id/ucLeftPaneContainer"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -529,3 +539,5 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
