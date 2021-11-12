@@ -443,11 +443,11 @@ class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
 
 class NavigatorState : IComplexPropertySubTypeProtocolClass() {
 
-    var upperButton = true
-    var midButton = true
-    var downButton = true
-    var leftButton = true
-    var rightButton = true
+    var upperButton = false
+    var midButton = false
+    var downButton = false
+    var leftButton = false
+    var rightButton = false
 
     var touchType = NAV_TOUCH_TYPE_INVALID
 
@@ -532,7 +532,7 @@ class NavigatorState : IComplexPropertySubTypeProtocolClass() {
         executionString += if (this.downButton) {
             '1'
         } else {
-            '2'
+            '0'
         }
         executionString += if (this.leftButton) {
             '1'

@@ -135,13 +135,29 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
                 executeButtonCommand(v?.id, false)
                 v?.performClick()
             }
-            else -> {}
+            else -> {
+                Log.e("NavProp:onTouch", "Unknown touch event in navigator control activity ${event?.action}")
+            }
         }
         // NOTE: returning true blocks the image-changes on user-interaction
         return false
     }
 
     private fun executeButtonCommand(Id: Int?, activate: Boolean){
+
+        // TODO: sometimes in a multi-touch condition, there is a command missing
+
+        if(verboseLog){
+            val buttonStr = when(Id){
+                R.id.navConNavigateDownButton -> "Down"
+                R.id.navConNavigateLeftButton -> "Left"
+                R.id.navConNavigateMiddleButton -> "Mid"
+                R.id.navConNavigateRightButton -> "Right"
+                R.id.navConNavigateUpButton -> "Up"
+                else -> "Invalid"
+            }
+            Log.d("NavProp:ExecButtonCom", "Execute Button Command-> Button: $buttonStr -> Active: $activate ")
+        }
 
         val navigatorState = NavigatorState()
 
@@ -164,21 +180,21 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     private fun setCurrentViewStateFromComplexPropertyState(navigatorState: NavigatorState) {
         var minHeightVal = 280
 
-        if(navigatorState.upperButton){
+        if(!navigatorState.upperButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateUpButton).visibility = View.GONE
             minHeightVal -= 70
         }
-        if(navigatorState.rightButton){
+        if(!navigatorState.rightButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility = View.GONE
         }
-        if(navigatorState.downButton){
+        if(!navigatorState.downButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).visibility = View.GONE
             minHeightVal -= 70
         }
-        if(navigatorState.leftButton){
+        if(!navigatorState.leftButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility = View.GONE
         }
-        if(navigatorState.midButton){
+        if(!navigatorState.midButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility = View.GONE
         }
         if(minHeightVal < 280){
