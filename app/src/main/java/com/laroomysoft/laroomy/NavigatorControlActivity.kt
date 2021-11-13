@@ -119,11 +119,6 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
 
-        // TODO: what does the return value mean????!
-
-        // TODO: what is with multi-touch, implement this if possible!!!
-        //val isDown = (v as AppCompatButton).isPressed
-
         when(event?.action){
             MotionEvent.ACTION_CANCEL -> {
                 executeButtonCommand(v?.id, false)
@@ -135,8 +130,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
                 executeButtonCommand(v?.id, false)
                 v?.performClick()
             }
+            MotionEvent.ACTION_MOVE -> {}
             else -> {
-                Log.e("NavProp:onTouch", "Unknown touch event in navigator control activity ${event?.action}")
+                Log.e("NavProp:onTouch", "Unknown touch event in navigator control activity: ${event?.action}")
             }
         }
         // NOTE: returning true blocks the image-changes on user-interaction
@@ -178,27 +174,21 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(navigatorState: NavigatorState) {
-        var minHeightVal = 280
 
         if(!navigatorState.upperButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateUpButton).visibility = View.GONE
-            minHeightVal -= 70
+            findViewById<ConstraintLayout>(R.id.navConUpperButtonContainer).visibility = View.GONE
         }
         if(!navigatorState.rightButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility = View.GONE
+            findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility = View.INVISIBLE
         }
         if(!navigatorState.downButton){
             findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).visibility = View.GONE
-            minHeightVal -= 70
         }
         if(!navigatorState.leftButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility = View.GONE
+            findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility = View.INVISIBLE
         }
         if(!navigatorState.midButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility = View.GONE
-        }
-        if(minHeightVal < 280){
-            findViewById<ConstraintLayout>(R.id.navConNavigatorContainer).minHeight = minHeightVal
+            findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility = View.INVISIBLE
         }
     }
 
@@ -254,20 +244,6 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         }
     }
 
-//    fun onNavigateButtonClick(view: View){
-//
-//        val directionChar = when(view.id){
-//            R.id.navConNavigateUpButton -> '1'
-//            R.id.navConNavigateRightButton -> '2'
-//            R.id.navConNavigateDownButton -> '3'
-//            R.id.navConNavigateLeftButton -> '4'
-//            R.id.navConNavigateMiddleButton -> '5'
-//            else -> "0"// zero has no function (error command)
-//        }
-//        val executionString = "C${a8BitValueToString(relatedElementID)}$directionChar$"
-//        ApplicationProperty.bluetoothConnectionManger.sendData(executionString)
-//    }
-
     override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
         super.onRemoteUserMessage(deviceHeaderData)
         notifyUser(deviceHeaderData.message, R.color.InfoColor)
@@ -309,6 +285,5 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
-
 }
 

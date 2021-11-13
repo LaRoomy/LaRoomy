@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/deviceMainParentContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DeviceMainActivity">
@@ -15,26 +17,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/deviceTypeHeaderImageView"
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/deviceTypeHeaderImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:background="@color/transparentColor"
             android:contentDescription="@string/DeviceTypeHeaderImageDescription"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:layout_marginStart="10dp"
             android:onClick="onReconnectDevice"
-            android:src="@drawable/electronic_device"
+            android:src="@drawable/ic_menu_white_36dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ImageContrastCheck" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/deviceTypeHeaderImageView"
+            app:layout_constraintStart_toEndOf="@id/deviceTypeHeaderImageButton"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_bias="0.2">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -59,8 +65,22 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/deviceMainActivityDeviceTypeHeaderNameTextView" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/devicePageSpinKit"
+                style="@style/SpinKitView.Small.FadingCircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/deviceMainActivityDiscardDeviceButton"
             android:layout_width="wrap_content"
@@ -86,13 +106,14 @@
             android:src="@drawable/settings_white_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/headerSeparatorLineView"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:background="@color/separatorColor"
@@ -104,58 +125,54 @@
         android:id="@+id/deviceInfoSubHeaderContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="2dp"
         android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerSeparatorLineView">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/deviceMainActivityDeviceInfoSubHeaderImageView"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="30dp"
-            android:contentDescription="@string/DeviceInfoSubHeaderImageDescription"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/settings1_white" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/deviceMainActivityDeviceInfoSubHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="20dp"
             android:layout_marginEnd="40dp"
             android:text="@string/DMA_LoadingPropertiesUserInfo"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/deviceMainActivityDeviceInfoSubHeaderImageView"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.github.ybq.android.spinkit.SpinKitView
-            android:id="@+id/devicePageSpinKit"
-            style="@style/SpinKitView.Small.FadingCircle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <View
+            android:id="@+id/subHeaderSeparatorLineView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/deviceMainActivityDeviceInfoSubHeaderTextView" />
+
+
+        <!--
+                <com.github.ybq.android.spinkit.SpinKitView
+                    android:id="@+id/devicePageSpinKit"
+                    style="@style/SpinKitView.Small.FadingCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+        -->
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
-        android:id="@+id/subHeaderSeparatorLineView"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="15dp"
-        android:background="@color/separatorColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deviceInfoSubHeaderContainer" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/devicePropertyListView"
@@ -168,6 +185,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subHeaderSeparatorLineView" />
+        app:layout_constraintTop_toBottomOf="@id/deviceInfoSubHeaderContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

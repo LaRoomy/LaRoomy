@@ -50,78 +50,112 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:minWidth="280dp"
-            android:minHeight="280dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/navConHeaderContainer">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/navConNavigateUpButton"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/navbutton_up_image"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/NavigatorControlActivityUpButtonContentDescription"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/navConUpperButtonContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/navConNavigateMiddleButton"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/navbutton_mid_image"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/NavigatorControlActivityOkButtonContentDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/navConNavigateUpButton"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/NavigatorControlActivityUpButtonContentDescription"
+                    android:focusable="true"
+                    android:src="@drawable/navbutton_up_image"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/navConMidButtonContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/navConUpperButtonContainer">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/navConNavigateLeftButton"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/navbutton_left_image"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/NavigatorControlActivityLeftButtonContentDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/navConNavigateLeftButton"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/NavigatorControlActivityLeftButtonContentDescription"
+                    android:focusable="true"
+                    android:src="@drawable/navbutton_left_image"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/navConNavigateMiddleButton"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="30dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/NavigatorControlActivityOkButtonContentDescription"
+                    android:focusable="true"
+                    android:src="@drawable/navbutton_mid_image"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/navConNavigateLeftButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/navConNavigateRightButton"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="30dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/NavigatorControlActivityRightButtonContentDescription"
+                    android:focusable="true"
+                    android:src="@drawable/navbutton_right_image"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/navConNavigateMiddleButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/navConDownButtonContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/navConMidButtonContainer">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/navConNavigateRightButton"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/navbutton_right_image"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/NavigatorControlActivityRightButtonContentDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/navConNavigateDownButton"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:contentDescription="@string/NavigatorControlActivityDownButtonContentDescription"
+                    android:focusable="true"
+                    android:src="@drawable/navbutton_down_image"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/navConNavigateDownButton"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/navbutton_down_image"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/NavigatorControlActivityDownButtonContentDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -133,7 +167,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/navConNavigatorContainer" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

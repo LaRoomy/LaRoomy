@@ -8,8 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.transition.Slide
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.*
+import android.view.animation.ScaleAnimation
+import android.view.animation.TranslateAnimation
 import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
@@ -35,12 +39,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var devicePropertyListLayoutManager: RecyclerView.LayoutManager
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
 
-    private lateinit var deviceTypeHeaderImageView: AppCompatImageView
+    private lateinit var deviceTypeHeaderImageButton: AppCompatImageButton
     private lateinit var deviceTypeHeaderTextView: AppCompatTextView
     private lateinit var deviceConnectionStatusTextView: AppCompatTextView
-    private lateinit var deviceHeaderNotificationImageView: AppCompatImageView
+
+    //private lateinit var deviceHeaderNotificationImageView: AppCompatImageView
+
     private lateinit var deviceHeaderNotificationTextView: AppCompatTextView
-    private lateinit var deviceSettingsButton: AppCompatImageButton
+    private lateinit var deviceHeaderNotificationContainer: ConstraintLayout
+
+    //private lateinit var deviceSettingsButton: AppCompatImageButton
+
     private lateinit var popUpWindow: PopupWindow
 
 
@@ -70,12 +79,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get UI Elements
-        this.deviceTypeHeaderImageView = findViewById(R.id.deviceTypeHeaderImageView)
+        this.deviceTypeHeaderImageButton = findViewById(R.id.deviceTypeHeaderImageButton)
         this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainActivityDeviceTypeHeaderNameTextView)
         this.deviceConnectionStatusTextView = findViewById(R.id.deviceMainActivityDeviceConnectionStatusTextView)
-        this.deviceHeaderNotificationImageView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderImageView)
+
+        //this.deviceHeaderNotificationImageView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderImageView)
+
         this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
-        this.deviceSettingsButton = findViewById(R.id.deviceMainActivityDeviceSettingsButton)
+        this.deviceHeaderNotificationContainer = findViewById(R.id.deviceInfoSubHeaderContainer)
+
+        //this.deviceSettingsButton = findViewById(R.id.deviceMainActivityDeviceSettingsButton)
 
         // init recycler view!!
         this.devicePropertyListLayoutManager = LinearLayoutManager(this)
@@ -128,7 +141,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
 
             setUIConnectionStatus(false)
-            setDeviceInfoHeader(29, getString(R.string.DMA_DeviceConnectionSuspended))
+            showNotificationHeaderAndPostMessage(29, getString(R.string.DMA_DeviceConnectionSuspended))
 
             this.activityWasSuspended = true
         } else {
@@ -166,7 +179,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // set UI visual state
                 resetSelectedItemBackground()
                 setUIConnectionStatus(false)
-                setDeviceInfoHeader(30, getString(R.string.DMA_NoConnection))
+                showNotificationHeaderAndPostMessage(30, getString(R.string.DMA_NoConnection))
 
                 // schedule back-navigation
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -289,7 +302,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // check if a button needs to be recovered
         if(this.buttonRecoveryRequired){
             this.buttonRecoveryRequired = false
-            this.deviceSettingsButton.setImageResource(R.drawable.settings_white_24)
+
+            //this.deviceSettingsButton.setImageResource(R.drawable.settings_white_24)
+
         }
     }
 
@@ -367,7 +382,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.propertyList.clear()
             this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
-            this.setDeviceInfoHeader(33, getString(R.string.DMA_LoadingPropertiesUserInfo))
+            this.showNotificationHeaderAndPostMessage(33, getString(R.string.DMA_LoadingPropertiesUserInfo))
         }
         Handler(Looper.getMainLooper()).postDelayed({
             ApplicationProperty.bluetoothConnectionManager.reloadProperties()
@@ -815,18 +830,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         finish()
     }
 
-    fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        if(ApplicationProperty.bluetoothConnectionManager.isConnected) {
-            // highlight button
-            this.deviceSettingsButton.setImageResource(R.drawable.settings_gold_pushed_24)
-            this.buttonRecoveryRequired = true
-            // prevent the normal "onPause" execution
-            (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-            // navigate to the device settings activity..
-            val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
-            startActivity(intent)
-        }
-    }
+//    fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+//        if(ApplicationProperty.bluetoothConnectionManager.isConnected) {
+//            // highlight button
+//            this.deviceSettingsButton.setImageResource(R.drawable.settings_gold_pushed_24)
+//            this.buttonRecoveryRequired = true
+//            // prevent the normal "onPause" execution
+//            (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+//            // navigate to the device settings activity..
+//            val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
+//            startActivity(intent)
+//        }
+//    }
 
     fun onReconnectDevice(@Suppress("UNUSED_PARAMETER")view: View){
         // re-connect
@@ -860,16 +875,48 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    private fun setDeviceInfoHeader(imageID: Int, message: String){
+    private fun showNotificationHeaderAndPostMessage(imageID: Int, message: String){
 
         // TODO: Problem: the view is outside of the screen if the text is too long -> it must be wrapped
 
         runOnUiThread {
-            this.deviceHeaderNotificationImageView.setImageResource(
-                resourceIdForImageId(imageID)
-            )
+            //this.deviceHeaderNotificationImageView.setImageResource(
+                //resourceIdForImageId(imageID)
+            //)
+
+            this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
             this.deviceHeaderNotificationTextView.text = message
+
+            // TODO: schedule the hide of the container
+
         }
+
+
+    }
+
+    private fun hideNotificationHeader(){
+
+//        val translateAnimation = TranslateAnimation(0f,0f, 0f, -(this.deviceHeaderNotificationContainer.height.toFloat()))
+//        translateAnimation.duration = 500
+//        translateAnimation.fillAfter = false
+
+        //val scaleAnimation = ScaleAnimation(0f, 0f, 0f, this.deviceHeaderNotificationContainer.height.toFloat())
+        //scaleAnimation.duration = 500
+
+
+        //this.deviceHeaderNotificationContainer.startAnimation(scaleAnimation)
+
+        val transition = Slide(Gravity.TOP)
+        transition.duration = 600
+        transition.addTarget(this.deviceHeaderNotificationContainer)
+
+        TransitionManager.beginDelayedTransition(findViewById(R.id.deviceMainParentContainer), transition)
+
+        //this.deviceHeaderNotificationTextView.visibility = View.GONE
+
+
+        this.deviceHeaderNotificationContainer.visibility = View.GONE
+
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -896,7 +943,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // stop spinner and set info header
                 runOnUiThread {
                     this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-                    this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
+                    this.showNotificationHeaderAndPostMessage(43, getString(R.string.DMA_Ready))
                 }
             }
         }
@@ -937,8 +984,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
 
         runOnUiThread {
+
+            // TODO: ??
+            //this.deviceHeaderNotificationContainer.visibility = View.GONE
+
+            this.hideNotificationHeader()
+
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-            this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
+
+
+            //this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
+
 
             // TODO: test!
             //this.devicePropertyListViewAdapter.notifyDataSetChanged()
@@ -1041,7 +1097,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
         super.onRemoteUserMessage(deviceHeaderData)
-        this.setDeviceInfoHeader(deviceHeaderData.imageID, deviceHeaderData.message)
+        this.showNotificationHeaderAndPostMessage(deviceHeaderData.imageID, deviceHeaderData.message)
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
