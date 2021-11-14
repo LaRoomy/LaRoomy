@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/deviceMainParentContainer"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DeviceMainActivity">
@@ -174,7 +175,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.laroomysoft.laroomy.DeviceMainPropertyRecyclerView
         android:id="@+id/devicePropertyListView"
         android:layout_width="0dp"
         android:layout_height="0dp"

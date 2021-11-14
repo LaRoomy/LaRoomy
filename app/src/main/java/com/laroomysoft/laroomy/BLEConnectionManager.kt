@@ -2329,7 +2329,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         cancel()
                     }
                 }
-            }, (0).toLong(), (150).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
+            }, (0).toLong(), (200).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
 
     }
 

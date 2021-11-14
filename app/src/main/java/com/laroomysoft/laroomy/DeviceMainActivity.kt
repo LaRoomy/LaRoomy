@@ -29,12 +29,13 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.math.exp
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
 
     // device property list elements
-    private lateinit var devicePropertyListRecyclerView: RecyclerView
+    private lateinit var devicePropertyListRecyclerView: DeviceMainPropertyRecyclerView
     private lateinit var devicePropertyListViewAdapter: RecyclerView.Adapter<*>
     private lateinit var devicePropertyListLayoutManager: RecyclerView.LayoutManager
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
@@ -114,7 +115,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // bind the elements to the recycler
         this.devicePropertyListRecyclerView =
-            findViewById<RecyclerView>(R.id.devicePropertyListView)
+            findViewById<DeviceMainPropertyRecyclerView>(R.id.devicePropertyListView)
                 .apply {
                     setHasFixedSize(true)
                     layoutManager = devicePropertyListLayoutManager
@@ -884,10 +885,19 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 //resourceIdForImageId(imageID)
             //)
 
-            this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
+            //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
             this.deviceHeaderNotificationTextView.text = message
 
+            //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
+
+            val expandCollapseExtension = ExpandCollapseExtension()
+            expandCollapseExtension.expand(this.deviceHeaderNotificationContainer, 600)
+
             // TODO: schedule the hide of the container
+
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                this.hideNotificationHeader()
+            }, 4000, TimeUnit.MILLISECONDS)
 
         }
 
@@ -906,17 +916,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         //this.deviceHeaderNotificationContainer.startAnimation(scaleAnimation)
 
-        val transition = Slide(Gravity.TOP)
-        transition.duration = 600
-        transition.addTarget(this.deviceHeaderNotificationContainer)
-
-        TransitionManager.beginDelayedTransition(findViewById(R.id.deviceMainParentContainer), transition)
+//        val transition = Slide(Gravity.TOP)
+//        transition.duration = 600
+//        transition.addTarget(this.deviceHeaderNotificationContainer)
+//
+//        TransitionManager.beginDelayedTransition(findViewById(R.id.deviceMainParentContainer), transition)
 
         //this.deviceHeaderNotificationTextView.visibility = View.GONE
 
 
-        this.deviceHeaderNotificationContainer.visibility = View.GONE
+        //this.deviceHeaderNotificationContainer.visibility = View.GONE
 
+        runOnUiThread {
+            this.deviceHeaderNotificationTextView.text = ""
+
+            val expandCollapseExtension = ExpandCollapseExtension()
+            expandCollapseExtension.collapse(this.deviceHeaderNotificationContainer, 600)
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {
@@ -991,6 +1007,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.hideNotificationHeader()
 
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
+
+
 
 
             //this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
@@ -1096,7 +1114,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
-        super.onRemoteUserMessage(deviceHeaderData)
+        //super.onRemoteUserMessage(deviceHeaderData)
         this.showNotificationHeaderAndPostMessage(deviceHeaderData.imageID, deviceHeaderData.message)
     }
 
