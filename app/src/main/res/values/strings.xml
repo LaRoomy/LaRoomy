@@ -30,6 +30,9 @@
     <string name="DMA_LoadingPropertiesUserInfo">Loading Properties..</string>
     <string name="DMA_NoConnection">No connection</string>
     <string name="DMA_ErrorElementText">error:type !</string>
+    <string name="DMA_PopUpMenuText_DeviceSettings">Device Settings</string>
+    <string name="DMA_PopUpMenuText_DiscardDevice">Close Device</string>
+    <string name="DMA_PopUpMenuText_ReloadProperties">Reload Properties</string>
 
 
     <string name="RGB_HeaderText">RGB Control</string>

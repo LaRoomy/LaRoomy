@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
                 true
             )
 
-        this.popUpWindow.animationStyle = R.style.MainActivityPopUpAnimationStyle
+        this.popUpWindow.animationStyle = R.style.sideSlidePopUpAnimationStyle
 
         this.popUpWindow.setOnDismissListener {
             // normalize the button and the main activity alpha, but do it with delay (500 ms for the popup animation time!)

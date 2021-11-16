@@ -8,12 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.transition.Slide
-import android.transition.TransitionManager
 import android.util.Log
 import android.view.*
-import android.view.animation.ScaleAnimation
-import android.view.animation.TranslateAnimation
 import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
@@ -29,7 +25,6 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-import kotlin.math.exp
 
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
@@ -40,9 +35,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var devicePropertyListLayoutManager: RecyclerView.LayoutManager
     //private var devicePropertyList= ArrayList<DevicePropertyListContentInformation>()
 
-    private lateinit var deviceTypeHeaderImageButton: AppCompatImageButton
     private lateinit var deviceTypeHeaderTextView: AppCompatTextView
     private lateinit var deviceConnectionStatusTextView: AppCompatTextView
+    private lateinit var deviceMenuButton: AppCompatImageButton
 
     //private lateinit var deviceHeaderNotificationImageView: AppCompatImageView
 
@@ -52,15 +47,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     //private lateinit var deviceSettingsButton: AppCompatImageButton
 
     private lateinit var popUpWindow: PopupWindow
+    private lateinit var deviceMenuPopUpWindow: PopupWindow
 
 
     private var activityWasSuspended = false
-    private var buttonRecoveryRequired = false
+    //private var buttonRecoveryRequired = false
     private var restoreIndex = -1
     private var deviceImageResourceId = -1
     private var propertyLoadingFinished = false
     private var levelSelectorPopUpOpen = false
     private var optionSelectorPopUpOpen = false
+    private var deviceMenuOpen = false
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -80,7 +77,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get UI Elements
-        this.deviceTypeHeaderImageButton = findViewById(R.id.deviceTypeHeaderImageButton)
+        this.deviceMenuButton = findViewById(R.id.deviceMenuImageButton)
         this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainActivityDeviceTypeHeaderNameTextView)
         this.deviceConnectionStatusTextView = findViewById(R.id.deviceMainActivityDeviceConnectionStatusTextView)
 
@@ -299,13 +296,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // TODO: how to confirm the device-properties
             // maybe make a changed-parameter in the device firmware and call that to upgrade performance and hold the line clear for communication?
-        }
-        // check if a button needs to be recovered
-        if(this.buttonRecoveryRequired){
-            this.buttonRecoveryRequired = false
-
-            //this.deviceSettingsButton.setImageResource(R.drawable.settings_white_24)
-
         }
     }
 
@@ -823,26 +813,43 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     fun onDiscardDeviceButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
         // finish the activity and navigate back to the start activity (MainActivity)
         // same procedure like onBackPressed!
-
-        ApplicationProperty.bluetoothConnectionManager.clear()
-
-        // start main activity to select a new device!!!
-
-        finish()
+        try {
+            this.deviceMenuPopUpWindow.dismiss()
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
+        } catch (e: Exception){
+            Log.e("discardDevButtonClick", "Exception occurred on discard device button click. Info: $e")
+        }
     }
 
-//    fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-//        if(ApplicationProperty.bluetoothConnectionManager.isConnected) {
-//            // highlight button
-//            this.deviceSettingsButton.setImageResource(R.drawable.settings_gold_pushed_24)
-//            this.buttonRecoveryRequired = true
-//            // prevent the normal "onPause" execution
-//            (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-//            // navigate to the device settings activity..
-//            val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
-//            startActivity(intent)
-//        }
-//    }
+    fun onReloadPropertiesButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+
+        try {
+            this.deviceMenuPopUpWindow.dismiss()
+            this.reloadProperties()
+
+        } catch (e: Exception){
+            Log.e("reloadPropButtonClick", "Exception occurred on reload properties button click. Info: $e")
+        }
+
+    }
+
+    fun onDeviceSettingsButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+        try {
+            if (ApplicationProperty.bluetoothConnectionManager.isConnected) {
+                // dismiss popup
+                this.deviceMenuPopUpWindow.dismiss()
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                    true
+                // navigate to the device settings activity..
+                val intent = Intent(this@DeviceMainActivity, DeviceSettingsActivity::class.java)
+                startActivity(intent)
+            }
+        } catch (e: Exception){
+            Log.e("onDevSettingButtonClick", "Exception occurred on device settings button click. Info: $e")
+        }
+    }
 
     fun onReconnectDevice(@Suppress("UNUSED_PARAMETER")view: View){
         // re-connect
@@ -856,6 +863,62 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // TODO: remove this, this is temporary
             //ApplicationProperty.bluetoothConnectionManager.sendData("D024$")
             //this.reloadProperties()
+        }
+    }
+
+    @SuppressLint("InflateParams")
+    fun onDeviceMenuButtonClick(@Suppress("UNUSED_PARAMETER")view: View) {
+
+        // prevent double execution
+        if(!this.deviceMenuOpen){
+
+            // shade the background
+            this.devicePropertyListRecyclerView.alpha = 0.2f
+
+            // set the menu button to selected state
+            this.deviceMenuButton.setImageResource(R.drawable.ic_menu_yellow_36dp)
+
+            // set popup open parameter
+            this.deviceMenuOpen = true
+
+            // get layout inflater
+            val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+            // get recycler view position
+            val recyclerViewPos = intArrayOf(0, 0)
+            this.devicePropertyListRecyclerView.getLocationInWindow(recyclerViewPos)
+
+            // inflate the view
+            val popUpView =
+                layoutInflater.inflate(R.layout.device_main_activity_popup_menu_flyout, null)
+
+            // and create the instance
+            this.deviceMenuPopUpWindow =
+                PopupWindow(
+                    popUpView,
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    true
+                )
+
+            // set animation
+            this.deviceMenuPopUpWindow.animationStyle = R.style.sideSlidePopUpAnimationStyle
+
+            // set on dismiss listener
+            this.deviceMenuPopUpWindow.setOnDismissListener {
+                // normalize parameter with delay that equals the animation slide time
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    this.devicePropertyListRecyclerView.alpha = 1f
+                    this.deviceMenuOpen = false
+                    this.deviceMenuButton.setImageResource(R.drawable.ic_menu_white_36dp)
+                }, 300, TimeUnit.MILLISECONDS)
+            }
+
+            // show it!
+            this.deviceMenuPopUpWindow.showAtLocation(
+                this.devicePropertyListRecyclerView,
+                Gravity.NO_GRAVITY, 0, recyclerViewPos.elementAt(1) - 5
+            )
         }
     }
 

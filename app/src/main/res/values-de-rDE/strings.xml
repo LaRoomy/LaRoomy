@@ -32,6 +32,9 @@
     <string name="DMA_LoadingPropertiesUserInfo">Lade Eigenschaften..</string>
     <string name="DMA_NoConnection">Keine Verbindung</string>
     <string name="DMA_ErrorElementText">error:type !</string>
+    <string name="DMA_PopUpMenuText_DeviceSettings">Geräte-Einstellungen</string>
+    <string name="DMA_PopUpMenuText_DiscardDevice">Gerät schließen</string>
+    <string name="DMA_PopUpMenuText_ReloadProperties">Eigenschaften neu laden</string>
 
 
 

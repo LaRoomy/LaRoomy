@@ -1482,7 +1482,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bleDeviceData.clear()
     }
 
-    fun clearPropertyRelatedParameter(){
+    private fun clearPropertyRelatedParameter(){
         this.propertyUpToDate = false
         this.uIAdapterList.clear()
         this.elementUpdateList.clear()
@@ -1707,14 +1707,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun reloadProperties(){
-
-        // TODO: reset all necessary arrays and parameter???
-        // something is reset in "startDevicePropertyListing":
-
         this.clearPropertyRelatedParameter()
-
-        //this.startDevicePropertyListing()
-
+        this.startPropertyListing()
     }
 
 //    private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
