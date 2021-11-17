@@ -114,7 +114,7 @@
         android:id="@+id/deviceInfoSubHeaderContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="5dp"
         android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -130,6 +130,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:background="@drawable/device_user_info_header_background"
+            android:onClick="onDeviceMainNotificationAreaClick"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -158,19 +159,17 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--
         <View
             android:id="@+id/subHeaderSeparatorLineView"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="15dp"
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/deviceMainActivityDeviceInfoSubHeaderSubContainer" />
--->
 
 
         <!--

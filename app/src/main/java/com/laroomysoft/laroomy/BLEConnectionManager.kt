@@ -706,6 +706,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // device-header / user-message notification
                     handleUserMessage(data, dataSize)
                 }
+                '5' -> {
+                    // time request notification from device
+                    handleTimeRequest()
+                }
                 else -> {
                     if(verboseLog){
                         Log.e("readDeviceNotification", "Unknown device notification type")
@@ -730,13 +734,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             deviceInfoHeaderData.imageID = Integer.decode(hexString)
             deviceInfoHeaderData.type = data[9]
-            deviceInfoHeaderData.message = data.removeRange(0, 10)
+            deviceInfoHeaderData.displayTime = data[10].toString().toLong()
+            deviceInfoHeaderData.message = data.removeRange(0, 11)
 
             this.propertyCallback.onRemoteUserMessage(deviceInfoHeaderData)
         } else {
             // no notification data
             // TODO! error message
         }
+    }
+
+    private fun handleTimeRequest(){
+        // get the time and send the client command to the device
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
+        val min = calendar.get(Calendar.MINUTE)
+        val sec = calendar.get(Calendar.SECOND)
+
+        var timeRequestResponse = "520008005"
+        timeRequestResponse += a8bitValueTo2CharHexValue(hour)
+        timeRequestResponse += a8bitValueTo2CharHexValue(min)
+        timeRequestResponse += a8bitValueTo2CharHexValue(sec)
+        timeRequestResponse += '\r'
+        this.sendData(timeRequestResponse)
     }
 
     private fun readPropertyExecutionResponse(data: String, dataSize: Int) : Boolean {
@@ -3183,24 +3203,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return if (id < 256 && id > -1) { id } else -1
     }
 
-    private fun setDeviceTime(){
-        // get the time and send the client command to the device
-        val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
-        val min = calendar.get(Calendar.MINUTE)
-        val sec = calendar.get(Calendar.SECOND)
-        val outString = "ScT&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
-        if(verboseLog) {
-            Log.d(
-                "M:setDeviceTime",
-                "Sending current local time to the device. Output Data is: $outString"
-            )
-        }
-        this.sendData(outString)
-    }
+//    private fun setDeviceTime(){
+//        // get the time and send the client command to the device
+//        val calendar = Calendar.getInstance()
+//        val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
+//        val min = calendar.get(Calendar.MINUTE)
+//        val sec = calendar.get(Calendar.SECOND)
+//        val outString = "ScT&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
+//        if(verboseLog) {
+//            Log.d(
+//                "M:setDeviceTime",
+//                "Sending current local time to the device. Output Data is: $outString"
+//            )
+//        }
+//        this.sendData(outString)
+//    }
 
     fun doComplexPropertyStateRequestForPropertyIndex(propertyIndex: Int) {
+
         this.sendComplexPropertyStateRequest(propertyIndex)
+
     }
 
     private fun sendBindingRequest(useCustomKey: Boolean){
@@ -3375,6 +3397,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun notifyBackNavigationToDeviceMainPage() {
+
+        // TODO !!!!!!!!!!!!!!!!!!!
+
+
         this.multiComplexPageID = -1
         this.multiComplexPropertyPageOpen = false
         sendData(this.navigatedToDeviceMainPageNotification)

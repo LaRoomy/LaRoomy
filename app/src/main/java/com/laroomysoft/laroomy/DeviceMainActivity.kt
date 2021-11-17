@@ -139,7 +139,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
 
             setUIConnectionStatus(false)
-            showNotificationHeaderAndPostMessage(29, getString(R.string.DMA_DeviceConnectionSuspended))
+
+            //showNotificationHeaderAndPostMessage(29, getString(R.string.DMA_DeviceConnectionSuspended))
 
             this.activityWasSuspended = true
         } else {
@@ -177,7 +178,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // set UI visual state
                 resetSelectedItemBackground()
                 setUIConnectionStatus(false)
-                showNotificationHeaderAndPostMessage(30, getString(R.string.DMA_NoConnection))
+
+                // TODO: or show a dialog ??
+
+
+                //showNotificationHeaderAndPostMessage(30, getString(R.string.DMA_NoConnection))
 
                 // schedule back-navigation
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -371,9 +376,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // at first update the UI
         runOnUiThread {
             this.propertyList.clear()
-            this.devicePropertyListViewAdapter.notifyDataSetChanged()
+            //this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
-            this.showNotificationHeaderAndPostMessage(33, getString(R.string.DMA_LoadingPropertiesUserInfo))
+
+            val deviceHeaderData = DeviceInfoHeaderData()
+            deviceHeaderData.message = getString(R.string.DMA_LoadingPropertiesUserInfo)
+            deviceHeaderData.displayTime = 9
+
+            this.showNotificationHeaderAndPostMessage(deviceHeaderData)
         }
         Handler(Looper.getMainLooper()).postDelayed({
             ApplicationProperty.bluetoothConnectionManager.reloadProperties()
@@ -851,6 +861,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
+    fun onDeviceMainNotificationAreaClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        runOnUiThread {
+            this.hideNotificationHeader()
+        }
+    }
+
+
     fun onReconnectDevice(@Suppress("UNUSED_PARAMETER")view: View){
         // re-connect
         // confirm device-properties???
@@ -926,9 +943,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private fun setUIConnectionStatus(status :Boolean){
 
         runOnUiThread {
-//            val statusText =
-//                findViewById<TextView>(R.id.deviceMainActivityDeviceConnectionStatusTextView)
-
             if (status) {
                 this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.connectedTextColor))
                 this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ConnectionStatus_connected)
@@ -939,32 +953,37 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    private fun showNotificationHeaderAndPostMessage(imageID: Int, message: String){
-
-        // TODO: Problem: the view is outside of the screen if the text is too long -> it must be wrapped
-
+    private fun showNotificationHeaderAndPostMessage(deviceHeaderData: DeviceInfoHeaderData) {
         runOnUiThread {
             //this.deviceHeaderNotificationImageView.setImageResource(
-                //resourceIdForImageId(imageID)
+            //resourceIdForImageId(imageID)
             //)
 
             //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
-            this.deviceHeaderNotificationTextView.text = message
+            this.deviceHeaderNotificationTextView.text = deviceHeaderData.message
+            this.deviceHeaderNotificationTextView.setTextColor(
+                getColor(
+                    colorForUserMessageType(
+                        deviceHeaderData.type
+                    )
+                )
+            )
 
             //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
 
             val expandCollapseExtension = ExpandCollapseExtension()
             expandCollapseExtension.expand(this.deviceHeaderNotificationContainer, 600)
-
-            // TODO: schedule the hide of the container
-
-            Executors.newSingleThreadScheduledExecutor().schedule({
-                this.hideNotificationHeader()
-            }, 4000, TimeUnit.MILLISECONDS)
-
         }
 
+        // schedule the hide of the container (if requested)
 
+        if (deviceHeaderData.displayTime > 0) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                runOnUiThread {
+                    this.hideNotificationHeader()
+                }
+            }, deviceHeaderData.displayTime, TimeUnit.MILLISECONDS)
+        }
     }
 
     private fun hideNotificationHeader(){
@@ -1022,7 +1041,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // stop spinner and set info header
                 runOnUiThread {
                     this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-                    this.showNotificationHeaderAndPostMessage(43, getString(R.string.DMA_Ready))
+
+                    val deviceHeaderData = DeviceInfoHeaderData()
+                    deviceHeaderData.message = getString(R.string.DMA_Ready)
+                    this.showNotificationHeaderAndPostMessage(deviceHeaderData)
                 }
             }
         }
@@ -1177,8 +1199,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
-        //super.onRemoteUserMessage(deviceHeaderData)
-        this.showNotificationHeaderAndPostMessage(deviceHeaderData.imageID, deviceHeaderData.message)
+        this.showNotificationHeaderAndPostMessage(deviceHeaderData)
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {

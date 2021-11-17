@@ -43,9 +43,25 @@ class DeviceInfoHeaderData {
     var imageID = -1
     var type = USERMESSAGE_TYPE_INFO
 
+    var displayTime: Long = 5000
+    set(value) {
+        field = when(value){
+            0L -> 5000
+            1L -> 7500
+            2L -> 10000
+            3L -> 12500
+            4L -> 15000
+            5L -> 17500
+            6L -> 20000
+            9L -> 0
+            else -> 22500
+        }
+    }
+
     fun clear() {
         this.message = ""
         this.imageID = -1
+        this.displayTime = 0
     }
 }
 

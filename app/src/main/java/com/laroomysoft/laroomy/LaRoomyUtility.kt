@@ -27,6 +27,15 @@ fun colorForPercentageLevel(level: Int): Int {
     else Color.GREEN
 }
 
+fun colorForUserMessageType(type: Char) : Int {
+    return when(type){
+        '0' -> R.color.InfoColor
+        '1' -> R.color.WarningColor
+        '2' -> R.color.ErrorColor
+        else -> R.color.InfoColor
+    }
+}
+
 fun get8BitValueAsPercent(value: Int) : Int {
     var ret = -1
 
