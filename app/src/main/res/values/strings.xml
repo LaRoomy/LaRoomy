@@ -33,6 +33,7 @@
     <string name="DMA_PopUpMenuText_DeviceSettings">Device Settings</string>
     <string name="DMA_PopUpMenuText_DiscardDevice">Close Device</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Reload Properties</string>
+    <string name="DMA_ReconnectDevice">Resuming Connection..</string>
 
 
     <string name="RGB_HeaderText">RGB Control</string>

@@ -35,6 +35,7 @@
     <string name="DMA_PopUpMenuText_DeviceSettings">Geräte-Einstellungen</string>
     <string name="DMA_PopUpMenuText_DiscardDevice">Gerät schließen</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Eigenschaften neu laden</string>
+    <string name="DMA_ReconnectDevice">Verbindung wird wiederhergestellt..</string>
 
 
 

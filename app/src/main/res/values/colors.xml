@@ -20,6 +20,7 @@
     <color name="selectedSeparatorColor">#F5CD06</color>
     <color name="disconnectedTextColor">#FF8888</color>
     <color name="connectedTextColor">#88FFAA</color>
+    <color name="connectingTextColor">#AAAA55</color>
     <color name="groupColor">#444444</color>
     <color name="groupHeaderColor">#555555</color>
     <color name="groupBottomSeparatorColor">#FF000000</color>

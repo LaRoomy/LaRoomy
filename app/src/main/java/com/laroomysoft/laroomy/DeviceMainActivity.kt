@@ -26,6 +26,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
+const val STATUS_DISCONNECTED = 0
+const val STATUS_CONNECTED = 1
+const val STATUS_CONNECTING = 2
 
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
 
@@ -133,16 +136,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 )
             }
 
-            // TODO: suspend connection (maybe delayed in background???)
-            //ApplicationProperty.bluetoothConnectionManger.close()
-
+            // suspend connection
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
-
-            setUIConnectionStatus(false)
-
-            //showNotificationHeaderAndPostMessage(29, getString(R.string.DMA_DeviceConnectionSuspended))
-
+            setUIConnectionStatus(STATUS_DISCONNECTED)
             this.activityWasSuspended = true
+
         } else {
             // reset parameter:
             (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = false
@@ -177,9 +175,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                 // set UI visual state
                 resetSelectedItemBackground()
-                setUIConnectionStatus(false)
+                setUIConnectionStatus(STATUS_DISCONNECTED)
 
                 // TODO: or show a dialog ??
+
+                // try to reconnect ??? try it several times like in loading activity
 
 
                 //showNotificationHeaderAndPostMessage(30, getString(R.string.DMA_NoConnection))
@@ -270,31 +270,35 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.deviceTypeHeaderTextView.text =
                 ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
 
-            // TODO: reactivate!:
-            //this.deviceTypeHeaderImageView.setImageResource(this.deviceImageResourceId)
-
-            // Update the connection status
-            setUIConnectionStatus(ApplicationProperty.bluetoothConnectionManager.isConnected)
-
             // show the loading circle
-            this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
+            //this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
 
             // check if this is a call on creation or resume:
             if (this.activityWasSuspended) {
-
                 // must be a resume action
 
-                // realign objects
+                // Update the connection status
+                //setUIConnectionStatus(STATUS_CONNECTING)  // ?????????
+
+
+                // realign objects is not necessary here!
                 //ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
                 //ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
-
-
 
                 // try to reconnect
                 ApplicationProperty.bluetoothConnectionManager.resumeConnection()
                 this.activityWasSuspended = false
 
             } else {
+                // Update the connection status
+                setUIConnectionStatus(
+                    if(ApplicationProperty.bluetoothConnectionManager.isConnected){
+                        STATUS_CONNECTED
+                    } else {
+                        STATUS_DISCONNECTED
+                    }
+                )
+
                 // must be the creation process -> start property listing
                 ApplicationProperty.bluetoothConnectionManager.startPropertyListing()
             }
@@ -335,32 +339,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun getBackgroundDrawableFromElementIndex(index: Int){}
-
-//    private fun setItemSeparatorViewColors(index: Int, top_colorID: Int, bottom_colorID: Int){
-//        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
-//        val top = linearLayout?.findViewById<View>(R.id.topSeparator)
-//        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
-//
-//        if(top_colorID != -1) {
-//            top?.setBackgroundColor(getColor(top_colorID))
-//        }
-//
-//        if(bottom_colorID != -1) {
-//            bottom?.setBackgroundColor(getColor(bottom_colorID))
-//        }
-//    }
-
-//    private fun setItemTopSeparatorColor(index: Int, colorID: Int){
-//        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
-//        val top = linearLayout?.findViewById<View>(R.id.topSeparator)
-//        top?.setBackgroundColor(getColor(colorID))
-//    }
-//
-//    private fun setItemBottomSeparatorColor(index: Int, colorID: Int){
-//        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
-//        val bottom = linearLayout?.findViewById<View>(R.id.bottomSeparator)
-//        bottom?.setBackgroundColor(getColor(colorID))
-//    }
 
     private fun reloadProperties(){
 
@@ -940,15 +918,24 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
 
-    private fun setUIConnectionStatus(status :Boolean){
+    private fun setUIConnectionStatus(status :Int){
 
         runOnUiThread {
-            if (status) {
-                this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.connectedTextColor))
-                this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ConnectionStatus_connected)
-            } else {
-                this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.disconnectedTextColor))
-                this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ConnectionStatus_disconnected)
+            when (status) {
+                STATUS_CONNECTED -> {
+                    this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.connectedTextColor))
+                    this.deviceConnectionStatusTextView.text =
+                        getString(R.string.DMA_ConnectionStatus_connected)
+                }
+                STATUS_CONNECTING -> {
+                    this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.connectingTextColor))
+                    this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ReconnectDevice)
+                }
+                else -> {
+                    this.deviceConnectionStatusTextView.setTextColor(getColor(R.color.disconnectedTextColor))
+                    this.deviceConnectionStatusTextView.text =
+                        getString(R.string.DMA_ConnectionStatus_disconnected)
+                }
             }
         }
     }
@@ -1024,7 +1011,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         (applicationContext as ApplicationProperty).logControl("I: Connection State changed in DeviceMainActivity to $state")
 
         // set the UI State to connected:
-        this.setUIConnectionStatus(state)
+        val conStatus = if(state){
+            STATUS_CONNECTED
+        } else {
+            STATUS_DISCONNECTED
+        }
+        this.setUIConnectionStatus(conStatus)
+
         // stop the loading circle and set the info-header
         if(state) {
 
@@ -1042,9 +1035,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 runOnUiThread {
                     this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
 
-                    val deviceHeaderData = DeviceInfoHeaderData()
-                    deviceHeaderData.message = getString(R.string.DMA_Ready)
-                    this.showNotificationHeaderAndPostMessage(deviceHeaderData)
+                    //val deviceHeaderData = DeviceInfoHeaderData()
+                    //deviceHeaderData.message = getString(R.string.DMA_Ready)
+                    //this.showNotificationHeaderAndPostMessage(deviceHeaderData)
+
+                    //this.hideNotificationHeader()
                 }
             }
         }

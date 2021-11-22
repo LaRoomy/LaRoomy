@@ -44,38 +44,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
-    private val authenticationString = "xPsM0-33wSp_mmT$"// outgoing
-    private val testCommand = "vXtest385_26$"// outgoing
-    private val propertyStringPrefix = "IPR" // incoming -prefix
-    private val groupStringPrefix = "IPG"// incoming -prefix
-    private val groupMemberStringPrefix = "mI%"
-    private val propertyNameStartIndicator = "PD:S"// incoming -prefix
-    private val propertyNameEndIndicator = "PD:E"// incoming
-    private val groupInfoStartIndicator = "GI:S"//incoming -prefix
-    private val groupInfoEndIndicator = "GI:E"// incoming
-    private val complexDataStateTransmissionEntry = "PSC"
-    private val simpleDataStateTransmissionEntry = "PSS"
-    private val propertyChangedNotificationEntry = "DnPcx1="
-    private val propertyGroupChangedNotificationEntry = "DnPGc=t"
-    private val deviceHeaderStartEntry = "DnDIHs7"
-    private val deviceHeaderCloseMessage = "DnDIHe+"
 
-    private val deviceReconnectedNotification = "500002002\r"
-
-    private val navigatedToDeviceMainPageNotification = "yDnNavM=5$"
-    private val multiComplexPropertyPageInvokedStartEntry = "yDnMCIv-X"
-    private val multiComplexPropertyNameSetterEntry = "MCN&"
-    private val multiComplexPropertyDataSetterEntry = "MCD&"
-    private val enableBindingSetterCommandEntry = "SeB:"
-    private val releaseDeviceBindingCommand = "SrB>$"
-    private val propertyRetrievalCompleteNotification = "yDnPRf-P!$"// outgoing
-    private val requestLocalTimeCommand = "RqLcTime"// incoming
-    private val bindingNotSupportedNotification = "DnBNS=x"// incoming
-    private val bindingSuccessNotification = "DnBNS=y"// incoming
-    private val bindingErrorNotification = "DnBNS=e"// incoming
 
     // static notifications
-    private val propertyLoadingCompleteNotification = "5000030010\r"
+    private val propertyLoadingCompleteNotification = "5000030010\r"        // sent when the retrieving of the properties is complete (raw loading - not from cache)
+    private val deviceReconnectedNotification = "500002002\r"               // sent when the connection was suspended (user has left the app) and the user re-invoked the app
+    private val userNavigatedBackToDeviceMainNotification = "500002004\r"   // sent when the user has opened a complex property page and navigated back to device-main-page
+
+
     //private val propertyLoadedFromCacheCompleteNotification = "5000030011\r"
 
     // new ones:
@@ -144,7 +120,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
 
-    //var deviceInfoHeaderData = DeviceInfoHeaderData()
 
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
@@ -398,14 +373,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
 
-            // log (binary):
-            //Log.d("M:CB:CharChanged", "Characteristic changed. Value: ${characteristic?.value}")
-
             // get data
             val dataAsString = characteristic?.getStringValue(0)
-
-//            // format data
-//            dataAsString = formatIncomingData(dataAsString ?: "")
 
             // log (string)
             if(verboseLog) {
@@ -417,189 +386,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if (!dispatchTransmission(dataAsString ?: "")) {
                     callback.onDataReceived(dataAsString ?: "")
                 }
-            } catch (e:Exception){
-                if(verboseLog){
-                    Log.e("onCharacteristicChanged", "Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
+            } catch (e: Exception) {
+                if (verboseLog) {
+                    Log.e(
+                        "onCharacteristicChanged",
+                        "Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}"
+                    )
                 }
                 applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
-
-
-                // TODO: notify user and navigate back, however respond to the error
             }
-
-            // check authentication
-            /*
-            if(authRequired){
-
-                if(verboseLog) {
-                    Log.d("M:CB:CharChanged", "Data Received - Authentication Required")
-                }
-
-                when(dataAsString){
-                    authenticationResponse -> {
-                        if(verboseLog) {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - Authentication successful - Device ID confirmed"
-                            )
-                        }
-                        if(passKeySecondTryOut){
-                            isCurrentConnectionDoneWithSharedBindingKey = true
-                        }
-                        authRequired = false
-                        authenticationSuccess = true
-                        // save the device address (but only if the authentication was successful)
-                        saveLastSuccessfulConnectedDeviceAddress(gatt?.device?.address ?: "")
-                        callback.onAuthenticationSuccessful()
-                    }
-                    authenticationResponseBindingPasskeyRequired -> {
-                        if(verboseLog) {
-                            Log.d(
-                                "M:CB:CharChanged",
-                                "Data Received - Authentication - Device ID confirmed - additional binding is required"
-                            )
-                        }
-                        applicationProperty.logControl("I: Authentication success. Binding is required!")
-
-                        // check if custom or default binding is active
-                        val defaultBindingKeyMustBeUsed =
-                            (activityContext.applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
-
-                        isBindingRequired = true
-                        sendBindingRequest(defaultBindingKeyMustBeUsed)
-
-
-//                        if(!defaultBindingKeyMustBeUsed){
-//                            Log.e(
-//                                "M:CB:CharChanged",
-//                                "Binding is not activated - Connection attempt must be rejected!"
-//                            )
-//                            //callback.onConnectionAttemptFailed(activityContext.getString(R.string.CA_BindingNotActivated))
-//                        } else {
-//                            Log.d(
-//                                "M:CB:CharChanged",
-//                                "Data Received - Authentication - Send Binding information"
-//                            )
-//                            isBindingRequired = true
-//                            // send the passkey to proceed
-//                            sendBindingRequest()
-//                        }
-                    }
-                    authenticationResponseBindingPasskeyInvalid -> {
-                        Log.e("M:CB:CharChanged", "Data Received - Authentication - Passkey rejected from device - PASSKEY INVALID")
-                        applicationProperty.logControl("E: Passkey invalid - Connection rejected")
-
-                        if(!passKeySecondTryOut) {
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:CB:CharChanged",
-                                    "Searching for a saved passkey for a specific mac address"
-                                )
-                            }
-                            applicationProperty.logControl("I: Generate lookup for shared passkey")
-
-                            val passKey =
-                                tryUseSavedPassKeyForSpecificMacAddress(currentDevice?.address ?: "")
-
-                            if(passKey == ERROR_NOTFOUND){
-                                Log.e("M:CB:CharChanged", "No saved passKey - reject connection")
-                                applicationProperty.logControl("E: No shared key - reject connection")
-                                callback.onBindingPasskeyRejected()
-                            } else {
-                                if(verboseLog) {
-                                    Log.d(
-                                        "M:CB:CharChanged",
-                                        "Saved passkey found - try to use this key in the second chance"
-                                    )
-                                }
-                                applicationProperty.logControl("I: Shared passkey found - try again")
-
-                                passKeySecondTryOut = true
-                                sendBindingRequest(passKey)
-                            }
-                        } else {
-                            Log.e("M:CB:CharChanged", "Passkey rejected on the second chance - finally reject connection")
-                            applicationProperty.logControl("E: Passkey finally rejected. Stop process.")
-                            // raise event
-                            callback.onBindingPasskeyRejected()
-                        }
-                    }
-                    else -> {
-                        Log.w("M:CB:CharChanged", "!Warning: Authentication failed! Unexpected Authentication Token")
-                        applicationProperty.logControl("E: Authentication failed: Unexpected token.")
-                    }
-                }
-            }
-            else {
-                var dataProcessed = checkForDeviceCommandsAndNotifications(dataAsString ?: "error")
-
-                if(!dataProcessed) {
-
-//                    if(updateStackProcessActive) {
-//                        dataProcessed = checkSingleAction(dataAsString ?: "error")
-//                    }
-                    dataProcessed = processElementUpdateStack(dataAsString ?: "error")
-
-                    // TODO: add user-logs to all loops:  ???
-
-                    if(!dataProcessed) {
-                        // check if one of the property-retrieving-loops is active
-                        if (propertyLoopActive) {
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:CB:CharChanged",
-                                    "Data Received - Property Loop is active - check for property-string"
-                                )
-                            }
-                            // try to add the device property, if the end is reached the loop will be cut off
-                            dataProcessed = addDeviceProperty(dataAsString ?: "error")
-                        }
-                        if (propertyNameResolveLoopActive) {
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:CB:CharChanged",
-                                    "Data Received - PropertyName resolve Loop is active - check for name-strings"
-                                )
-                            }
-                            // check and handle property-name-resolve-request
-                            dataProcessed = resolvePropertyName(dataAsString ?: "error")
-                        }
-                        if (groupLoopActive) {
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:CB:CharChanged",
-                                    "Data Received - group indexing Loop is active - check for group-id for indexes"
-                                )
-                            }
-                            // try to add the group, if the end is reached, the loop will be cut off
-                            dataProcessed = addPropertyGroup(dataAsString ?: "error")
-                        }
-                        if (groupInfoLoopActive) {
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:CB:CharChanged",
-                                    "Data Received - group-detail-info Loop is active - check the detailed info for the given ID"
-                                )
-                            }
-                            // if the detailed group info loop is active, check the string for group info
-                            dataProcessed = resolveGroupInfo(dataAsString ?: "error")
-                        }
-                        if(deviceHeaderRecordingActive){
-                            if(verboseLog) {
-                                Log.d(
-                                    "M:CB:CharChanged",
-                                    "Data Received - deviceHeaderDataRecording is active -> add string to buffer. Data: $dataAsString"
-                                )
-                            }
-                            deviceInfoHeaderData.message += dataAsString
-                        }
-                    }
-                }
-                // launch event
-                if(!dataProcessed){
-                    callback.onDataReceived(dataAsString)
-                }
-            }*/
         }
     }
 
@@ -1707,7 +1502,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     callback.onComponentError(
                         BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE)
                 }
-            }, 3000, TimeUnit.MILLISECONDS)
+            }, 10000, TimeUnit.MILLISECONDS)
 
         } else {
             Log.e("M:Bmngr:resumeC", "BluetoothManager: Internal Device Address invalid- trying to connect to saved address")
@@ -1731,355 +1526,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.startPropertyListing()
     }
 
-//    private fun checkForDeviceCommandsAndNotifications(data: String) :Boolean {
-//        var dataProcessed = false
-//        // log:
-//        if(verboseLog) {
-//            Log.d("M:CheckDevComAndNoti", "Check received string for notification")
-//        }
-//
-//        // TODO: add user-logs to all notifications???
-//        // check:
-//
-//        // only accept notifications if the property and group loops are not in progress
-//        if(!this.propertyLoopActive && !this.groupLoopActive && !this.propertyNameResolveLoopActive && !this.groupInfoLoopActive) {
-//            when {
-//                data.startsWith(propertyChangedNotificationEntry) -> {
-//                    this.updateProperty(data)
-//                    dataProcessed = true
-//
-//                    if(verboseLog) {
-//                        Log.d("M:CheckDevComAndNoti", "Property-Changed Notification detected")
-//                    }
-//                }
-//
-//                data.startsWith(propertyGroupChangedNotificationEntry) -> {
-//                    this.updatePropertyGroup(data)
-//                    dataProcessed = true
-//
-//                    if(verboseLog) {
-//                        Log.d("M:CheckDevComAndNoti", "PropertyGroup-Changed Notification detected")
-//                    }
-//                }
-//                data.startsWith(this.complexDataStateTransmissionEntry) -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "Complex-Property-State data received -> try to resolve it!"
-//                        )
-//                    }
-//                    this.resolveComplexStateData(data)
-//                    dataProcessed = true
-//                }
-//                data.startsWith(this.multiComplexPropertyNameSetterEntry) -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "Multi-Complex-Property Name-Data received -> try to resolve it!"
-//                        )
-//                    }
-//                    this.resolveMultiComplexStateData(data, true)
-//                    dataProcessed = true
-//                }
-//                data.startsWith(this.multiComplexPropertyDataSetterEntry) -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "Multi-Complex-Property Value-Data received -> try to resolve it!"
-//                        )
-//                    }
-//                    this.resolveMultiComplexStateData(data, false)
-//                    dataProcessed = true
-//                }
-//                data.startsWith(this.simpleDataStateTransmissionEntry) -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "Simple-Property-State data received -> try to resolve it!"
-//                        )
-//                    }
-//                    this.resolveSimpleStateData(data)
-//                    dataProcessed = true
-//                }
-//                data.startsWith(this.deviceHeaderStartEntry) -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "DeviceHeader start notification detected -> start recording"
-//                        )
-//                    }
-//                    //this.startDeviceHeaderRecording(data)
-//                    dataProcessed = true
-//                }
-//                data == this.deviceHeaderCloseMessage -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "DeviceHeader end notification detected -> reset parameter and trigger event"
-//                        )
-//                    }
-//                    //this.endDeviceHeaderRecording()
-//                    dataProcessed = true
-//                }
-//                data == this.testCommand -> {
-//                    if(verboseLog) {
-//                        Log.d("M:CheckDevComAndNoti", "Test command received.")
-//                    }
-//                    this.connectionTestSucceeded = true
-//                    this.callback.onConnectionTestSuccess()
-//                    dataProcessed = true
-//                }
-//                data == this.requestLocalTimeCommand -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "Local Time Request received. Sending Time to Device."
-//                        )
-//                    }
-//                    this.setDeviceTime()
-//                }
-//                data == this.bindingNotSupportedNotification -> {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:CheckDevComAndNoti",
-//                            "The device has the create-binding request rejected. -> Forward to current Activity (must be the DeviceSettingsActivity"
-//                        )
-//                    }
-//                    this.propertyCallback.onDeviceNotification(DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED)
-//                }
-//                data == this.bindingSuccessNotification -> {
-//                    Log.d(
-//                        "M:CheckDevComAndNoti",
-//                        "Binding-Success: The device has the binding command accepted."
-//                    )
-//                    this.propertyCallback.onDeviceNotification(DEVICE_NOTIFICATION_BINDING_SUCCESS)
-//                }
-//                data == this.bindingErrorNotification -> {
-//                    Log.d(
-//                        "M:CheckDevComAndNoti",
-//                        "Binding-Error: The device has reported an error on a binding command"
-//                    )
-//                    this.propertyCallback.onDeviceNotification(DEVICE_NOTIFICATION_BINDING_ERROR)
-//                }
-//            }
-//        }
-//        else {
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:CheckDevComAndNoti",
-//                    "Loop must be active - skip Notification or Command processing"
-//                )
-//            }
-//        }
-//        return dataProcessed
-//    }
-
-//    private fun updateProperty(data: String){
-//        if(data.length < 19){
-//            var entireProperty = false
-//            var entireDetail = false
-//            var thisProperty = false
-//            var thisPropertyDetail = false
-//            var propID = ""
-//            var propIndex = ""
-//
-//            data.forEachIndexed { index, c ->
-//                when(index){
-//                    7 -> propID += c
-//                    8 -> propID += c
-//                    9 -> propID += c
-//                    10 -> propIndex += c
-//                    11 -> propIndex += c
-//                    12 -> propIndex += c
-//                    13 -> if(c != '0')entireProperty = true
-//                    14 -> if(c != '0')entireDetail = true
-//                    15 -> if(c != '0')thisProperty = true
-//                    16 -> if(c != '0')thisPropertyDetail = true
-//                }
-//            }
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:updateProperty",
-//                    "Recording of Property-Update String complete:\nUpdate: entireProperty = $entireProperty\nUpdate: entireDetail = $entireDetail\nUpdate: thisProperty = $thisProperty\nUpdate: thisPropertyDetail = $thisPropertyDetail"
-//                )
-//            }
-//            if(entireProperty){
-//                // TODO: this must be checked
-//                this.propertyCallback.onCompletePropertyInvalidated()
-//                return
-//            }
-//            if(entireDetail){
-//                // TODO: this must be checked
-//                this.propertyNameResolveSingleAction = true
-//
-//                //startRetrievingPropertyNames()
-//
-//            }
-//            if(thisProperty){
-//                val updateInfo = ElementUpdateInfo()
-//                updateInfo.elementID = propID.toInt()
-//                updateInfo.elementIndex = propIndex.toInt()
-//                updateInfo.elementType = PROPERTY_ELEMENT
-//                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
-//
-//                this.elementUpdateList.add(updateInfo)
-//
-//                this.startUpdateStackProcessing()
-//
-//                //this.sendSinglePropertyRequest(propIndex.toInt())
-//            }
-//            if(thisPropertyDetail){
-//                val updateInfo = ElementUpdateInfo()
-//                updateInfo.elementID = propID.toInt()
-//                updateInfo.elementIndex = propIndex.toInt()
-//                updateInfo.elementType = PROPERTY_ELEMENT
-//                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
-//
-//                this.elementUpdateList.add(updateInfo)
-//
-//                this.startUpdateStackProcessing()
-//
-//                //this.sendSinglePropertyResolveRequest(propID.toInt())
-//            }
-//
-//        }
-//        else {
-//            Log.e("M:updateProperty", "Error: insufficient string length")
-//        }
-//    }
-//
-//    private fun updatePropertyGroup(data: String){
-//        if(data.length < 19){
-//            var entirePropertyGroup = false
-//            var entireGroupDetail = false
-//            var thisGroup = false
-//            var thisGroupDetail = false
-//            var groupID = ""
-//            var groupIndex = ""
-//
-//            data.forEachIndexed { index, c ->
-//                when(index){
-//                    7 -> groupID += c
-//                    8 -> groupID += c
-//                    9 -> groupID += c
-//                    10 -> groupIndex += c
-//                    11 -> groupIndex += c
-//                    12 -> groupIndex += c
-//                    13 -> if(c != '0')entirePropertyGroup = true
-//                    14 -> if(c != '0')entireGroupDetail = true
-//                    15 -> if(c != '0')thisGroup = true
-//                    16 -> if(c != '0')thisGroupDetail = true
-//                }
-//            }
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:updatePropGroup",
-//                    "Recording of Property Group Update String complete:\nUpdate: entirePropertyGroup = $entirePropertyGroup\nUpdate: entireGroupDetail = $entireGroupDetail\nUpdate: thisgroup = $thisGroup\nUpdate: thisGroupDetail = $thisGroupDetail"
-//                )
-//            }
-//
-//            if(entirePropertyGroup){
-//                // TODO: check if this works!
-//                this.propertyCallback.onCompletePropertyInvalidated()
-//                return
-//            }
-//            if(entireGroupDetail){
-//                // TODO: check if this works!
-//                this.propertyGroupNameResolveSingleAction = true
-//
-//
-//
-//                //startDetailedGroupInfoLoop()
-//
-//
-//            }
-//            if(thisGroup){
-//                val updateInfo = ElementUpdateInfo()
-//                updateInfo.elementID = groupID.toInt()
-//                updateInfo.elementIndex = groupIndex.toInt()
-//                updateInfo.elementType = GROUP_ELEMENT
-//                updateInfo.updateType = UPDATE_TYPE_ELEMENT_DEFINITION
-//
-//                this.elementUpdateList.add(updateInfo)
-//
-//                this.startUpdateStackProcessing()
-//
-//                //this.sendSinglePropertyGroupRequest(groupIndex.toInt())
-//            }
-//            if(thisGroupDetail){
-//                val updateInfo = ElementUpdateInfo()
-//                updateInfo.elementID = groupID.toInt()
-//                updateInfo.elementIndex = groupIndex.toInt()
-//                updateInfo.elementType = GROUP_ELEMENT
-//                updateInfo.updateType = UPDATE_TYPE_DETAIL_DEFINITION
-//
-//                this.elementUpdateList.add(updateInfo)
-//
-//                this.startUpdateStackProcessing()
-//
-//                //this.sendSingleGroupDetailRequest(groupID.toInt())
-//            }
-//
-//        }
-//        else {
-//            Log.e("M:updatePropGroup", "Error: insufficient string length")
-//        }
-//    }
-
-    private fun sendSinglePropertyResolveRequest(propertyID: Int){
-        if(verboseLog) {
-            Log.d("M:SendRequest", "SendSinglePropertyResolveRequest: Invoked")
-        }
-        if(this.isConnected) {
-            // set marker
-            this.singlePropertyDetailRetrievingAction = true
-            // get language identification
-            val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                "Deutsch" -> 1
-                else -> 0
-            }
-            // build string
-            val data =
-                when {
-                    (propertyID < 10) -> "B${languageIdentificationChar}00$propertyID$"
-                    ((propertyID > 9) && (propertyID < 100)) -> "B${languageIdentificationChar}0$propertyID$"
-                    else -> "B${languageIdentificationChar}$propertyID$"
-                }
-            // send request
-            this.sendData(data)
-        }
-    }
-
-    private fun sendSingleGroupDetailRequest(groupID: Int){
-        if(verboseLog) {
-            Log.d("M:SendRequest", "SendSingleGroupDetailRequest: Invoked")
-        }
-        if(this.isConnected) {
-            // set marker
-            this.singleGroupDetailRetrievingAction = true
-            // get language identification
-            val languageIdentificationChar = when((this.activityContext.applicationContext as ApplicationProperty).systemLanguage){
-                "Deutsch" -> 1
-                else -> 0
-            }
-            // build string
-            val data =
-                when {
-                    (groupID < 10) -> "F${languageIdentificationChar}00$groupID$"
-                    ((groupID > 9) && (groupID < 100)) -> "F${languageIdentificationChar}0$groupID$"
-                    else -> "F${languageIdentificationChar}$groupID$"
-                }
-            // send request
-            this.sendData(data)
-        }
-    }
-
     private fun generateUIAdaptableArrayListFromDeviceProperties(){
 
         this.dataReadyToShow = false
         this.uIAdapterList.clear()
-
-        // new: test!
 
         try {
             if (this.laRoomyDevicePropertyList.size > 0) {
@@ -2226,98 +1676,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return
         }
 
+        // notify finalization of the process
+        Handler(Looper.getMainLooper()).postDelayed({
+            this.sendData(propertyLoadingCompleteNotification)
+        }, 700)
 
 
+        // add the elements with a timer-delay
+        itemAddCounter = 0
 
-
-
-        ////////////////////////////////////
-        // old:
-//        if(this.laRoomyDevicePropertyList.size > 0) {
-//
-//            var globalIndex = 0
-//
-//            if (this.laRoomyPropertyGroupList.size > 0) {
-//                for (laRoomyDevicePropertyGroup in this.laRoomyPropertyGroupList) {
-//                    // create the group entry
-//                    val dpl = DevicePropertyListContentInformation()
-//                    dpl.elementType = GROUP_ELEMENT
-//                    dpl.canNavigateForward = false
-//                    dpl.internalElementIndex = laRoomyDevicePropertyGroup.groupIndex
-//                    dpl.elementText = laRoomyDevicePropertyGroup.groupName
-//                    dpl.imageID = laRoomyDevicePropertyGroup.imageID
-//                    // add the global index of the position in the array
-//                    dpl.globalIndex = globalIndex
-//                    globalIndex++
-//                    // add the group to the list
-//                    this.uIAdapterList.add(dpl)
-//
-//                    // add the device properties to the group by their IDs
-//                    for (ID in laRoomyDevicePropertyGroup.memberIDs) {
-//                        this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-//                            if (laRoomyDeviceProperty.propertyIndex == ID) {
-//                                // ID found -> add property to list
-//                                val propertyEntry = DevicePropertyListContentInformation()
-//                                propertyEntry.elementType = PROPERTY_ELEMENT
-//                                propertyEntry.canNavigateForward =
-//                                    laRoomyDeviceProperty.needNavigation()
-//                                propertyEntry.isGroupMember = true
-//                                propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
-//                                propertyEntry.imageID = laRoomyDeviceProperty.imageID
-//                                propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
-//                                //propertyEntry.indexInsideGroup = index
-//                                propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
-//                                propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
-//                                // set global index
-//                                propertyEntry.globalIndex = globalIndex
-//                                globalIndex++
-//                                // add it to the list
-//                                this.uIAdapterList.add(propertyEntry)
-//                                // ID found -> further processing not necessary -> break the loop
-//                                return@forEachIndexed
-//                            }
-//                        }
-//                    }
-//
-//                    // mark the last element in the group
-//                    this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
-//                }
-//            }
-//            // now add the properties which are not part of a group
-//            this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-//                // only add the non-group properties
-//                if (!laRoomyDeviceProperty.isGroupMember) {
-//                    // create the entry
-//                    val propertyEntry = DevicePropertyListContentInformation()
-//                    propertyEntry.elementType = PROPERTY_ELEMENT
-//                    propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
-//                    propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
-//                    propertyEntry.imageID = laRoomyDeviceProperty.imageID
-//                    propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
-//                    //propertyEntry.indexInsideGroup = index
-//                    propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
-//                    propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
-//                    // set global index
-//                    propertyEntry.globalIndex = globalIndex
-//                    globalIndex++
-//                    // add it to the list
-//                    this.uIAdapterList.add(propertyEntry)
-//                }
-//            }
-
-            // end: old
-            //////////////////////////////////////
-
-            // notify finalization of the process
-            Handler(Looper.getMainLooper()).postDelayed({
-                this.sendData(propertyLoadingCompleteNotification)
-            }, 700)
-
-
-            // add the elements with a timer-delay
-            itemAddCounter = 0
-
-            Timer().scheduleAtFixedRate(object : TimerTask() {
+        Timer().scheduleAtFixedRate(
+            object : TimerTask() {
                 override fun run() {
                     try {
                         propertyCallback.onUIAdaptableArrayListItemAdded(
@@ -2334,522 +1703,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             dataReadyToShow = true
                             propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
                         }
-                    } catch (e: IndexOutOfBoundsException){
-                        if(verboseLog){
-                            Log.e("generateUIArray", "Error while adding the Elements to the view. Exception: $e")
+                    } catch (e: IndexOutOfBoundsException) {
+                        if (verboseLog) {
+                            Log.e(
+                                "generateUIArray",
+                                "Error while adding the Elements to the view. Exception: $e"
+                            )
                         }
                         applicationProperty.logControl("E: Error while adding the elements to the view. Exception: $e")
                         // FIXME: reset the whole???
                         cancel()
                     }
                 }
-            }, (0).toLong(), (200).toLong())// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
-
+            },
+            (0).toLong(),
+            (200).toLong()
+        )// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
     }
-
-
-//    private fun checkSingleAction(data: String) :Int {
-//
-//
-//        //Log.d("M:CheckSingleAction", "single-action-retrieving is active look for a transmission to record")
-//
-//        // TODO: add more logs!
-//
-//        // TODO: if the retrieving loop is active, this should not be executed
-//
-//        if(this.singlePropertyRetrievingAction) {
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:CheckSingleAction",
-//                    "Single Property Request is active, look for an appropriate transmission"
-//                )
-//            }
-//            if (data.startsWith(propertyStringPrefix)) {
-//                if(verboseLog) {
-//                    Log.d("M:CheckSingleAction", "Property-String-Prefix detected")
-//                }
-//                // its a  single property request response
-//
-//                // initialize the property element from string
-//                val updatedLaRoomyDeviceProperty = LaRoomyDeviceProperty()
-//                updatedLaRoomyDeviceProperty.fromString(data)
-//                var updateIndex = -1
-//
-//                // search the property ID in the list
-//                this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-//                    if(laRoomyDeviceProperty.propertyIndex == updatedLaRoomyDeviceProperty.propertyIndex){
-//                        updateIndex = index
-//                        return@forEachIndexed
-//                    }
-//                }
-//
-//                // replace the origin
-//                if(updateIndex != -1) {
-//                    // get the original property entry
-//                    val laroomyDeviceProperty =
-//                        this.laRoomyDevicePropertyList.elementAt(updateIndex)
-//
-//                    // check for invalidation
-//                    if(laroomyDeviceProperty.propertyIndex != updatedLaRoomyDeviceProperty.propertyIndex){
-//                        // this can only occur if the complete property changed -> launch invalidated event
-//                        this.propertyCallback.onCompletePropertyInvalidated()
-//                        return SINGLEACTION_PROCESSING_ERROR
-//                    }
-//                    // set the possible new values
-//                    laroomyDeviceProperty.imageID = updatedLaRoomyDeviceProperty.imageID
-//                    laroomyDeviceProperty.propertyType = updatedLaRoomyDeviceProperty.propertyType
-//                    laroomyDeviceProperty.groupIndex = updatedLaRoomyDeviceProperty.groupIndex
-//
-//                    // override the existing entry (reset)
-//                    this.laRoomyDevicePropertyList[updateIndex] = laroomyDeviceProperty
-//                }
-//                updateIndex = -1
-//
-//                // search the appropriate element in the UI-Adapter-List and save the index
-//                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-//                    if((devicePropertyListContentInformation.internalElementIndex == updatedLaRoomyDeviceProperty.propertyIndex)
-//                        && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
-//                        updateIndex = index
-//                        return@forEachIndexed
-//                    }
-//                }
-//
-//                // replace the origin
-//                if(updateIndex != -1) {
-//                    // get the element from the UI-Adapter list and update all possible data
-//                    val updateDevicePropertyListContentInformation =
-//                        uIAdapterList.elementAt(updateIndex)
-//                    updateDevicePropertyListContentInformation.canNavigateForward =
-//                        updatedLaRoomyDeviceProperty.needNavigation()
-//                    updateDevicePropertyListContentInformation.propertyType =
-//                        updatedLaRoomyDeviceProperty.propertyType
-//                    updateDevicePropertyListContentInformation.imageID =
-//                        updatedLaRoomyDeviceProperty.imageID
-//                    updateDevicePropertyListContentInformation.isGroupMember =
-//                        updatedLaRoomyDeviceProperty.isGroupMember
-//
-//                    // replace the element in the UI-Adapter
-//                    this.uIAdapterList[updateIndex] = updateDevicePropertyListContentInformation
-//                    this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-//                }
-//                // mark the single action as processed
-//                this.singlePropertyRetrievingAction = false
-//
-//                return SINGLEACTION_PROCESSING_COMPLETE
-//            }
-//        }
-//
-//        if(this.singlePropertyDetailRetrievingAction){
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:CheckSingleAction",
-//                    "Single Property DETAIL Request is active, look for an appropriate transmission"
-//                )
-//            }
-//            when{
-//                data.startsWith(propertyNameStartIndicator) -> {
-//                    if(verboseLog) {
-//                        Log.d("M:CheckSingleAction", "Property-Name start indicator detected")
-//                    }
-//                    // its a property description request -> look for the property id to record
-//                    val id = this.propertyIDFromStartEntry(data)
-//                    if(id != -1){
-//                        this.currentPropertyResolveID = id
-//                    }
-//                    // TODO: if the id is invalid -> reset parameter???
-//                    return SINGLEACTION_PARTIALLY_PROCESSED
-//                }
-//                data.startsWith(propertyNameEndIndicator) -> {
-//                    if(verboseLog) {
-//                        Log.d("M:CheckSingleAction", "Property-Name end indicator detected")
-//                    }
-//                    // end of transmission, set marker to false and erase the ID
-//                    this.currentPropertyResolveID = -1
-//                    this.singlePropertyDetailRetrievingAction = false
-//                    return SINGLEACTION_PROCESSING_COMPLETE
-//                }
-//                else -> {
-//                    var updateIndex = -1
-//
-//                    if(this.currentPropertyResolveID != -1){
-//                        if(verboseLog) {
-//                            Log.d(
-//                                "M:CheckSingleAction",
-//                                "Must be the property name. Data is: <$data>"
-//                            )
-//                        }
-//                        // must be the name for the property
-//                        // search the element in the property-list
-//                        this.laRoomyDevicePropertyList.forEach {
-//                            if(it.propertyIndex == this.currentPropertyResolveID){
-//                                it.propertyDescriptor = data
-//                                return@forEach
-//                            }
-//                        }
-//                        // find the element in the UI-Adapter
-//                        this.uIAdapterList.forEach {
-//                            if((it.elementType == PROPERTY_ELEMENT) && (it.internalElementIndex == this.currentPropertyResolveID)){
-//                                it.elementText = data
-//                                updateIndex = it.globalIndex
-//                                return@forEach
-//                            }
-//                        }
-//                        this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-//                        return SINGLEACTION_PARTIALLY_PROCESSED
-//                    }
-//                }
-//            }
-//        }
-//
-//        if(this.singleGroupRetrievingAction){
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:CheckSingleAction",
-//                    "Single Group Request is active, look for an appropriate transmission"
-//                )
-//            }
-//            if(data.startsWith(groupStringPrefix)){
-//                if(verboseLog) {
-//                    Log.d("M:CheckSingleAction", "Group-Prefix detected")
-//                }
-//                // its a group request response
-//
-//                val updatedGroup = LaRoomyDevicePropertyGroup()
-//                updatedGroup.fromString(data)
-//
-//                var updateIndex = -1
-//
-//                // search the element in the groupList
-//                this.laRoomyPropertyGroupList.forEachIndexed { index, laroomyDevicePropertyGroup ->
-//                    if(laroomyDevicePropertyGroup.groupIndex == updatedGroup.groupIndex){
-//                        updateIndex = index
-//                        return@forEachIndexed
-//                    }
-//                }
-//
-//                // replace the origin
-//                if(updateIndex != -1) {
-//                    // get to original element
-//                    val propGroup =
-//                        laRoomyPropertyGroupList.elementAt(updateIndex)
-//
-//                    // check for invalidation
-//                    if(propGroup.groupIndex != updatedGroup.groupIndex){
-//                        this.propertyCallback.onCompletePropertyInvalidated()
-//                        return SINGLEACTION_PROCESSING_ERROR
-//                    }
-//                    // set possible values
-//                    propGroup.imageID = updatedGroup.imageID
-//                    propGroup.memberCount = updatedGroup.memberCount
-//
-//                    // override the existing entry (reset)
-//                    this.laRoomyPropertyGroupList[updateIndex] = propGroup
-//                }
-//                updateIndex = -1
-//
-//                // update the UI-Adapter
-//                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-//                    if((devicePropertyListContentInformation.elementType == GROUP_ELEMENT)
-//                    && (devicePropertyListContentInformation.internalElementIndex == updatedGroup.groupIndex)){
-//                        updateIndex = index
-//                        return@forEachIndexed
-//                    }
-//                }
-//
-//                // replace the origin
-//                if(updateIndex != -1){
-//                    // get the original element
-//                    val originElement =
-//                        uIAdapterList.elementAt(updateIndex)
-//
-//                    // set new possible values
-//                    originElement.imageID = updatedGroup.imageID
-//
-//                    // replace the original in the UI-Adapter
-//                    this.uIAdapterList[updateIndex] = originElement
-//
-//                    this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-//                }
-//                this.singleGroupRetrievingAction = false
-//                return SINGLEACTION_PROCESSING_COMPLETE
-//            }
-//        }
-//
-//        if(this.singleGroupDetailRetrievingAction){
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:CheckSingleAction",
-//                    "Single Group DETAIL Request is active, look for an appropriate transmission"
-//                )
-//            }
-//           when{
-//               data.startsWith(groupInfoStartIndicator) -> {
-//                   if(verboseLog) {
-//                       Log.d("M:CheckSingleAction", "Group Info start indicator detected")
-//                   }
-//                   // its a group detail request response start entry -> look for the group id to record
-//                   val id = this.groupIDFromStartEntry(data)
-//                   if(id != -1){
-//                       this.currentGroupResolveID = id
-//                   }
-//                   // TODO: if the id is invalid -> reset parameter???
-//                   return SINGLEACTION_PARTIALLY_PROCESSED
-//               }
-//               data.startsWith(groupInfoEndIndicator) -> {
-//                   if(verboseLog) {
-//                       Log.d("M:CheckSingleAction", "Group Info end indicator detected")
-//                   }
-//                   // end of transmission, set marker to false and erase the ID
-//                   this.currentGroupResolveID = -1
-//                   this.singleGroupDetailRetrievingAction = false
-//                   return SINGLEACTION_PROCESSING_COMPLETE
-//               }
-//               else -> {
-//                   // must be the new group detail
-//                   if(this.currentGroupResolveID != -1){
-//                       if(verboseLog) {
-//                           Log.d(
-//                               "M:CheckSingleAction",
-//                               "Must be Group-detail data. Data is <$data>"
-//                           )
-//                       }
-//                       return if(data.startsWith(groupMemberStringPrefix)){
-//                           if(verboseLog) {
-//                               Log.d("M:CheckSingleAction", "Group-Member String Prefix detected")
-//                           }
-//                           // must be the member ID transmission part
-//                           // TODO: if the member IDs changed, the whole property must be invalidated and rearranged
-//                           //this.propertyCallback.onCompletePropertyInvalidated()
-//                           SINGLEACTION_PARTIALLY_PROCESSED
-//                       } else {
-//                           if(verboseLog) {
-//                               Log.d("M:CheckSingleAction", "Must be the Group-Name..")
-//                           }
-//                           // must be the name for the group
-//                           // search the element in the groupList
-//                           this.laRoomyPropertyGroupList.forEach {
-//                               if(it.groupIndex == this.currentGroupResolveID){
-//                                   it.groupName = data
-//                                   return@forEach
-//                               }
-//                           }
-//                           var updateIndex = -1
-//
-//                           // find the element in the UI-Adapter
-//                           this.uIAdapterList.forEach {
-//                               if((it.internalElementIndex == this.currentGroupResolveID) && (it.elementType == GROUP_ELEMENT)){
-//                                   it.elementText = data
-//                                   updateIndex = it.globalIndex
-//                                   return@forEach
-//                               }
-//                           }
-//                           this.propertyCallback.onUIAdaptableArrayItemChanged(updateIndex)
-//                           // return true:
-//                           SINGLEACTION_PARTIALLY_PROCESSED
-//                       }
-//                   }
-//               }
-//           }
-//        }
-//        return SINGLEACTION_NOT_PROCESSED
-//    }
-
-//    private fun setPropertyStateForId(propertyID: Int, propertyState: Int, enabled: Boolean){
-//        this.laRoomyDevicePropertyList.forEach {
-//            if(it.propertyIndex == propertyID){
-//                it.propertyState = propertyState
-//                return@forEach
-//            }
-//        }
-//    }
-
-//    private fun resolveSimpleStateData(data: String){
-//        // simple state data transmission length is 11 chars, for example: "PSS0221840$
-//        if(data.length > 9){
-//            // resolve ID:
-//            val propertyID: Int
-//            var strID = ""
-//            strID += data.elementAt(3)
-//            strID += data.elementAt(4)
-//            strID += data.elementAt(5)
-//            propertyID = strID.toInt()
-//
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:resolveSimpleSData",
-//                    "Trying to resolve simple state data for Property-ID: $propertyID"
-//                )
-//            }
-//
-//            if(propertyID > -1 && propertyID < 256) {
-//                val propertyElement = this.propertyElementFromID(propertyID)
-//
-//                // resolve state
-//                var state = ""
-//                state += data.elementAt(6)
-//                state += data.elementAt(7)
-//                state += data.elementAt(8)
-//                val newState = state.toInt()
-//
-//                // apply new state to property-array
-//                //setPropertyStateForId(propertyID, newState, (data.elementAt(9) == '1'))
-//
-//                // apply new state to uIAdapter
-//                var changedIndex = -1
-//
-//                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-//                    if (devicePropertyListContentInformation.internalElementIndex == propertyElement.propertyIndex) {
-//                        devicePropertyListContentInformation.simplePropertyState = newState
-//                        changedIndex = index
-//                    }
-//                }
-//
-//                // 4. launch property changed event
-//                this.propertyCallback.onSimplePropertyStateChanged(
-//                    changedIndex,
-//                    newState
-//                )
-//            } else {
-//                Log.e("M:resolveSimpleSData", "Property-ID invalid! ID: $propertyID")
-//            }
-//        } else {
-//            Log.e("M:resolveSimpleSData", "Simple-State transmission-length too short")
-//        }
-//    }
-//
-//    private fun resolveComplexStateData(data: String){
-//        // minimum complex data array must be 6!
-//        if(data.length > 5) {
-//
-//            // 1. Transform ID and get the type for the ID
-//            var id = ""
-//            id += data.elementAt(3)
-//            id += data.elementAt(4)
-//            id += data.elementAt(5)
-//
-//            val propertyID =
-//                id.toInt()
-//
-//            if(verboseLog) {
-//                Log.d(
-//                    "M:resolveComplexSData",
-//                    "Trying to resolve complexStateData for ID: $propertyID"
-//                )
-//            }
-//
-//            if(propertyID > -1 && propertyID < 256) {
-//                val propertyElement = this.propertyElementFromID(propertyID)
-//
-//                // 2. Retrieve the type-associated data
-//                val propertyStateChanged = when (propertyElement.propertyType) {
-//                    COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> retrieveRGBStateData(
-//                        propertyElement.propertyIndex,
-//                        data
-//                    )
-//                    COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> retrieveExLevelSelectorData(
-//                        propertyElement.propertyIndex,
-//                        data
-//                    )
-//                    COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> retrieveSimpleTimeSelectorData(
-//                        propertyElement.propertyIndex,
-//                        data
-//                    )
-//
-//                    // elapse-time selector mission
-//
-//                    COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> retrieveTimeFrameSelectorData(
-//                        propertyElement.propertyIndex,
-//                        data
-//                    )
-//                    COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> retrieveSimpleNavigatorData(
-//                        propertyElement.propertyIndex,
-//                        data
-//                    )
-//                    COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> retrieveBarGraphDisplayData(
-//                        propertyElement.propertyIndex,
-//                        data
-//                    )
-//
-//                    // TODO: handle all complex types here!
-//
-//                    else -> true
-//
-//                }
-//
-//                // 3. Change UI Adapter
-//                if (propertyStateChanged) {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:resolveComplexSData",
-//                            "ComplexPropertyState has changed -> adapting changes to UI"
-//                        )
-//                    }
-//
-//                    var changedIndex = -1
-//
-//                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-//                        if (devicePropertyListContentInformation.internalElementIndex == propertyElement.propertyIndex) {
-//                            devicePropertyListContentInformation.complexPropertyState =
-//                                laRoomyDevicePropertyList.elementAt(propertyElement.propertyIndex).complexPropertyState
-//                            changedIndex = index
-//                        }
-//                    }
-//
-//                    // 4. launch property changed event
-//                    //      !! = but only if the complex-state-loop is not active (because the successive invocation will impact the UI performance)
-//                    if(!this.complexStateLoopActive) {
-//                        this.propertyCallback.onComplexPropertyStateChanged(
-//                            changedIndex,
-//                            this.uIAdapterList.elementAt(changedIndex).complexPropertyState
-//                        )
-//                    }
-//                }
-//
-//                // 5. Check if the state-loop is active and continue or close it
-//                if (this.complexStateLoopActive) {
-//                    if(verboseLog) {
-//                        Log.d("M:resolveComplexSData", "Complex state loop is active")
-//                    }
-//                    if (this.currentStateRetrievingIndex < this.complexStatePropertyIDs.size) {
-//                        this.requestPropertyState(
-//                            this.complexStatePropertyIDs.elementAt(this.currentStateRetrievingIndex)
-//                        )
-//                        this.currentStateRetrievingIndex++
-//
-//                        // test:
-//                        if (this.currentStateRetrievingIndex == this.complexStatePropertyIDs.size){
-//
-//                            // works!!!
-//
-//                                if(verboseLog) {
-//                                    Log.d(
-//                                        "M:resolveComplexSData",
-//                                        "Complex state loop reached invalid index -> close Loop"
-//                                    )
-//                                }
-//                            this.complexStateLoopActive = false
-//                            this.currentStateRetrievingIndex = -1
-//
-//                            //this.setDeviceTime()
-//                        }
-//
-//                    } else {
-//                        if(verboseLog) {
-//                            Log.d(
-//                                "M:resolveComplexSData",
-//                                "Complex state loop reached invalid index -> close Loop"
-//                            )
-//                        }
-//                        this.complexStateLoopActive = false
-//                        this.currentStateRetrievingIndex = -1
-//                    }
-//                }
-//            } else {
-//                Log.e("M:resolveComplexSData", "Property-ID invalid ID: $propertyID")
-//                applicationProperty.logControl("E: Property ID invalid: $propertyID")
-//            }
-//        }
-//    }
 
     private fun resolveMultiComplexStateData(data: String, isName: Boolean){
 
@@ -2948,182 +1818,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return LaRoomyDeviceProperty()
     }
 
-    private fun retrieveRGBStateData(elementIndex: Int, data: String): Boolean {
-        // check the transmission length first
-        if(data.length < 19)
-            return false
-        else {
-            var rVal = ""
-            var gVal = ""
-            var bVal = ""
-            var command = ""
-
-            for(i in 6..8)
-                command += data.elementAt(i)
-            for(i in 9..11)
-                rVal += data.elementAt(i)
-            for(i in 12..14)
-                gVal += data.elementAt(i)
-            for(i in 15..17)
-                bVal += data.elementAt(i)
-
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.commandValue = command.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = rVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = gVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = bVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.hardTransitionFlag =
-                when(data.elementAt(18)){
-                    '0' -> false
-                    else -> true
-                }
-
-            return true
-        }
-    }
-
-    private fun retrieveExLevelSelectorData(elementIndex: Int, data: String) : Boolean {
-        // check the transmission length first
-        if(data.length < 9){
-            return false
-        } else {
-            var strLevel = ""
-
-            for(i in 7..9)
-                strLevel += data.elementAt(i)
-
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = strLevel.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.onOffState =
-                when(data.elementAt(6)){
-                    '1' -> true
-                    else -> false
-                }
-            return true
-        }
-    }
-
-    private fun retrieveSimpleTimeSelectorData(elementIndex: Int, data: String): Boolean {
-        // check the transmission length first
-        if(data.length < 13){
-            return false
-        } else {
-            var hourVal = ""
-            var minVal = ""
-            var timeSetter = ""
-            timeSetter += data.elementAt(6)
-
-            for(i in 7..8)
-                hourVal += data.elementAt(i)
-
-            for(i in 9..10)
-                minVal += data.elementAt(i)
-
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.timeSetterIndex = timeSetter.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = hourVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = minVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.onOffState =
-                when(data.elementAt(11)){
-                    '1' -> true
-                    else -> false
-                }
-            return true
-        }
-    }
-
-    private fun retrieveTimeFrameSelectorData(elementIndex: Int, data: String) : Boolean {
-        // check the transmission length first
-        if(data.length < 16){
-            return false
-        } else {
-            var onTimeHourVal = ""
-            var onTimeMinVal = ""
-            var offTimeHourVal = ""
-            var offTimeMinVal = ""
-
-            // data[6] is reserved and could be used for extra data
-
-            for(i in 7..8)
-                onTimeHourVal += data.elementAt(i)
-
-            for(i in 9..10)
-                onTimeMinVal += data.elementAt(i)
-
-            for(i in 11..12)
-                offTimeHourVal += data.elementAt(i)
-
-            for(i in 13..14)
-                offTimeMinVal += data.elementAt(i)
-
-
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = onTimeHourVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = onTimeMinVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = offTimeHourVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.commandValue = offTimeHourVal.toInt()
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.onOffState =
-                when(data.elementAt(15)){
-                    '1' -> true
-                    else -> false
-                }
-            return true
-        }
-    }
-
-    private fun retrieveSimpleNavigatorData(elementIndex: Int, data: String): Boolean{
-        // check the transmission length first
-        if(data.length < 11){
-            return false
-        } else {
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne =
-                when(data.elementAt(6)){
-                    '1' -> 1
-                    else -> 0
-                }
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo =
-                when(data.elementAt(7)){
-                    '1' -> 1
-                    else -> 0
-                }
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree =
-                when (data.elementAt(8)){
-                    '1' -> 1
-                    else -> 0
-                }
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueFour =
-                when (data.elementAt(9)){
-                    '1' -> 1
-                    else -> 0
-                }
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueFive =
-                when(data.elementAt(10)){
-                    '1' -> 1
-                    else -> 0
-                }
-            return true
-        }
-    }
-
-    private fun retrieveBarGraphDisplayData(elementIndex: Int, data: String): Boolean{
-        // check the transmission length first
-        if(data.length < 7){
-            return false
-        } else {
-            // at index 6 -> number of bars
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toString().toInt()
-            // at index 7 -> show value as bar-descriptor
-            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = data.elementAt(7).toString().toInt()
-            // at index 8 until string-end -> fixed maximum value
-            if(data.length > 8){
-                var fixedMaxVal = ""
-
-                data.forEachIndexed { index, c ->
-                    if(index > 7){
-                        fixedMaxVal += c
-                    }
-                }
-                this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = fixedMaxVal.toInt()
-            }
-        }
-        return true
-    }
+//    private fun retrieveBarGraphDisplayData(elementIndex: Int, data: String): Boolean{
+//        // check the transmission length first
+//        if(data.length < 7){
+//            return false
+//        } else {
+//            // at index 6 -> number of bars
+//            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toString().toInt()
+//            // at index 7 -> show value as bar-descriptor
+//            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = data.elementAt(7).toString().toInt()
+//            // at index 8 until string-end -> fixed maximum value
+//            if(data.length > 8){
+//                var fixedMaxVal = ""
+//
+//                data.forEachIndexed { index, c ->
+//                    if(index > 7){
+//                        fixedMaxVal += c
+//                    }
+//                }
+//                this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = fixedMaxVal.toInt()
+//            }
+//        }
+//        return true
+//    }
 
     private fun startComplexStateDataLoop(){
         if(verboseLog) {
@@ -3181,48 +1898,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: setup a timeout, to recognize if the device is responding
     }
 
-
-    private fun propertyIDFromStartEntry(data: String) : Int {
-        var propertyID = ""
-
-        data.forEachIndexed { index, c ->
-            when (index) {
-                0 -> if (c != 'P') return -1
-                1 -> if (c != 'D') return -1
-                2 -> if (c != ':') return -1
-                3 -> if (c != 'S') return -1
-                4 -> propertyID += c
-                5 -> propertyID += c
-                6 -> propertyID += c
-            }
-        }
-        // convert property ID to Int and check the value
-        val id =
-            propertyID.toInt()
-
-        return if (id < 256 && id > -1) { id } else -1
-    }
-
-//    private fun setDeviceTime(){
-//        // get the time and send the client command to the device
-//        val calendar = Calendar.getInstance()
-//        val hour = calendar.get(Calendar.HOUR_OF_DAY)// 24 hour format!
-//        val min = calendar.get(Calendar.MINUTE)
-//        val sec = calendar.get(Calendar.SECOND)
-//        val outString = "ScT&${a8BitValueAsTwoCharString(hour)}${a8BitValueAsTwoCharString(min)}${a8BitValueAsTwoCharString(sec)}$"
-//        if(verboseLog) {
-//            Log.d(
-//                "M:setDeviceTime",
-//                "Sending current local time to the device. Output Data is: $outString"
-//            )
-//        }
-//        this.sendData(outString)
-//    }
-
     fun doComplexPropertyStateRequestForPropertyIndex(propertyIndex: Int) {
-
         this.sendComplexPropertyStateRequest(propertyIndex)
-
     }
 
     private fun sendBindingRequest(useCustomKey: Boolean){
@@ -3292,10 +1969,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     PROPERTY_ELEMENT -> {
                         when (updateElement.updateType) {
                             UPDATE_TYPE_ELEMENT_DEFINITION -> {
-                                sendSinglePropertyRequest(updateElement.elementIndex)
+                                //sendSinglePropertyRequest(updateElement.elementIndex)
                             }
                             UPDATE_TYPE_DETAIL_DEFINITION -> {
-                                sendSinglePropertyResolveRequest(updateElement.elementID)
+                                //sendSinglePropertyResolveRequest(updateElement.elementID)
                             }
                         }
                     }
@@ -3305,7 +1982,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 //sendSinglePropertyGroupRequest(updateElement.elementIndex)
                             }
                             UPDATE_TYPE_DETAIL_DEFINITION -> {
-                                sendSingleGroupDetailRequest(updateElement.elementID)
+                                //sendSingleGroupDetailRequest(updateElement.elementID)
                             }
                         }
                     }
@@ -3391,7 +2068,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         return when(this.propertyTypeFromID(propertyID)){
             COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> true
-            // MARK: add all multicomplex properties here
+            // TODO: add all multicomplex properties here
             else -> false
         }
     }
@@ -3403,11 +2080,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         this.multiComplexPageID = -1
         this.multiComplexPropertyPageOpen = false
-        sendData(this.navigatedToDeviceMainPageNotification)
+
+        sendData(this.userNavigatedBackToDeviceMainNotification)
+
+
         // TODO: !!
     }
 
     fun notifyMultiComplexPropertyPageInvoked(propertyID: Int) {
+
+        // TODO: ?
+
         this.multiComplexPageID = propertyID
         this.multiComplexPropertyPageOpen = true
         this.multiComplexTypeID = this.propertyTypeFromID(propertyID)
@@ -3418,16 +2101,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 "Multi-Complex-Property-Page invoked notification send for property-ID: ${this.multiComplexPageID} and type-ID: ${this.multiComplexTypeID}"
             )
         }
-        sendData("${this.multiComplexPropertyPageInvokedStartEntry}${a8BitValueToString(propertyID)}$")
+
+        //sendData("${this.multiComplexPropertyPageInvokedStartEntry}${a8BitValueToString(propertyID)}$")
+
     }
 
     fun enableDeviceBinding(passKey: String){
-        this.sendData("$enableBindingSetterCommandEntry$passKey$")
+        //this.sendData("$enableBindingSetterCommandEntry$passKey$")
         this.isBindingRequired = true
     }
 
     fun releaseDeviceBinding(){
-        this.sendData(releaseDeviceBindingCommand)
+        //this.sendData(releaseDeviceBindingCommand)
         this.isBindingRequired = false
     }
 
