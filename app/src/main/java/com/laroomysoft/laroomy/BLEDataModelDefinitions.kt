@@ -65,13 +65,6 @@ class DeviceInfoHeaderData {
     }
 }
 
-class ElementUpdateInfo {
-    var elementID = -1
-    var elementIndex = -1
-    var elementType = -1
-    var updateType = -1
-}
-
 class MultiComplexPropertyData {
     var dataIndex = -1
     var dataName = ""

@@ -220,7 +220,7 @@
     <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Settings</string>
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
 
-    <!-- Image/ImageButton content descriptions -->
+    <!-- content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
     <string name="DeviceTypeHeaderImageButtonDescription">Remove the device and select a new device</string>
@@ -239,6 +239,7 @@
     <string name="NavigatorControlActivityRightButtonContentDescription" translatable="false">Send a right command to the remote device</string>
     <string name="NavigatorControlActivityLeftButtonContentDescription" translatable="false">Send an left command to the remote device</string>
     <string name="MainActivityAddButtonContentDescription" translatable="false">Add a new device to your list</string>
+    <string name="DeviceMainActivityPropertyListDescription" translatable="false">Shows the properties of the remote device</string>
 
     <!-- Activity Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>

@@ -24,11 +24,6 @@ private const val MAX_CONNECTION_ATTEMPTS = 10
 const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
 const val UPDATE_TYPE_DETAIL_DEFINITION = 2
 
-const val SINGLEACTION_NOT_PROCESSED = 1
-const val SINGLEACTION_PARTIALLY_PROCESSED = 2
-const val SINGLEACTION_PROCESSING_COMPLETE = 3
-const val SINGLEACTION_PROCESSING_ERROR = 4
-
 const val DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED = 1
 const val DEVICE_NOTIFICATION_BINDING_SUCCESS = 2
 const val DEVICE_NOTIFICATION_BINDING_ERROR = 3
@@ -94,7 +89,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var dataReadyToShow = false
     private var deviceHeaderRecordingActive = false
     private var updateStackProcessActive = false
-    private var multiComplexPropertyPageOpen = false
+    //private var multiComplexPropertyPageOpen = false
 
     private var suspendedDeviceAddress = ""
 
@@ -110,8 +105,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
 
-    private var multiComplexPageID = -1 // initialize with invalid marker
-    private var multiComplexTypeID = -1 // initialize with invalid marker
+    //private var multiComplexPageID = -1 // initialize with invalid marker
+    //private var multiComplexTypeID = -1 // initialize with invalid marker
     private lateinit var activityContext: Context
     //private lateinit var callingActivity: Activity
     private lateinit var callback: BleEventCallback
@@ -124,8 +119,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
-    var elementUpdateList = ArrayList<ElementUpdateInfo>()
-
 
     var currentUsedServiceUUID = ""
         // used to cache the current service uuid
@@ -578,7 +571,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.readSimpleStateData(pIndex, data, dataSize)
             } else {
                 // must be complex state data
-                this.readComplexStateData(pIndex, pType, data, dataSize)
+                this.readComplexStateData(pIndex, pType, data)
             }
             true
         } else {
@@ -635,7 +628,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun readComplexStateData(propertyIndex: Int, propertyType: Int, data: String, dataSize: Int){
+    private fun readComplexStateData(propertyIndex: Int, propertyType: Int, data: String){
         // forward the data regarding to the type
         when(propertyType){
             COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
@@ -721,6 +714,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.laRoomyPropertyGroupList[laRoomyDevicePropertyGroup.groupIndex] =
                         laRoomyDevicePropertyGroup
                 }
+                // update UI
+                this.updateGroupElementInUIList(laRoomyDevicePropertyGroup)
             }
             return true
         }
@@ -1269,17 +1264,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
         this.uIAdapterList.clear()
-        this.elementUpdateList.clear()
         this.singlePropertyRetrievingAction = false
         this.singleGroupRetrievingAction = false
         this.singlePropertyDetailRetrievingAction = false
         this.singleGroupDetailRetrievingAction = false
         this.updateStackProcessActive = false
-        this.multiComplexPropertyPageOpen = false
+        //this.multiComplexPropertyPageOpen = false
         this.currentPropertyResolveID = -1
         this.currentGroupResolveID = -1
-        this.multiComplexPageID = -1
-        this.multiComplexTypeID = -1
+        //this.multiComplexPageID = -1
+        //this.multiComplexTypeID = -1
         this.isBindingRequired = false
         this.isCurrentConnectionDoneWithSharedBindingKey = false
         this.passKeySecondTryOut = false
@@ -1300,17 +1294,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun clearPropertyRelatedParameter(){
         this.propertyUpToDate = false
         this.uIAdapterList.clear()
-        this.elementUpdateList.clear()
         this.singlePropertyRetrievingAction = false
         this.singleGroupRetrievingAction = false
         this.singlePropertyDetailRetrievingAction = false
         this.singleGroupDetailRetrievingAction = false
         this.updateStackProcessActive = false
-        this.multiComplexPropertyPageOpen = false
+        //this.multiComplexPropertyPageOpen = false
         this.currentPropertyResolveID = -1
         this.currentGroupResolveID = -1
-        this.multiComplexPageID = -1
-        this.multiComplexTypeID = -1
+        //this.multiComplexPageID = -1
+        //this.multiComplexTypeID = -1
 
         this.propertyRequestIndexCounter = 0
 
@@ -1721,84 +1714,84 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         )// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
     }
 
-    private fun resolveMultiComplexStateData(data: String, isName: Boolean){
-
-        if(verboseLog) {
-            Log.d(
-                "M:RslveMultiCmplx",
-                "ResolveMultiComplexStateData invoked - isName = $isName / data = $data"
-            )
-        }
-
-        if(this.multiComplexPropertyPageOpen){
-            val dataIndex = data.elementAt(4).toString().toInt()
-            var name = ""
-
-            if(isName){
-                data.forEachIndexed { index, c ->
-                    if(index > 4){
-                        name += c
-                    }
-                }
-
-                val mcd = MultiComplexPropertyData()
-                mcd.isName = true
-                mcd.dataName = name
-                mcd.dataIndex = dataIndex
-
-                // trigger event
-                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
-            } else {
-                this.resolveSpecificMultiComplexStateData(data, dataIndex)
-            }
-        } else {
-            // send error notification ?!
-            Log.e(
-                "M:RslveMultiCmplx",
-                "ResolveMultiComplexStateData error: multi-complex page not open!"
-            )
-        }
-    }
-
-    private fun resolveSpecificMultiComplexStateData(data: String, dataIndex: Int){
-
-        when(this.multiComplexTypeID){
-            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
-                var stringData = ""
-//                stringData += data.elementAt(5)
-//                stringData += data.elementAt(6)
-//                stringData += data.elementAt(7)
-
-//                try {
-//                    for (i in 5 until data.length) {
-//                        stringData += data.elementAt(i)
+//    private fun resolveMultiComplexStateData(data: String, isName: Boolean){
+//
+//        if(verboseLog) {
+//            Log.d(
+//                "M:RslveMultiCmplx",
+//                "ResolveMultiComplexStateData invoked - isName = $isName / data = $data"
+//            )
+//        }
+//
+//        if(this.multiComplexPropertyPageOpen){
+//            val dataIndex = data.elementAt(4).toString().toInt()
+//            var name = ""
+//
+//            if(isName){
+//                data.forEachIndexed { index, c ->
+//                    if(index > 4){
+//                        name += c
 //                    }
 //                }
-//                catch(e: IndexOutOfBoundsException){
-//                    Log.e("M:resolveSMCSD", "Exception in \"resolveSpecificMultiComplexStateData\" Message: ${e.localizedMessage}")
-//                    return
+//
+//                val mcd = MultiComplexPropertyData()
+//                mcd.isName = true
+//                mcd.dataName = name
+//                mcd.dataIndex = dataIndex
+//
+//                // trigger event
+//                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
+//            } else {
+//                this.resolveSpecificMultiComplexStateData(data, dataIndex)
+//            }
+//        } else {
+//            // send error notification ?!
+//            Log.e(
+//                "M:RslveMultiCmplx",
+//                "ResolveMultiComplexStateData error: multi-complex page not open!"
+//            )
+//        }
+//    }
+
+//    private fun resolveSpecificMultiComplexStateData(data: String, dataIndex: Int){
+//
+//        when(this.multiComplexTypeID){
+//            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
+//                var stringData = ""
+////                stringData += data.elementAt(5)
+////                stringData += data.elementAt(6)
+////                stringData += data.elementAt(7)
+//
+////                try {
+////                    for (i in 5 until data.length) {
+////                        stringData += data.elementAt(i)
+////                    }
+////                }
+////                catch(e: IndexOutOfBoundsException){
+////                    Log.e("M:resolveSMCSD", "Exception in \"resolveSpecificMultiComplexStateData\" Message: ${e.localizedMessage}")
+////                    return
+////                }
+//
+//                data.forEachIndexed { index, c ->
+//                    if(index > 4){
+//                        stringData += c
+//                    }
 //                }
-
-                data.forEachIndexed { index, c ->
-                    if(index > 4){
-                        stringData += c
-                    }
-                }
-
-                val mcd = MultiComplexPropertyData()
-                mcd.dataIndex = dataIndex
-                mcd.dataValue = stringData.toInt()
-                mcd.isName = false
-
-                // trigger event
-                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
-            }
-            else -> {
-                // send error?
-            }
-        }
-
-    }
+//
+//                val mcd = MultiComplexPropertyData()
+//                mcd.dataIndex = dataIndex
+//                mcd.dataValue = stringData.toInt()
+//                mcd.isName = false
+//
+//                // trigger event
+//                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
+//            }
+//            else -> {
+//                // send error?
+//            }
+//        }
+//
+//    }
 
     private fun propertyTypeFromID(ID: Int) : Int {
         this.laRoomyDevicePropertyList.forEach {
@@ -1953,117 +1946,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-
-    private fun startUpdateStackProcessing(){
-        if(this.elementUpdateList.isNotEmpty()) {
-            if(!this.updateStackProcessActive) {
-
-                if(verboseLog) {
-                    Log.d("M:startUSP", "Update stack processing started..")
-                }
-                this.updateStackProcessActive = true
-
-                val updateElement = this.elementUpdateList.elementAt(0)
-
-                when (updateElement.elementType) {
-                    PROPERTY_ELEMENT -> {
-                        when (updateElement.updateType) {
-                            UPDATE_TYPE_ELEMENT_DEFINITION -> {
-                                //sendSinglePropertyRequest(updateElement.elementIndex)
-                            }
-                            UPDATE_TYPE_DETAIL_DEFINITION -> {
-                                //sendSinglePropertyResolveRequest(updateElement.elementID)
-                            }
-                        }
-                    }
-                    GROUP_ELEMENT -> {
-                        when (updateElement.updateType) {
-                            UPDATE_TYPE_ELEMENT_DEFINITION -> {
-                                //sendSinglePropertyGroupRequest(updateElement.elementIndex)
-                            }
-                            UPDATE_TYPE_DETAIL_DEFINITION -> {
-                                //sendSingleGroupDetailRequest(updateElement.elementID)
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            this.updateStackProcessActive = false
-        }
-    }
-
-//    private fun processElementUpdateStack(data: String): Boolean {
-//        return if(this.updateStackProcessActive) {
-//            if(verboseLog) {
-//                Log.d("M:USP", "ProcessElementUpdateStack invoked. Check transmission..")
-//            }
-//
-//            val singleAction = this.checkSingleAction(data)
-//            val processed = singleAction != SINGLEACTION_NOT_PROCESSED
-//
-//            // check if the first element was processed
-//            if (singleAction == SINGLEACTION_PROCESSING_COMPLETE) {
-//                if(verboseLog) {
-//                    Log.d(
-//                        "M:USP",
-//                        "ProcessElementUpdateStack - Element processed - remove the last and look for other elements in the array"
-//                    )
-//                }
-//
-//                // remove the element
-//                this.elementUpdateList.removeAt(0)
-//                // check if there are elements left in the array
-//                if(this.elementUpdateList.isNotEmpty()){
-//
-//                    val updateElement = this.elementUpdateList.elementAt(0)
-//
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:USP",
-//                            "ProcessElementUpdateStack - Request next element: ID: ${updateElement.elementID} Index: ${updateElement.elementIndex}"
-//                        )
-//                    }
-//
-//                    when (updateElement.elementType) {
-//                        PROPERTY_ELEMENT -> {
-//                            when (updateElement.updateType) {
-//                                UPDATE_TYPE_ELEMENT_DEFINITION -> {
-//                                    sendSinglePropertyRequest(updateElement.elementIndex)
-//                                }
-//                                UPDATE_TYPE_DETAIL_DEFINITION -> {
-//                                    sendSinglePropertyResolveRequest(updateElement.elementID)
-//                                }
-//                            }
-//                        }
-//                        GROUP_ELEMENT -> {
-//                            when (updateElement.updateType) {
-//                                UPDATE_TYPE_ELEMENT_DEFINITION -> {
-// //                                   sendSinglePropertyGroupRequest(updateElement.elementIndex)
-//                                }
-//                                UPDATE_TYPE_DETAIL_DEFINITION -> {
-//                                    sendSingleGroupDetailRequest(updateElement.elementID)
-//                                }
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    if(verboseLog) {
-//                        Log.d(
-//                            "M:USP",
-//                            "ProcessElementUpdateStack - NO MORE ELEMENTS LEFT - Stop update process"
-//                        )
-//                    }
-//                    this.updateStackProcessActive = false
-//                }
-//            }
-//            processed
-//        } else {
-//            false
-//        }
-//
-//    }
-
     fun isMultiComplexProperty(propertyID: Int) : Boolean{
 
         return when(this.propertyTypeFromID(propertyID)){
@@ -2078,8 +1960,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO !!!!!!!!!!!!!!!!!!!
 
 
-        this.multiComplexPageID = -1
-        this.multiComplexPropertyPageOpen = false
+        //this.multiComplexPageID = -1
+        //this.multiComplexPropertyPageOpen = false
 
         sendData(this.userNavigatedBackToDeviceMainNotification)
 
@@ -2087,23 +1969,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: !!
     }
 
-    fun notifyMultiComplexPropertyPageInvoked(propertyID: Int) {
+    fun notifyComplexPropertyPageInvoked(propertyID: Int) {
 
         // TODO: ?
 
-        this.multiComplexPageID = propertyID
-        this.multiComplexPropertyPageOpen = true
-        this.multiComplexTypeID = this.propertyTypeFromID(propertyID)
+        //this.multiComplexPageID = propertyID
+        //this.multiComplexPropertyPageOpen = true
+        //this.multiComplexTypeID = this.propertyTypeFromID(propertyID)
 
         if(verboseLog) {
             Log.d(
                 "M:NotifyMCPPI",
-                "Multi-Complex-Property-Page invoked notification send for property-ID: ${this.multiComplexPageID} and type-ID: ${this.multiComplexTypeID}"
+                "Multi-Complex-Property-Page invoked - sending notification - property-ID: $propertyID"
             )
         }
+        //(this.activityContext.applicationContext as ApplicationProperty).logControl("I: Multi-Complex-Property-Page invoked - sending notification - property-ID: $propertyID")
 
-        //sendData("${this.multiComplexPropertyPageInvokedStartEntry}${a8BitValueToString(propertyID)}$")
+        var notification = "50"
+        notification += a8bitValueTo2CharHexValue(propertyID)
+        notification += "02003\r"
 
+        sendData(notification)
     }
 
     fun enableDeviceBinding(passKey: String){
@@ -2115,23 +2001,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         //this.sendData(releaseDeviceBindingCommand)
         this.isBindingRequired = false
     }
-
-//    private fun tryUseSavedPassKeyForSpecificMacAddress(macAddress: String) : String {
-//        val bindingPairManager = BindingPairManager(this.activityContext)
-//        return bindingPairManager.lookUpForPassKeyWithMacAddress(macAddress)
-//    }
-
-//    fun formatIncomingData(data: String) : String {
-//
-//        var dOut = ""
-//
-//        data.forEach {
-//            if((it != '\r') && (it != '\n')){
-//                dOut += it
-//            }
-//        }
-//        return dOut
-//    }
 
     private fun stopAllPendingLoopsAndResetParameter(){
 
@@ -2204,6 +2073,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.internalElementIndex = laRoomyDeviceProperty.propertyIndex
                 devicePropertyListContentInformation.propertyType = laRoomyDeviceProperty.propertyType
                 devicePropertyListContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
+
+                this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                return@forEachIndexed
+            }
+        }
+    }
+
+    private fun updateGroupElementInUIList(laRoomyDevicePropertyGroup: LaRoomyDevicePropertyGroup){
+
+        this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+
+            if(laRoomyDevicePropertyGroup.groupIndex == devicePropertyListContentInformation.internalElementIndex){
+
+                devicePropertyListContentInformation.elementType = GROUP_ELEMENT
+                devicePropertyListContentInformation.canNavigateForward = false
+                devicePropertyListContentInformation.elementText = laRoomyDevicePropertyGroup.groupName
+                devicePropertyListContentInformation.imageID = laRoomyDevicePropertyGroup.imageID
 
                 this.propertyCallback.onUIAdaptableArrayItemChanged(index)
                 return@forEachIndexed

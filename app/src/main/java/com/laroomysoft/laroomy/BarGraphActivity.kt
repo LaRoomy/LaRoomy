@@ -126,7 +126,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             this.mustReconnect = false
         } else {
             // notify the device that multi-complex property was invoked
-            ApplicationProperty.bluetoothConnectionManager.notifyMultiComplexPropertyPageInvoked(this.relatedElementID)
+            ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(this.relatedElementID)
         }
     }
 
