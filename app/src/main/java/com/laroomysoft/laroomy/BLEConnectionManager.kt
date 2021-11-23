@@ -14,15 +14,15 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-private const val MAX_CONNECTION_ATTEMPTS = 10
+//private const val MAX_CONNECTION_ATTEMPTS = 10
 
 //const val UNKNOWN_DEVICETYPE = 0
 //const val LAROOMYDEVICETYPE_XNG = 1
 //const val LAROOMYDEVICETYPE_CTX = 2
 //const val LAROOMYDEVICETYPE_TVM = 3
 
-const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
-const val UPDATE_TYPE_DETAIL_DEFINITION = 2
+//const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
+//const val UPDATE_TYPE_DETAIL_DEFINITION = 2
 
 const val DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED = 1
 const val DEVICE_NOTIFICATION_BINDING_SUCCESS = 2
@@ -38,8 +38,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
 
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-
-
 
     // static notifications
     private val propertyLoadingCompleteNotification = "5000030010\r"        // sent when the retrieving of the properties is complete (raw loading - not from cache)
@@ -71,32 +69,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     var isCurrentConnectionDoneWithSharedBindingKey = false
 
-    private var authRequired = true
     private var propertyLoopActive = false
-    private var propertyNameResolveLoopActive = false
-    private var passKeySecondTryOut = false
     private var groupLoopActive = false
-    private var groupInfoLoopActive = false
-    private var propertyConfirmationModeActive = false
-    private var propertyNameResolveSingleAction = false
-    private var propertyGroupNameResolveSingleAction = false
-    private var singlePropertyRetrievingAction = false
-    private var singlePropertyDetailRetrievingAction = false
-    private var singleGroupRetrievingAction = false
-    private var singleGroupDetailRetrievingAction = false
     private var isResumeConnectionAttempt = false
-    private var propertyUpToDate = false
     private var dataReadyToShow = false
-    private var deviceHeaderRecordingActive = false
-    private var updateStackProcessActive = false
-    //private var multiComplexPropertyPageOpen = false
 
     private var suspendedDeviceAddress = ""
 
-    private var currentPropertyResolveID = -1 // initialize with invalid marker
-    private var currentPropertyResolveIndex = -1 // initialize with invalid marker
-    private var currentGroupResolveID = -1 // initialize with invalid marker
-    private var currentGroupResolveIndex = -1 // initialize with invalid marker
 
     // parameter regarding the complex state loop
     private var currentComplexStateRetrievingIndex = -1 // initialize with invalid marker
@@ -104,11 +83,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var complexStatePropertyIndexes = ArrayList<Int>()
 
 
-
-    //private var multiComplexPageID = -1 // initialize with invalid marker
-    //private var multiComplexTypeID = -1 // initialize with invalid marker
     private lateinit var activityContext: Context
-    //private lateinit var callingActivity: Activity
     private lateinit var callback: BleEventCallback
     private lateinit var propertyCallback: PropertyCallback
     var currentDevice: BluetoothDevice? = null
@@ -141,46 +116,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         get() {
             // clear the list:
             field.clear()
-            // check if the user wants to list all bonded devices
-            val listAllDevices =
-                (activityContext.applicationContext as ApplicationProperty).loadBooleanData(
-                    R.string.FileKey_AppSettings,
-                    R.string.DataKey_ListAllDevices
-                )
-            // fill the list with all bonded devices
-            if (listAllDevices) {
 
-                var imageIndex = 0
+            // add the data
+            this.bleAdapter?.bondedDevices?.forEach {
+                val device = LaRoomyDevicePresentationModel()
+                device.name = it.name
+                device.address = it.address
+                device.image = 0
 
-                this.bleAdapter?.bondedDevices?.forEach {
-                    val device = LaRoomyDevicePresentationModel()
-                    device.name = it.name
-                    device.address = it.address
-
-                    //device.type = laRoomyDeviceTypeFromName(it.name)
-
-                    if(device.name.contains("laroomy", true)||(device.name.contains("lry", true))){
-                        device.image = R.drawable.laroomy_icon_sq64
-                    } else {
-                        device.image = imageFromIndexCounter(imageIndex)
-                        imageIndex++
-                    }
-                    field.add(device)
-                }
-            } else {
-                // fill the list only with laroomy devices (or devices which follow the laroomy-name guidelines)
-                this.bleAdapter?.bondedDevices?.forEach {
-                    // It is not possible to get the uuids from the device here
-                    // -> so the name must be the criteria to identify a laroomy device!
-                    if (it.name.startsWith("Laroomy") || it.name.contains("LRY", true) || it.name.contains("laroomy", true)) {
-                        val device = LaRoomyDevicePresentationModel()
-                        device.name = it.name
-                        device.address = it.address
-                        device.image = R.drawable.laroomy_icon_sq64
-                        //device.type = laRoomyDeviceTypeFromName(it.name)
-                        field.add(device)
-                    }
-                }
+                field.add(device)
             }
             return field
         }
@@ -196,15 +140,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private val requestEnableBT: Int = 13
 
-    private var propertyDetailChangedOnConfirmation = false
-    private var groupDetailChangedOnConfirmation = false
-
-    private var connectionAttemptCounter = 0// remove!
-
-    private var propertyRequestIndexCounter = 0
-    private var groupRequestIndexCounter = 0
-
-    private var itemAddCounter = -1
+    private var uIItemAddCounter = -1
 
 
     // callback implementation for BluetoothGatt
@@ -479,24 +415,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             when(data[8]){
                 '1' -> {
-                    // property state changed notification
-                    sendPropertyStateRequest(elementIndex)
-                }
-                '2' -> {
-                    // property element changed notification
-                    sendSinglePropertyRequest(elementIndex)
-                }
-                '3' -> {
-                    // group element changed notification
-                    sendSingleGroupRequest(elementIndex)
-                }
-                '4' -> {
-                    // device-header / user-message notification
+                    // user-message notification
                     handleUserMessage(data, dataSize)
                 }
-                '5' -> {
+                '2' -> {
                     // time request notification from device
                     handleTimeRequest()
+                }
+                '3' -> {
+                    // property invalidated notification
+                    this.reloadProperties()
+                }
+                '4' -> {
+
+                }
+                '5' -> {
+
                 }
                 else -> {
                     if(verboseLog){
@@ -1200,22 +1134,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData(rqString)
     }
 
-    private fun sendSinglePropertyRequest(propertyIndex: Int){
-
-        // if the loop is not active, the property will be updated, not added
-
-        //this.singlePropertyRetrievingAction = true
-
-        // invalidate parameter???
-
-        // TODO!
-    }
-
-    private fun sendSingleGroupRequest(groupIndex: Int){
-        //this.singleGroupRetrievingAction = true
-
-        // TODO!
-    }
+//    private fun sendSinglePropertyRequest(propertyIndex: Int){
+//
+//        // if the loop is not active, the property will be updated, not added
+//
+//        //this.singlePropertyRetrievingAction = true
+//
+//        // invalidate parameter???
+//
+//        // TODO!
+//    }
+//
+//    private fun sendSingleGroupRequest(groupIndex: Int){
+//        //this.singleGroupRetrievingAction = true
+//
+//        // TODO!
+//    }
 
     ///////////////////////////////////////////////////////////////// section!
 
@@ -1257,34 +1191,34 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.currentDevice = null
         this.currentUsedServiceUUID = ""
         this.isConnected = false
-        this.authRequired = true
-        this.propertyUpToDate = false
+        //this.authRequired = true
+        //this.propertyUpToDate = false
         this.connectionTestSucceeded = false
         this.connectionSuspended = false
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
         this.uIAdapterList.clear()
-        this.singlePropertyRetrievingAction = false
-        this.singleGroupRetrievingAction = false
-        this.singlePropertyDetailRetrievingAction = false
-        this.singleGroupDetailRetrievingAction = false
-        this.updateStackProcessActive = false
+        //this.singlePropertyRetrievingAction = false
+        //this.singleGroupRetrievingAction = false
+        //this.singlePropertyDetailRetrievingAction = false
+        //this.singleGroupDetailRetrievingAction = false
+        //this.updateStackProcessActive = false
         //this.multiComplexPropertyPageOpen = false
-        this.currentPropertyResolveID = -1
-        this.currentGroupResolveID = -1
+        //this.currentPropertyResolveID = -1
+        //this.currentGroupResolveID = -1
         //this.multiComplexPageID = -1
         //this.multiComplexTypeID = -1
         this.isBindingRequired = false
         this.isCurrentConnectionDoneWithSharedBindingKey = false
-        this.passKeySecondTryOut = false
+        //this.passKeySecondTryOut = false
 
-        this.propertyRequestIndexCounter = 0
+        //this.propertyRequestIndexCounter = 0
 
         this.propertyLoopActive = false
-        this.propertyNameResolveLoopActive = false
+        //this.propertyNameResolveLoopActive = false
         this.groupLoopActive = false
-        this.groupInfoLoopActive = false
-        this.deviceHeaderRecordingActive = false
+        //this.groupInfoLoopActive = false
+        //this.deviceHeaderRecordingActive = false
 
         this.laRoomyDevicePropertyList.clear()
         this.laRoomyPropertyGroupList.clear()
@@ -1292,26 +1226,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun clearPropertyRelatedParameter(){
-        this.propertyUpToDate = false
+        //this.propertyUpToDate = false
         this.uIAdapterList.clear()
-        this.singlePropertyRetrievingAction = false
-        this.singleGroupRetrievingAction = false
-        this.singlePropertyDetailRetrievingAction = false
-        this.singleGroupDetailRetrievingAction = false
-        this.updateStackProcessActive = false
+        //this.singlePropertyRetrievingAction = false
+        //this.singleGroupRetrievingAction = false
+        //this.singlePropertyDetailRetrievingAction = false
+        //this.singleGroupDetailRetrievingAction = false
+        //this.updateStackProcessActive = false
         //this.multiComplexPropertyPageOpen = false
-        this.currentPropertyResolveID = -1
-        this.currentGroupResolveID = -1
+        //this.currentPropertyResolveID = -1
+        //this.currentGroupResolveID = -1
         //this.multiComplexPageID = -1
         //this.multiComplexTypeID = -1
 
-        this.propertyRequestIndexCounter = 0
+        //this.propertyRequestIndexCounter = 0
 
         this.propertyLoopActive = false
-        this.propertyNameResolveLoopActive = false
+        //this.propertyNameResolveLoopActive = false
         this.groupLoopActive = false
-        this.groupInfoLoopActive = false
-        this.deviceHeaderRecordingActive = false
+        //this.groupInfoLoopActive = false
+        //this.deviceHeaderRecordingActive = false
 
         this.laRoomyDevicePropertyList.clear()
         this.laRoomyPropertyGroupList.clear()
@@ -1379,7 +1313,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.connectToRemoteDevice(address)
     }
 
-    fun connectToRemoteDevice(macAddress: String?){
+    private fun connectToRemoteDevice(macAddress: String?){
         this.currentDevice =
             BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
         this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
@@ -1394,6 +1328,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
     }
 
+/*
     private fun connect(){
         if(this.currentDevice != null) {
             this.bluetoothGatt =
@@ -1402,6 +1337,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         else
             this.callback.onConnectionAttemptFailed(activityContext.getString(R.string.Error_ConnectionFailed_NoDevice))
     }
+*/
 
     fun sendData(data: String){
 
@@ -1610,12 +1546,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         this.uIAdapterList.add(propertyEntry)
 
                         // check if the member-id-array in the group element contains this element
-                        if(!this.laRoomyPropertyGroupList.elementAt(expectedGroupIndex).memberIDs.contains(laRoomyDeviceProperty.propertyIndex)){
-                            if(verboseLog){
-                                Log.w("generateUIArray", "Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
-                            }
-                            applicationProperty.logControl("W: Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
-                        }
+//                        if(!this.laRoomyPropertyGroupList.elementAt(expectedGroupIndex).memberIDs.contains(laRoomyDeviceProperty.propertyIndex)){
+//                            if(verboseLog){
+//                                Log.w("generateUIArray", "Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
+//                            }
+//                            applicationProperty.logControl("W: Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
+//                        }
 
                         // check if this is the last property element
                         if(laRoomyDevicePropertyList.size == index + 1){
@@ -1676,7 +1612,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
         // add the elements with a timer-delay
-        itemAddCounter = 0
+        uIItemAddCounter = 0
 
         Timer().scheduleAtFixedRate(
             object : TimerTask() {
@@ -1684,15 +1620,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     try {
                         propertyCallback.onUIAdaptableArrayListItemAdded(
                             uIAdapterList.elementAt(
-                                itemAddCounter
+                                uIItemAddCounter
                             )
                         )
 
-                        itemAddCounter++
+                        uIItemAddCounter++
 
-                        if (itemAddCounter == uIAdapterList.size) {
+                        if (uIItemAddCounter == uIAdapterList.size) {
                             cancel()
-                            itemAddCounter = -1
+                            uIItemAddCounter = -1
                             dataReadyToShow = true
                             propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
                         }
@@ -2007,25 +1943,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // TODO: make sure to cover all parameter
 
         this.propertyLoopActive = false
-        this.propertyNameResolveLoopActive = false
+        //this.propertyNameResolveLoopActive = false
         this.groupLoopActive = false
-        this.groupInfoLoopActive = false
+        //this.groupInfoLoopActive = false
         this.complexStateLoopActive = false
-        this.deviceHeaderRecordingActive = false
+        //this.deviceHeaderRecordingActive = false
 
         this.complexStatePropertyIndexes.clear()
 
-        this.currentPropertyResolveID = -1
-        this.currentGroupResolveIndex = -1
-        this.groupRequestIndexCounter = -1
+        //this.currentPropertyResolveID = -1
+        //this.currentGroupResolveIndex = -1
+        //this.groupRequestIndexCounter = -1
         this.currentComplexStateRetrievingIndex = -1
 
-        this.propertyNameResolveSingleAction = false
-        this.propertyGroupNameResolveSingleAction = false
-        this.propertyConfirmationModeActive = false
-        this.groupDetailChangedOnConfirmation = false
-        this.propertyDetailChangedOnConfirmation = false
-        this.propertyUpToDate = false // TODO: is this right???
+        //this.propertyNameResolveSingleAction = false
+        //this.propertyGroupNameResolveSingleAction = false
+        //this.propertyConfirmationModeActive = false
+        //this.groupDetailChangedOnConfirmation = false
+        //this.propertyDetailChangedOnConfirmation = false
+        //this.propertyUpToDate = false // TODO: is this right???
     }
 
     // new helpers

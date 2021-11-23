@@ -4,8 +4,6 @@ import android.graphics.Color
 import android.util.Log
 import android.widget.SeekBar
 
-const val UNDEFINED = -1
-
 const val PASSKEY_TYPE_NONE = 0
 const val PASSKEY_TYPE_SHARED = 1
 const val PASSKEY_TYPE_CUSTOM = 2
@@ -24,9 +22,6 @@ const val UC_PIN_CHANGE_MODE = '1'
 const val USERMESSAGE_TYPE_INFO = '0'
 const val USERMESSAGE_TYPE_WARNING = '1'
 const val USERMESSAGE_TYPE_ERROR = '2'
-
-
-
 
 
 class LaRoomyDevicePresentationModel {
@@ -85,7 +80,7 @@ class ComplexPropertyState {
     var valueFive = -1     // general use                   // flag value in simple Navigator
     var commandValue =
         -1  // (Command in RGB Selector)     // (not used in ExtendedLevelSelector)      // (??
-    var enabledState = true// at this time only a placeholder (not implemented yet)
+    //var enabledState = true// at this time only a placeholder (not implemented yet)
     var onOffState =
         false // (used in RGB Selector)    // used in ExLevelSelector                  // not used(for on/off use extra property)  //  not used(for on/off use extra property)
     var strValue = ""
@@ -94,7 +89,7 @@ class ComplexPropertyState {
     // single used values (only valid in specific complex states)
     var hardTransitionFlag =
         false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
-    var timeSetterIndex = -1        // Value to identify the time setter type
+    //var timeSetterIndex = -1        // Value to identify the time setter type
 }
 
 abstract class IComplexPropertySubTypeProtocolClass {
@@ -1008,7 +1003,6 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener {
         this.isGroupMember = false
         this.isLastInGroup = false
         this.elementType = -1
-        //this.indexInsideGroup = -1
         this.globalIndex = -1
         this.elementText = ""
         this.internalElementIndex = -1
@@ -1047,7 +1041,7 @@ class LaRoomyDeviceProperty {
     var isGroupMember = false
     var groupIndex = -1
     var imageID = -1
-    var hasChanged = false
+    //var hasChanged = false
     var propertyState = -1
     var flags = -1
     var complexPropertyState = ComplexPropertyState()
@@ -1143,26 +1137,6 @@ class LaRoomyDeviceProperty {
         }
     }
 
-    fun checkRawEquality(ldp: LaRoomyDeviceProperty): Boolean {
-        return ((ldp.propertyType == this.propertyType) && (ldp.propertyIndex == this.propertyIndex) && (ldp.imageID == this.imageID))
-    }
-
-    private fun isNumber(char: Char): Boolean {
-        return when (char) {
-            '0' -> true
-            '1' -> true
-            '2' -> true
-            '3' -> true
-            '4' -> true
-            '5' -> true
-            '6' -> true
-            '7' -> true
-            '8' -> true
-            '9' -> true
-            else -> false
-        }
-    }
-
     override fun hashCode(): Int {
         var result = propertyIndex
         result = 31 * result + propertyType
@@ -1170,7 +1144,7 @@ class LaRoomyDeviceProperty {
         result = 31 * result + isGroupMember.hashCode()
         result = 31 * result + groupIndex
         result = 31 * result + imageID
-        result = 32 * result + hasChanged.hashCode()
+        //result = 32 * result + hasChanged.hashCode()
         return result
     }
 }
@@ -1180,9 +1154,8 @@ class LaRoomyDevicePropertyGroup {
     var groupIndex = -1
     var groupName = "unset"
     var memberCount = 0
-    var memberIDs = ArrayList<Int>()
     var imageID = -1
-    var hasChanged = false
+    //var hasChanged = false
 
     override fun equals(other: Any?): Boolean {
         // check reference equality
@@ -1193,7 +1166,7 @@ class LaRoomyDevicePropertyGroup {
         if (other.groupIndex != this.groupIndex) return false
         //if(other.groupName != this.groupName)return false // the comparison of this member is not reasonable, because the element is not defined in the group-string
         if (other.memberCount != this.memberCount) return false
-        if (other.memberIDs != this.memberIDs) return false
+        //if (other.memberIDs != this.memberIDs) return false
         if (other.imageID != this.imageID) return false
         // all data is the same -> return true
         return true
@@ -1223,24 +1196,8 @@ class LaRoomyDevicePropertyGroup {
                 this.imageID = Integer.decode(imgID)
 
 
-                // make sure the string is long enough for all members
-                val minLength = 12 + (2 * this.memberCount)
-
-                // extract member id's
-                if (groupString.length >= minLength) {
-
-                    var hexVal = "0x"
-
-                    for (i in 0 until this.memberCount) {
-                        val index = 12 + (i * 2)
-                        hexVal += groupString[index]
-                        hexVal += groupString[index + 1]
-                        this.memberIDs.add(Integer.decode(hexVal))
-                        hexVal = "0x"
-                    }
-                }
                 // get the descriptor
-                this.groupName = groupString.removeRange(0, minLength)
+                this.groupName = groupString.removeRange(0, 12)
                 this.groupName = this.groupName.removeSuffix("\r")
 
                 if (verboseLog) {
@@ -1248,10 +1205,6 @@ class LaRoomyDevicePropertyGroup {
                     Log.d("M:PropGroup:fromString", "GroupIndex: ${this.groupIndex}")
                     Log.d("M:PropGroup:fromString", "MemberAmount: ${this.memberCount}")
                     Log.d("M:PropGroup:fromString", "GroupImageID: ${this.imageID}")
-                    Log.d("M:PropGroup:fromString", "Member IDs:")
-                    this.memberIDs.forEachIndexed { index, i ->
-                        Log.d("M:PropGroup:fromString", "Index: $index ID: $i")
-                    }
                 }
             }
         } catch (except: Exception) {
@@ -1259,26 +1212,11 @@ class LaRoomyDevicePropertyGroup {
         }
     }
 
-    fun checkRawEquality(ldpg: LaRoomyDevicePropertyGroup): Boolean {
-        return ((this.groupIndex == ldpg.groupIndex) && (this.imageID == ldpg.imageID) && (this.memberCount == ldpg.memberCount))
-    }
-
-//    fun setMemberIDs(id1: Int, id2: Int, id3: Int, id4: Int, id5: Int){
-//        this.memberIDs.clear()
-//        this.memberIDs.add(id1)
-//        this.memberIDs.add(id2)
-//        this.memberIDs.add(id3)
-//        this.memberIDs.add(id4)
-//        this.memberIDs.add(id5)
-//    }
-
     override fun hashCode(): Int {
         var result = groupIndex
         result = 31 * result + groupName.hashCode()
         result = 31 * result + memberCount
-        result = 31 * result + memberIDs.hashCode()
         result = 31 * result + imageID
-        result = 31 * result + hasChanged.hashCode()
         return result
     }
 }

@@ -27,6 +27,22 @@ fun colorForPercentageLevel(level: Int): Int {
     else Color.GREEN
 }
 
+fun isNumber(char: Char): Boolean {
+    return when (char) {
+        '0' -> true
+        '1' -> true
+        '2' -> true
+        '3' -> true
+        '4' -> true
+        '5' -> true
+        '6' -> true
+        '7' -> true
+        '8' -> true
+        '9' -> true
+        else -> false
+    }
+}
+
 fun colorForUserMessageType(type: Char) : Int {
     return when(type){
         '0' -> R.color.InfoColor
@@ -319,7 +335,36 @@ fun deviceImageFromName(name: String): Int {
     return when {
         (isLaroomyDevice(name)) -> R.drawable.laroomy_icon_sq64
         else -> {
-            R.drawable.ic_settings_remote_white_48dp
+            when {
+                name.contains("HME") -> {
+                    R.drawable.ic_home_white_48dp
+                }
+                name.contains("LGB") -> {
+                    R.drawable.ic_light_bulb_white_48dp
+                }
+                name.contains("RMT") -> {
+                    R.drawable.ic_settings_remote_white_48dp
+                }
+                name.contains("ANL") -> {
+                    R.drawable.ic_analytics_white_48dp
+                }
+                name.contains("WFS") -> {
+                    R.drawable.ic_wifi_white_48dp
+                }
+                name.contains("TSP") -> {
+                    R.drawable.ic_schedule_white_48dp
+                }
+                name.contains("TNE") -> {
+                    R.drawable.ic_tune_white_48dp
+                }
+                name.contains("LCK") -> {
+                    R.drawable.ic_lock_open_white_48dp
+                }
+                else -> {
+                    R.drawable.ic_bluetooth_connected_white_48dp
+                }
+            }
+
         }
     }
 }

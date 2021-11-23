@@ -240,6 +240,7 @@
     <string name="NavigatorControlActivityLeftButtonContentDescription" translatable="false">Send an left command to the remote device</string>
     <string name="MainActivityAddButtonContentDescription" translatable="false">Add a new device to your list</string>
     <string name="DeviceMainActivityPropertyListDescription" translatable="false">Shows the properties of the remote device</string>
+    <string name="AddDeviceListElementContentDescription" translatable="false">Adds the device to the known devices</string>
 
     <!-- Activity Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
