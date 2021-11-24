@@ -53,7 +53,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@NavigatorControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).setOnTouchListener(this)
@@ -86,7 +86,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         // when the user navigates back, do a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
         // close activity
         finish()
         if(!isStandAlonePropertyMode) {
@@ -104,7 +104,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             Log.d("M:NavCon:onResume", "onResume executed in Navigator Control Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@NavigatorControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
@@ -114,6 +114,9 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             }
             ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
+        } else {
+            // notify the remote device of the invocation of this property-page
+            ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(this.relatedElementID)
         }
     }
 

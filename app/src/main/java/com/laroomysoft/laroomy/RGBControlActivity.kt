@@ -109,7 +109,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         this.headerTextView = findViewById(R.id.rgbHeaderTextView)
         this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this, this@RGBControlActivity)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get program speed seekBar
@@ -173,7 +173,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementIndex
+        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementIndex
         // close activity
         finish()
         if(!isStandAlonePropertyMode) {
@@ -217,7 +217,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             Log.d("M:RGBPage:onResume", "onResume executed in RGBControlActivity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@RGBControlActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // TODO: test if the dualContainer will be set visible on reConnection (otherwise make the visibility secure here)
@@ -229,6 +229,9 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             }
             ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
+        } else {
+            // notify the remote device of the invocation of this property-page
+            ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(this.relatedElementIndex)
         }
     }
 

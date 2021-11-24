@@ -48,7 +48,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         }
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@BarGraphActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get the notification text-view
@@ -78,7 +78,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
 
         // close activity
         finish()
@@ -114,7 +114,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             Log.d("M:BGD:onResume", "onResume executed in Bar-Graph Activity")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@BarGraphActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
@@ -125,7 +125,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
         } else {
-            // notify the device that multi-complex property was invoked
+            // notify the remote device of the invocation of this property-page
             ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(this.relatedElementID)
         }
     }

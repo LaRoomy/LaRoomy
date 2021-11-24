@@ -27,7 +27,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@LoadingActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // if logging is enabled set the appropriate data

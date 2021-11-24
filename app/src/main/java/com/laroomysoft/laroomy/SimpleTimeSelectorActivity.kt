@@ -56,7 +56,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         this.currentMinute = timeSelectorState.minute
 
         // bind the callbacks and context of the bluetooth-manager to this activity
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // config timeSelector
@@ -87,7 +87,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // when the user navigates back, do a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateID = this.relatedElementID
+        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
         // close activity
         finish()
         if(!isStandAlonePropertyMode) {
@@ -105,7 +105,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             Log.d("M:STSPage:onResume", "onResume executed in Simple Time Selector Control")
         }
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@SimpleTimeSelectorActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // reconnect to the device if necessary (if the user has left the application)
@@ -115,6 +115,9 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             }
             ApplicationProperty.bluetoothConnectionManager.resumeConnection()
             this.mustReconnect = false
+        } else {
+            // notify the remote device of the invocation of this property-page
+            ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(this.relatedElementID)
         }
     }
 

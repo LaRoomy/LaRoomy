@@ -67,6 +67,8 @@ class ApplicationProperty : Application() {
         lateinit var bluetoothConnectionManager: BLEConnectionManager
     }
 
+
+
     lateinit var systemLanguage: String
 
     // navigation control parameter:
@@ -77,7 +79,7 @@ class ApplicationProperty : Application() {
     var appSettingsResetDone = false
     var eventLogEnabled = false
     var mainActivityListElementWasAdded = false
-    var complexUpdateID = -1
+    var complexUpdateIndex = -1
 
     //var userNavigatedFromCommActivity = false
 
@@ -102,7 +104,7 @@ class ApplicationProperty : Application() {
         this.noConnectionKillOnPauseExecution = false
         this.uiAdapterChanged = false
         this.complexPropertyUpdateRequired = false
-        this.complexUpdateID = -1
+        this.complexUpdateIndex = -1
         this.navigatedFromPropertySubPage = false
     }
 

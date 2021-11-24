@@ -83,7 +83,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var complexStatePropertyIndexes = ArrayList<Int>()
 
 
-    private lateinit var activityContext: Context
+    //private lateinit var activityContext: Context
     private lateinit var callback: BleEventCallback
     private lateinit var propertyCallback: PropertyCallback
     var currentDevice: BluetoothDevice? = null
@@ -131,7 +131,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
         val bluetoothManager =
-            activityContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+            applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
 
@@ -728,7 +728,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     // binding is required, so send the binding request on basis of the passkey setup
                     val useCustomKeyForBinding =
-                        (activityContext.applicationContext as ApplicationProperty).loadBooleanData(
+                        applicationProperty.loadBooleanData(
                             R.string.FileKey_AppSettings,
                             R.string.DataKey_UseCustomBindingKey
                         )
@@ -888,7 +888,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // add language identifier
             val languageIdentificationString =
-                when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
+                when (applicationProperty.systemLanguage) {
                     "Deutsch" -> "de\r"
                     else -> "en\r"
                 }
@@ -959,7 +959,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // add language identifier
             val languageIdentificationString =
-                when ((this.activityContext.applicationContext as ApplicationProperty).systemLanguage) {
+                when (applicationProperty.systemLanguage) {
                     "Deutsch" -> "de\r"
                     else -> "en\r"
                 }
@@ -1153,8 +1153,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     ///////////////////////////////////////////////////////////////// section!
 
-    fun reAlignContextReferences(cContext: Context, eventHandlerObject: BleEventCallback){
-        this.activityContext = cContext
+    fun setBleEventHandler(eventHandlerObject: BleEventCallback){
         this.callback = eventHandlerObject
     }
 
@@ -1316,7 +1315,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun connectToRemoteDevice(macAddress: String?){
         this.currentDevice =
             BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
-        this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
+        this.bluetoothGatt = this.currentDevice?.connectGatt(applicationProperty.applicationContext, false, this.gattCallback)
     }
 
     fun connectToBondedDeviceWithMacAddress(macAddress: String?){
@@ -1325,7 +1324,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.currentDevice = it
             }
         }
-        this.bluetoothGatt = this.currentDevice?.connectGatt(this.activityContext, false, this.gattCallback)
+        this.bluetoothGatt = this.currentDevice?.connectGatt(applicationProperty.applicationContext, false, this.gattCallback)
     }
 
 /*
@@ -1836,7 +1835,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val passKey: String
 
         // at first look for a shared key for the device
-        val bindingPairManager = BindingPairManager(this.activityContext)
+        val bindingPairManager = BindingPairManager(applicationProperty.applicationContext)
         val sharedKey = bindingPairManager.lookUpForPassKeyWithMacAddress(this.currentDevice?.address ?: "")
 
         // if a shared binding key for the mac address exists, the key is preferred,
@@ -1862,7 +1861,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         if(passKey == ERROR_NOTFOUND){
             // critical error (should not happen)
-            this.callback.onComponentError(this.activityContext.getString(R.string.Error_SavedBindingKeyIsEmpty))
+            this.callback.onComponentError(applicationProperty.applicationContext.getString(R.string.Error_SavedBindingKeyIsEmpty))
         } else {
             // at first, build the request-string
             var bindingRequestString = "6100"
@@ -1882,36 +1881,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun isMultiComplexProperty(propertyID: Int) : Boolean{
-
-        return when(this.propertyTypeFromID(propertyID)){
-            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> true
-            // TODO: add all multicomplex properties here
-            else -> false
-        }
-    }
+//    fun isMultiComplexProperty(propertyID: Int) : Boolean{
+//
+//        return when(this.propertyTypeFromID(propertyID)){
+//            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> true
+//            // TODO: add all multicomplex properties here
+//            else -> false
+//        }
+//    }
 
     fun notifyBackNavigationToDeviceMainPage() {
-
-        // TODO !!!!!!!!!!!!!!!!!!!
-
-
-        //this.multiComplexPageID = -1
-        //this.multiComplexPropertyPageOpen = false
-
         sendData(this.userNavigatedBackToDeviceMainNotification)
-
-
-        // TODO: !!
     }
 
     fun notifyComplexPropertyPageInvoked(propertyID: Int) {
-
-        // TODO: ?
-
-        //this.multiComplexPageID = propertyID
-        //this.multiComplexPropertyPageOpen = true
-        //this.multiComplexTypeID = this.propertyTypeFromID(propertyID)
 
         if(verboseLog) {
             Log.d(
@@ -1919,8 +1902,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 "Multi-Complex-Property-Page invoked - sending notification - property-ID: $propertyID"
             )
         }
-        //(this.activityContext.applicationContext as ApplicationProperty).logControl("I: Multi-Complex-Property-Page invoked - sending notification - property-ID: $propertyID")
-
         var notification = "50"
         notification += a8bitValueTo2CharHexValue(propertyID)
         notification += "02003\r"
@@ -2066,7 +2047,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
         }
         // update the UI-Array
-        this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+        this.uIAdapterList.forEachIndexed { _, devicePropertyListContentInformation ->
             if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
                 devicePropertyListContentInformation.complexPropertyState = cState
             }

@@ -76,7 +76,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.deviceImageResourceId = intent.getIntExtra("BondedDeviceImageResourceId", -1)
 
         // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@DeviceMainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
         // get UI Elements
@@ -193,27 +193,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             } else {
                 // do a complex state- update if required...
+/*
                 if ((this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired) {
                     if(verboseLog) {
                         Log.d(
                             "M:onResume",
-                            "Complex-State-Update required for ID ${(this.applicationContext as ApplicationProperty).complexUpdateID}"
+                            "Complex-State-Update required for Property-Index ${(this.applicationContext as ApplicationProperty).complexUpdateIndex}"
                         )
                     }
 
-                    (applicationContext as ApplicationProperty).logControl("Resumed Device Main Activity: Complex-State-Update required for ID: ${(this.applicationContext as ApplicationProperty).complexUpdateID}")
+                    (applicationContext as ApplicationProperty).logControl("Resumed Device Main Activity: Complex-State-Update required for Index: ${(this.applicationContext as ApplicationProperty).complexUpdateIndex}")
 
                     (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired =
                         false
 
-                    if (ApplicationProperty.bluetoothConnectionManager.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateID)) {
+                    if (ApplicationProperty.bluetoothConnectionManager.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateIndex)) {
                         // delay the complex state update
                         Handler(Looper.getMainLooper()).postDelayed(
                             {
                                 ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForPropertyIndex(
-                                    (this.applicationContext as ApplicationProperty).complexUpdateID
+                                    (this.applicationContext as ApplicationProperty).complexUpdateIndex
                                 )
-                                (this.applicationContext as ApplicationProperty).complexUpdateID =
+                                (this.applicationContext as ApplicationProperty).complexUpdateIndex =
                                     -1
                             },
                             500
@@ -221,11 +222,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     } else {
                         // this is not a multicomplex property, do the complex state update immediately
                         ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForPropertyIndex(
-                            (this.applicationContext as ApplicationProperty).complexUpdateID
+                            (this.applicationContext as ApplicationProperty).complexUpdateIndex
                         )
-                        (this.applicationContext as ApplicationProperty).complexUpdateID = -1
+                        (this.applicationContext as ApplicationProperty).complexUpdateIndex = -1
                     }
                 }
+*/
 
                 // set property-item to normal background
                 resetSelectedItemBackground()
@@ -236,10 +238,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     false
 
                 // realign the context objects to the bluetoothManager
-                ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(
-                    this@DeviceMainActivity,
-                    this
-                )
+                ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
                 ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
                 // update info-header and states

@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@MainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
 
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
         (applicationContext as ApplicationProperty).addedDevices = AddedDevices(applicationContext)
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         }
 
         // realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
-        ApplicationProperty.bluetoothConnectionManager.reAlignContextReferences(this@MainActivity, this)
+        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
 
         // show or hide the no-content hint if the list is empty or not
         if(this.availableDevices.isEmpty()){
