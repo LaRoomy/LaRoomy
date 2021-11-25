@@ -86,6 +86,8 @@ class ComplexPropertyState {
     var strValue = ""
     var flags = 0           // Flag-Value in RGB Selector
 
+    var floatValue = -1f
+
     // single used values (only valid in specific complex states)
     var hardTransitionFlag =
         false  // Value for hard-transition in RGB Selector (0 == SoftTransition / 1 == HardTransition)
@@ -573,6 +575,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
         this.numBars = complexPropertyState.valueOne
         this.useValueAsBarDescriptor = (complexPropertyState.valueTwo and 0x01) != 0
         this.useFixedMaximumValue = (complexPropertyState.valueTwo and 0x02) != 0
+        this.fixedMaximumValue = complexPropertyState.floatValue
         this.errorFlag = this.fromComplexPropertyString(complexPropertyState.strValue, false)
     }
 
@@ -662,6 +665,9 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                         }
                     }
                     '\r' -> {
+                        if(recString.isNotEmpty()){
+                            strArray.add(recString)
+                        }
                         return@forEachIndexed
                     }
                 }
@@ -722,7 +728,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                         } else {
                             // record the data
                             nextValidIndex = -1
-                            var dataIndex = 4
+                            var dataIndex = 3
                             var barNameString = ""
 
                             // record the bar-name
@@ -736,8 +742,9 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                                         this.barNames[barIndex] = barNameString
                                     }
                                     nextValidIndex = dataIndex + 2
+                                    break
                                 } else {
-                                    barNameString += data[dataIndex]
+                                    barNameString += s[dataIndex]
                                 }
                                 dataIndex++
                             }
@@ -747,42 +754,44 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                                 dataIndex = nextValidIndex
 
                                 if (s[dataIndex] == '_') {
-                                    // undefined placeholder char -> add value zero
-                                    if (!isUpdateMode) {
+
+                                    // undefined placeholder char -> add value zero in initial mode, in update mode let the ???
+                                    //if (!isUpdateMode) {
                                         // initial mode
                                         this.barValues.add(0f)
-                                    } else {
-                                        var barValueString = ""
+                                    //}
 
-                                        // record the bar-value
-                                        while (dataIndex < s.length) {
-                                            if (s[dataIndex] == '\r') {
-                                                break
-                                            }
-                                            barValueString += s[dataIndex]
-                                            dataIndex++
+                                } else {
+                                    var barValueString = ""
+
+                                    // record the bar-value
+                                    while (dataIndex < s.length) {
+                                        if (s[dataIndex] == '\r') {
+                                            break
                                         }
-                                        if(!isUpdateMode) {
-                                            // initial mode
-                                            if (barValueString.isNotEmpty()) {
-                                                this.barValues.add(
-                                                    barValueString.toFloat()
-                                                )
-                                            } else {
-                                                this.barValues.add(0f)
-                                                return false
-                                            }
+                                        barValueString += s[dataIndex]
+                                        dataIndex++
+                                    }
+                                    if (!isUpdateMode) {
+                                        // initial mode
+                                        if (barValueString.isNotEmpty()) {
+                                            this.barValues.add(
+                                                barValueString.toFloat()
+                                            )
                                         } else {
-                                            // must be update mode
-                                            if(barValueString.isNotEmpty()){
-                                                this.barValues[barIndex] = barValueString.toFloat()
-                                            }
+                                            this.barValues.add(0f)
+                                            return false
+                                        }
+                                    } else {
+                                        // must be update mode
+                                        if (barValueString.isNotEmpty()) {
+                                            this.barValues[barIndex] = barValueString.toFloat()
                                         }
                                     }
-                                } else {
-                                    // error
-                                    return false
                                 }
+                            } else {
+                                // error
+                                return false
                             }
                         }
                     }
@@ -833,13 +842,14 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
             flags = flags or 0x02
         }
 
+        cState.floatValue = this.fixedMaximumValue
         cState.valueTwo = flags
         cState.strValue = this.toComplexPropertyString()
         return cState
     }
 
     override fun fromString(data: String): Boolean {
-        return if (data.length < 10) {
+        return if (data.length < 11) {
             if (verboseLog) {
                 Log.e(
                     "BarGraphData:fromString",
@@ -849,14 +859,14 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
             false
         } else {
             // get the flag values
-            val flags = data[8].toString().toInt()
+            val flags = a2CharHexValueToIntValue(data[8], data[9])
             this.useValueAsBarDescriptor = (flags and 0x01) != 0
             this.useFixedMaximumValue = (flags and 0x02) != 0
 
             // get the number of bars
-            this.numBars = data[9].toString().toInt()
+            this.numBars = data[10].toString().toInt()
 
-            val pureData = data.removeRange(0, 9)
+            val pureData = data.removeRange(0, 11)
             this.fromComplexPropertyString(pureData, false)
         }
     }
