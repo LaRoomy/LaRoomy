@@ -418,10 +418,10 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         }
     }
 
-    override fun onComponentError(message: String) {
-        super.onComponentError(message)
+    override fun onConnectionError(errorID: Int) {
+        super.onConnectionError(errorID)
         // if there is a connection failure -> navigate back
-        when(message){
+        when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
                 (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
                 finish()

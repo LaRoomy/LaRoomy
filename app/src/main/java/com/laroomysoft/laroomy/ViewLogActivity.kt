@@ -59,7 +59,7 @@ class ViewLogActivity : AppCompatActivity() {
         this.notificationTextView.text = message
     }
 
-    class LogDataListAdapter(val logDataList: ArrayList<String>)
+    class LogDataListAdapter(private val logDataList: ArrayList<String>)
         : RecyclerView.Adapter<LogDataListAdapter.ViewHolder>() {
 
         class ViewHolder(val linearLayout: LinearLayout) : RecyclerView.ViewHolder(linearLayout)

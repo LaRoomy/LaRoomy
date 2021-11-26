@@ -1,6 +1,5 @@
 package com.laroomysoft.laroomy
 
-import android.content.Context
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.app.Activity
@@ -24,18 +23,19 @@ import kotlin.collections.ArrayList
 //const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
 //const val UPDATE_TYPE_DETAIL_DEFINITION = 2
 
-const val DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED = 1
-const val DEVICE_NOTIFICATION_BINDING_SUCCESS = 2
-const val DEVICE_NOTIFICATION_BINDING_ERROR = 3
+const val BINDING_RESPONSE_BINDING_NOT_SUPPORTED = 1
+const val BINDING_RESPONSE_BINDING_SUCCESS = 2
+const val BINDING_RESPONSE_BINDING_ERROR = 3
+const val BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY = 4
+const val BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR = 5
+const val BINDING_RESPONSE_RELEASE_BINDING_SUCCESS = 6
 
-const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE = "unable to resume connection - device not reachable"
-const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = "unable to resume connection - invalid address"
+const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE = 1
+const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = 2
+const val BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED = 3
+const val BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING = 4
 
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
-
-    // constant properties (regarding the device!) ////////////////////////
-    //private val serviceUUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
-    //private val characteristicUUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
 
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
@@ -43,14 +43,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val propertyLoadingCompleteNotification = "5000030010\r"        // sent when the retrieving of the properties is complete (raw loading - not from cache)
     private val deviceReconnectedNotification = "500002002\r"               // sent when the connection was suspended (user has left the app) and the user re-invoked the app
     private val userNavigatedBackToDeviceMainNotification = "500002004\r"   // sent when the user has opened a complex property page and navigated back to device-main-page
+    //private val propertyLoadedFromCacheCompleteNotification = "5000030011\r" // future use or delete it...!
 
-
-    //private val propertyLoadedFromCacheCompleteNotification = "5000030011\r"
-
-    // new ones:
     private val bleDeviceData = BLEDeviceData()
 
-    /////////////////////////////////////////////////
 
     var isConnected:Boolean = false
         private set
@@ -62,12 +58,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     var isBindingRequired = false
         private set
-    var connectionTestSucceeded = false
-        private set
+
+//    var connectionTestSucceeded = false
+//        private set
+
     var connectionSuspended = false
         private set
 
-    var isCurrentConnectionDoneWithSharedBindingKey = false
+    //var isCurrentConnectionDoneWithSharedBindingKey = false
 
     private var propertyLoopActive = false
     private var groupLoopActive = false
@@ -83,14 +81,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var complexStatePropertyIndexes = ArrayList<Int>()
 
 
-    //private lateinit var activityContext: Context
+    // Callbacks
     private lateinit var callback: BleEventCallback
     private lateinit var propertyCallback: PropertyCallback
+
+    // bluetooth system objects
     var currentDevice: BluetoothDevice? = null
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
+    // --
+    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
+        this.bleAdapter?.bondedDevices
+    }
+    // --
+    private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
+        val bluetoothManager =
+            applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothManager.adapter
+    }
 
 
+    // device-property objects
     var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
@@ -108,9 +119,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val isConnectionDoneWithSharedKey: Boolean
     get() = (this.bleDeviceData.passKeyTypeUsed == PASSKEY_TYPE_SHARED)
 
-    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
-        this.bleAdapter?.bondedDevices
-    }
 
     var bondedLaRoomyDevices = ArrayList<LaRoomyDevicePresentationModel>()
         get() {
@@ -128,12 +136,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             return field
         }
-
-    private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
-        val bluetoothManager =
-            applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
-    }
 
     private val BluetoothAdapter.isDisabled: Boolean
         get() = !isEnabled
@@ -425,6 +427,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 '3' -> {
                     // property invalidated notification
                     this.reloadProperties()
+
+                    // TODO: this will not work, what is if the UI is on a complex-property-page!?
+                    // TODO: raise a callback method and let this the activities do!
                 }
                 '4' -> {
 
@@ -739,7 +744,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // no binding is required, so notify the subscriber of the callback
                     saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
                     bleDeviceData.authenticationSuccess = true
-                    callback.onAuthenticationSuccessful()
+                    callback.onInitializationSuccessful()
                 }
             }
         }
@@ -784,7 +789,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // binding success
                         saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
                         bleDeviceData.authenticationSuccess = true
-                        callback.onAuthenticationSuccessful()
+                        callback.onInitializationSuccessful()
                         true
                     }
                 }
@@ -798,12 +803,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                     Log.e("EnableBinding", "Enable-Binding Response: FAILED. Binding not supported!")
                                 }
                                 applicationProperty.logControl("E: Received Binding-Failed response from the device. -Binding not supported")
+
+                                this.propertyCallback.onBindingResponse(
+                                    BINDING_RESPONSE_BINDING_NOT_SUPPORTED
+                                )
                             }
                             else -> {
                                 if (verboseLog) {
                                     Log.e("EnableBinding", "Enable-Binding Response: FAILED. -Unknown error")
                                 }
                                 applicationProperty.logControl("E: Received Binding-Failed response from the device. -Unknown error")
+
+                                this.propertyCallback.onBindingResponse(
+                                    BINDING_RESPONSE_BINDING_ERROR
+                                )
                             }
                         }
                     } else {
@@ -812,6 +825,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             Log.d("EnableBinding", "Enable-Binding Response: SUCCESS.")
                         }
                         applicationProperty.logControl("I: Received Enable-Binding-Success response from the device.")
+
+                        this.propertyCallback.onBindingResponse(
+                            BINDING_RESPONSE_BINDING_SUCCESS
+                        )
                     }
                     return true
                 }
@@ -825,12 +842,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                     Log.e("ReleaseBinding", "Release-Binding Response: FAILED. -wrong passkey")
                                 }
                                 applicationProperty.logControl("E: Received Release-Failed response from the device. -wrong passkey")
+
+                                this.propertyCallback.onBindingResponse(
+                                    BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY
+                                )
                             }
                             else -> {
                                 if (verboseLog) {
                                     Log.e("ReleaseBinding", "Release-Binding Response: FAILED. -Unknown error")
                                 }
                                 applicationProperty.logControl("E: Received Release-Failed response from the device. -Unknown error")
+
+                                this.propertyCallback.onBindingResponse(
+                                    BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR
+                                )
                             }
                         }
                     } else {
@@ -839,6 +864,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             Log.d("ReleaseBinding", "Release-Binding Response: SUCCESS.")
                         }
                         applicationProperty.logControl("I: Received Release-Binding-Success response from the device.")
+
+                        this.propertyCallback.onBindingResponse(
+                            BINDING_RESPONSE_RELEASE_BINDING_SUCCESS
+                        )
                     }
                     return true
                 }
@@ -1192,7 +1221,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isConnected = false
         //this.authRequired = true
         //this.propertyUpToDate = false
-        this.connectionTestSucceeded = false
+        //this.connectionTestSucceeded = false
         this.connectionSuspended = false
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
@@ -1208,7 +1237,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         //this.multiComplexPageID = -1
         //this.multiComplexTypeID = -1
         this.isBindingRequired = false
-        this.isCurrentConnectionDoneWithSharedBindingKey = false
+        //this.isCurrentConnectionDoneWithSharedBindingKey = false
         //this.passKeySecondTryOut = false
 
         //this.propertyRequestIndexCounter = 0
@@ -1224,30 +1253,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bleDeviceData.clear()
     }
 
-    private fun clearPropertyRelatedParameter(){
-        //this.propertyUpToDate = false
-        this.uIAdapterList.clear()
-        //this.singlePropertyRetrievingAction = false
-        //this.singleGroupRetrievingAction = false
-        //this.singlePropertyDetailRetrievingAction = false
-        //this.singleGroupDetailRetrievingAction = false
-        //this.updateStackProcessActive = false
-        //this.multiComplexPropertyPageOpen = false
-        //this.currentPropertyResolveID = -1
-        //this.currentGroupResolveID = -1
-        //this.multiComplexPageID = -1
-        //this.multiComplexTypeID = -1
+    private fun clearPropertyRelatedParameterAndStopAllLoops(){
 
-        //this.propertyRequestIndexCounter = 0
-
+        // stop loops
         this.propertyLoopActive = false
-        //this.propertyNameResolveLoopActive = false
         this.groupLoopActive = false
-        //this.groupInfoLoopActive = false
-        //this.deviceHeaderRecordingActive = false
+        this.complexStateLoopActive = false
 
+        // clear arrays
+        this.uIAdapterList.clear()
         this.laRoomyDevicePropertyList.clear()
         this.laRoomyPropertyGroupList.clear()
+        this.complexStatePropertyIndexes.clear()
+
+        // reset other params
+        this.currentComplexStateRetrievingIndex = -1
     }
 
     private fun imageFromIndexCounter(indexCounter: Int) : Int {
@@ -1306,10 +1326,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val address =
             this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
 
-        if(address == ERROR_NOTFOUND)
-            this.callback.onConnectionAttemptFailed("Error: no device address found")
-        else
+        if(address == ERROR_NOTFOUND) {
+            //this.callback.onConnectionAttemptFailed("Error: no device address found")
+
+            // TODO: error callback!
+
+        } else {
             this.connectToRemoteDevice(address)
+        }
     }
 
     private fun connectToRemoteDevice(macAddress: String?){
@@ -1343,7 +1367,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(!this.isConnected){
             Log.e("M:sendData", "Unexpected error, bluetooth device not connected")
             applicationProperty.logControl("E: Unexpected: sendData invoked, but device not connected")
-            this.callback.onComponentError("Unexpected error, bluetooth device not connected")
+
+            this.callback.onConnectionError(BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED)
         }
         else {
             if(verboseLog) {
@@ -1370,9 +1395,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
-
-            // raise event:
-            this.callback.onDataSent(data)
         }
     }
 
@@ -1427,14 +1449,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // set up a handler to check if the connection works
             Executors.newSingleThreadScheduledExecutor().schedule({
                 if(!isConnected){
-                    callback.onComponentError(
+                    callback.onConnectionError(
                         BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE)
                 }
             }, 10000, TimeUnit.MILLISECONDS)
 
         } else {
             Log.e("M:Bmngr:resumeC", "BluetoothManager: Internal Device Address invalid- trying to connect to saved address")
-            this.callback.onComponentError(
+            this.callback.onConnectionError(
                 BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE)
         }
     }
@@ -1450,7 +1472,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     fun reloadProperties(){
-        this.clearPropertyRelatedParameter()
+        this.clearPropertyRelatedParameterAndStopAllLoops()
         this.startPropertyListing()
     }
 
@@ -1746,30 +1768,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return LaRoomyDeviceProperty()
     }
 
-//    private fun retrieveBarGraphDisplayData(elementIndex: Int, data: String): Boolean{
-//        // check the transmission length first
-//        if(data.length < 7){
-//            return false
-//        } else {
-//            // at index 6 -> number of bars
-//            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueOne = data.elementAt(6).toString().toInt()
-//            // at index 7 -> show value as bar-descriptor
-//            this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueTwo = data.elementAt(7).toString().toInt()
-//            // at index 8 until string-end -> fixed maximum value
-//            if(data.length > 8){
-//                var fixedMaxVal = ""
-//
-//                data.forEachIndexed { index, c ->
-//                    if(index > 7){
-//                        fixedMaxVal += c
-//                    }
-//                }
-//                this.laRoomyDevicePropertyList.elementAt(elementIndex).complexPropertyState.valueThree = fixedMaxVal.toInt()
-//            }
-//        }
-//        return true
-//    }
-
     private fun startComplexStateDataLoop(){
         if(verboseLog) {
             Log.d(
@@ -1861,7 +1859,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         if(passKey == ERROR_NOTFOUND){
             // critical error (should not happen)
-            this.callback.onComponentError(applicationProperty.applicationContext.getString(R.string.Error_SavedBindingKeyIsEmpty))
+            this.callback.onConnectionError(BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING)
         } else {
             // at first, build the request-string
             var bindingRequestString = "6100"
@@ -1918,34 +1916,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         //this.sendData(releaseDeviceBindingCommand)
         this.isBindingRequired = false
     }
-
-    private fun stopAllPendingLoopsAndResetParameter(){
-
-        // TODO: make sure to cover all parameter
-
-        this.propertyLoopActive = false
-        //this.propertyNameResolveLoopActive = false
-        this.groupLoopActive = false
-        //this.groupInfoLoopActive = false
-        this.complexStateLoopActive = false
-        //this.deviceHeaderRecordingActive = false
-
-        this.complexStatePropertyIndexes.clear()
-
-        //this.currentPropertyResolveID = -1
-        //this.currentGroupResolveIndex = -1
-        //this.groupRequestIndexCounter = -1
-        this.currentComplexStateRetrievingIndex = -1
-
-        //this.propertyNameResolveSingleAction = false
-        //this.propertyGroupNameResolveSingleAction = false
-        //this.propertyConfirmationModeActive = false
-        //this.groupDetailChangedOnConfirmation = false
-        //this.propertyDetailChangedOnConfirmation = false
-        //this.propertyUpToDate = false // TODO: is this right???
-    }
-
-    // new helpers
 
     private fun propertyTypeFromIndex(propertyIndex: Int) : Int {
         return if(propertyIndex < this.laRoomyDevicePropertyList.size){
@@ -2057,19 +2027,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     // the callback definition for the event handling in the calling class
     interface BleEventCallback : Serializable{
         fun onConnectionStateChanged(state: Boolean){}
-        fun onConnectionAttemptFailed(message: String){}
         fun onDataReceived(data: String?){}
-        fun onDataSent(data: String?){}
-        fun onComponentError(message: String){}
-        fun onAuthenticationSuccessful(){}
+        fun onConnectionError(errorID: Int){}
+        fun onInitializationSuccessful(){}
         fun onBindingPasskeyRejected(){}
         fun onDeviceReadyForCommunication(){}
     }
 
     interface PropertyCallback: Serializable {
-        fun onPropertyDataChanged(propertyIndex: Int, propertyID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
-        fun onPropertyGroupDataChanged(groupIndex: Int, groupID: Int){}// if the index is -1 the whole data changed or the changes are not indexed -> iterate the array and check the .hasChanged -Parameter
-        fun onCompletePropertyInvalidated(){}
         fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
         fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
         fun onUIAdaptableArrayItemChanged(index: Int){}
@@ -2077,7 +2042,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}
         fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
-        fun onDeviceNotification(notificationID: Int){}
+        fun onBindingResponse(responseID: Int){}
         fun getCurrentOpenComplexPropPagePropertyIndex() : Int {
             // if overwritten, do not return the super method!
             return -1

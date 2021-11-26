@@ -10,6 +10,9 @@ import android.view.View
 import android.widget.TextView
 import java.lang.IndexOutOfBoundsException
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -21,6 +24,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     private var connectionAttemptCounter = 0
     private var macAddressToConnect = ""
     private var curDeviceListIndex = -5
+    private var propertyLoadingStarted = false
     //private var authenticationAttemptCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,8 +110,17 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onPause() {
         super.onPause()
+
+        // TODO: suspend connection, if there was one
+
         //ApplicationProperty.bluetoothConnectionManger.clear() this is fucking wrong!!
         //finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // TODO: resume connection, if there was one and check if the property loading has started, if so, reload the properties, they may be incomplete
     }
 
     private fun setProgressText(text: String){
@@ -127,16 +140,25 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
 
     // Interface methods:
-    override fun onAuthenticationSuccessful() {
-        super.onAuthenticationSuccessful()
+    override fun onInitializationSuccessful() {
+        super.onInitializationSuccessful()
+
+        this.propertyLoadingStarted = true
+        ApplicationProperty.bluetoothConnectionManager.startPropertyListing()
+
+
+
         // navigate to the next activity and retrieve the properties there:
-        val intent =
-            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+
+
+//        val intent =
+//            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
 
         // in auto-connect-mode the parameter "curDeviceListIndex" is -2, this is an invalid index and not suitable to get the image of the device
         // so get the image for the device
-        var image = -1
+        //var image = -1
 
+/*
         if(curDeviceListIndex < 0){
             // the list index is invalid, must be an auto-connect procedure
                 // generate lookup for the address in the bonded device list:
@@ -168,11 +190,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 R.drawable.bluetooth_green_glow_sq64
             }
         }
+*/
 
-        intent.putExtra("BondedDeviceImageResourceId", image)
-        startActivity(intent)
+        //intent.putExtra("BondedDeviceImageResourceId", image)
+        //startActivity(intent)
         // finish this activity
-        finish()
+        //finish()
     }
 
     override fun onBindingPasskeyRejected() {
@@ -262,25 +285,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         }
     }
 
-    override fun onConnectionAttemptFailed(message: String) {
-        super.onConnectionAttemptFailed(message)
-
-        Log.e("M:CB:ConAttemptFail", "Error - Connection Failed in Loading Activity")
-        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in LoadingActivity")
-
-        setErrorText(message)
-        // navigate back with delay
-        Handler(Looper.getMainLooper()).postDelayed({
-
-            // TODO: check if this works!?
-
-            blockAllFurtherProcessing = true
-            ApplicationProperty.bluetoothConnectionManager.clear()
-            finish()
-
-        },3000)
-    }
-
     override fun onDeviceReadyForCommunication() {
         super.onDeviceReadyForCommunication()
 
@@ -312,14 +316,41 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         }
     }
 
-    override fun onComponentError(message: String) {
-        super.onComponentError(message)
-        setErrorText(message)
+    override fun onConnectionError(errorID: Int) {
+        super.onConnectionError(errorID)
+
+        // TODO: add log
+
+        // TODO: notify user
+        when(errorID){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {}
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {}
+            BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING -> {}
+            else -> {}
+        }
+
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            blockAllFurtherProcessing = true
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
+        }, 3000, TimeUnit.MILLISECONDS)
+
+        // TODO: notify user and navigate back, if necessary
+
     }
 
     fun onLoadingStringClick(view: View) {
 
         // FIXME: maybe temp, this has no effect, the problem is/was that there is no connection
         ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
+    }
+
+    override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
+        super.onUIAdaptableArrayListGenerationComplete(UIArray)
+
+        val intent =
+            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

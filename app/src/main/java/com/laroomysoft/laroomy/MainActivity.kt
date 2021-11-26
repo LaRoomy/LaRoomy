@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConnectionManager.BleEventCallback {
+class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
@@ -58,8 +58,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
 
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
         (applicationContext as ApplicationProperty).addedDevices = AddedDevices(applicationContext)
@@ -160,15 +158,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
         // check if bluetooth is enabled
         ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
 
-
         // normalize controls on back navigation
         if(addButtonNormalizationRequired){
             addButtonNormalizationRequired = false
             addDeviceButton.setImageResource(R.drawable.ic_add_white_36dp)
         }
-
-        // realign context objects in the bluetooth manager, if this is called after a back-navigation from the Loading-Activity or so...
-        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
 
         // show or hide the no-content hint if the list is empty or not
         if(this.availableDevices.isEmpty()){
@@ -357,11 +351,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BLEConn
             laRoomyDevListAdapter.removeAt(position)
             notifyItemRemoved(position)
         }
-    }
-
-    // Interface methods:
-    override fun onComponentError(message: String) {
-        notifyUser(message)
     }
 
     fun onMainActivityAddDeviceButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {

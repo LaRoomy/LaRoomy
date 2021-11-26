@@ -67,7 +67,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
             shareBindingContainer.visibility = View.VISIBLE
 
-            if(ApplicationProperty.bluetoothConnectionManager.isCurrentConnectionDoneWithSharedBindingKey){
+            if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey){
                 // the current connection is established with a shared binding key
                 // -> no sharing is possible, only the origin can share the binding, so disable the button and notify the user
                 findViewById<AppCompatImageButton>(R.id.deviceSettingsActivityShareButton).isEnabled = false
@@ -246,19 +246,19 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
     }
 
-    override fun onConnectionAttemptFailed(message: String) {
-        super.onConnectionAttemptFailed(message)
+//    override fun onConnectionAttemptFailed(message: String) {
+//        super.onConnectionAttemptFailed(message)
+//
+//        Log.e("M:DSPPage:onConnFailed", "Connection Attempt failed in Device Settings Activity. Message: $message")
+//        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in DeviceSettingsActivity. Reason: $message")
+//
+//        notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
+//    }
 
-        Log.e("M:DSPPage:onConnFailed", "Connection Attempt failed in Device Settings Activity. Message: $message")
-        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in DeviceSettingsActivity. Reason: $message")
-
-        notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
-    }
-
-    override fun onComponentError(message: String) {
-        super.onComponentError(message)
+    override fun onConnectionError(errorID: Int) {
+        super.onConnectionError(errorID)
         // if there is a connection failure -> navigate back
-        when(message){
+        when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
                 (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
                 finish()
@@ -290,11 +290,11 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
 
-    override fun onDeviceNotification(notificationID: Int) {
-        super.onDeviceNotification(notificationID)
+    override fun onBindingResponse(responseID: Int) {
+        super.onBindingResponse(responseID)
         // look for a rejected/error/success setting notification
-        when(notificationID){
-            DEVICE_NOTIFICATION_BINDING_NOT_SUPPORTED -> {
+        when(responseID){
+            BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {
                 // update the hint for the user
                 bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
 
@@ -307,11 +307,11 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 // notify user
                 notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification), R.color.WarningColor)
             }
-            DEVICE_NOTIFICATION_BINDING_SUCCESS -> {
+            BINDING_RESPONSE_BINDING_SUCCESS -> {
                 //notify user
                 notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingSuccessNotification), R.color.successLightColor)
             }
-            DEVICE_NOTIFICATION_BINDING_ERROR -> {
+            BINDING_RESPONSE_BINDING_ERROR -> {
                 // update the hint for the user
                 bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
                 // reset the switch
@@ -319,6 +319,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 //notify user
                 notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingErrorNotification), R.color.errorLightColor)
             }
+
+            // TODO: update this function and add the new notification IDs
+
         }
     }
 

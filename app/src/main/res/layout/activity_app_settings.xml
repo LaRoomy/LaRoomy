@@ -221,6 +221,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--
         <View
             android:id="@+id/setupActivitySecondSeparatorView"
             android:layout_width="match_parent"
@@ -282,6 +283,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesContainer"
             tools:ignore="TextContrastCheck" />
+-->
 
         <View
             android:id="@+id/setupActivityThirdSeparatorView"
@@ -291,7 +293,7 @@
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityListAllDevicesHintTextView" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityBindingCodeContainer" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setupActivityUUIDManagerButton"

@@ -56,7 +56,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var activityWasSuspended = false
     //private var buttonRecoveryRequired = false
     private var restoreIndex = -1
-    private var deviceImageResourceId = -1
+    //private var deviceImageResourceId = -1
     private var propertyLoadingFinished = false
     private var levelSelectorPopUpOpen = false
     private var optionSelectorPopUpOpen = false
@@ -73,7 +73,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
-        this.deviceImageResourceId = intent.getIntExtra("BondedDeviceImageResourceId", -1)
+        //this.deviceImageResourceId = intent.getIntExtra("BondedDeviceImageResourceId", -1)
 
         // realign the context to the bluetoothManager (NOTE: only on creation - onResume handles this on navigation)
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
@@ -101,6 +101,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyList.add(dc)
 */
 
+        // TODO: this is a new way, must be tested, if the ui-array is complete, copy it
+        if(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.isNotEmpty()){
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEach {
+                this.propertyList.add(it)
+            }
+        }
 
         // bind array to adapter
         this.devicePropertyListViewAdapter =
@@ -1054,10 +1060,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    override fun onComponentError(message: String) {
-        super.onComponentError(message)
+    override fun onConnectionError(errorID: Int) {
+        super.onConnectionError(errorID)
 
-        when(message){
+        when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
                 ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()

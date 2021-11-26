@@ -23,7 +23,7 @@ class AppSettingsActivity : AppCompatActivity() {
     private lateinit var passwordViewModeButton: AppCompatImageButton
     private lateinit var useCustomBindingKeySwitch: SwitchCompat
     private lateinit var autoConnectSwitch: SwitchCompat
-    private lateinit var listAllDevicesSwitch: SwitchCompat
+    //private lateinit var listAllDevicesSwitch: SwitchCompat
     private lateinit var passwordContainer: ConstraintLayout
     private lateinit var enableLogSwitch: SwitchCompat
     private lateinit var passKeyInputNotificationTextView: AppCompatTextView
@@ -65,6 +65,8 @@ class AppSettingsActivity : AppCompatActivity() {
                     passwordContainer.visibility = View.VISIBLE
                 }
             }
+
+/*
         this.listAllDevicesSwitch =
             findViewById<SwitchCompat>(R.id.setupActivityListAllDevicesSwitch).apply {
                 val state =
@@ -74,6 +76,8 @@ class AppSettingsActivity : AppCompatActivity() {
                     )
                 this.isChecked = state
             }
+*/
+
         this.enableLogSwitch =
             findViewById<SwitchCompat>(R.id.setupActivityEnableLoggingSwitch).apply {
                 val state =
@@ -212,6 +216,8 @@ class AppSettingsActivity : AppCompatActivity() {
                 else -> passwordContainer.visibility = View.GONE
             }
         }
+
+/*
         this.listAllDevicesSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(
@@ -220,6 +226,8 @@ class AppSettingsActivity : AppCompatActivity() {
                 R.string.DataKey_ListAllDevices
             )
         }
+*/
+
         this.enableLogSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(
@@ -277,7 +285,7 @@ class AppSettingsActivity : AppCompatActivity() {
             this.autoConnectSwitch.isChecked = false
             this.useCustomBindingKeySwitch.isChecked = false
             passwordContainer.visibility = View.GONE
-            this.listAllDevicesSwitch.isChecked = false
+            //this.listAllDevicesSwitch.isChecked = false
             this.enableLogSwitch.isChecked = false
             this.setShowLogButtonVisibility(false)
             this.keepScreenActiveSwitchCompat.isChecked = false
