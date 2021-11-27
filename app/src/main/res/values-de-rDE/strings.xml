@@ -23,6 +23,10 @@
     <string name="CA_BindingPasskeyRejected">Falscher Bindungs-Code: Verbindung abgelehnt</string>
     <string name="CA_BindingNotActivated">Geräte-Bindung ist erforderlich, aber deaktiviert in App-Einstellungen</string>
     <string name="CA_TimeoutForConnection">Zeitüberschreitung - Gerät nicht erreichbar</string>
+    <string name="CA_LoadingProperties">Geräte-Eigenschaften werden geladen..</string>
+    <string name="CA_ErrorDeviceListIndexInvalid">Ungültiger Geräte-Index</string>
+    <string name="CA_ErrorDeviceAddressAccessException">Kritischer Fehler. Index nicht im zulässigen Bereich.</string>
+
 
 
     <string name="DMA_ConnectionStatus_disconnected">getrennt</string>
@@ -256,6 +260,10 @@
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">Kein gültiges Gerät gefunden</string>
     <string name="Error_SavedBindingKeyIsEmpty">Verbindungsschlüssel konnte nicht geladen werden. Schlüssel war null.</string>
+    <string name="Error_ResumeFailedDeviceNotReachable">Wiederherstellen der Verbindung fehlgeschlagen: Gerät nicht erreichbar.</string>
+    <string name="Error_ResumeFailedNoDevice">Wiederherstellen der Verbindung fehlgeschlagen: Gerät nicht vorhanden.</string>
+    <string name="Error_UnexpectedBindingKeyMissing">Unerwarteter Fehler: Interner Bindungsschlüssel fehlt.</string>
+    <string name="Error_UnknownError">Unbekannter Fehler aufgetreten.</string>
 
 
     <!-- FileKeys: -->

@@ -26,7 +26,6 @@
         android:textAlignment="center"
         android:layout_marginTop="5dp"
         android:text="@string/UniversalPlaceholderName"
-        android:onClick="onLoadingStringClick"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/spin_kit"

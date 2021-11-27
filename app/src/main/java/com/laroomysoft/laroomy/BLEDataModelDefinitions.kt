@@ -1147,6 +1147,11 @@ class LaRoomyDeviceProperty {
         }
     }
 
+    override fun toString(): String {
+        // TODO!
+        return "TODO!!!!"
+    }
+
     override fun hashCode(): Int {
         var result = propertyIndex
         result = 31 * result + propertyType
@@ -1220,6 +1225,11 @@ class LaRoomyDevicePropertyGroup {
         } catch (except: Exception) {
             Log.e("M:LDP:Group:fromString", "Exception occurred: ${except.message}")
         }
+    }
+
+    override fun toString(): String {
+        // TODO!
+        return "TODO!!!!!"
     }
 
     override fun hashCode(): Int {

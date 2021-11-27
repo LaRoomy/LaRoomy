@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -25,6 +24,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     private var macAddressToConnect = ""
     private var curDeviceListIndex = -5
     private var propertyLoadingStarted = false
+    private var connectionMustResetDueToOnPauseExecution = false
     //private var authenticationAttemptCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,9 +60,16 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 // error state
                 Log.e("M:LoadingAct::onCreate", "The given DeviceListIndex is -ErrorState- (-1)")
                 (applicationContext as ApplicationProperty).logControl("E: Device-List-Index invalid.")
-
-                // TODO: Notify user? Navigate back? With delay?
-
+                // notify user
+                this.setMessageText(
+                    R.color.errorLightColor,
+                    getString(R.string.CA_ErrorDeviceListIndexInvalid)
+                )
+                // navigate back with delay
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                    finish()
+                }, 5000, TimeUnit.MILLISECONDS)
             }
             -2 -> {
                 // cache the address to connect again if an unexpected disconnect event occurs
@@ -91,12 +98,20 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(
                         adr
                     )
-                    setProgressText(getString(R.string.CA_Connecting))
+                    setProgressText(
+                        getString(R.string.CA_Connecting)
+                    )
                 } catch (e: IndexOutOfBoundsException){
                     Log.e("M:E:onCreate", "IndexOutOfBoundsException in LoadingActivity in onCreate")
                     Log.e("M:E:onCreate", "Index was: ${this.curDeviceListIndex} / bonded-list-size: ${ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.size}")
-
-                    // TODO: navigate back??? Notify User???
+                    (applicationContext as ApplicationProperty).logControl("E: Critical Error, Exception occurred while accessing the device-address: $e")
+                    setProgressText(
+                        getString(R.string.CA_ErrorDeviceAddressAccessException)
+                    )
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                        finish()
+                    }, 3000, TimeUnit.MILLISECONDS)
                 }
             }
         }
@@ -110,17 +125,27 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onPause() {
         super.onPause()
-
-        // TODO: suspend connection, if there was one
-
-        //ApplicationProperty.bluetoothConnectionManger.clear() this is fucking wrong!!
-        //finish()
+        if(verboseLog){
+            Log.w("LA:onPause", "OnPause executed in Loading Activity -> stop connection process")
+        }
+        // clear the connection process and start over on resume
+        ApplicationProperty.bluetoothConnectionManager.disconnect()
+        this.connectionMustResetDueToOnPauseExecution = true
     }
 
     override fun onResume() {
         super.onResume()
-
-        // TODO: resume connection, if there was one and check if the property loading has started, if so, reload the properties, they may be incomplete
+        if(verboseLog){
+            Log.w("LA:onResume", "OnResume executed in Loading Activity -> restart connection process")
+        }
+        if(this.connectionMustResetDueToOnPauseExecution) {
+            // start over with the connection process
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(
+                this.macAddressToConnect
+            )
+            this.connectionMustResetDueToOnPauseExecution = false
+        }
     }
 
     private fun setProgressText(text: String){
@@ -142,7 +167,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     // Interface methods:
     override fun onInitializationSuccessful() {
         super.onInitializationSuccessful()
-
+        if(verboseLog){
+            Log.d("LA:onInitSuccess", "Initialization successful in Loading Activity, start property listing")
+        }
+        this.setProgressText(
+            getString(R.string.CA_LoadingProperties)
+        )
         this.propertyLoadingStarted = true
         ApplicationProperty.bluetoothConnectionManager.startPropertyListing()
 
@@ -319,30 +349,29 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onConnectionError(errorID: Int) {
         super.onConnectionError(errorID)
 
-        // TODO: add log
-
-        // TODO: notify user
-        when(errorID){
-            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {}
-            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {}
-            BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING -> {}
-            else -> {}
+        val errorMessage = when(errorID){
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
+                getString(R.string.Error_ResumeFailedDeviceNotReachable)
+            }
+            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
+                getString(R.string.Error_ResumeFailedNoDevice)
+            }
+            BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING -> {
+                getString(R.string.Error_UnexpectedBindingKeyMissing)
+            }
+            else -> {
+                getString(R.string.Error_UnknownError)
+            }
         }
+        this.setErrorText(errorMessage)
+        Log.e("LA:onConError", "Error occurred in Loading Activity. User message: $errorMessage")
+        (applicationContext as ApplicationProperty).logControl("E: $errorMessage")
 
         Executors.newSingleThreadScheduledExecutor().schedule({
             blockAllFurtherProcessing = true
             ApplicationProperty.bluetoothConnectionManager.clear()
             finish()
         }, 3000, TimeUnit.MILLISECONDS)
-
-        // TODO: notify user and navigate back, if necessary
-
-    }
-
-    fun onLoadingStringClick(view: View) {
-
-        // FIXME: maybe temp, this has no effect, the problem is/was that there is no connection
-        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
     }
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {

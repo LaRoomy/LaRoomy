@@ -15,6 +15,7 @@
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
     <string name="CA_Initialize">Initialize..</string>
+    <string name="CA_LoadingProperties">Loading Properties..</string>
 
     <!-- check if this is really necessary??? -->
     <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
@@ -22,6 +23,8 @@
     <string name="CA_BindingPasskeyRejected">Wrong binding-passkey: connection rejected</string>
     <string name="CA_BindingNotActivated">Binding required but not activated in App-Settings</string>
     <string name="CA_TimeoutForConnection">Timeout - Device not reachable</string>
+    <string name="CA_ErrorDeviceListIndexInvalid">Invalid Device-List index</string>
+    <string name="CA_ErrorDeviceAddressAccessException">Critical error. Index out of bounds.</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
@@ -34,6 +37,7 @@
     <string name="DMA_PopUpMenuText_DiscardDevice">Close Device</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Reload Properties</string>
     <string name="DMA_ReconnectDevice">Resuming Connection..</string>
+
 
 
     <string name="RGB_HeaderText">RGB Control</string>
@@ -249,6 +253,10 @@
     <!-- Errors -->
     <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
     <string name="Error_SavedBindingKeyIsEmpty">Binding Key loading failed. Key was empty.</string>
+    <string name="Error_ResumeFailedDeviceNotReachable">Resuming connection failed: Device not reachable.</string>
+    <string name="Error_ResumeFailedNoDevice">Resuming connection failed: No device.</string>
+    <string name="Error_UnexpectedBindingKeyMissing">Unexpected error: Internal binding key is missing.</string>
+    <string name="Error_UnknownError">Unknown error occurred.</string>
 
 
     <!-- FileKeys: -->

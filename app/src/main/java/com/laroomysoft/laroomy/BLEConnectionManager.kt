@@ -1415,7 +1415,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isConnected = false
     }
 
-    private fun disconnect(){
+    fun disconnect(){
         this.bluetoothGatt?.disconnect()
         this.isConnected = false
     }
