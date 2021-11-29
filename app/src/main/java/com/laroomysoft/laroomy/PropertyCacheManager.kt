@@ -1,5 +1,9 @@
 package com.laroomysoft.laroomy
 
+import android.content.Context
+
+const val propertyCacheNameEntry = "PCacheF_"
+
 class DevicePropertyCacheData {
 
     private val propertyStringList = ArrayList<String>()
@@ -53,22 +57,82 @@ class DevicePropertyCacheData {
 
     fun toFileData() : String {
 
-        return "TODO!"
+        var fileBuffer = ""
+
+        this.propertyStringList.forEach {
+            fileBuffer += "$it\n"
+        }
+        this.groupStringList.forEach {
+            fileBuffer += "$it\n"
+        }
+        return fileBuffer
+    }
+
+    fun fromFileData(data: String) : Boolean {
+        var holderString = ""
+
+        data.forEach {
+            if(it == '\n'){
+                if(holderString.isNotEmpty()){
+                    when(holderString.elementAt(0)) {
+                        'P' -> {
+                            this.propertyStringList.add(holderString)
+                        }
+                        'G' -> {
+                            this.groupStringList.add(holderString)
+                        }
+                        else -> {
+                            return false
+                        }
+                    }
+                }
+                // reset holder
+                holderString = ""
+            } else {
+                // record line
+                holderString += it
+            }
+        }
+        if(holderString.isNotEmpty()) {
+            // should be not necessary because the last char in the file must be a line-feed
+            when (holderString.elementAt(0)) {
+                'P' -> {
+                    this.propertyStringList.add(holderString)
+                }
+                'G' -> {
+                    this.groupStringList.add(holderString)
+                }
+                else -> {
+                    return false
+                }
+            }
+        }
+        return true
     }
 }
 
-class PropertyCacheManager {
+class PropertyCacheManager(val appContext: Context) {
 
-    fun savePCacheData(devicePropertyCacheData: DevicePropertyCacheData){
-
+    fun savePCacheData(devicePropertyCacheData: DevicePropertyCacheData, macAddress: String) {
+        appContext.openFileOutput("$propertyCacheNameEntry$macAddress", Context.MODE_PRIVATE).use {
+            it.write(devicePropertyCacheData.toFileData().toByteArray())
+        }
     }
 
+    fun loadPCacheData(macAddress: String) : DevicePropertyCacheData {
 
+        var sBuffer: String
 
-//    fun lookupForPCacheDataWithMacAddress(macAddress: String) : DevicePropertyCacheData{
-//
-//    }
+        appContext.openFileInput("$propertyCacheNameEntry$macAddress").bufferedReader().use {
+            sBuffer = it.readText()
+        }
 
+        val devicePropertyCacheData = DevicePropertyCacheData()
 
+        if(sBuffer.isNotEmpty()){
+            devicePropertyCacheData.fromFileData(sBuffer)
+        }
 
+        return devicePropertyCacheData
+    }
 }

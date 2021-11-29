@@ -1148,8 +1148,13 @@ class LaRoomyDeviceProperty {
     }
 
     override fun toString(): String {
+
+        var outString = "P0"
+        outString += a8bitValueTo2CharHexValue(this.propertyIndex)
+        outString += "0000"
+
         // TODO!
-        return "TODO!!!!"
+        return outString
     }
 
     override fun hashCode(): Int {
@@ -1228,8 +1233,14 @@ class LaRoomyDevicePropertyGroup {
     }
 
     override fun toString(): String {
+
+        var outString = "G0"
+        outString += a8bitValueTo2CharHexValue(this.groupIndex)
+        outString += "0000"
+
+
         // TODO!
-        return "TODO!!!!!"
+        return outString
     }
 
     override fun hashCode(): Int {
