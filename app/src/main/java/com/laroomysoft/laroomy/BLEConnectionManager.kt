@@ -902,7 +902,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(propertyData.isValid){
                     this.laRoomyDevicePropertyList = propertyData.deviceProperties
                     this.laRoomyPropertyGroupList = propertyData.devicePropertyGroups
-                    this.generateUIAdaptableArrayListFromDeviceProperties(false)
+                    this.generateUIAdaptableArrayListFromDeviceProperties(addInALoopWhenReady)
                     return
                 } else {
                     if(verboseLog){
@@ -925,6 +925,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         this.propertyLoopActive = true
         this.sendNextPropertyRequest(-1)
+    }
+
+    fun startReloadProperties(){
+        this.invokeCallbackLoopAfterUIDataGeneration = true
+        this.propertyLoopActive = true
+        this.sendNextPropertyRequest(-1)
+
     }
 
     private fun sendNextPropertyRequest(currentIndex: Int){
@@ -1053,7 +1060,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
 
                 val devicePropertyCacheData = DevicePropertyCacheData()
-                DevicePropertyCacheData().generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
+                devicePropertyCacheData.generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
 
                 PropertyCacheManager(applicationProperty.applicationContext)
                     .savePCacheData(
@@ -1534,7 +1541,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun reloadProperties(){
         this.clearPropertyRelatedParameterAndStopAllLoops()
-        this.startPropertyListing(true)
+        //this.startPropertyListing(true)
+        this.startReloadProperties()
     }
 
     private fun generateUIAdaptableArrayListFromDeviceProperties(addInALoop: Boolean){

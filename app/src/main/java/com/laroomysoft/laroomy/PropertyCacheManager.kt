@@ -117,20 +117,27 @@ class DevicePropertyCacheData {
 class PropertyCacheManager(val appContext: Context) {
 
     fun savePCacheData(devicePropertyCacheData: DevicePropertyCacheData, macAddress: String) {
-        if(macAddress.isNotEmpty()) {
+        if (macAddress.isNotEmpty()) {
             try {
-                appContext.openFileOutput(
-                    "$propertyCacheNameEntry$macAddress",
-                    Context.MODE_PRIVATE
-                )
-                    .use {
-                        it.write(devicePropertyCacheData.toFileData().toByteArray())
+                val dataToSave = devicePropertyCacheData.toFileData()
+                if (dataToSave.isNotEmpty()) {
+                    appContext.openFileOutput(
+                        "$propertyCacheNameEntry$macAddress",
+                        Context.MODE_PRIVATE
+                    ).use {
+                        it.write(dataToSave.toByteArray())
                     }
+                } else {
+                    Log.e("PropCacheManager", "Unexpected error in PropertyCacheManager. DataToSave was empty!")
+                }
             } catch (e: Exception) {
                 Log.e("PropCacheManager", "Unexpected error in PropertyCacheManager. Info: $e")
             }
         } else {
-            Log.e("PropCacheManager", "Invalid operation. MacAddress to save was empty. Skip save operation!")
+            Log.e(
+                "PropCacheManager",
+                "Invalid operation. MacAddress to save was empty. Skip save operation!"
+            )
         }
     }
 

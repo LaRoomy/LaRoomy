@@ -25,6 +25,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     private var curDeviceListIndex = -5
     private var propertyLoadingStarted = false
     private var connectionMustResetDueToOnPauseExecution = false
+    private var preventNormalOnPauseExecution = false
     //private var authenticationAttemptCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +68,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 )
                 // navigate back with delay
                 Executors.newSingleThreadScheduledExecutor().schedule({
+                    this.preventNormalOnPauseExecution = true
                     ApplicationProperty.bluetoothConnectionManager.clear()
                     finish()
                 }, 5000, TimeUnit.MILLISECONDS)
@@ -109,6 +111,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                         getString(R.string.CA_ErrorDeviceAddressAccessException)
                     )
                     Executors.newSingleThreadScheduledExecutor().schedule({
+                        this.preventNormalOnPauseExecution = true
                         ApplicationProperty.bluetoothConnectionManager.clear()
                         finish()
                     }, 3000, TimeUnit.MILLISECONDS)
@@ -119,6 +122,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onBackPressed() {
         super.onBackPressed()
+        this.preventNormalOnPauseExecution
         ApplicationProperty.bluetoothConnectionManager.clear()
         finish()
     }
@@ -126,11 +130,15 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     override fun onPause() {
         super.onPause()
         if(verboseLog){
-            Log.w("LA:onPause", "OnPause executed in Loading Activity -> stop connection process")
+            Log.w("LA:onPause", "OnPause executed in Loading Activity -> stop connection process. Prevent normal onPause execution is: ${this.preventNormalOnPauseExecution}")
         }
-        // clear the connection process and start over on resume
-        ApplicationProperty.bluetoothConnectionManager.disconnect()
-        this.connectionMustResetDueToOnPauseExecution = true
+        if(!this.preventNormalOnPauseExecution) {
+            // clear the connection process and start over on resume
+            ApplicationProperty.bluetoothConnectionManager.disconnect()
+            this.connectionMustResetDueToOnPauseExecution = true
+        } else {
+            this.preventNormalOnPauseExecution = false
+        }
     }
 
     override fun onResume() {
@@ -236,6 +244,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         ApplicationProperty.bluetoothConnectionManager.clear()
         // navigate back with delay
         Handler(Looper.getMainLooper()).postDelayed({
+            this.preventNormalOnPauseExecution = true
             finish()
         }, 4000)
     }
@@ -283,6 +292,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                             )
                             // navigate back with delay
                             Handler(Looper.getMainLooper()).postDelayed({
+                                this.preventNormalOnPauseExecution = true
                                 finish()
                             }, 1500)
                         }
@@ -309,6 +319,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             } else {
                 // all attempts to connect failed -> go back to start (main activity)
                 (applicationContext as ApplicationProperty).logControl("E: Connection failed. Navigate back to main.")
+                this.preventNormalOnPauseExecution = true
                 ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()
             }
@@ -369,6 +380,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
         Executors.newSingleThreadScheduledExecutor().schedule({
             blockAllFurtherProcessing = true
+            this.preventNormalOnPauseExecution = true
             ApplicationProperty.bluetoothConnectionManager.clear()
             finish()
         }, 3000, TimeUnit.MILLISECONDS)
@@ -376,6 +388,8 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
+
+        this.preventNormalOnPauseExecution = true
 
         val intent =
             Intent(this@LoadingActivity, DeviceMainActivity::class.java)

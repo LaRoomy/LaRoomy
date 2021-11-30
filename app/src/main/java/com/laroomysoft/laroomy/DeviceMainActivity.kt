@@ -57,7 +57,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     //private var buttonRecoveryRequired = false
     private var restoreIndex = -1
     //private var deviceImageResourceId = -1
-    private var propertyLoadingFinished = false
+    private var propertyLoadingFinished = true
     private var levelSelectorPopUpOpen = false
     private var optionSelectorPopUpOpen = false
     private var deviceMenuOpen = false
@@ -358,6 +358,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // at first update the UI
         runOnUiThread {
+            this.propertyLoadingFinished = false
             this.propertyList.clear()
             //this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE

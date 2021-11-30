@@ -1152,8 +1152,16 @@ class LaRoomyDeviceProperty {
         var outString = "P0"
         outString += a8bitValueTo2CharHexValue(this.propertyIndex)
         outString += "0000"
+        outString += a8bitValueTo2CharHexValue(this.propertyType)
+        outString += a8bitValueTo2CharHexValue(this.imageID)
+        outString += a8bitValueTo2CharHexValue(this.groupIndex)
+        outString += a8bitValueTo2CharHexValue(this.flags)
+        outString += a8bitValueTo2CharHexValue(this.propertyState)
+        outString += this.propertyDescriptor
 
-        // TODO!
+        // TODO! it is more efficient to use literal strings
+
+
         return outString
     }
 
@@ -1237,9 +1245,15 @@ class LaRoomyDevicePropertyGroup {
         var outString = "G0"
         outString += a8bitValueTo2CharHexValue(this.groupIndex)
         outString += "0000"
+        outString += a8bitValueTo2CharHexValue(this.memberCount)
+        outString += a8bitValueTo2CharHexValue(this.imageID)
+        outString += groupName
+        outString += '\r'
 
 
-        // TODO!
+        // TODO! it is more efficient to use literal strings
+
+
         return outString
     }
 
