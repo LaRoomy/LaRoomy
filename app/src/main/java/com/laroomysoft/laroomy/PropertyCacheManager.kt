@@ -1,6 +1,9 @@
 package com.laroomysoft.laroomy
 
 import android.content.Context
+import android.util.Log
+import java.io.FileNotFoundException
+import java.lang.Exception
 
 const val propertyCacheNameEntry = "PCacheF_"
 
@@ -114,25 +117,46 @@ class DevicePropertyCacheData {
 class PropertyCacheManager(val appContext: Context) {
 
     fun savePCacheData(devicePropertyCacheData: DevicePropertyCacheData, macAddress: String) {
-        appContext.openFileOutput("$propertyCacheNameEntry$macAddress", Context.MODE_PRIVATE).use {
-            it.write(devicePropertyCacheData.toFileData().toByteArray())
+        if(macAddress.isNotEmpty()) {
+            try {
+                appContext.openFileOutput(
+                    "$propertyCacheNameEntry$macAddress",
+                    Context.MODE_PRIVATE
+                )
+                    .use {
+                        it.write(devicePropertyCacheData.toFileData().toByteArray())
+                    }
+            } catch (e: Exception) {
+                Log.e("PropCacheManager", "Unexpected error in PropertyCacheManager. Info: $e")
+            }
+        } else {
+            Log.e("PropCacheManager", "Invalid operation. MacAddress to save was empty. Skip save operation!")
         }
     }
 
     fun loadPCacheData(macAddress: String) : DevicePropertyCacheData {
 
-        var sBuffer: String
-
-        appContext.openFileInput("$propertyCacheNameEntry$macAddress").bufferedReader().use {
-            sBuffer = it.readText()
-        }
-
+        var sBuffer = ""
         val devicePropertyCacheData = DevicePropertyCacheData()
+
+        try {
+            appContext.openFileInput("$propertyCacheNameEntry$macAddress").bufferedReader().use {
+                sBuffer = it.readText()
+            }
+        } catch (e: FileNotFoundException){
+            if(verboseLog){
+                Log.d("PropCacheManager", "Lookup for file failed. File not found. For Mac-Address: $macAddress Exception: $e")
+            }
+        }
 
         if(sBuffer.isNotEmpty()){
             devicePropertyCacheData.fromFileData(sBuffer)
         }
-
         return devicePropertyCacheData
+    }
+
+    fun clearCache(){
+        // TODO !!!!!!!!!!!!!!!
+        // and invoke in settings activity
     }
 }

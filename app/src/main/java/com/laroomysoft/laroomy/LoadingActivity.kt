@@ -174,7 +174,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             getString(R.string.CA_LoadingProperties)
         )
         this.propertyLoadingStarted = true
-        ApplicationProperty.bluetoothConnectionManager.startPropertyListing()
+        ApplicationProperty.bluetoothConnectionManager.startPropertyListing(false)
 
 
 

@@ -23,7 +23,7 @@ class AppSettingsActivity : AppCompatActivity() {
     private lateinit var passwordViewModeButton: AppCompatImageButton
     private lateinit var useCustomBindingKeySwitch: SwitchCompat
     private lateinit var autoConnectSwitch: SwitchCompat
-    //private lateinit var listAllDevicesSwitch: SwitchCompat
+    private lateinit var savePropertiesSwitch: SwitchCompat
     private lateinit var passwordContainer: ConstraintLayout
     private lateinit var enableLogSwitch: SwitchCompat
     private lateinit var passKeyInputNotificationTextView: AppCompatTextView
@@ -66,17 +66,16 @@ class AppSettingsActivity : AppCompatActivity() {
                 }
             }
 
-/*
-        this.listAllDevicesSwitch =
-            findViewById<SwitchCompat>(R.id.setupActivityListAllDevicesSwitch).apply {
+        this.savePropertiesSwitch =
+            findViewById<SwitchCompat>(R.id.setupActivitySavePropertiesSwitch).apply {
                 val state =
                     (applicationContext as ApplicationProperty).loadBooleanData(
                         R.string.FileKey_AppSettings,
-                        R.string.DataKey_ListAllDevices
+                        R.string.DataKey_SaveProperties,
+                        true
                     )
                 this.isChecked = state
             }
-*/
 
         this.enableLogSwitch =
             findViewById<SwitchCompat>(R.id.setupActivityEnableLoggingSwitch).apply {
@@ -217,16 +216,14 @@ class AppSettingsActivity : AppCompatActivity() {
             }
         }
 
-/*
-        this.listAllDevicesSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+        this.savePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
             (this.applicationContext as ApplicationProperty).saveBooleanData(
                 b,
                 R.string.FileKey_AppSettings,
-                R.string.DataKey_ListAllDevices
+                R.string.DataKey_SaveProperties
             )
         }
-*/
 
         this.enableLogSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 

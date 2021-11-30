@@ -122,8 +122,8 @@
     <string name="SetupActivity_CustomBindingCodeElementText">Benutzerdefinierten Bindungs-Key verwenden</string>
     <string name="SetupActivity_CustomBindingCodeHint">Standardmäßig wird ein zufällig generierter Schlüssel verwendet. Dieser kann hier geändert werden.</string>
     <string name="SetupActivity_BindingCodeDescriptor">Bindungs-Code</string>
-    <string name="SetupActivity_ListAllDevicesElementText">Alle Bluetooth-Geräte auflisten</string>
-    <string name="SetupActivity_ListAllDevicesHint">Es werden alle mit dem System gekoppelten Geräte aufgelisted. Standardmäßig werden nur Geräte aufgelistet, die den LaRoomy Namenskonventionen entsprechen</string>
+    <string name="SetupActivity_SavePropertiesElementText">Geräte-Eigenschaften speichern</string>
+    <string name="SetupActivity_SavePropertiesHint">Die Geräte-Eigenschaften werden für das entsprechende Gerät gespeichert. Die zum Verbinden benötigte Zeit wird dadurch reduziert.</string>
     <string name="SetupActivity_UUIDManagerButtonText">UUID Profile verwalten</string>
     <string name="SetupActivity_EnableLoggingElementText">Verbindungsprotokoll erstellen</string>
     <string name="SetupActivity_EnableLoggingHint">Es wird ein temporäres Übertragungs-Protokoll erstellt. Unter Umständen führt das zu einer Beeinträchtigung der Performance, kann aber bei der Fehlersuche oder der Entwicklung des Endgerätes hilfreich sein.</string>

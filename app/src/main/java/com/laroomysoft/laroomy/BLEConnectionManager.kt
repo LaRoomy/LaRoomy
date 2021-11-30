@@ -52,9 +52,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         private set
 
     val initializationSuccess : Boolean
-        get() {
-        return this.bleDeviceData.authenticationSuccess
-    }
+        get() = this.bleDeviceData.authenticationSuccess
 
     var isBindingRequired = false
         private set
@@ -70,7 +68,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var propertyLoopActive = false
     private var groupLoopActive = false
     private var isResumeConnectionAttempt = false
-    private var dataReadyToShow = false
+    private var invokeCallbackLoopAfterUIDataGeneration = false
+
+    //private var dataReadyToShow = false
 
     private var suspendedDeviceAddress = ""
 
@@ -883,11 +883,45 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun startPropertyListing(){
+    fun startPropertyListing(addInALoopWhenReady: Boolean){
+
+        this.invokeCallbackLoopAfterUIDataGeneration = addInALoopWhenReady
+
         if(verboseLog){
-            Log.d("startPropList", "Starting property listing...")
+            Log.d("startPropList", "Property Listing requested -> Lookup if loading from cache is permitted.")
         }
-        applicationProperty.logControl("I: Starting property listing...")
+        applicationProperty.logControl("I: Property Listing requested -> Lookup if loading from cache is permitted.")
+
+        if(this.bleDeviceData.hasCachingPermission){
+            if(applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+
+                val propertyData =
+                    PropertyCacheManager(applicationProperty.applicationContext)
+                        .loadPCacheData(this.currentDevice?.address ?: "")
+
+                if(propertyData.isValid){
+                    this.laRoomyDevicePropertyList = propertyData.deviceProperties
+                    this.laRoomyPropertyGroupList = propertyData.devicePropertyGroups
+                    this.generateUIAdaptableArrayListFromDeviceProperties(false)
+                    return
+                } else {
+                    if(verboseLog){
+                        Log.d("startPropList", "Property data not valid. The reason is most likely that no property data is saved for the macAddress")
+                    }
+                    applicationProperty.logControl("I: No property data found. Loading from cache failed. Start requesting from device..")
+                }
+            } else {
+                if(verboseLog){
+                    Log.w("startPropList", "The user has not set up property caching. Requesting properties from device.")
+                }
+                applicationProperty.logControl("W: The user has not set up property caching. Start requesting properties from device.")
+            }
+        } else {
+            if(verboseLog){
+                Log.w("startPropList", "The remote device does not support loading from cache. Requesting properties from device.")
+            }
+            applicationProperty.logControl("W: The remote device does not support loading from cache. Start requesting properties from device.")
+        }
 
         this.propertyLoopActive = true
         this.sendNextPropertyRequest(-1)
@@ -935,20 +969,31 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // the property loop is complete, check if there are groups and request them
             if(this.bleDeviceData.groupCount > 0){
+                // there must be groups, proceed with the group loop
                 this.startGroupListing()
             } else {
+                // no groups, finalize the retrieval!
 
-                // TODO: there are no groups, so proceed without
+                // save data to cache if permitted
+                if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+
+                    val devicePropertyCacheData = DevicePropertyCacheData()
+                    DevicePropertyCacheData().generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
+
+                    PropertyCacheManager(applicationProperty.applicationContext)
+                        .savePCacheData(
+                            devicePropertyCacheData,
+                            this.currentDevice?.address ?: ""
+                        )
+                }
 
                 // generate UI-data
-                this.generateUIAdaptableArrayListFromDeviceProperties()
+                this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration)
 
                 // start retrieving the complex property states
                 Handler(Looper.getMainLooper()).postDelayed({
                     this.startComplexStateDataLoop()
                 }, 1000)
-
-
             }
         }
     }
@@ -1004,8 +1049,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             applicationProperty.logControl("I: Final group count reached. Group-count is: ${this.bleDeviceData.groupCount}")
 
+            // save data to cache if permitted
+            if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+
+                val devicePropertyCacheData = DevicePropertyCacheData()
+                DevicePropertyCacheData().generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
+
+                PropertyCacheManager(applicationProperty.applicationContext)
+                    .savePCacheData(
+                        devicePropertyCacheData,
+                        this.currentDevice?.address ?: ""
+                    )
+            }
+
             // generate UI-data
-            this.generateUIAdaptableArrayListFromDeviceProperties()
+            this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration)
 
             // start retrieving the complex property states
             Handler(Looper.getMainLooper()).postDelayed({
@@ -1248,6 +1306,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         //this.groupInfoLoopActive = false
         //this.deviceHeaderRecordingActive = false
 
+        this.invokeCallbackLoopAfterUIDataGeneration = false
+
         this.laRoomyDevicePropertyList.clear()
         this.laRoomyPropertyGroupList.clear()
         this.bleDeviceData.clear()
@@ -1259,6 +1319,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.propertyLoopActive = false
         this.groupLoopActive = false
         this.complexStateLoopActive = false
+        this.invokeCallbackLoopAfterUIDataGeneration = false
 
         // clear arrays
         this.uIAdapterList.clear()
@@ -1473,12 +1534,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun reloadProperties(){
         this.clearPropertyRelatedParameterAndStopAllLoops()
-        this.startPropertyListing()
+        this.startPropertyListing(true)
     }
 
-    private fun generateUIAdaptableArrayListFromDeviceProperties(){
+    private fun generateUIAdaptableArrayListFromDeviceProperties(addInALoop: Boolean){
 
-        this.dataReadyToShow = false
+        //this.dataReadyToShow = false
         this.uIAdapterList.clear()
 
         try {
@@ -1566,14 +1627,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // add it to the list
                         this.uIAdapterList.add(propertyEntry)
 
-                        // check if the member-id-array in the group element contains this element
-//                        if(!this.laRoomyPropertyGroupList.elementAt(expectedGroupIndex).memberIDs.contains(laRoomyDeviceProperty.propertyIndex)){
-//                            if(verboseLog){
-//                                Log.w("generateUIArray", "Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
-//                            }
-//                            applicationProperty.logControl("W: Inconsistency detected. The property element with index: ${laRoomyDeviceProperty.propertyIndex} is defined as part of the group with index: ${laRoomyDeviceProperty.groupIndex} but the group definition has no property with index: ${laRoomyDeviceProperty.propertyIndex}")
-//                        }
-
                         // check if this is the last property element
                         if(laRoomyDevicePropertyList.size == index + 1){
                             currentGroup = -1
@@ -1633,42 +1686,50 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
         // add the elements with a timer-delay
-        uIItemAddCounter = 0
+        if(addInALoop) {
+            uIItemAddCounter = 0
 
-        Timer().scheduleAtFixedRate(
-            object : TimerTask() {
-                override fun run() {
-                    try {
-                        propertyCallback.onUIAdaptableArrayListItemAdded(
-                            uIAdapterList.elementAt(
-                                uIItemAddCounter
+            Timer().scheduleAtFixedRate(
+                object : TimerTask() {
+                    override fun run() {
+                        try {
+                            propertyCallback.onUIAdaptableArrayListItemAdded(
+                                uIAdapterList.elementAt(
+                                    uIItemAddCounter
+                                )
                             )
-                        )
 
-                        uIItemAddCounter++
+                            uIItemAddCounter++
 
-                        if (uIItemAddCounter == uIAdapterList.size) {
+                            if (uIItemAddCounter == uIAdapterList.size) {
+                                cancel()
+                                uIItemAddCounter = -1
+                                //dataReadyToShow = true
+                                propertyCallback.onUIAdaptableArrayListGenerationComplete(
+                                    uIAdapterList
+                                )
+                            }
+                        } catch (e: IndexOutOfBoundsException) {
+                            if (verboseLog) {
+                                Log.e(
+                                    "generateUIArray",
+                                    "Error while adding the Elements to the view. Exception: $e"
+                                )
+                            }
+                            applicationProperty.logControl("E: Error while adding the elements to the view. Exception: $e")
+                            // FIXME: reset the whole???
                             cancel()
-                            uIItemAddCounter = -1
-                            dataReadyToShow = true
-                            propertyCallback.onUIAdaptableArrayListGenerationComplete(uIAdapterList)
                         }
-                    } catch (e: IndexOutOfBoundsException) {
-                        if (verboseLog) {
-                            Log.e(
-                                "generateUIArray",
-                                "Error while adding the Elements to the view. Exception: $e"
-                            )
-                        }
-                        applicationProperty.logControl("E: Error while adding the elements to the view. Exception: $e")
-                        // FIXME: reset the whole???
-                        cancel()
                     }
-                }
-            },
-            (0).toLong(),
-            (200).toLong()
-        )// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
+                },
+                (0).toLong(),
+                (150).toLong()
+            )// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
+        } else {
+            propertyCallback.onUIAdaptableArrayListGenerationComplete(
+                uIAdapterList
+            )
+        }
     }
 
 //    private fun resolveMultiComplexStateData(data: String, isName: Boolean){

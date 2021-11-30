@@ -119,8 +119,8 @@
     <string name="SetupActivity_CustomBindingCodeElementText">Use custom binding key</string>
     <string name="SetupActivity_CustomBindingCodeHint">By default a random generated binding-code is used. To use your own key, set it up here.</string>
     <string name="SetupActivity_BindingCodeDescriptor">Binding-Code</string>
-    <string name="SetupActivity_ListAllDevicesElementText">List all bluetooth devices</string>
-    <string name="SetupActivity_ListAllDevicesHint">If activated, the app will list all bonded Bluetooth- devices. By default, only devices corresponding to the LaRoomy naming conventions are listed.</string>
+    <string name="SetupActivity_SavePropertiesElementText">Save Device-Properties</string>
+    <string name="SetupActivity_SavePropertiesHint">If activated, the device-properties for the connected remote device will be saved. This results in a faster connection performance.</string>
     <string name="SetupActivity_UUIDManagerButtonText">Manage UUID-Profiles</string>
     <string name="SetupActivity_EnableLoggingElementText">Enable Connection Log</string>
     <string name="SetupActivity_EnableLoggingHint">All transmission-data and connection-events will be saved to a temporary cache. This may reduce the performance in the connection process but could be helpful for troubleshooting or during the development process of the remote device.</string>
@@ -271,7 +271,7 @@
     <string name="DataKey_AutoConnect" translatable="false">autoConnectValue</string>
     <string name="DataKey_DefaultRandomBindingPasskey" translatable="false">bindingPasskey</string>
     <string name="DataKey_CustomBindingPasskey" translatable="false">customBindingPasskey</string>
-    <string name="DataKey_ListAllDevices" translatable="false">listAllDevicesValue</string>
+    <string name="DataKey_SaveProperties" translatable="false">saveProperties</string>
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
     <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>
     <string name="DataKey_KeepScreenActive" translatable="false">keepScreenActiveKey</string>
