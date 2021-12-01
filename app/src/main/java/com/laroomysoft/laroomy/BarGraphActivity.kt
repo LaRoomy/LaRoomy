@@ -271,25 +271,30 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
 
-    override fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData) {
-        super.onMultiComplexPropertyDataUpdated(data)
+    override fun onFastDataPipeInvoked(data: String) {
 
-        // if the index is in range replace the element and update the graph
-        if(data.dataIndex <= this.maxBarIndex){
 
-            if(data.isName && !this.useValueAsBarDescriptor){
-                barDataList.elementAt(data.dataIndex).barText = data.dataName
-            } else {
-
-                barDataList.elementAt(data.dataIndex).barValue = data.dataValue.toFloat()
-
-                if(this.useValueAsBarDescriptor){
-                    barDataList.elementAt(data.dataIndex).barText = data.dataValue.toString()
-                }
-            }
-            this.refreshBarGraph()
-        } else {
-            (applicationContext as ApplicationProperty).logControl("E: BarGraph dataIndex invalid. Index was: ${data.dataIndex}. Maximum Bar index is $maxBarIndex")
-        }
     }
+
+//    override fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData) {
+//        super.onMultiComplexPropertyDataUpdated(data)
+//
+//        // if the index is in range replace the element and update the graph
+//        if(data.dataIndex <= this.maxBarIndex){
+//
+//            if(data.isName && !this.useValueAsBarDescriptor){
+//                barDataList.elementAt(data.dataIndex).barText = data.dataName
+//            } else {
+//
+//                barDataList.elementAt(data.dataIndex).barValue = data.dataValue.toFloat()
+//
+//                if(this.useValueAsBarDescriptor){
+//                    barDataList.elementAt(data.dataIndex).barText = data.dataValue.toString()
+//                }
+//            }
+//            this.refreshBarGraph()
+//        } else {
+//            (applicationContext as ApplicationProperty).logControl("E: BarGraph dataIndex invalid. Index was: ${data.dataIndex}. Maximum Bar index is $maxBarIndex")
+//        }
+//    }
 }

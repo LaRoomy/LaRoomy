@@ -60,12 +60,12 @@ class DeviceInfoHeaderData {
     }
 }
 
-class MultiComplexPropertyData {
-    var dataIndex = -1
-    var dataName = ""
-    var dataValue = -1
-    var isName = false
-}
+//class MultiComplexPropertyData {
+//    var dataIndex = -1
+//    var dataName = ""
+//    var dataValue = -1
+//    var isName = false
+//}
 
 class ComplexPropertyState {
     // shared state values (multi-purpose)
@@ -1159,8 +1159,7 @@ class LaRoomyDeviceProperty {
         outString += a8bitValueTo2CharHexValue(this.propertyState)
         outString += this.propertyDescriptor
 
-        // TODO! it is more efficient to use literal strings
-
+        // it is more efficient to use string-templates in this case here!!!
 
         return outString
     }
@@ -1250,9 +1249,7 @@ class LaRoomyDevicePropertyGroup {
         outString += groupName
         outString += '\r'
 
-
-        // TODO! it is more efficient to use literal strings
-
+        // it is more efficient to use string-templates in this case here!!!
 
         return outString
     }

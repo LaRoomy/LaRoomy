@@ -1203,14 +1203,21 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.showNotificationHeaderAndPostMessage(deviceHeaderData)
     }
 
+    override fun onPropertyInvalidated() {
+        if(verboseLog){
+            Log.d("DMA:PropInvalidated", "Property was invalidated from remote device -> Reload Properties")
+        }
+        (applicationContext as ApplicationProperty).logControl("I: Property was invalidated from remote device -> Reload Properties")
+
+        this.reloadProperties()
+    }
+
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
         // no complex property page is open
         return -1
     }
 
     override fun onUIAdaptableArrayItemChanged(index: Int) {
-        super.onUIAdaptableArrayItemChanged(index)
-
         runOnUiThread {
             devicePropertyListViewAdapter.notifyItemChanged(index)
         }

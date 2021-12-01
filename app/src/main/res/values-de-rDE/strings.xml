@@ -147,6 +147,8 @@
     <string name="ResetAppActivity_ResetBindingDataCheckBoxHint">Alle Daten bezüglich der Geräte-Bindung werden gelöscht. Inklusive der geteilen Bindungsdaten.</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxHint">Alle UUID-Profile werden gelöscht. Statische Profile bleiben erhalten.</string>
     <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxHint">Es wird ein neuer Zufalls-Schlüssel generiert. Vorsicht mit dieser Reset-Option wenn Geräte den aktuellen Bindungs-Schlüssel benötigen.</string>
+    <string name="ResetAppActivity_ResetPropertyCacheCheckboxText">Gespeicherte Geräte-Eigenschaften</string>
+    <string name="ResetAppActivity_ResetPropertyCacheCheckboxHint">Der Zwischenspeicher für Geräte-Eigenschaften wird bereinigt.</string>
     <string name="ResetAppActivity_CancelButtonText">Abbrechen</string>
     <string name="ResetAppActivity_ResetButtonText">Reset</string>
     <string name="ResetAppActivity_NoDataSelected">Keine Daten ausgewählt.</string>

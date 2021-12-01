@@ -17,6 +17,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     private lateinit var resetBindingDataCheckBox: AppCompatCheckBox
     private lateinit var resetUUIDProfilesCheckBox: AppCompatCheckBox
     private lateinit var resetDefaultBindingKeyCheckBox: AppCompatCheckBox
+    private lateinit var resetPropertyCacheCheckBox: AppCompatCheckBox
 
     private lateinit var notificationTextView: AppCompatTextView
 
@@ -44,6 +45,9 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         this.resetDefaultBindingKeyCheckBox = findViewById(R.id.resetAppActivityResetDefaultBindingKeyCheckBox)
         this.resetDefaultBindingKeyCheckBox.setOnCheckedChangeListener(this)
 
+        this.resetPropertyCacheCheckBox = findViewById(R.id.resetAppActivityResetPropertyCacheCheckBox)
+        this.resetPropertyCacheCheckBox.setOnCheckedChangeListener(this)
+
         this.notificationTextView = findViewById(R.id.resetAppActivityNotificationTextView)
     }
 
@@ -58,19 +62,27 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
                         this.resetBindingDataCheckBox.isChecked = true
                         this.resetUUIDProfilesCheckBox.isChecked = true
                         this.resetDefaultBindingKeyCheckBox.isChecked = true
+                        this.resetPropertyCacheCheckBox.isChecked = true
                     } else {
                         this.resetAppSettingsCheckBox.isChecked = false
                         this.resetBindingDataCheckBox.isChecked = false
                         this.resetUUIDProfilesCheckBox.isChecked = false
                         this.resetDefaultBindingKeyCheckBox.isChecked = false
+                        this.resetPropertyCacheCheckBox.isChecked = false
                     }
                 } else {
                     this.blockInternalOnCheckExecution = false
                 }
             }
             else -> {
-                if (this.resetDefaultBindingKeyCheckBox.isChecked && this.resetAppSettingsCheckBox.isChecked && this.resetBindingDataCheckBox.isChecked && this.resetUUIDProfilesCheckBox.isChecked) {
+                if (this.resetDefaultBindingKeyCheckBox.isChecked
+                    && this.resetAppSettingsCheckBox.isChecked
+                    && this.resetBindingDataCheckBox.isChecked
+                    && this.resetUUIDProfilesCheckBox.isChecked
+                    && this.resetPropertyCacheCheckBox.isChecked) {
+
                     this.selectAllCheckBox.isChecked = true
+
                 } else {
                     if (this.selectAllCheckBox.isChecked) {
                         this.blockInternalOnCheckExecution = true
@@ -149,6 +161,9 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
             } else {
                 Log.e("M:ResetData", "Reset error: generating random passkey failed.")
             }
+        }
+        if(this.resetPropertyCacheCheckBox.isChecked){
+            PropertyCacheManager(this.applicationContext).clearCache()
         }
     }
 

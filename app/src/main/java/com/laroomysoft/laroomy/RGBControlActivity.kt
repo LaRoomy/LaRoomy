@@ -561,4 +561,18 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
+
+    override fun onPropertyInvalidated() {
+        if(!isStandAlonePropertyMode) {
+            (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = true
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+
+            finish()
+
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
+    }
 }

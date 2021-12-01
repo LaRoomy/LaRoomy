@@ -80,6 +80,7 @@ class ApplicationProperty : Application() {
     var eventLogEnabled = false
     var mainActivityListElementWasAdded = false
     var complexUpdateIndex = -1
+    var propertyInvalidatedOnSubPage = false
 
     //var userNavigatedFromCommActivity = false
 

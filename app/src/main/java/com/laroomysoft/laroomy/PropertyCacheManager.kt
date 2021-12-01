@@ -162,8 +162,11 @@ class PropertyCacheManager(val appContext: Context) {
         return devicePropertyCacheData
     }
 
-    fun clearCache(){
-        // TODO !!!!!!!!!!!!!!!
-        // and invoke in settings activity
+    fun clearCache() {
+        appContext.filesDir.listFiles()?.forEach {
+            if (it.isFile && it.name.startsWith(propertyCacheNameEntry)) {
+                it.delete()
+            }
+        }
     }
 }

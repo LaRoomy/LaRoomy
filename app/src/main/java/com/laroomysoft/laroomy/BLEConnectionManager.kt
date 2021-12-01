@@ -388,8 +388,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     dataProcessed = readInitTransmission(data, dataSize)
                 }
                 '8' -> {
-                    // data-setter string
-                    // TODO: !
+                    // fast data setter
+                    dataProcessed = readFastDataSetterTransmission(data, dataSize)
                 }
             }
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
@@ -418,21 +418,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             when(data[8]){
                 '1' -> {
                     // user-message notification
-                    handleUserMessage(data, dataSize)
+                    this.handleUserMessage(data, dataSize)
                 }
                 '2' -> {
                     // time request notification from device
-                    handleTimeRequest()
+                    this.handleTimeRequest()
                 }
                 '3' -> {
                     // property invalidated notification
-                    this.reloadProperties()
-
-                    // TODO: this will not work, what is if the UI is on a complex-property-page!?
-                    // TODO: raise a callback method and let this the activities do!
+                    this.propertyCallback.onPropertyInvalidated()
                 }
                 '4' -> {
-
+                    // save properties to cache notification
+                    this.savePropertyDataToCacheIfPermitted()
                 }
                 '5' -> {
 
@@ -883,6 +881,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
+    private fun readFastDataSetterTransmission(data: String, dataSize: Int) : Boolean {
+
+        return true
+    }
+
     fun startPropertyListing(addInALoopWhenReady: Boolean){
 
         this.invokeCallbackLoopAfterUIDataGeneration = addInALoopWhenReady
@@ -931,7 +934,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.invokeCallbackLoopAfterUIDataGeneration = true
         this.propertyLoopActive = true
         this.sendNextPropertyRequest(-1)
-
     }
 
     private fun sendNextPropertyRequest(currentIndex: Int){
@@ -1541,8 +1543,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun reloadProperties(){
         this.clearPropertyRelatedParameterAndStopAllLoops()
-        //this.startPropertyListing(true)
         this.startReloadProperties()
+    }
+
+    fun savePropertyDataToCacheIfPermitted(){
+        // save data to cache if permitted
+        if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+
+            val devicePropertyCacheData = DevicePropertyCacheData()
+            devicePropertyCacheData.generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
+
+            PropertyCacheManager(applicationProperty.applicationContext)
+                .savePCacheData(
+                    devicePropertyCacheData,
+                    this.currentDevice?.address ?: ""
+                )
+        }
     }
 
     private fun generateUIAdaptableArrayListFromDeviceProperties(addInALoop: Boolean){
@@ -2107,10 +2123,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
         fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
         fun onUIAdaptableArrayItemChanged(index: Int){}
+        fun onPropertyInvalidated(){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}
-        fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
+        //fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
+        fun onFastDataPipeInvoked(data: String){}
         fun onBindingResponse(responseID: Int){}
         fun getCurrentOpenComplexPropPagePropertyIndex() : Int {
             // if overwritten, do not return the super method!
