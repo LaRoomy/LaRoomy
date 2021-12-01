@@ -115,7 +115,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
     fun resetAppActivityOnResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
-        if(this.resetAppSettingsCheckBox.isChecked || this.resetBindingDataCheckBox.isChecked || this.resetUUIDProfilesCheckBox.isChecked || this.resetDefaultBindingKeyCheckBox.isChecked){
+        if(this.resetAppSettingsCheckBox.isChecked || this.resetBindingDataCheckBox.isChecked || this.resetUUIDProfilesCheckBox.isChecked || this.resetDefaultBindingKeyCheckBox.isChecked || this.resetPropertyCacheCheckBox.isChecked) {
             val dialog = AlertDialog.Builder(this)
             dialog.setTitle(getString(R.string.ResetAppActivity_DialogTitle))
             dialog.setMessage(getString(R.string.ResetAppActivity_DialogMessage))

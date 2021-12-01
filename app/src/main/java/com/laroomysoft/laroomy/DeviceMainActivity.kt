@@ -235,6 +235,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
 */
 
+
+                // realign the context objects to the bluetoothManager
+                ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
+                ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
+
+                // notify the device that the user navigated back to the device main page
+                ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
+
                 // set property-item to normal background
                 resetSelectedItemBackground()
 
@@ -243,27 +251,25 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
                     false
 
-                // realign the context objects to the bluetoothManager
-                ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
-                ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
+                if ((this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage) {
 
-                // update info-header and states
-                // TODO: Reintegrate the info header or remove it!?
-//                if (ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.valid) {
-//                    setDeviceInfoHeader(
-//                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.imageID,
-//                        ApplicationProperty.bluetoothConnectionManager.deviceInfoHeaderData.message
-//                    )
-//                }
+                    this.reloadProperties()
+
+                    (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage =
+                        false
+                }
+
+
+
+
+
                 if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
                     (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
 
-                    // TODO: update data in a loop!?
+                    // TODO: update data in a loop!? or is this not necessary anymore????
 
                 }
 
-                // notify the device that the user navigated back to the device main page
-                ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
 
                 // TODO: detect state-changes and update the property-list-items
             }
