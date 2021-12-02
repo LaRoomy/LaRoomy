@@ -624,7 +624,6 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     }
 
     private fun fromComplexPropertyString(data: String, isUpdateMode: Boolean): Boolean {
-        // TODO: find syntax!
 
         // the transmission data entry must be removed on transmission reception
 
@@ -659,7 +658,9 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                         // check exit condition
                         if (data[index + 1] == ';') {
                             // end of bar definition
-                            strArray.add(recString)
+                            if (recString.isNotEmpty()) {
+                                strArray.add(recString)
+                            }
                             recString = ""
                             nextValidIndex = index + 2
                         }
@@ -667,6 +668,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                     '\r' -> {
                         if(recString.isNotEmpty()){
                             strArray.add(recString)
+                            recString = ""
                         }
                         return@forEachIndexed
                     }
@@ -675,6 +677,10 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                 if (index >= nextValidIndex) {
                     recString += c
                 }
+            }
+
+            if(recString.isNotEmpty()){
+                strArray.add(recString)
             }
 
             var barIndex: Int

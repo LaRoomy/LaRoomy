@@ -882,8 +882,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun readFastDataSetterTransmission(data: String, dataSize: Int) : Boolean {
-
-        return true
+        return if(dataSize < 8){
+            if(verboseLog){
+                Log.e("readFastDataSetter", "DataSize too short. DataSize was $dataSize. Minimum is 8!")
+            }
+            false
+        } else {
+            this.propertyCallback.onFastDataPipeInvoked(
+                a2CharHexValueToIntValue(data.elementAt(2), data.elementAt(3)),
+                data.removeRange(8, data.length - 1)
+            )
+            true
+        }
     }
 
     fun startPropertyListing(addInALoopWhenReady: Boolean){
@@ -2128,7 +2138,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}
         //fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
-        fun onFastDataPipeInvoked(data: String){}
+        fun onFastDataPipeInvoked(propertyID: Int, data: String){}
         fun onBindingResponse(responseID: Int){}
         fun getCurrentOpenComplexPropPagePropertyIndex() : Int {
             // if overwritten, do not return the super method!

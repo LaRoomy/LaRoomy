@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatTextView
+import java.lang.Exception
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -271,9 +272,62 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
     }
 
-    override fun onFastDataPipeInvoked(data: String) {
+    override fun onFastDataPipeInvoked(propertyID: Int, data: String) {
+
+        try {
+
+            val strArray = ArrayList<String>()
+            var recString = ""
+            var nextValidIndex = -1
+
+            // separate the bar-definition strings
+            data.forEachIndexed { index, c ->
+
+                when (c) {
+                    ';' -> {
+                        // check exit condition
+                        if (data[index + 1] == ';') {
+                            // end of bar definition
+                            if (recString.isNotEmpty()) {
+                                strArray.add(recString)
+                            }
+                            recString = ""
+                            nextValidIndex = index + 2
+                        }
+                    }
+                    '\r' -> {
+                        if (recString.isNotEmpty()) {
+                            strArray.add(recString)
+                            recString = ""
+                        }
+                        return@forEachIndexed
+                    }
+                }
+
+                if (index >= nextValidIndex) {
+                    recString += c
+                }
+            }
+            if (recString.isNotEmpty()) {
+                strArray.add(recString)
+            }
+            // update values from bar definition strings
+            strArray.forEach {
+                // get bar-index
+                val barIndex = it.elementAt(0).toString().toInt()
+
+                
 
 
+                if(barIndex == 9){
+
+                }
+
+
+            }
+        } catch (e: Exception){
+            Log.e("BarGraphDataPipe", "Exception occurred: $e")
+        }
     }
 
 //    override fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData) {
@@ -297,4 +351,6 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 //            (applicationContext as ApplicationProperty).logControl("E: BarGraph dataIndex invalid. Index was: ${data.dataIndex}. Maximum Bar index is $maxBarIndex")
 //        }
 //    }
+
+
 }

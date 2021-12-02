@@ -376,4 +376,17 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             startActivity(shareIntent)
         }
     }
+
+    override fun onPropertyInvalidated() {
+        (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = true
+        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+
+        finish()
+
+        overridePendingTransition(
+            R.anim.finish_activity_slide_animation_in,
+            R.anim.finish_activity_slide_animation_out
+        )
+
+    }
 }
