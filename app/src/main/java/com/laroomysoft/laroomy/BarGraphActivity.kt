@@ -316,7 +316,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 // get bar-index
                 val barIndex = it.elementAt(0).toString().toInt()
 
-                
+
 
 
                 if(barIndex == 9){
