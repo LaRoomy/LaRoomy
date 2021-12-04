@@ -210,6 +210,8 @@
 
     <string name="ViewLogActivity_HeaderText">Verbindungs-Protokoll</string>
     <string name="ViewLogActivity_NotificationNoLogDataAvailable">Keine Protokolldaten vorhanden</string>
+    <string name="ViewLogActivity_NotificationLoggingIsDisabled">Log erstellen is deaktiviert</string>
+
 
 
 

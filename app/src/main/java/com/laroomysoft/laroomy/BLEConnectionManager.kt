@@ -890,7 +890,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             this.propertyCallback.onFastDataPipeInvoked(
                 a2CharHexValueToIntValue(data.elementAt(2), data.elementAt(3)),
-                data.removeRange(8, data.length - 1)
+                data.removeRange(0, 8)
             )
             true
         }
@@ -916,6 +916,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.laRoomyDevicePropertyList = propertyData.deviceProperties
                     this.laRoomyPropertyGroupList = propertyData.devicePropertyGroups
                     this.generateUIAdaptableArrayListFromDeviceProperties(addInALoopWhenReady)
+
+                    if(!addInALoopWhenReady){
+
+                        // TODO: start simple state loop ???
+
+                        // must be loaded from cache, so start the complex loop here
+                        this.startComplexStateDataLoop()
+                    }
+
                     return
                 } else {
                     if(verboseLog){

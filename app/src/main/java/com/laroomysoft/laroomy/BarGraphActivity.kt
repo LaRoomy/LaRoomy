@@ -273,9 +273,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     }
 
     override fun onFastDataPipeInvoked(propertyID: Int, data: String) {
-
         try {
-
             val strArray = ArrayList<String>()
             var recString = ""
             var nextValidIndex = -1
@@ -311,46 +309,41 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             if (recString.isNotEmpty()) {
                 strArray.add(recString)
             }
+
             // update values from bar definition strings
-            strArray.forEach {
-                // get bar-index
-                val barIndex = it.elementAt(0).toString().toInt()
+            if(strArray.isNotEmpty()) {
+                strArray.forEach {
+                    // get bar-index
+                    val barIndex = it.elementAt(0).toString().toInt()
 
+                    if ((it[1] == ':') && (it[2] == ':')) {
 
+                        var strValueRec = ""
 
+                        it.forEachIndexed { index, c ->
+                            if (index > 2) {
+                                strValueRec += c
+                            }
+                        }
 
-                if(barIndex == 9){
+                        if (strValueRec.isNotEmpty()) {
 
+                            val barValue = strValueRec.toFloat()
+
+                            if (barIndex == 9) {
+                                // this is the fixed value definition
+                                this.barGraph.fixedMaximumValue = barValue.toInt()
+                            } else {
+                                // set bar value
+                                this.barDataList[barIndex].barValue = barValue
+                            }
+                        }
+                    }
                 }
-
-
+                this.refreshBarGraph()
             }
         } catch (e: Exception){
             Log.e("BarGraphDataPipe", "Exception occurred: $e")
         }
     }
-
-//    override fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData) {
-//        super.onMultiComplexPropertyDataUpdated(data)
-//
-//        // if the index is in range replace the element and update the graph
-//        if(data.dataIndex <= this.maxBarIndex){
-//
-//            if(data.isName && !this.useValueAsBarDescriptor){
-//                barDataList.elementAt(data.dataIndex).barText = data.dataName
-//            } else {
-//
-//                barDataList.elementAt(data.dataIndex).barValue = data.dataValue.toFloat()
-//
-//                if(this.useValueAsBarDescriptor){
-//                    barDataList.elementAt(data.dataIndex).barText = data.dataValue.toString()
-//                }
-//            }
-//            this.refreshBarGraph()
-//        } else {
-//            (applicationContext as ApplicationProperty).logControl("E: BarGraph dataIndex invalid. Index was: ${data.dataIndex}. Maximum Bar index is $maxBarIndex")
-//        }
-//    }
-
-
 }

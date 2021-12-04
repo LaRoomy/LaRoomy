@@ -201,6 +201,7 @@
 
     <string name="ViewLogActivity_HeaderText">Connection Log</string>
     <string name="ViewLogActivity_NotificationNoLogDataAvailable">No Log-Data available</string>
+    <string name="ViewLogActivity_NotificationLoggingIsDisabled">Log creation is disabled</string>
 
     <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Binding Data successful saved.</string>

@@ -36,10 +36,23 @@ class ViewLogActivity : AppCompatActivity() {
             layoutManager = logDataListLayoutManager
         }
 
-        if((applicationContext as ApplicationProperty).connectionLog.size <= 1){
-            notifyUser(getString(R.string.ViewLogActivity_NotificationNoLogDataAvailable), R.color.InfoColor)
+        if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)) {
+            if ((applicationContext as ApplicationProperty).connectionLog.size <= 1) {
+                notifyUser(
+                    getString(R.string.ViewLogActivity_NotificationNoLogDataAvailable),
+                    R.color.warningLightColor
+                )
+            } else {
+                notifyUser(
+                    (applicationContext as ApplicationProperty).logRecordingTime,
+                    R.color.goldAccentColor
+                )
+            }
         } else {
-            notifyUser((applicationContext as ApplicationProperty).logRecordingTime, R.color.goldAccentColor)
+            notifyUser(
+                getString(R.string.ViewLogActivity_NotificationLoggingIsDisabled),
+                R.color.warningLightColor
+            )
         }
     }
 
