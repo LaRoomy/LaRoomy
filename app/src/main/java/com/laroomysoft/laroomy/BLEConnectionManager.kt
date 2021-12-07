@@ -2151,12 +2151,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun stopLoopTimeoutWatcher(){
         if(this.timeoutWatcherData.isStarted) {
+            if (verboseLog) {
+                Log.d("StopTimeOutWatcher", "Loop-Timeout Watcher stopped! Loop-Type was ${loopTypeToString(timeoutWatcherData.loopType)}")
+            }
             this.timeoutWatcherData.reset()
             this.timeoutTimer.cancel()
-
-            if (verboseLog) {
-                Log.d("StopTimeOutWatcher", "Loop-Timeout Watcher stopped!")
-            }
         }
     }
 
