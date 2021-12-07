@@ -327,6 +327,17 @@ fun isHexCharacter(c: Char) : Boolean {
     }
 }
 
+fun loopTypeToString(loopType: Int) : String {
+    return when(loopType){
+        LOOPTYPE_NONE -> "none"
+        LOOPTYPE_PROPERTY -> "property"
+        LOOPTYPE_GROUP -> "group"
+        LOOPTYPE_SIMPLESTATE -> "simple property-state"
+        LOOPTYPE_COMPLEXSTATE -> "complex property-state"
+        else -> "unknown"
+    }
+}
+
 fun isLaroomyDevice(name: String) : Boolean {
     return name.contains("laroomy", true)||(name.contains("lry", true))
 }

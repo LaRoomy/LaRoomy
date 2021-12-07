@@ -23,6 +23,12 @@ const val USERMESSAGE_TYPE_INFO = '0'
 const val USERMESSAGE_TYPE_WARNING = '1'
 const val USERMESSAGE_TYPE_ERROR = '2'
 
+const val LOOPTYPE_NONE = 0
+const val LOOPTYPE_PROPERTY = 1
+const val LOOPTYPE_GROUP = 2
+const val LOOPTYPE_COMPLEXSTATE = 3
+const val LOOPTYPE_SIMPLESTATE = 4
+
 
 class LaRoomyDevicePresentationModel {
     // NOTE: This is the data-model for the DeviceListItem in the main-activity
@@ -60,12 +66,21 @@ class DeviceInfoHeaderData {
     }
 }
 
-//class MultiComplexPropertyData {
-//    var dataIndex = -1
-//    var dataName = ""
-//    var dataValue = -1
-//    var isName = false
-//}
+class LoopTimeoutWatcherData {
+    var timeoutFlag = false
+    var isStarted = false
+    var loopType = LOOPTYPE_NONE
+    var currentIndex = -1
+    var loopRepeatCounter = 0
+
+    fun reset(){
+        timeoutFlag = false
+        isStarted = false
+        loopType = LOOPTYPE_NONE
+        currentIndex = -1
+        loopRepeatCounter = 0
+    }
+}
 
 class ComplexPropertyState {
     // shared state values (multi-purpose)
