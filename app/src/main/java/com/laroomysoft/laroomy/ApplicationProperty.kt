@@ -98,7 +98,7 @@ class ApplicationProperty : Application() {
         eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
 
         // add the initial placeholder value
-        this.connectionLog.add(getString(R.string.ConnectionLog_NoContent))
+        //this.connectionLog.add(getString(R.string.ConnectionLog_NoContent))
     }
 
     fun resetControlParameter(){

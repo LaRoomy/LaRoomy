@@ -40,12 +40,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
     // static notifications
-    private val propertyLoadingCompleteNotification = "5000030010\r"        // sent when the retrieving of the properties is complete (raw loading - not from cache)
-    private val deviceReconnectedNotification = "500002002\r"               // sent when the connection was suspended (user has left the app) and the user re-invoked the app
-    private val userNavigatedBackToDeviceMainNotification = "500002004\r"   // sent when the user has opened a complex property page and navigated back to device-main-page
-    //private val propertyLoadedFromCacheCompleteNotification = "5000030011\r" // future use or delete it...!
+    private val propertyLoadingCompleteNotification = "5000030010\r"         // sent when the retrieving of the properties is complete (raw loading - not from cache)
+    private val deviceReconnectedNotification = "500002002\r"                // sent when the connection was suspended (user has left the app) and the user re-invoked the app
+    private val userNavigatedBackToDeviceMainNotification = "500002004\r"    // sent when the user has opened a complex property page and navigated back to device-main-page
+    private val propertyLoadedFromCacheCompleteNotification = "5000030011\r" // sent when the properties and groups are loaded from cache and the operation is complete
 
+    // data holder objects
     private val bleDeviceData = BLEDeviceData()
+    private val timeoutWatcherData = LoopTimeoutWatcherData()
+
+    // timer
+    private lateinit var timeoutTimer: Timer
 
 
     var isConnected:Boolean = false
@@ -57,9 +62,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var isBindingRequired = false
         private set
 
-//    var connectionTestSucceeded = false
-//        private set
-
     var connectionSuspended = false
         private set
 
@@ -69,8 +71,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var groupLoopActive = false
     private var isResumeConnectionAttempt = false
     private var invokeCallbackLoopAfterUIDataGeneration = false
-
-    //private var dataReadyToShow = false
 
     private var suspendedDeviceAddress = ""
 
@@ -604,6 +604,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.currentComplexStateRetrievingIndex = -1
                 this.complexStatePropertyIndexes.clear()
                 this.complexStateLoopActive = false
+                this.stopLoopTimeoutWatcher()
 
                 if(verboseLog){
                     Log.d("readComplexStateData", "Complex property state loop finished: Count is: $finalCount")
@@ -890,7 +891,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             this.propertyCallback.onFastDataPipeInvoked(
                 a2CharHexValueToIntValue(data.elementAt(2), data.elementAt(3)),
-                data.removeRange(8, data.length - 1)
+                data.removeRange(0, 8)
             )
             true
         }
@@ -915,7 +916,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(propertyData.isValid){
                     this.laRoomyDevicePropertyList = propertyData.deviceProperties
                     this.laRoomyPropertyGroupList = propertyData.devicePropertyGroups
-                    this.generateUIAdaptableArrayListFromDeviceProperties(addInALoopWhenReady)
+                    this.generateUIAdaptableArrayListFromDeviceProperties(addInALoopWhenReady, true)
+
+                    if(!addInALoopWhenReady){
+
+                        // TODO: start simple state loop ???
+
+                        // must be loaded from cache, so start the complex loop here
+                        this.startComplexStateDataLoop()
+                    }
+
                     return
                 } else {
                     if(verboseLog){
@@ -937,12 +947,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         this.propertyLoopActive = true
+        this.startLoopTimeoutWatcher(LOOPTYPE_PROPERTY)
         this.sendNextPropertyRequest(-1)
     }
 
     fun startReloadProperties(){
         this.invokeCallbackLoopAfterUIDataGeneration = true
         this.propertyLoopActive = true
+        this.startLoopTimeoutWatcher(LOOPTYPE_PROPERTY)
         this.sendNextPropertyRequest(-1)
     }
 
@@ -953,6 +965,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         // check for the end of the property count
         if(newIndex < this.bleDeviceData.propertyCount){
+
+            // notify timeout watcher
+            this.notifyLoopIsWorking(newIndex)
+
             // build request string
             var rqString = "11"
 
@@ -980,6 +996,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
 
             this.propertyLoopActive = false
+            this.stopLoopTimeoutWatcher()
 
             if(verboseLog){
                 Log.d("sendNextPropRQ", "Final property count reached. Property count is: ${this.bleDeviceData.propertyCount}")
@@ -1007,7 +1024,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
 
                 // generate UI-data
-                this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration)
+                this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration, false)
 
                 // start retrieving the complex property states
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -1024,6 +1041,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         applicationProperty.logControl("I: Starting group listing...")
 
         this.groupLoopActive = true
+        this.startLoopTimeoutWatcher(LOOPTYPE_GROUP)
         this.sendNextGroupRequest(-1)
     }
 
@@ -1034,6 +1052,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         // check for the end of the group count
         if(newIndex < this.bleDeviceData.groupCount){
+
+            // notify timeout-watcher
+            this.notifyLoopIsWorking(newIndex)
 
             // build request string
             var rqString = "21"
@@ -1062,6 +1083,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             // end of loop
             this.groupLoopActive = false
+            this.stopLoopTimeoutWatcher()
 
             if(verboseLog){
                 Log.d("sendNextGroupRQ", "Final group count reached. Group-count is: ${this.bleDeviceData.groupCount}")
@@ -1082,7 +1104,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             // generate UI-data
-            this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration)
+            this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration, false)
 
             // start retrieving the complex property states
             Handler(Looper.getMainLooper()).postDelayed({
@@ -1571,7 +1593,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun generateUIAdaptableArrayListFromDeviceProperties(addInALoop: Boolean){
+    private fun generateUIAdaptableArrayListFromDeviceProperties(addInALoop: Boolean, isCacheLoadingOperation: Boolean){
 
         //this.dataReadyToShow = false
         this.uIAdapterList.clear()
@@ -1713,12 +1735,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return
         }
 
-        // notify finalization of the process
-        Handler(Looper.getMainLooper()).postDelayed({
-            this.sendData(propertyLoadingCompleteNotification)
-        }, 700)
-
-
         // add the elements with a timer-delay
         if(addInALoop) {
             uIItemAddCounter = 0
@@ -1736,12 +1752,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             uIItemAddCounter++
 
                             if (uIItemAddCounter == uIAdapterList.size) {
+                                // cancel timer
                                 cancel()
                                 uIItemAddCounter = -1
-                                //dataReadyToShow = true
                                 propertyCallback.onUIAdaptableArrayListGenerationComplete(
                                     uIAdapterList
                                 )
+                                // notify the finalization of the process
+                                if(isCacheLoadingOperation){
+                                    sendData(propertyLoadedFromCacheCompleteNotification)
+                                } else {
+                                    sendData(propertyLoadingCompleteNotification)
+                                }
                             }
                         } catch (e: IndexOutOfBoundsException) {
                             if (verboseLog) {
@@ -1763,87 +1785,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             propertyCallback.onUIAdaptableArrayListGenerationComplete(
                 uIAdapterList
             )
+
+            // notify finalization of the process
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                if(isCacheLoadingOperation){
+                    sendData(propertyLoadedFromCacheCompleteNotification)
+                } else {
+                    sendData(propertyLoadingCompleteNotification)
+                }
+
+            }, 500, TimeUnit.MILLISECONDS)
         }
     }
-
-//    private fun resolveMultiComplexStateData(data: String, isName: Boolean){
-//
-//        if(verboseLog) {
-//            Log.d(
-//                "M:RslveMultiCmplx",
-//                "ResolveMultiComplexStateData invoked - isName = $isName / data = $data"
-//            )
-//        }
-//
-//        if(this.multiComplexPropertyPageOpen){
-//            val dataIndex = data.elementAt(4).toString().toInt()
-//            var name = ""
-//
-//            if(isName){
-//                data.forEachIndexed { index, c ->
-//                    if(index > 4){
-//                        name += c
-//                    }
-//                }
-//
-//                val mcd = MultiComplexPropertyData()
-//                mcd.isName = true
-//                mcd.dataName = name
-//                mcd.dataIndex = dataIndex
-//
-//                // trigger event
-//                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
-//            } else {
-//                this.resolveSpecificMultiComplexStateData(data, dataIndex)
-//            }
-//        } else {
-//            // send error notification ?!
-//            Log.e(
-//                "M:RslveMultiCmplx",
-//                "ResolveMultiComplexStateData error: multi-complex page not open!"
-//            )
-//        }
-//    }
-
-//    private fun resolveSpecificMultiComplexStateData(data: String, dataIndex: Int){
-//
-//        when(this.multiComplexTypeID){
-//            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
-//                var stringData = ""
-////                stringData += data.elementAt(5)
-////                stringData += data.elementAt(6)
-////                stringData += data.elementAt(7)
-//
-////                try {
-////                    for (i in 5 until data.length) {
-////                        stringData += data.elementAt(i)
-////                    }
-////                }
-////                catch(e: IndexOutOfBoundsException){
-////                    Log.e("M:resolveSMCSD", "Exception in \"resolveSpecificMultiComplexStateData\" Message: ${e.localizedMessage}")
-////                    return
-////                }
-//
-//                data.forEachIndexed { index, c ->
-//                    if(index > 4){
-//                        stringData += c
-//                    }
-//                }
-//
-//                val mcd = MultiComplexPropertyData()
-//                mcd.dataIndex = dataIndex
-//                mcd.dataValue = stringData.toInt()
-//                mcd.isName = false
-//
-//                // trigger event
-//                this.propertyCallback.onMultiComplexPropertyDataUpdated(mcd)
-//            }
-//            else -> {
-//                // send error?
-//            }
-//        }
-//
-//    }
 
     private fun propertyTypeFromID(ID: Int) : Int {
         this.laRoomyDevicePropertyList.forEach {
@@ -1892,15 +1845,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.currentComplexStateRetrievingIndex = 0
             this.complexStateLoopActive = true
 
+            // setup a timeout, to recognize if the remote device is not responding
+            this.startLoopTimeoutWatcher(LOOPTYPE_COMPLEXSTATE)
+
             this.sendComplexPropertyStateRequest(
                 this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex)
             )
-
-            // TODO: setup a timeout, to recognize if the remote device is not responding
         }
     }
 
     private fun sendComplexPropertyStateRequest(propertyIndex: Int){
+
+        // notify the timeout-watcher
+        this.notifyLoopIsWorking(propertyIndex)
 
         val hexIndex = Integer.toHexString(propertyIndex)
         var requestString = "31"
@@ -1915,8 +1872,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         requestString += "0000\r"
 
         this.sendData(requestString)
-
-        // TODO: setup a timeout, to recognize if the device is responding
     }
 
     fun doComplexPropertyStateRequestForPropertyIndex(propertyIndex: Int) {
@@ -2116,6 +2071,91 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
                 devicePropertyListContentInformation.complexPropertyState = cState
             }
+        }
+    }
+
+    private fun startLoopTimeoutWatcher(loopType: Int){
+
+        timeoutWatcherData.isStarted = true
+        timeoutWatcherData.timeoutFlag = true
+        timeoutWatcherData.loopType = loopType
+
+        if(verboseLog){
+            Log.d("StartTimeOutWatcher", "Loop-Timeout Watcher started..")
+        }
+
+        this.timeoutTimer = Timer()
+
+        this.timeoutTimer.scheduleAtFixedRate(
+            object : TimerTask() {
+                override fun run() {
+
+                    // first check if loops are running, if not, stop the timer
+                    if(!complexStateLoopActive && !propertyLoopActive && !groupLoopActive){
+                        if(verboseLog){
+                            Log.w("LoopTimeoutWatcher", "All loops are offline. Execute self reset. Loop-type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
+                        }
+                        timeoutWatcherData.reset()
+                        cancel()
+                    } else {
+
+                        if (timeoutWatcherData.timeoutFlag) {
+                            // the flag was not reset during the reception of a response, there must be a problem
+                            if (timeoutWatcherData.loopRepeatCounter < 4) {
+                                if (verboseLog) {
+                                    Log.w(
+                                        "LoopTimeoutWatcher",
+                                        "Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}"
+                                    )
+                                }
+                                applicationProperty.logControl("W: Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}")
+
+
+                                // TODO: restart loop from loop-type!
+
+                            } else {
+                                // loop could not be finalized
+                                Log.e("LoopTimeoutWatcher", "Loop-Timeout occurred 3 times! - Device not responding!")
+                                applicationProperty.logControl("E: Loop-Timeout occurred 3 times! - Device not responding!")
+
+
+                                // TODO: what to do here?? notify user?? close device??
+                            }
+
+                        } else {
+                            if(verboseLog){
+                                Log.d("LoopTimeoutWatcher", "Timeout condition was checked. Everything fine..")
+                            }
+                            // set the flag to true (if it is still true on the next execution, there must be a problem)
+                            timeoutWatcherData.timeoutFlag = true
+                        }
+                    }
+                }
+            }, (0).toLong(), (500).toLong()
+        )
+    }
+
+    private fun notifyLoopIsWorking(currentIndex: Int){
+        if(this.timeoutWatcherData.isStarted){
+            this.timeoutWatcherData.currentIndex = currentIndex
+            this.timeoutWatcherData.timeoutFlag = false
+        } else {
+            if(verboseLog) {
+                Log.d(
+                    "NotifyTimeoutWatcher",
+                    "NotifyTimeoutWatcher was invoked. No loop active. Action was discarded."
+                )
+            }
+        }
+    }
+
+    private fun stopLoopTimeoutWatcher(){
+        if(this.timeoutWatcherData.isStarted) {
+            if (verboseLog) {
+                Log.d("StopTimeOutWatcher", "Loop-Timeout Watcher stopped! Loop-Type was ${loopTypeToString(timeoutWatcherData.loopType)}")
+            }
+            this.timeoutWatcherData.reset()
+            this.timeoutTimer.cancel()
         }
     }
 

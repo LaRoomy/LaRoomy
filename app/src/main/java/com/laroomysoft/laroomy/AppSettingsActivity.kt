@@ -94,7 +94,8 @@ class AppSettingsActivity : AppCompatActivity() {
                     setShowLogButtonVisibility(state)
                 }, 200)
 
-                // TODO: delete logArray and time-stamp??
+                (applicationContext as ApplicationProperty).logRecordingTime = ""
+                (applicationContext as ApplicationProperty).connectionLog.clear()
             }
         this.keepScreenActiveSwitchCompat =
             findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
