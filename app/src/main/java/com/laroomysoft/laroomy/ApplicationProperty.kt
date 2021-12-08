@@ -344,6 +344,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         112 -> R.drawable.flash_yellow
         113 -> R.drawable.add_white_sq48_simple
         114 -> R.drawable.add_blue_sq48_simple
+        115 -> R.drawable.rgb_circles
 
         // TODO: implement all new image resources here...
 
