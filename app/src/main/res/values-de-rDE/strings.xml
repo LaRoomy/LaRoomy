@@ -26,6 +26,7 @@
     <string name="CA_LoadingProperties">Geräte-Eigenschaften werden geladen..</string>
     <string name="CA_ErrorDeviceListIndexInvalid">Ungültiger Geräte-Index</string>
     <string name="CA_ErrorDeviceAddressAccessException">Kritischer Fehler. Index nicht im zulässigen Bereich.</string>
+    <string name="CA_InitTimeoutOccurred">Timeout: Gerät antwortet nicht</string>
 
 
 
@@ -162,7 +163,7 @@
     <string name="DeviceSettingsActivity_HeaderText">Geräte-Einstellungen</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Gerät verbunden</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Gerät getrennt</string>
-    <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Gerätebindung aktivieren</string>
+    <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Gerätebindung aktiv</string>
     <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">Beim Aktivieren wird eine Anforderung zum Herstellen einer Bindung an das Gerät gesendet. Wenn das Gerät diese Funktion unterstützt, wird der Bindungs-Schlüssel an das Gerät übermittelt und ist für alle nachfolgenden Verbindungen mit dem Gerät erforderlich.</string>
     <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">Beim Deaktivieren wird eine Anforderung zum Löschen der Bindung an das Gerät gesendet. Es wird kein Bindungs-Schlüssel mehr benötigt um eine Verbindung herzustellen.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Werkseinstellungen</string>
@@ -181,6 +182,10 @@
     <string name="DeviceSettingsActivity_DeviceMACAddressDescriptorText">MAC:</string>
     <string name="DeviceSettingsActivity_DeviceServiceUUIDDescriptorText">Service UUID:</string>
     <string name="DeviceSettingsActivity_DeviceCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="DeviceSettingsActivity_ReleaseBindingSuccessText">Gerätebindung erfolgreich gelöst.</string>
+    <string name="DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText">Fehler beim Lösen der Geräte-Bindung: Falscher Schlüssel.</string>
+    <string name="DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText">Fehler beim Lösen der Geräte-Bindung: Unbekannter Fehler.</string>
+    <string name="DeviceSettingsActivity_ShowDeviceInfoButtonText">Geräte-Info anzeigen</string>
 
 
 

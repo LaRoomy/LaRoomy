@@ -175,65 +175,17 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     // Interface methods:
     override fun onInitializationSuccessful() {
         super.onInitializationSuccessful()
-        if(verboseLog){
-            Log.d("LA:onInitSuccess", "Initialization successful in Loading Activity, start property listing")
+        if (verboseLog) {
+            Log.d(
+                "LA:onInitSuccess",
+                "Initialization successful in Loading Activity, start property listing"
+            )
         }
         this.setProgressText(
             getString(R.string.CA_LoadingProperties)
         )
         this.propertyLoadingStarted = true
         ApplicationProperty.bluetoothConnectionManager.startPropertyListing(false)
-
-
-
-        // navigate to the next activity and retrieve the properties there:
-
-
-//        val intent =
-//            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
-
-        // in auto-connect-mode the parameter "curDeviceListIndex" is -2, this is an invalid index and not suitable to get the image of the device
-        // so get the image for the device
-        //var image = -1
-
-/*
-        if(curDeviceListIndex < 0){
-            // the list index is invalid, must be an auto-connect procedure
-                // generate lookup for the address in the bonded device list:
-            ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.forEach {
-                if(it.address == ApplicationProperty.bluetoothConnectionManager.currentDevice?.address){
-                    image = it.image
-                    return@forEach
-                }
-            }
-            if(image == -1){
-                // image was not found, set a placeholder image
-                image = if(isLaroomyDevice(ApplicationProperty.bluetoothConnectionManager.currentDevice?.name ?: "Name")){
-                    // laroomy device
-                    R.drawable.laroomy_icon_sq64
-                } else {
-                    // any device
-                    R.drawable.bluetooth_green_glow_sq64
-                }
-            }
-        } else {
-            image = try {
-                ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.elementAt(
-                    this.curDeviceListIndex
-                ).image
-            } catch (e: IndexOutOfBoundsException){
-                Log.e("M:E:Auth:Success", "IndexOutOfBoundsException in LoadingActivity in callback-method: onAuthenticationSuccessful")
-                Log.e("M:E:Auth:Success", "ExceptionMessage: ${e.message}")
-                Log.e("M:E:Auth:Success", "Current index was ${this.curDeviceListIndex} / size of bonded-list: ${ApplicationProperty.bluetoothConnectionManager.bondedLaRoomyDevices.size}")
-                R.drawable.bluetooth_green_glow_sq64
-            }
-        }
-*/
-
-        //intent.putExtra("BondedDeviceImageResourceId", image)
-        //startActivity(intent)
-        // finish this activity
-        //finish()
     }
 
     override fun onBindingPasskeyRejected() {
@@ -334,27 +286,70 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         }
         (applicationContext as ApplicationProperty).logControl("I: Device ready for communication - sending authentication string")
 
-        // device ready -> send authentication
         runOnUiThread {
-            setProgressText(getString(R.string.CA_Connected))
-            // send init request
-            Handler(Looper.getMainLooper()).postDelayed({
-                ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
-
-                // check the init with delay an try again if it is false
-                Handler(Looper.getMainLooper()).postDelayed({
-
-                    // TODO: maybe check here if the device is disconnected and try to reconnect
-
-                    if(!ApplicationProperty.bluetoothConnectionManager.initializationSuccess){
-                        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
-                    }
-                },2000)// FIXME: what is the right time interval??
-                
-                // notify User:
-                setProgressText(getString(R.string.CA_Initialize))
-            }, 1500) // FIXME: what is the right time interval??
+            setProgressText(getString(R.string.CA_Initialize))
         }
+
+        // device ready -> start init process
+        Timer().scheduleAtFixedRate(object : TimerTask() {
+
+            var counter = 0
+
+            override fun run() {
+                if(counter < 8) {
+                    if (!ApplicationProperty.bluetoothConnectionManager.initializationSuccess) {
+                        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
+                        counter++
+                    } else {
+                        cancel()
+                    }
+                } else {
+                    // all attempts to init are failed
+                    cancel()
+
+                    // log
+                    Log.e(
+                        "M:CB:InitTryout",
+                        "Timeout for the initialization process. Remote device not responding. Stop process."
+                    )
+                    (applicationContext as ApplicationProperty).logControl("E: Timeout for the initialization process. Remote device not responding. Stop process.")
+
+                    // notify user
+                    runOnUiThread {
+                        setErrorText(getString(R.string.CA_InitTimeoutOccurred))
+                    }
+
+                    // navigate back with delay
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        blockAllFurtherProcessing = true
+                        preventNormalOnPauseExecution = true
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                        finish()
+                    }, 3000, TimeUnit.MILLISECONDS)
+                }
+            }
+        }, 1500, 1500)
+
+//        // device ready -> send authentication
+//        runOnUiThread {
+//            setProgressText(getString(R.string.CA_Connected))
+//            // send init request (with a short delay to make sure the remote device is ready)
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
+//
+//                // check the init with delay an try again if it is false
+//                Handler(Looper.getMainLooper()).postDelayed({
+//
+//                    if(!ApplicationProperty.bluetoothConnectionManager.initializationSuccess){
+//                        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
+//                    }
+//
+//                },2000)// FIXME: what is the right time interval??
+//
+//                // notify User:
+//                setProgressText(getString(R.string.CA_Initialize))
+//            }, 1500) // FIXME: what is the right time interval??
+//        }
     }
 
     override fun onConnectionError(errorID: Int) {

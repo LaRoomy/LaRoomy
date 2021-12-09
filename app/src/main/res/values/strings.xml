@@ -22,9 +22,10 @@
 
     <string name="CA_BindingPasskeyRejected">Wrong binding-passkey: connection rejected</string>
     <string name="CA_BindingNotActivated">Binding required but not activated in App-Settings</string>
-    <string name="CA_TimeoutForConnection">Timeout - Device not reachable</string>
+    <string name="CA_TimeoutForConnection">Timeout: Device not reachable</string>
     <string name="CA_ErrorDeviceListIndexInvalid">Invalid Device-List index</string>
     <string name="CA_ErrorDeviceAddressAccessException">Critical error. Index out of bounds.</string>
+    <string name="CA_InitTimeoutOccurred">Timeout: Remote device not responding</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
@@ -158,7 +159,7 @@
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
     <string name="DeviceSettingsActivity_UserInfo_Connected">Device Connected</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Device Disconnected</string>
-    <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Enable Binding</string>
+    <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Device-Binding active</string>
     <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">When activating, a binding-request will be sent to the remote device. If supported by the device, your binding-code will be written to the device and is necessary for all subsequent connections.</string>
     <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">When deactivating, a binding-release-request will be sent to the remote device. If successful, the device accepts all connections.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Factory Reset</string>
@@ -177,6 +178,10 @@
     <string name="DeviceSettingsActivity_DeviceMACAddressDescriptorText">MAC:</string>
     <string name="DeviceSettingsActivity_DeviceServiceUUIDDescriptorText">Service UUID:</string>
     <string name="DeviceSettingsActivity_DeviceCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="DeviceSettingsActivity_ReleaseBindingSuccessText">Binding successful released.</string>
+    <string name="DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText">Release binding failed. Wrong passkey!</string>
+    <string name="DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText">Release binding failed. Unknown error!</string>
+    <string name="DeviceSettingsActivity_ShowDeviceInfoButtonText">Show device info</string>
 
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>

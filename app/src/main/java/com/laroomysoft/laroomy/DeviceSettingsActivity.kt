@@ -92,26 +92,26 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
             // create/release device binding
 
+            val passkey =
+                // select default or custom key in relation to the appropriate setting
+                when((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)) {
+                    true -> {
+                        (applicationContext as ApplicationProperty).loadSavedStringData(
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_CustomBindingPasskey
+                        )
+                    }
+                    false -> {
+                        (applicationContext as ApplicationProperty).loadSavedStringData(
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_DefaultRandomBindingPasskey
+                        )
+                    }
+                }
+
             when(isChecked){
                 true -> {
                     // enable the device binding
-                    val passkey =
-                        // select default or custom key in relation to the appropriate setting
-                        when((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)) {
-                            true -> {
-                                (applicationContext as ApplicationProperty).loadSavedStringData(
-                                    R.string.FileKey_AppSettings,
-                                    R.string.DataKey_CustomBindingPasskey
-                                )
-                            }
-                            false -> {
-                                (applicationContext as ApplicationProperty).loadSavedStringData(
-                                    R.string.FileKey_AppSettings,
-                                    R.string.DataKey_DefaultRandomBindingPasskey
-                                )
-                            }
-                        }
-                    //ApplicationProperty.bluetoothConnectionManger.sendData("SeB§$passkey$")
                     ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding(passkey)
 
                     // update the hint for the user
@@ -122,8 +122,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 }
                 else -> {
                     // release the device binding
-                    //ApplicationProperty.bluetoothConnectionManger.sendData("SrB>$")
-                    ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding()
+                    ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding(passkey)
 
                     // update the hint for the user
                     bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
@@ -212,13 +211,21 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         factoryResetAlertDialog()
     }
 
+    fun onDeviceSettingsActivityShowDevInfoButtonClick(view: View) {
+        // hide the button and show the device info..
+        view.visibility = View.GONE
+        findViewById<ConstraintLayout>(R.id.deviceSettingsActivityDeviceInfoParentContainer).visibility = View.VISIBLE
+
+    }
+
+
     private fun factoryResetAlertDialog(){
         val dialog = AlertDialog.Builder(this)
         dialog.setMessage(R.string.DeviceSettingsActivity_FactoryResetConfirmationMessage)
         dialog.setTitle(R.string.DeviceSettingsActivity_FactoryResetButtonDescriptorText)
         dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
             // send factory reset command
-            ApplicationProperty.bluetoothConnectionManager.sendData("SfR=$")
+            ApplicationProperty.bluetoothConnectionManager.sendFactoryResetCommand()
             dialogInterface.dismiss()
         }
         dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
@@ -245,15 +252,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             setUIElementsEnabledState(state)
         }
     }
-
-//    override fun onConnectionAttemptFailed(message: String) {
-//        super.onConnectionAttemptFailed(message)
-//
-//        Log.e("M:DSPPage:onConnFailed", "Connection Attempt failed in Device Settings Activity. Message: $message")
-//        (applicationContext as ApplicationProperty).logControl("E: Failed to connect in DeviceSettingsActivity. Reason: $message")
-//
-//        notifyUser("${getString(R.string.GeneralMessage_connectingFailed)} $message", R.color.ErrorColor)
-//    }
 
     override fun onConnectionError(errorID: Int) {
         super.onConnectionError(errorID)
@@ -293,10 +291,11 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     override fun onBindingResponse(responseID: Int) {
         super.onBindingResponse(responseID)
         // look for a rejected/error/success setting notification
-        when(responseID){
+        when (responseID) {
             BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {
                 // update the hint for the user
-                bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                bindingHintTextView.text =
+                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
 
                 // hide the share-button
                 shareBindingContainer.visibility = View.GONE
@@ -305,23 +304,61 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 bindingSwitch.isChecked = false
 
                 // notify user
-                notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification), R.color.WarningColor)
+                notifyUserWithDelayedReset(
+                    getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification),
+                    R.color.WarningColor
+                )
             }
             BINDING_RESPONSE_BINDING_SUCCESS -> {
                 //notify user
-                notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingSuccessNotification), R.color.successLightColor)
+                notifyUserWithDelayedReset(
+                    getString(R.string.DeviceSettingsActivity_BindingSuccessNotification),
+                    R.color.successLightColor
+                )
             }
             BINDING_RESPONSE_BINDING_ERROR -> {
                 // update the hint for the user
-                bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                bindingHintTextView.text =
+                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
                 // reset the switch
                 bindingSwitch.isChecked = false
                 //notify user
-                notifyUserWithDelayedReset(getString(R.string.DeviceSettingsActivity_BindingErrorNotification), R.color.errorLightColor)
+                notifyUserWithDelayedReset(
+                    getString(R.string.DeviceSettingsActivity_BindingErrorNotification),
+                    R.color.errorLightColor
+                )
             }
-
-            // TODO: update this function and add the new notification IDs
-
+            BINDING_RESPONSE_RELEASE_BINDING_SUCCESS -> {
+                // notify user
+                notifyUserWithDelayedReset(
+                    getString(R.string.DeviceSettingsActivity_ReleaseBindingSuccessText),
+                    R.color.successLightColor
+                )
+            }
+            BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
+                // update the hint for the user
+                bindingHintTextView.text =
+                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
+                // reset the switch
+                bindingSwitch.isChecked = true
+                // notify user
+                notifyUserWithDelayedReset(
+                    getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText),
+                    R.color.errorLightColor
+                )
+            }
+            BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR -> {
+                // update the hint for the user
+                bindingHintTextView.text =
+                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
+                // reset the switch
+                bindingSwitch.isChecked = true
+                // notify user
+                notifyUserWithDelayedReset(
+                    getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText),
+                    R.color.errorLightColor
+                )
+            }
         }
     }
 
@@ -387,6 +424,5 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             R.anim.finish_activity_slide_animation_in,
             R.anim.finish_activity_slide_animation_out
         )
-
     }
 }

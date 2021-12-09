@@ -67,8 +67,6 @@ class ApplicationProperty : Application() {
         lateinit var bluetoothConnectionManager: BLEConnectionManager
     }
 
-
-
     lateinit var systemLanguage: String
 
     // navigation control parameter:
@@ -93,7 +91,12 @@ class ApplicationProperty : Application() {
     override fun onCreate() {
         super.onCreate()
         bluetoothConnectionManager = BLEConnectionManager(this)
-        systemLanguage = Locale.getDefault().displayLanguage
+
+
+        //systemLanguage = Locale.getDefault().displayLanguage
+
+
+        systemLanguage = Locale.getDefault().language
 
         eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
 
