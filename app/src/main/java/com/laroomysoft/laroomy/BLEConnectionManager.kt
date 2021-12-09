@@ -44,6 +44,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private val deviceReconnectedNotification = "500002002\r"                // sent when the connection was suspended (user has left the app) and the user re-invoked the app
     private val userNavigatedBackToDeviceMainNotification = "500002004\r"    // sent when the user has opened a complex property page and navigated back to device-main-page
     private val propertyLoadedFromCacheCompleteNotification = "5000030011\r" // sent when the properties and groups are loaded from cache and the operation is complete
+    private val factoryResetCommand = "500002006\r"                          // sent when the user executes the factory reset on the device-settings page
 
     // data holder objects
     private val bleDeviceData = BLEDeviceData()
@@ -409,11 +410,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             // get ID
 
-            var hexString = "0x"
-            hexString += data[2]
-            hexString += data[3]
-            val elementIndex =
-                Integer.decode(hexString)
+//            var hexString = "0x"
+//            hexString += data[2]
+//            hexString += data[3]
+//            val elementIndex =
+//                Integer.decode(hexString)
 
             when(data[8]){
                 '1' -> {
@@ -433,7 +434,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.savePropertyDataToCacheIfPermitted()
                 }
                 '5' -> {
-
+                    // language request notification
+                    this.handleLanguageRequest()
                 }
                 else -> {
                     if(verboseLog){
@@ -482,6 +484,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         timeRequestResponse += a8bitValueTo2CharHexValue(sec)
         timeRequestResponse += '\r'
         this.sendData(timeRequestResponse)
+    }
+
+    private fun handleLanguageRequest(){
+        var languageRequestResponse = "5200"
+        languageRequestResponse += a8bitValueTo2CharHexValue(applicationProperty.systemLanguage.length + 2)
+        languageRequestResponse += "005${applicationProperty.systemLanguage}\r"
+        sendData(languageRequestResponse)
     }
 
     private fun readPropertyExecutionResponse(data: String, dataSize: Int) : Boolean {
@@ -985,12 +994,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             rqString += "0300"
 
             // add language identifier
-            val languageIdentificationString =
-                when (applicationProperty.systemLanguage) {
-                    "Deutsch" -> "de\r"
-                    else -> "en\r"
-                }
-            rqString += languageIdentificationString
+//            val languageIdentificationString =
+//                when (applicationProperty.systemLanguage) {
+//                    "Deutsch" -> "de\r"
+//                    else -> "en\r"
+//                }
+//            rqString += languageIdentificationString
+
+            rqString += applicationProperty.systemLanguage
 
             sendData(rqString)
         } else {
@@ -1072,12 +1083,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             rqString += "0300"
 
             // add language identifier
-            val languageIdentificationString =
-                when (applicationProperty.systemLanguage) {
-                    "Deutsch" -> "de\r"
-                    else -> "en\r"
-                }
-            rqString += languageIdentificationString
+//            val languageIdentificationString =
+//                when (applicationProperty.systemLanguage) {
+//                    "Deutsch" -> "de\r"
+//                    else -> "en\r"
+//                }
+            //rqString += languageIdentificationString
+
+            rqString += applicationProperty.systemLanguage
 
             sendData(rqString)
         } else {
@@ -1957,13 +1970,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         sendData(notification)
     }
 
+    fun sendFactoryResetCommand(){
+        this.sendData(this.factoryResetCommand)
+    }
+
     fun enableDeviceBinding(passKey: String){
-        //this.sendData("$enableBindingSetterCommandEntry$passKey$")
+        // build enable binding string
+        var bindingString = "6000"
+        bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
+        bindingString += "001$passKey\r"
+        // send it
+        this.sendData(bindingString)
         this.isBindingRequired = true
     }
 
-    fun releaseDeviceBinding(){
-        //this.sendData(releaseDeviceBindingCommand)
+    fun releaseDeviceBinding(passKey: String){
+        // build release binding string
+        var bindingString = "6000"
+        bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
+        bindingString += "000$passKey\r"
+        // send it
+        this.sendData(bindingString)
         this.isBindingRequired = false
     }
 
