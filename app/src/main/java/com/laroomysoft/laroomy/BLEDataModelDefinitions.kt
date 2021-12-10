@@ -73,7 +73,7 @@ class LoopTimeoutWatcherData {
     var currentIndex = -1
     var loopRepeatCounter = 0
 
-    fun reset(){
+    fun clear(){
         timeoutFlag = false
         isStarted = false
         loopType = LOOPTYPE_NONE

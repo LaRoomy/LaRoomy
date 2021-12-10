@@ -310,9 +310,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     // log
                     Log.e(
                         "M:CB:InitTryout",
-                        "Timeout for the initialization process. Remote device not responding. Stop process."
+                        "Timeout for the initialization process. Remote device not responding. Stoping process.."
                     )
-                    (applicationContext as ApplicationProperty).logControl("E: Timeout for the initialization process. Remote device not responding. Stop process.")
+                    (applicationContext as ApplicationProperty).logControl("E: Timeout for the initialization process. Remote device not responding. Stoping process..")
 
                     // notify user
                     runOnUiThread {
@@ -364,6 +364,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             }
             BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING -> {
                 getString(R.string.Error_UnexpectedBindingKeyMissing)
+            }
+            BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING -> {
+                getString(R.string.CA_TransmissionTimeoutOccurred)
             }
             else -> {
                 getString(R.string.Error_UnknownError)

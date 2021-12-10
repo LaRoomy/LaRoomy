@@ -26,7 +26,8 @@
     <string name="CA_LoadingProperties">Geräte-Eigenschaften werden geladen..</string>
     <string name="CA_ErrorDeviceListIndexInvalid">Ungültiger Geräte-Index</string>
     <string name="CA_ErrorDeviceAddressAccessException">Kritischer Fehler. Index nicht im zulässigen Bereich.</string>
-    <string name="CA_InitTimeoutOccurred">Timeout: Gerät antwortet nicht</string>
+    <string name="CA_InitTimeoutOccurred">Zeitüberschreitung während der Initialisierung: Gerät antwortet nicht</string>
+    <string name="CA_TransmissionTimeoutOccurred">Zeitüberschreitung während der Übertragung: Gerät antwortet nicht</string>
 
 
 

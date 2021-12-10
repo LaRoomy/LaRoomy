@@ -13,16 +13,6 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-//private const val MAX_CONNECTION_ATTEMPTS = 10
-
-//const val UNKNOWN_DEVICETYPE = 0
-//const val LAROOMYDEVICETYPE_XNG = 1
-//const val LAROOMYDEVICETYPE_CTX = 2
-//const val LAROOMYDEVICETYPE_TVM = 3
-
-//const val UPDATE_TYPE_ELEMENT_DEFINITION = 1
-//const val UPDATE_TYPE_DETAIL_DEFINITION = 2
-
 const val BINDING_RESPONSE_BINDING_NOT_SUPPORTED = 1
 const val BINDING_RESPONSE_BINDING_SUCCESS = 2
 const val BINDING_RESPONSE_BINDING_ERROR = 3
@@ -34,6 +24,7 @@ const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHA
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = 2
 const val BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED = 3
 const val BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING = 4
+const val BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING = 5
 
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
@@ -53,7 +44,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     // timer
     private lateinit var timeoutTimer: Timer
 
-
     var isConnected:Boolean = false
         private set
 
@@ -63,10 +53,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     var isBindingRequired = false
         private set
 
-    var connectionSuspended = false
-        private set
-
-    //var isCurrentConnectionDoneWithSharedBindingKey = false
+    private var connectionSuspended = false
 
     private var propertyLoopActive = false
     private var groupLoopActive = false
@@ -75,6 +62,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private var suspendedDeviceAddress = ""
 
+    // parameter regarding the simple state loop
+    private var currentSimpleStateRetrievingIndex = -1 // initialize with invalid marker
+    private var simpleStateLoopActive = false
+    private var simpleStatePropertyIndexes = ArrayList<Int>()
 
     // parameter regarding the complex state loop
     private var currentComplexStateRetrievingIndex = -1 // initialize with invalid marker
@@ -101,9 +92,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         bluetoothManager.adapter
     }
 
-
     // device-property objects
-    var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
+    private var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
     var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -467,7 +457,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.propertyCallback.onRemoteUserMessage(deviceInfoHeaderData)
         } else {
             // no notification data
-            // TODO! error message
+            if(verboseLog){
+                Log.w("handleUserMessage", "User-Message transmission contains no data.")
+            }
+            applicationProperty.logControl("W: User-Message contains no data")
         }
     }
 
@@ -571,6 +564,55 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             } else {
                 Log.e("readSimpleStateData", "UI-Element was not found, PropertyIndex: $propertyIndex")
             }
+
+            // check if the loop is active and send the next request if necessary
+            if(this.simpleStateLoopActive){
+
+                // check if this is a valid transmission or if the property index defers from the expected one
+                if (this.simpleStatePropertyIndexes.elementAt(this.currentSimpleStateRetrievingIndex) != propertyIndex) {
+
+                    // increase retrieving index
+                    this.currentSimpleStateRetrievingIndex++
+
+                    // check if the loop is finished
+                    if (this.currentSimpleStateRetrievingIndex >= this.simpleStatePropertyIndexes.size) {
+                        val finalCount = this.currentSimpleStateRetrievingIndex
+
+                        // simple state data loop is finished
+                        this.currentSimpleStateRetrievingIndex = -1
+                        this.simpleStatePropertyIndexes.clear()
+                        this.simpleStateLoopActive = false
+                        this.stopLoopTimeoutWatcher()
+
+                        if (verboseLog) {
+                            Log.d(
+                                "readSimpleStateData",
+                                "Simple property state loop finished: Count is: $finalCount"
+                            )
+                        }
+                        applicationProperty.logControl("I: Simple property state loop finished: Count is: $finalCount")
+
+                        // start complex state loop
+                        this.startComplexStateDataLoop()
+
+                    } else {
+                        // request next simple property state
+                        if (verboseLog) {
+                            Log.d(
+                                "readSimpleStateData",
+                                "Simple Property Loop active. Requesting next state"
+                            )
+                        }
+                        this.sendPropertyStateRequest(
+                            this.simpleStatePropertyIndexes.elementAt(this.currentSimpleStateRetrievingIndex)
+                        )
+                    }
+                } else {
+                    if(verboseLog){
+                        Log.w("readSimpleStateData", "Simple property state loop is active, but the received index is not the requested one.")
+                    }
+                }
+            }
         }
     }
 
@@ -599,39 +641,45 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.processBarGraphData(propertyIndex, data)
             }
         }
+
         // check if the loop is active and send the next request if necessary
         if(this.complexStateLoopActive){
 
-            // increase retrieving index
-            this.currentComplexStateRetrievingIndex++
+            // check if this is a valid transmission or if the property index defers from the expected one
+            if(this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex) != propertyIndex) {
 
-            // check if the loop is finished
-            if(this.currentComplexStateRetrievingIndex >= this.complexStatePropertyIndexes.size){
-                val finalCount = this.currentComplexStateRetrievingIndex
+                // increase retrieving index
+                this.currentComplexStateRetrievingIndex++
 
-                // the complex state data loop is finished
-                this.currentComplexStateRetrievingIndex = -1
-                this.complexStatePropertyIndexes.clear()
-                this.complexStateLoopActive = false
-                this.stopLoopTimeoutWatcher()
+                // check if the loop is finished
+                if (this.currentComplexStateRetrievingIndex >= this.complexStatePropertyIndexes.size) {
+                    val finalCount = this.currentComplexStateRetrievingIndex
 
-                if(verboseLog){
-                    Log.d("readComplexStateData", "Complex property state loop finished: Count is: $finalCount")
-                }
-                applicationProperty.logControl("I: Complex property state loop finished: Count is: $finalCount")
-            } else {
-                // request next complex property state
-                if (verboseLog) {
-                    Log.d(
-                        "readComplexStateData",
-                        "Complex Property Loop active. Requesting next state"
+                    // the complex state data loop is finished
+                    this.currentComplexStateRetrievingIndex = -1
+                    this.complexStatePropertyIndexes.clear()
+                    this.complexStateLoopActive = false
+                    this.stopLoopTimeoutWatcher()
+
+                    if (verboseLog) {
+                        Log.d(
+                            "readComplexStateData",
+                            "Complex property state loop finished: Count is: $finalCount"
+                        )
+                    }
+                    applicationProperty.logControl("I: Complex property state loop finished: Count is: $finalCount")
+                } else {
+                    // request next complex property state
+                    if (verboseLog) {
+                        Log.d(
+                            "readComplexStateData",
+                            "Complex Property Loop active. Requesting next state"
+                        )
+                    }
+                    this.sendComplexPropertyStateRequest(
+                        this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex)
                     )
                 }
-                this.sendComplexPropertyStateRequest(
-                    this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex)
-                )
-
-                // TODO: renew the timeout, to detect if the device is responding
             }
         }
     }
@@ -929,12 +977,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                     if(!addInALoopWhenReady){
 
-                        // TODO: start simple state loop ???
-
-                        // must be loaded from cache, so start the complex loop here
-                        this.startComplexStateDataLoop()
+                        // the properties were loaded from cache, so the states couldn't be considered as valid
+                        // so start the simple state data loop. If the loop is finished, the complex state loop will be started
+                        this.startSimpleStateDataLoop()
                     }
-
                     return
                 } else {
                     if(verboseLog){
@@ -960,7 +1006,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendNextPropertyRequest(-1)
     }
 
-    fun startReloadProperties(){
+    private fun startReloadProperties(){
         this.invokeCallbackLoopAfterUIDataGeneration = true
         this.propertyLoopActive = true
         this.startLoopTimeoutWatcher(LOOPTYPE_PROPERTY)
@@ -1263,6 +1309,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun sendPropertyStateRequest(propertyIndex: Int){
+        // notify the watcher
+        this.notifyLoopIsWorking(propertyIndex)
+
+        // build request string
         var rqString = "31"
         val hexString = Integer.toHexString(propertyIndex)
         if(hexString.length < 2){
@@ -1272,27 +1322,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             rqString += hexString
         }
         rqString += "0000\r"
+
+        // send request
         this.sendData(rqString)
     }
-
-//    private fun sendSinglePropertyRequest(propertyIndex: Int){
-//
-//        // if the loop is not active, the property will be updated, not added
-//
-//        //this.singlePropertyRetrievingAction = true
-//
-//        // invalidate parameter???
-//
-//        // TODO!
-//    }
-//
-//    private fun sendSingleGroupRequest(groupIndex: Int){
-//        //this.singleGroupRetrievingAction = true
-//
-//        // TODO!
-//    }
-
-    ///////////////////////////////////////////////////////////////// section!
 
     fun setBleEventHandler(eventHandlerObject: BleEventCallback){
         this.callback = eventHandlerObject
@@ -1325,46 +1358,37 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bluetoothGatt?.close()
         this.bluetoothGatt = null
 
-        //this.preselectIndex = -1
-        //this.scanResultList.clear()
-
         this.currentDevice = null
         this.currentUsedServiceUUID = ""
         this.isConnected = false
-        //this.authRequired = true
-        //this.propertyUpToDate = false
-        //this.connectionTestSucceeded = false
+
         this.connectionSuspended = false
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
-        this.uIAdapterList.clear()
-        //this.singlePropertyRetrievingAction = false
-        //this.singleGroupRetrievingAction = false
-        //this.singlePropertyDetailRetrievingAction = false
-        //this.singleGroupDetailRetrievingAction = false
-        //this.updateStackProcessActive = false
-        //this.multiComplexPropertyPageOpen = false
-        //this.currentPropertyResolveID = -1
-        //this.currentGroupResolveID = -1
-        //this.multiComplexPageID = -1
-        //this.multiComplexTypeID = -1
+
         this.isBindingRequired = false
-        //this.isCurrentConnectionDoneWithSharedBindingKey = false
-        //this.passKeySecondTryOut = false
-
-        //this.propertyRequestIndexCounter = 0
-
-        this.propertyLoopActive = false
-        //this.propertyNameResolveLoopActive = false
-        this.groupLoopActive = false
-        //this.groupInfoLoopActive = false
-        //this.deviceHeaderRecordingActive = false
-
         this.invokeCallbackLoopAfterUIDataGeneration = false
 
+        // loops
+        this.propertyLoopActive = false
+        this.groupLoopActive = false
+        this.complexStateLoopActive = false
+        this.simpleStateLoopActive = false
+
+        // simple & complex state params
+        this.currentSimpleStateRetrievingIndex = -1
+        this.currentComplexStateRetrievingIndex = -1
+        this.simpleStatePropertyIndexes.clear()
+        this.complexStatePropertyIndexes.clear()
+
+        // property holder
+        this.uIAdapterList.clear()
         this.laRoomyDevicePropertyList.clear()
         this.laRoomyPropertyGroupList.clear()
+
+        // data holder
         this.bleDeviceData.clear()
+        this.timeoutWatcherData.clear()
     }
 
     private fun clearPropertyRelatedParameterAndStopAllLoops(){
@@ -1372,6 +1396,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // stop loops
         this.propertyLoopActive = false
         this.groupLoopActive = false
+        this.simpleStateLoopActive = false
         this.complexStateLoopActive = false
         this.invokeCallbackLoopAfterUIDataGeneration = false
 
@@ -1379,54 +1404,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.uIAdapterList.clear()
         this.laRoomyDevicePropertyList.clear()
         this.laRoomyPropertyGroupList.clear()
+        this.simpleStatePropertyIndexes.clear()
         this.complexStatePropertyIndexes.clear()
 
         // reset other params
+        this.currentSimpleStateRetrievingIndex = -1
         this.currentComplexStateRetrievingIndex = -1
-    }
-
-    private fun imageFromIndexCounter(indexCounter: Int) : Int {
-        return when(indexCounter){
-            0 -> {
-                R.drawable.bluetooth_green_glow_sq64
-            }
-            1 -> {
-                R.drawable.bluetooth_orange_glow_sq64
-            }
-            2 -> {
-                R.drawable.bluetooth_blue_glow_sq64
-            }
-            3 -> {
-                R.drawable.bluetooth_purple_glow_sq64
-            }
-            4 -> {
-                R.drawable.bluetooth_green_glow_sq64
-            }
-            5 -> {
-                R.drawable.bluetooth_orange_glow_sq64
-            }
-            6 -> {
-                R.drawable.bluetooth_blue_glow_sq64
-            }
-            7 -> {
-                R.drawable.bluetooth_purple_glow_sq64
-            }
-            8 -> {
-                R.drawable.bluetooth_green_glow_sq64
-            }
-            9 -> {
-                R.drawable.bluetooth_orange_glow_sq64
-            }
-            10 -> {
-                R.drawable.bluetooth_blue_glow_sq64
-            }
-            11 -> {
-                R.drawable.bluetooth_purple_glow_sq64
-            }
-            else -> {
-                R.drawable.bluetooth_orange_glow_sq64
-            }
-        }
     }
 
     fun getLastConnectedDeviceAddress() : String {
@@ -1453,7 +1436,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun connectToRemoteDevice(macAddress: String?){
         this.currentDevice =
-            BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
+            (applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter.getRemoteDevice(
+                macAddress
+            )
+
+        // old:
+            //BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
         this.bluetoothGatt = this.currentDevice?.connectGatt(applicationProperty.applicationContext, false, this.gattCallback)
     }
 
@@ -1591,7 +1579,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.startReloadProperties()
     }
 
-    fun savePropertyDataToCacheIfPermitted(){
+    private fun savePropertyDataToCacheIfPermitted(){
         // save data to cache if permitted
         if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
 
@@ -1811,34 +1799,56 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun propertyTypeFromID(ID: Int) : Int {
+    private fun startSimpleStateDataLoop(){
+        if(verboseLog) {
+            Log.d(
+                "M:startSimpleDataLoop",
+                "SimpleStateDataLoop started - At first: Indexing the Property-IDs with: simpleStateData"
+            )
+        }
+        // clear the Index-Array
+        this.simpleStatePropertyIndexes.clear()
+        // loop the properties and save the indexes of the properties with simple state data
         this.laRoomyDevicePropertyList.forEach {
-            if(ID == it.propertyIndex){
-                return it.propertyType
+            // check if this is a property with simple state data (NOTE: not all simple properties have state data)
+            if(this.checkPropertyForSimpleStateDataFromPropertyType(it.propertyType)){
+                this.simpleStatePropertyIndexes.add(it.propertyIndex)
             }
         }
-        return -1
-    }
 
-    private fun propertyElementFromID(ID: Int): LaRoomyDeviceProperty {
-        this.laRoomyDevicePropertyList.forEach {
-            if(ID == it.propertyIndex){
-                return it
+        // if there are properties with simple state -> start the loop
+        if(this.simpleStatePropertyIndexes.isNotEmpty()){
+            if(verboseLog) {
+                Log.d(
+                    "M:startSimpleDataLoop",
+                    "Found ${this.simpleStatePropertyIndexes.size} Elements with SimpleStateData -> start collecting from device"
+                )
             }
+            applicationProperty.logControl("I: Starting simple state data loop. Elements with simple state: ${this.simpleStatePropertyIndexes.size}")
+
+            this.currentSimpleStateRetrievingIndex = 0
+            this.simpleStateLoopActive = true
+
+            // start the watcher, to prohibit a blocking loop if the device is not responding
+            this.startLoopTimeoutWatcher(LOOPTYPE_SIMPLESTATE)
+
+            // start requesting the simple states
+            this.sendPropertyStateRequest(
+                this.simpleStatePropertyIndexes.elementAt(currentSimpleStateRetrievingIndex)
+            )
         }
-        return LaRoomyDeviceProperty()
     }
 
     private fun startComplexStateDataLoop(){
         if(verboseLog) {
             Log.d(
                 "M:startCompDataLoop",
-                "ComplexStateDataLoop started - At first: Indexing the Property-IDs with complexStateData"
+                "ComplexStateDataLoop started - At first: Indexing the Property-IDs with: complexStateData"
             )
         }
-        // clear the ID-Array
+        // clear the Index-Array
         this.complexStatePropertyIndexes.clear()
-        // loop the properties and save the ones with complex state
+        // loop the properties and save the indexes of the properties with complex state data
         this.laRoomyDevicePropertyList.forEach {
             // start with the first complex state data element
             if(it.propertyType >= COMPLEX_PROPERTY_START_INDEX){
@@ -1846,6 +1856,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
 
+        // if there are properties with complex state -> start the loop
         if(this.complexStatePropertyIndexes.isNotEmpty()) {
             if(verboseLog) {
                 Log.d(
@@ -1858,7 +1869,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.currentComplexStateRetrievingIndex = 0
             this.complexStateLoopActive = true
 
-            // setup a timeout, to recognize if the remote device is not responding
+            // start the watcher, to prohibit a blocking loop if the device is not responding
             this.startLoopTimeoutWatcher(LOOPTYPE_COMPLEXSTATE)
 
             this.sendComplexPropertyStateRequest(
@@ -1885,10 +1896,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         requestString += "0000\r"
 
         this.sendData(requestString)
-    }
-
-    fun doComplexPropertyStateRequestForPropertyIndex(propertyIndex: Int) {
-        this.sendComplexPropertyStateRequest(propertyIndex)
     }
 
     private fun sendBindingRequest(useCustomKey: Boolean){
@@ -1942,15 +1949,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-//    fun isMultiComplexProperty(propertyID: Int) : Boolean{
-//
-//        return when(this.propertyTypeFromID(propertyID)){
-//            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> true
-//            // TODO: add all multicomplex properties here
-//            else -> false
-//        }
-//    }
-
     fun notifyBackNavigationToDeviceMainPage() {
         sendData(this.userNavigatedBackToDeviceMainNotification)
     }
@@ -2000,6 +1998,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             Log.e("propTypeFromIndex", "Invalid index. Size of array is: ${this.laRoomyDevicePropertyList.size}. Index was: $propertyIndex")
             -1
+        }
+    }
+
+    private fun checkPropertyForSimpleStateDataFromPropertyType(pType: Int) : Boolean {
+        return if(pType >= COMPLEX_PROPERTY_START_INDEX){
+            false
+        } else {
+            when(pType){
+                PROPERTY_TYPE_BUTTON -> false
+                PROPERTY_TYPE_SWITCH -> true
+                PROPERTY_TYPE_LEVEL_SELECTOR -> true
+                PROPERTY_TYPE_LEVEL_INDICATOR -> true
+                PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> false
+                PROPERTY_TYPE_OPTION_SELECTOR -> true
+                else -> false
+            }
         }
     }
 
@@ -2118,11 +2132,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 override fun run() {
 
                     // first check if loops are running, if not, stop the timer
-                    if(!complexStateLoopActive && !propertyLoopActive && !groupLoopActive){
+                    if(!complexStateLoopActive && !propertyLoopActive && !groupLoopActive && !simpleStateLoopActive){
                         if(verboseLog){
                             Log.w("LoopTimeoutWatcher", "All loops are offline. Execute self reset. Loop-type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
                         }
-                        timeoutWatcherData.reset()
+                        timeoutWatcherData.clear()
                         cancel()
                     } else {
 
@@ -2137,18 +2151,36 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 }
                                 applicationProperty.logControl("W: Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}")
 
+                                // increase repeat counter
+                                timeoutWatcherData.loopRepeatCounter++
 
-                                // TODO: restart loop from loop-type!
-
+                                // restart loop from loop-type
+                                when(timeoutWatcherData.loopType){
+                                    LOOPTYPE_SIMPLESTATE -> {
+                                        startSimpleStateDataLoop()
+                                    }
+                                    LOOPTYPE_COMPLEXSTATE -> {
+                                        startComplexStateDataLoop()
+                                    }
+                                    LOOPTYPE_PROPERTY -> {
+                                        clearPropertyRelatedParameterAndStopAllLoops()
+                                        startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
+                                    }
+                                    LOOPTYPE_GROUP -> {
+                                        laRoomyPropertyGroupList.clear()
+                                        startGroupListing()
+                                    }
+                                }
                             } else {
                                 // loop could not be finalized
                                 Log.e("LoopTimeoutWatcher", "Loop-Timeout occurred 3 times! - Device not responding!")
                                 applicationProperty.logControl("E: Loop-Timeout occurred 3 times! - Device not responding!")
 
-
-                                // TODO: what to do here?? notify user?? close device??
+                                // raise event
+                                callback.onConnectionError(
+                                    BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING
+                                )
                             }
-
                         } else {
                             if(verboseLog){
                                 Log.d("LoopTimeoutWatcher", "Timeout condition was checked. Everything fine..")
@@ -2158,13 +2190,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-            }, (0).toLong(), (500).toLong()
+            }, (0).toLong(), (800).toLong()
         )
     }
 
     private fun notifyLoopIsWorking(currentIndex: Int){
         if(this.timeoutWatcherData.isStarted){
+            // save index
             this.timeoutWatcherData.currentIndex = currentIndex
+            // reset the timeout flag
             this.timeoutWatcherData.timeoutFlag = false
         } else {
             if(verboseLog) {
@@ -2181,7 +2215,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if (verboseLog) {
                 Log.d("StopTimeOutWatcher", "Loop-Timeout Watcher stopped! Loop-Type was ${loopTypeToString(timeoutWatcherData.loopType)}")
             }
-            this.timeoutWatcherData.reset()
+            this.timeoutWatcherData.clear()
             this.timeoutTimer.cancel()
         }
     }
@@ -2204,7 +2238,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}
-        //fun onMultiComplexPropertyDataUpdated(data: MultiComplexPropertyData){}
         fun onFastDataPipeInvoked(propertyID: Int, data: String){}
         fun onBindingResponse(responseID: Int){}
         fun getCurrentOpenComplexPropPagePropertyIndex() : Int {

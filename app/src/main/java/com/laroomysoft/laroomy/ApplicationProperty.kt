@@ -14,8 +14,6 @@ const val INFO_MESSAGE = 2
 const val UNDEFINED_ELEMENT = 0
 const val PROPERTY_ELEMENT = 1
 const val GROUP_ELEMENT = 2
-//const val SEPARATOR_ELEMENT = 3
-//const val NO_CONTENT_ELEMENT = 4
 
 // the numbers must conform to the types of the device!
 const val PROPERTY_TYPE_BUTTON = 1
