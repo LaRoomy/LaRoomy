@@ -1055,7 +1055,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //                }
 //            rqString += languageIdentificationString
 
-            rqString += applicationProperty.systemLanguage
+            rqString += "${applicationProperty.systemLanguage}\r"
 
             sendData(rqString)
         } else {
@@ -1144,7 +1144,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 //                }
             //rqString += languageIdentificationString
 
-            rqString += applicationProperty.systemLanguage
+            rqString += "${applicationProperty.systemLanguage}\r"
 
             sendData(rqString)
         } else {
