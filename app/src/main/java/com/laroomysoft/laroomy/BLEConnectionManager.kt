@@ -569,7 +569,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if(this.simpleStateLoopActive){
 
                 // check if this is a valid transmission or if the property index defers from the expected one
-                if (this.simpleStatePropertyIndexes.elementAt(this.currentSimpleStateRetrievingIndex) != propertyIndex) {
+                if (this.simpleStatePropertyIndexes.elementAt(this.currentSimpleStateRetrievingIndex) == propertyIndex) {
 
                     // increase retrieving index
                     this.currentSimpleStateRetrievingIndex++
@@ -646,7 +646,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(this.complexStateLoopActive){
 
             // check if this is a valid transmission or if the property index defers from the expected one
-            if(this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex) != propertyIndex) {
+            if(this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex) == propertyIndex) {
 
                 // increase retrieving index
                 this.currentComplexStateRetrievingIndex++
@@ -679,6 +679,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.sendComplexPropertyStateRequest(
                         this.complexStatePropertyIndexes.elementAt(this.currentComplexStateRetrievingIndex)
                     )
+                }
+            } else {
+                if(verboseLog){
+                    Log.w("readComplexStateData", "Complex property state loop is active, but the received index is not the requested one.")
                 }
             }
         }
@@ -1014,6 +1018,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun sendNextPropertyRequest(currentIndex: Int){
+
+
+        // TODO: what is this for a shit?????????????
+        // if the index is valid, the request will be sent, even if caching is set up
 
         // increase index
         val newIndex = currentIndex + 1
@@ -1578,6 +1586,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.clearPropertyRelatedParameterAndStopAllLoops()
         this.startReloadProperties()
     }
+
+//    fun reloadPropertiesAndSetToList(){
+//        this.clearPropertyRelatedParameterAndStopAllLoops()
+//        this.invokeCallbackLoopAfterUIDataGeneration = true
+//        this.startReloadProperties()
+//    }
 
     private fun savePropertyDataToCacheIfPermitted(){
         // save data to cache if permitted
@@ -2157,29 +2171,58 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 // restart loop from loop-type
                                 when(timeoutWatcherData.loopType){
                                     LOOPTYPE_SIMPLESTATE -> {
+                                        cancel()
                                         startSimpleStateDataLoop()
                                     }
                                     LOOPTYPE_COMPLEXSTATE -> {
+                                        cancel()
                                         startComplexStateDataLoop()
                                     }
                                     LOOPTYPE_PROPERTY -> {
-                                        clearPropertyRelatedParameterAndStopAllLoops()
-                                        startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
+                                        cancel()
+
+                                        //clearPropertyRelatedParameterAndStopAllLoops()
+                                        //startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
+
+                                        // TODO: reload, not start!!!!!!!!
+
                                     }
                                     LOOPTYPE_GROUP -> {
+                                        cancel()
                                         laRoomyPropertyGroupList.clear()
                                         startGroupListing()
                                     }
                                 }
                             } else {
                                 // loop could not be finalized
-                                Log.e("LoopTimeoutWatcher", "Loop-Timeout occurred 3 times! - Device not responding!")
-                                applicationProperty.logControl("E: Loop-Timeout occurred 3 times! - Device not responding!")
+                                Log.e("LoopTimeoutWatcher", "Loop-Timeout occurred 3 times! - Device not responding! Loop-Type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
+                                applicationProperty.logControl("E: Loop-Timeout occurred 3 times! - Device not responding! Loop-Type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
+
+                                // reset loop param
+                                when(timeoutWatcherData.loopType) {
+                                    LOOPTYPE_SIMPLESTATE -> {
+                                        simpleStateLoopActive = false
+                                    }
+                                    LOOPTYPE_COMPLEXSTATE -> {
+                                        complexStateLoopActive = false
+                                    }
+                                    LOOPTYPE_PROPERTY -> {
+                                        propertyLoopActive = false
+                                    }
+                                    LOOPTYPE_GROUP -> {
+                                        groupLoopActive = false
+                                    }
+                                }
+
+                                // clear watcher data
+                                timeoutWatcherData.clear()
 
                                 // raise event
                                 callback.onConnectionError(
                                     BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING
                                 )
+
+                                cancel()
                             }
                         } else {
                             if(verboseLog){

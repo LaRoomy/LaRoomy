@@ -154,6 +154,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             )
             this.connectionMustResetDueToOnPauseExecution = false
         }
+
+        // TODO: HANDLE INTERRUPTED PROPERTY LOADING ????? OR IS THIS NOT NECESSARY??????????
+
     }
 
     private fun setProgressText(text: String){
