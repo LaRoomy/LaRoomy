@@ -32,7 +32,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     // static notifications
     private val propertyLoadingCompleteNotification = "5000030010\r"         // sent when the retrieving of the properties is complete (raw loading - not from cache)
-    private val deviceReconnectedNotification = "500002002\r"                // sent when the connection was suspended (user has left the app) and the user re-invoked the app
+    private val deviceReconnectedNotification = "500002007\r"                // sent when the connection was suspended (user has left the app) and the user re-invoked the app
     private val userNavigatedBackToDeviceMainNotification = "500002004\r"    // sent when the user has opened a complex property page and navigated back to device-main-page
     private val propertyLoadedFromCacheCompleteNotification = "5000030011\r" // sent when the properties and groups are loaded from cache and the operation is complete
     private val factoryResetCommand = "500002006\r"                          // sent when the user executes the factory reset on the device-settings page
@@ -427,6 +427,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // language request notification
                     this.handleLanguageRequest()
                 }
+                '6' -> {
+                    // refresh all property states notification
+                    this.startSimpleStateDataLoop()
+                }
                 else -> {
                     if(verboseLog){
                         Log.e("readDeviceNotification", "Unknown device notification type")
@@ -471,7 +475,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val min = calendar.get(Calendar.MINUTE)
         val sec = calendar.get(Calendar.SECOND)
 
-        var timeRequestResponse = "520008005"
+        var timeRequestResponse = "520008002"
         timeRequestResponse += a8bitValueTo2CharHexValue(hour)
         timeRequestResponse += a8bitValueTo2CharHexValue(min)
         timeRequestResponse += a8bitValueTo2CharHexValue(sec)
@@ -752,6 +756,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         laRoomyDeviceProperty
                     // update ui-adapter-list
                     this.updatePropertyElementInUIList(laRoomyDeviceProperty)
+                    // save property to cache, but only if this is requested (field 1)
+                    if(data[1] == '4') {
+                        this.savePropertyDataToCacheIfPermitted()
+                    }
                 }
             }
             return true
@@ -975,6 +983,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         .loadPCacheData(this.currentDevice?.address ?: "")
 
                 if(propertyData.isValid){
+                    if(verboseLog){
+                        Log.d("startPropList", "Property and Group data loaded from cache.")
+                    }
+                    applicationProperty.logControl("I: Property and Group data loaded from cache.")
+
                     this.laRoomyDevicePropertyList = propertyData.deviceProperties
                     this.laRoomyPropertyGroupList = propertyData.devicePropertyGroups
                     this.generateUIAdaptableArrayListFromDeviceProperties(addInALoopWhenReady, true)
@@ -1019,10 +1032,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun sendNextPropertyRequest(currentIndex: Int){
 
-
-        // TODO: what is this for a shit?????????????
-        // if the index is valid, the request will be sent, even if caching is set up
-
         // increase index
         val newIndex = currentIndex + 1
 
@@ -1048,13 +1057,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             rqString += "0300"
 
             // add language identifier
-//            val languageIdentificationString =
-//                when (applicationProperty.systemLanguage) {
-//                    "Deutsch" -> "de\r"
-//                    else -> "en\r"
-//                }
-//            rqString += languageIdentificationString
-
             rqString += "${applicationProperty.systemLanguage}\r"
 
             sendData(rqString)
@@ -1136,14 +1138,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             //add data-size + flag values
             rqString += "0300"
 
-            // add language identifier
-//            val languageIdentificationString =
-//                when (applicationProperty.systemLanguage) {
-//                    "Deutsch" -> "de\r"
-//                    else -> "en\r"
-//                }
-            //rqString += languageIdentificationString
-
+            // add language identifier + deliminator
             rqString += "${applicationProperty.systemLanguage}\r"
 
             sendData(rqString)
@@ -1587,15 +1582,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.startReloadProperties()
     }
 
-//    fun reloadPropertiesAndSetToList(){
-//        this.clearPropertyRelatedParameterAndStopAllLoops()
-//        this.invokeCallbackLoopAfterUIDataGeneration = true
-//        this.startReloadProperties()
-//    }
-
     private fun savePropertyDataToCacheIfPermitted(){
         // save data to cache if permitted
         if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+
+            if(verboseLog){
+                Log.d("SavePDataToCache", "Caching is permitted: Saving property and group data to cache.")
+            }
+            applicationProperty.logControl("I: Caching is permitted - Saving property and group data to cache.")
 
             val devicePropertyCacheData = DevicePropertyCacheData()
             devicePropertyCacheData.generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)

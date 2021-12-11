@@ -94,7 +94,7 @@
 
       android:visibility="gone"
 
-      app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+      app:srcCompat="@drawable/ic_navigate_next_white_48dp" />
 
 
 
