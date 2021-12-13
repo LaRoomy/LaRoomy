@@ -898,6 +898,34 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     }
 }
 
+class LineGraphState: IComplexPropertySubTypeProtocolClass() {
+
+    override fun isValid(): Boolean {
+        return true
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+
+
+        return true
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        // this property type has no execution
+        return "invalid usage"
+    }
+}
+
 class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 
     var unLocked = false

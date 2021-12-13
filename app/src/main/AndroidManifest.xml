@@ -21,12 +21,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".LineGraphActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddDeviceActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:theme="@style/SplashTheme"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -37,8 +40,8 @@
         <activity android:name=".ResetAppDataActivity" />
         <activity
             android:name=".DataSharingReceiverActivity"
-            android:noHistory="true"
-            android:exported="true">
+            android:exported="true"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BarGraphActivity">
-
+    tools:context=".LineGraphActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bgdHeaderContainer"
+        android:id="@+id/lineGraphActivityHeaderContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -16,11 +15,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/bgdHeaderTextView"
+            android:id="@+id/lineGraphActivityHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/BarGraphActivity_HeaderText"
+            android:text="@string/LineGraphActivity_HeaderText"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <View
-            android:id="@+id/bgdHeaderSeparator"
+            android:id="@+id/lineGraphActivityHeaderSeparator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="5dp"
@@ -37,38 +36,40 @@
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bgdHeaderTextView" />
+            app:layout_constraintTop_toBottomOf="@id/lineGraphActivityHeaderTextView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.laroomysoft.laroomy.BarGraph
-        android:id="@+id/bgdBarGraphView"
+    <com.laroomysoft.laroomy.LineGraph
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:id="@+id/lineGraphActivityLineGraphView"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="20dp"
-        app:barTextSize="16sp"
-        app:scaleTextSize="10sp"
-        app:barDescriptionGap="22dp"
-        app:barTextColor="@color/normalTextColor"
-        app:barGraphOutlineColor="@color/normalOutlineColor"
-        app:scaleSectionWidth="40dp"
-        app:extraTopPadding="20dp"
-        app:layout_constraintBottom_toTopOf="@id/bgdActivityNotificationTextView"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="10dp"
+        app:errorTextSize="22sp"
+        app:valueTextSize="10sp"
+        app:drawAxesValues="true"
+        app:drawGridLines="true"
+        app:layout_constraintTop_toBottomOf="@id/lineGraphActivityHeaderContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/lineGraphActivityNotificationTextView"
+        />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/bgdActivityNotificationTextView"
+        android:id="@+id/lineGraphActivityNotificationTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxHeight="100dp"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

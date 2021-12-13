@@ -3,6 +3,7 @@
     <words>
       <w>bargraphdisplay</w>
       <w>cmplx</w>
+      <w>complexstate</w>
       <w>constraintlayout</w>
       <w>deutsch</w>
       <w>devicetype</w>
@@ -10,6 +11,8 @@
       <w>jetbrains</w>
       <w>laroomy</w>
       <w>ldpg</w>
+      <w>linegraph</w>
+      <w>looptype</w>
       <w>mcpdu</w>
       <w>multicomplex</w>
       <w>notfound</w>
@@ -17,6 +20,7 @@
       <w>phonelink</w>
       <w>rcon</w>
       <w>rslve</w>
+      <w>simplestate</w>
       <w>singleaction</w>
       <w>transmsn</w>
       <w>usermessage</w>

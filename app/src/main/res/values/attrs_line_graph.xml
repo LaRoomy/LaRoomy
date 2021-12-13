@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LineGraph">
+        <attr name="xAxisMinValue" format="float"/>
+        <attr name="xAxisMaxValue" format="float"/>
+        <attr name="yAxisMinValue" format="float"/>
+        <attr name="yAxisMaxValue" format="float"/>
+        <attr name="drawGridLines" format="boolean"/>
+        <attr name="drawAxesValues" format="boolean"/>
+        <attr name="errorTextSize" format="dimension"/>
+        <attr name="valueTextSize" format="dimension"/>
+        <attr name="xAxisGridIntersectionUnits" format="float"/>
+        <attr name="yAxisGridIntersectionUnits" format="float"/>
+    </declare-styleable>
+</resources>

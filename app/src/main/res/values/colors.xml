@@ -97,4 +97,15 @@
     <color name="decent_bar_7_color">#FF7BB7CC</color>
     <color name="decent_bar_8_color">#FF7BC7CC</color>
 
+    <!-- lineGraph colors -->
+    <color name="lineGraphLineColor">#FF00FF00</color> <!-- make this to gold accent color later! -->
+    <color name="lineGraphAxisColor">#FFFFFFFF</color>
+    <color name="lineGraphGridLineColor">#66FFFFFF</color>
+    <color name="lineGraphErrorColor">#FFCC5555</color>
+    <color name="lineGraphGridValueTextColor">#FFFFFFFF</color>
+    <color name="lineGraphGridValueStyleTextColor">#AA27F05D</color>
+
+    <color name="lineGraphXAxisGridValueTextColor">#FFBBBBFF</color>
+    <color name="lineGraphYAxisGridValueTextColor">#FFE0CC55</color>
+
 </resources>

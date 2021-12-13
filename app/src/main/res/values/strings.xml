@@ -41,7 +41,6 @@
     <string name="DMA_ReconnectDevice">Resuming Connection..</string>
 
 
-
     <string name="RGB_HeaderText">RGB Control</string>
     <string name="RGB_OnOff">On / Off</string>
     <string name="RGB_SingleColorModeButtonText">Single Color</string>
@@ -64,7 +63,9 @@
     <string name="TFS_From">From</string>
     <string name="TFS_To">To</string>
 
-    <string name="BGA_HeaderText">Bar Graph View</string>
+    <string name="BarGraphActivity_HeaderText">Bar Graph View</string>
+
+    <string name="LineGraphActivity_HeaderText">Line Graph View</string>
 
     <string name="UnlockCtrl_HeaderText">Unlock Control</string>
     <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
@@ -154,7 +155,6 @@
     <string name="ResetAppActivity_DialogTitle">Reset</string>
     <string name="ResetAppActivity_DialogPositiveButtonText">OK</string>
     <string name="ResetAppActivity_DialogNegativeButtonText">Cancel</string>
-
 
 
     <string name="DeviceSettingsActivity_HeaderText">Device-Settings</string>
