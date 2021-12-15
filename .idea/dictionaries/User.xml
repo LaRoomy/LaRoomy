@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="User">
     <words>
+      <w>bargraph</w>
       <w>bargraphdisplay</w>
       <w>cmplx</w>
       <w>complexstate</w>
@@ -24,6 +25,12 @@
       <w>singleaction</w>
       <w>transmsn</w>
       <w>usermessage</w>
+      <w>xisc</w>
+      <w>xmax</w>
+      <w>xmin</w>
+      <w>yisc</w>
+      <w>ymax</w>
+      <w>ymin</w>
     </words>
   </dictionary>
 </component>

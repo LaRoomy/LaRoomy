@@ -753,7 +753,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 startActivity(intent)
                 overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
-            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
+            COMPLEX_PROPERTY_TYPE_ID_BARGRAPH -> {
                 // prevent the normal "onPause" execution
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the navigator page

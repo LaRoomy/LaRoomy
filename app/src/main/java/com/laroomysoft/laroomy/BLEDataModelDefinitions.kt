@@ -595,7 +595,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     }
 
     fun updateFromString(data: String) : Boolean {
-        return if (data.length < 10) {
+        return if (data.length < 11) {
             if (verboseLog) {
                 Log.e(
                     "BarGraphData:updateFS",
@@ -612,7 +612,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
             // get the number of bars
             this.numBars = data[9].toString().toInt()
 
-            val pureData = data.removeRange(0, 9)
+            val pureData = data.removeRange(0, 11)
             this.fromComplexPropertyString(pureData, true)
         }
     }
@@ -900,24 +900,183 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
 
 class LineGraphState: IComplexPropertySubTypeProtocolClass() {
 
+    var drawGridLines = true
+    var drawAxisValues = true
+
+    var errorFlag = false
+
+    var xAxisMin = 0f
+    var xAxisMax = 0f
+    var yAxisMin = 0f
+    var yAxisMax = 0f
+
+    var xIntersectionUnits = 0f
+    var yIntersectionUnits = 0f
+
+    val lineData = ArrayList<LineGraphData>()
+
     override fun isValid(): Boolean {
+
+        // TODO: errorFlag ???
+
         return true
     }
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
-
+        this.drawGridLines = (complexPropertyState.valueOne and 0x01) != 0
+        this.drawAxisValues = (complexPropertyState.valueOne and 0x02) != 0
+        this.errorFlag = this.fromComplexPropertyString(complexPropertyState.strValue, false)
     }
 
     override fun toComplexPropertyState(): ComplexPropertyState {
         val cState = ComplexPropertyState()
 
+        var flags = 0
+        if(this.drawGridLines){
+            flags = flags or 0x01
+        }
+        if(this.drawAxisValues){
+            flags = flags or 0x02
+        }
+
+        cState.valueOne = flags
+        cState.strValue = this.toComplexPropertyString()
         return cState
     }
 
     override fun fromString(data: String): Boolean {
+        return if (data.length < 11) {
+            if (verboseLog) {
+                Log.e(
+                    "LineGraphData:fromString",
+                    "Error reading Data from LineGraphState Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            // get the flag values
+            val flags = a2CharHexValueToIntValue(data[8], data[9])
+            this.drawGridLines = (flags and 0x01) != 0
+            this.drawAxisValues = (flags and 0x02) != 0
 
+            val pureData = data.removeRange(0, 11)
+            this.fromComplexPropertyString(pureData, false)
+        }
+    }
 
+    private fun fromComplexPropertyString(data: String, isUpdateMode: Boolean) : Boolean{
+
+        val stringArray = ArrayList<String>()
+        var addString = ""
+
+        if(!isUpdateMode){
+            this.lineData.clear()
+        }
+
+        // separate the single definition string
+        data.forEach {
+            if((it != ';')&&(it != '\r')){
+                addString += it
+            } else {
+                if(addString.isNotEmpty()) {
+                    stringArray.add(addString)
+                    addString = ""
+                }
+            }
+        }
+        if(addString.isNotEmpty()){
+            stringArray.add(addString)
+        }
+
+        // read the definitions
+        stringArray.forEach {
+            try {
+                if ((it[0] == 'x') || (it[0] == 'y')) {
+                    // must be parameter definition
+                    var vName = ""
+                    var vValue = ""
+                    var isName = true
+
+                    // record the parameter name and value
+                    for(c in it){
+                        if(c == ':'){
+                            isName = false
+                        } else {
+                            if (isName) {
+                                vName += c
+                            } else {
+                                vValue += c
+                            }
+                        }
+                    }
+                    // set it to the member, respectively
+                    val fVal = vValue.toFloat()
+
+                    when(vName){
+                        "xmin" -> this.xAxisMin = fVal
+                        "xmax" -> this.xAxisMax = fVal
+                        "ymin" -> this.yAxisMin = fVal
+                        "ymax" -> this.yAxisMax = fVal
+                        "xisc" -> this.xIntersectionUnits = fVal
+                        "yisc" -> this.yIntersectionUnits = fVal
+                    }
+                } else {
+                    // must be point definition
+                    var xValue = ""
+                    var yValue = ""
+                    var isX = true
+
+                    for(c in it){
+                        if(c == ':'){
+                            isX = false
+                        } else {
+                            if(isX){
+                                xValue += c
+                            } else {
+                                yValue += c
+                            }
+                        }
+                    }
+
+                    this.lineData.add(
+                        LineGraphData(
+                            xValue.toFloat(),
+                            yValue.toFloat()
+                        )
+                    )
+                }
+            } catch (e: Exception){
+                Log.e("LineGraphState", "Error reading single value from String: $e")
+            }
+        }
         return true
+    }
+
+    fun toComplexPropertyString() : String {
+        var cString = ""
+
+
+        return cString
+    }
+
+    fun updateFromString(data: String) : Boolean {
+        return if (data.length < 11) {
+            if (verboseLog) {
+                Log.e(
+                    "LineGraphData:updateFS",
+                    "Error reading Data from LineGraphState Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            // get the flag values
+            val flags = data[8].toString().toInt()
+            this.drawGridLines = (flags and 0x01) != 0
+            this.drawAxisValues = (flags and 0x02) != 0
+
+            val pureData = data.removeRange(0, 11)
+            this.fromComplexPropertyString(pureData, true)
+        }
     }
 
     override fun toExecutionString(propertyIndex: Int): String {

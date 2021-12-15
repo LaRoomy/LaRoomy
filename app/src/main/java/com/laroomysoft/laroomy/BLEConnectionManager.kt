@@ -641,8 +641,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
                 this.processNavigatorData(propertyIndex, data)
             }
-            COMPLEX_PROPERTY_TYPE_ID_BARGRAPHDISPLAY -> {
+            COMPLEX_PROPERTY_TYPE_ID_BARGRAPH -> {
                 this.processBarGraphData(propertyIndex, data)
+            }
+            COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH -> {
+                this.processLineGraphData(propertyIndex, data)
             }
         }
 
@@ -1306,6 +1309,39 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             val cState =
                 barGraphState.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
+    }
+
+    private fun processLineGraphData(propertyIndex: Int, data: String){
+
+        val lineGraphState = LineGraphState()
+
+        // get the existing state
+        if(this.uIAdapterList.size > 0){
+            this.uIAdapterList.forEach {
+                if(it.internalElementIndex == propertyIndex){
+                    lineGraphState.fromComplexPropertyState(it.complexPropertyState)
+                }
+            }
+        }
+
+        // validate the existing state and apply the appropriate method
+        val res = if(lineGraphState.isValid() && data[10] != '0'){              // field 10 indicates the transmission-type (override|update)
+            lineGraphState.updateFromString(data)
+        } else {
+            lineGraphState.fromString(data)
+        }
+
+        // check the result and update the data (or handle error)
+        if(!res){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from LineGraphState data transmission.")
+            return
+        } else {
+            val cState =
+                lineGraphState.toComplexPropertyState()
 
             this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
         }
