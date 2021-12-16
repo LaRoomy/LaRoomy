@@ -1052,10 +1052,36 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
         return true
     }
 
-    fun toComplexPropertyString() : String {
+    private fun toComplexPropertyString() : String {
         var cString = ""
-
-
+        // save the scope and intersection params to string
+        for (i in 0 until 6) {
+            val vPara =
+                    when (i) {
+                        0 -> this.xAxisMin
+                        1 -> this.xAxisMax
+                        2 -> this.yAxisMin
+                        3 -> this.yAxisMax
+                        4 -> this.xIntersectionUnits
+                        5 -> this.yIntersectionUnits
+                        else -> 0f
+                    }
+            val nPara =
+                    when (i) {
+                        0 -> "xmin"
+                        1 -> "xmax"
+                        2 -> "ymin"
+                        3 -> "ymax"
+                        4 -> "xisc"
+                        5 -> "yisc"
+                        else -> "err!"
+                    }
+            cString += "$nPara:${vPara};"
+        }
+        // save the line-data to string
+        this.lineData.forEach {
+            cString += "${it.xVal}:${it.yVal};"
+        }
         return cString
     }
 

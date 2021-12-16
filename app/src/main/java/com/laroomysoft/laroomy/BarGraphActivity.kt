@@ -48,7 +48,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 ).elementText
         }
 
-        // bind the callbacks and context of the bluetooth-manager to this activity
+        // bind the callbacks of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
@@ -57,9 +57,6 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // get the bar-graph-view for further usage in this component
         this.barGraph = findViewById(R.id.bgdBarGraphView)
-
-        // get the maximum bar count (zero-based!) (old)
-        //this.maxBarIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.valueOne - 1
 
         // get the initial bar data
         val barGraphState = BarGraphState()
@@ -74,7 +71,6 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         super.onBackPressed()
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
