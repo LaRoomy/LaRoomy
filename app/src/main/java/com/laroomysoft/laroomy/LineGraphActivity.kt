@@ -125,6 +125,21 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
     private fun setCurrentViewStateFromComplexPropertyState(lineGraphState: LineGraphState){
 
+        if(lineGraphState.isValid()){
+            this.lineGraph.drawAxisValues = lineGraphState.drawAxisValues
+            this.lineGraph.drawGridLines = lineGraphState.drawGridLines
+
+            if(lineGraphState.xIntersectionUnits != 0f) {
+                this.lineGraph.xAxisGridIntersectionUnits = lineGraphState.xIntersectionUnits
+            }
+            if(lineGraphState.yIntersectionUnits != 0f) {
+                this.lineGraph.yAxisGridIntersectionUnits = lineGraphState.yIntersectionUnits
+            }
+
+            this.lineGraph.setRange(lineGraphState.xAxisMin, lineGraphState.yAxisMin, lineGraphState.xAxisMax, lineGraphState.yAxisMax)
+            this.lineGraph.lineGraphData = lineGraphState.lineData
+            this.lineGraph.invalidate()
+        }
     }
 
     private fun notifyUser(message: String, colorID: Int){
