@@ -22,6 +22,7 @@ const val INTERSECTION_NOT_SET = -1f
 
 class LineGraphData(val xVal: Float, val yVal: Float)
 class GridLineData(val absolutePosition: Float, var realValue: Float)
+class LineGraphRange(var xmin: Float, var xmax: Float, var ymin: Float, var ymax: Float)
 
 class LineGraph : View {
 
@@ -473,6 +474,25 @@ class LineGraph : View {
             yAxisMaxValue = yAxisMax
             isRangeDataValid = true
         }
+    }
+
+    fun setRange(range: LineGraphRange){
+        // check if the data is valid, if so: set the parameter
+        if((range.xmin == range.xmax)||(range.ymin == range.ymax)
+            ||(range.xmin > range.xmax)||(range.ymin > range.ymax)){
+
+            isRangeDataValid = false
+        } else {
+            xAxisMinValue = range.xmin
+            xAxisMaxValue = range.xmax
+            yAxisMinValue = range.ymin
+            yAxisMaxValue = range.ymax
+            isRangeDataValid = true
+        }
+    }
+
+    fun getRange(): LineGraphRange {
+        return LineGraphRange(this.xAxisMinValue, this.xAxisMaxValue, this.yAxisMinValue, this.yAxisMaxValue)
     }
 
     private val graphLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

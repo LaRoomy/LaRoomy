@@ -916,10 +916,7 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
     val lineData = ArrayList<LineGraphData>()
 
     override fun isValid(): Boolean {
-
-        // TODO: errorFlag ???
-
-        return true
+        return !errorFlag
     }
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
@@ -973,7 +970,7 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
             this.lineData.clear()
         }
 
-        // separate the single definition string
+        // separate the single definition string2
         data.forEach {
             if((it != ';')&&(it != '\r')){
                 addString += it
@@ -1019,6 +1016,9 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
                         "ymax" -> this.yAxisMax = fVal
                         "xisc" -> this.xIntersectionUnits = fVal
                         "yisc" -> this.yIntersectionUnits = fVal
+                        else -> {
+                            Log.e("LineGraphState", "Invalid parameter name in LineGraphState string: $vName")
+                        }
                     }
                 } else {
                     // must be point definition
@@ -1044,6 +1044,10 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
                             yValue.toFloat()
                         )
                     )
+                    if(this.lineData.size > 1000){
+                        Log.e("LineGraphState", "Error: too much data points, string recording skipped!")
+                        return@forEach
+                    }
                 }
             } catch (e: Exception){
                 Log.e("LineGraphState", "Error reading single value from String: $e")

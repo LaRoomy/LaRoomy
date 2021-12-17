@@ -15,6 +15,7 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     private lateinit var lineGraph: LineGraph
+    private var lineDataList = ArrayList<LineGraphData>()
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
@@ -138,6 +139,7 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
             this.lineGraph.setRange(lineGraphState.xAxisMin, lineGraphState.yAxisMin, lineGraphState.xAxisMax, lineGraphState.yAxisMax)
             this.lineGraph.lineGraphData = lineGraphState.lineData
+            this.lineDataList = lineGraphState.lineData
             this.lineGraph.invalidate()
         }
     }
@@ -236,7 +238,142 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
     override fun onFastDataPipeInvoked(propertyID: Int, data: String) {
         try {
 
-            // TODO: !
+            val lRange = this.lineGraph.getRange()
+            val stringArray = ArrayList<String>()
+            var addString = ""
+            var addLineData = false
+            var eraseLineData = true
+
+            // separate the single definition strings
+            data.forEach {
+                if((it != ';')&&(it != '\r')){
+                    addString += it
+                } else {
+                    if(addString.isNotEmpty()) {
+                        stringArray.add(addString)
+                        addString = ""
+                    }
+                }
+            }
+            if(addString.isNotEmpty()){
+                stringArray.add(addString)
+            }
+
+            // read the definitions
+            stringArray.forEach {
+                try {
+                    if ((it[0] == 'x') || (it[0] == 'y') || (it[0] == 'p')) {
+                        // must be parameter definition
+                        var vName = ""
+                        var vValue = "0"
+                        var isName = true
+
+                        // record the parameter name and value
+                        for (c in it) {
+                            if (c == ':') {
+                                isName = false
+                            } else {
+                                if (isName) {
+                                    vName += c
+                                } else {
+                                    vValue += c
+                                }
+                            }
+                        }
+
+                        // dispatch the parameter
+                        val fVal = vValue.toFloat()
+
+                        when (vName) {
+                            "xsc+" -> {
+                                lRange.xmax += fVal
+                                lRange.xmin += fVal
+                            }
+                            "xsc-" -> {
+                                lRange.xmax -= fVal
+                                lRange.xmin -= fVal
+                            }
+                            "ysc+" -> {
+                                lRange.ymax += fVal
+                                lRange.ymin += fVal
+                            }
+                            "ysc-" -> {
+                                lRange.ymax -= fVal
+                                lRange.ymin -= fVal
+                            }
+                            "xmin" -> lRange.xmin = fVal
+                            "xmax" -> lRange.xmax = fVal
+                            "ymin" -> lRange.ymin = fVal
+                            "ymax" -> lRange.ymax = fVal
+                            "xisc" -> this.lineGraph.xAxisGridIntersectionUnits = fVal
+                            "yisc" -> this.lineGraph.yAxisGridIntersectionUnits = fVal
+                            "padd" -> {
+                                eraseLineData = false
+                                addLineData = true
+                            }
+                            else -> {
+                                // invalid parameter name
+                                Log.e("LGA:FastDataPipe", "Invalid parameter name: $vName")
+                                (applicationContext as ApplicationProperty).logControl("E: Invalid parameter name in lineGraph fast data pipe: $vName")
+                            }
+                        }
+                    } else {
+                        // must be point definition
+                        var xValue = ""
+                        var yValue = ""
+                        var isX = true
+
+                        // if this is not an add sequence, erase the existing line-data, but do it only once!
+                        if(eraseLineData){
+                            this.lineDataList.clear()
+                            eraseLineData = false
+                        }
+
+                        for (c in it) {
+                            if (c == ':') {
+                                isX = false
+                            } else {
+                                if (isX) {
+                                    xValue += c
+                                } else {
+                                    yValue += c
+                                }
+                            }
+                        }
+
+                        this.lineDataList.add(
+                            LineGraphData(
+                                xValue.toFloat(),
+                                yValue.toFloat()
+                            )
+                        )
+
+                        // remove lowest point if it is outside of the range (only if this is an add sequence)
+                        if(addLineData) {
+                            if ((lineDataList.elementAt(0).xVal < lRange.xmin) || (lineDataList.elementAt(
+                                    0
+                                ).yVal < lRange.ymin)
+                            ) {
+                                lineDataList.removeAt(0)
+                            }
+                        }
+
+                        // check the maximum size of the lineData points
+                        if(this.lineDataList.size > 1000){
+                            if(verboseLog){
+                                Log.e("LGA:FastDataPipe", "Error: lineDataList maximum size exceeded - Skip further execution.")
+                            }
+                            (applicationContext as ApplicationProperty).logControl("E: lineDataList maximum size exceeded - Skip further execution.")
+                            return@forEach
+                        }
+                    }
+                } catch (e: Exception){
+                    Log.e("LGA:FastDataPipe", "Error reading single value from String: $e")
+                }
+            }
+            this.lineGraph.setRange(lRange)
+            this.lineGraph.lineGraphData = this.lineDataList
+            this.lineGraph.invalidate()
 
         } catch (e: Exception){
             Log.e("LineGraphDataPipe", "Exception occurred: $e")
