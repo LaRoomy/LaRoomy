@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LineGraphActivity"
-            android:exported="false" />
+            android:screenOrientation="locked" />
         <activity
             android:name=".AddDeviceActivity"
             android:exported="true" />

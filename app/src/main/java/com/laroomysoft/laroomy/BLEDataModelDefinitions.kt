@@ -916,13 +916,15 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
     val lineData = ArrayList<LineGraphData>()
 
     override fun isValid(): Boolean {
+        // note: the error flag is inverted
         return !errorFlag
     }
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         this.drawGridLines = (complexPropertyState.valueOne and 0x01) != 0
         this.drawAxisValues = (complexPropertyState.valueOne and 0x02) != 0
-        this.errorFlag = this.fromComplexPropertyString(complexPropertyState.strValue, false)
+        // note: the error flag is inverted
+        this.errorFlag = !this.fromComplexPropertyString(complexPropertyState.strValue, false)
     }
 
     override fun toComplexPropertyState(): ComplexPropertyState {
