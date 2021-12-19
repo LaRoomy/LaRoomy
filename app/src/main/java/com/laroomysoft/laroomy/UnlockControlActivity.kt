@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AnimationUtils
 import android.widget.PopupWindow
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.*
@@ -26,7 +27,6 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private var lockState = UC_STATE_LOCKED
 
     private var pinChangePopupOpen = false
-
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
@@ -173,6 +173,10 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     }
 
     fun onNumPadButtonClick(view: View){
+
+        val buttonAnimation = AnimationUtils.loadAnimation(this, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
+
         when(view.id){
             R.id.ucZeroButton -> {
                 this.currentEnteredPin += '0'
