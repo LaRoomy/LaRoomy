@@ -25,6 +25,7 @@ const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = 2
 const val BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED = 3
 const val BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING = 4
 const val BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING = 5
+const val BLE_INIT_NO_PROPERTIES = 6
 
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
@@ -787,35 +788,41 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             bleDeviceData.propertyCount = Integer.decode(hexString)
 
-            hexString = "0x"
-            hexString += data[10]
-            hexString += data[11]
+            if(bleDeviceData.propertyCount <= 0){
+                // this makes no sense
+                this.callback.onConnectionError(BLE_INIT_NO_PROPERTIES)
+            } else {
+                // go ahead
+                hexString = "0x"
+                hexString += data[10]
+                hexString += data[11]
 
-            bleDeviceData.groupCount = Integer.decode(hexString)
+                bleDeviceData.groupCount = Integer.decode(hexString)
 
-            if (data[12] == '1') {
-                bleDeviceData.hasCachingPermission = true
-            }
-
-            // check if binding is required
-            when {
-                (data[13] == '1') -> {
-                    this.bleDeviceData.isBindingRequired = true
-
-                    // binding is required, so send the binding request on basis of the passkey setup
-                    val useCustomKeyForBinding =
-                        applicationProperty.loadBooleanData(
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_UseCustomBindingKey
-                        )
-
-                    sendBindingRequest(useCustomKeyForBinding)
+                if (data[12] == '1') {
+                    bleDeviceData.hasCachingPermission = true
                 }
-                else -> {
-                    // no binding is required, so notify the subscriber of the callback
-                    saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
-                    bleDeviceData.authenticationSuccess = true
-                    callback.onInitializationSuccessful()
+
+                // check if binding is required
+                when {
+                    (data[13] == '1') -> {
+                        this.bleDeviceData.isBindingRequired = true
+
+                        // binding is required, so send the binding request on basis of the passkey setup
+                        val useCustomKeyForBinding =
+                            applicationProperty.loadBooleanData(
+                                R.string.FileKey_AppSettings,
+                                R.string.DataKey_UseCustomBindingKey
+                            )
+
+                        sendBindingRequest(useCustomKeyForBinding)
+                    }
+                    else -> {
+                        // no binding is required, so notify the subscriber of the callback
+                        saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
+                        bleDeviceData.authenticationSuccess = true
+                        callback.onInitializationSuccessful()
+                    }
                 }
             }
         }

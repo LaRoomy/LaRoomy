@@ -267,6 +267,7 @@
     <string name="Error_ResumeFailedNoDevice">Resuming connection failed: No device.</string>
     <string name="Error_UnexpectedBindingKeyMissing">Unexpected error: Internal binding key is missing.</string>
     <string name="Error_UnknownError">Unknown error occurred.</string>
+    <string name="Error_InitFailed_NoProperties">Initialization failed. Property count is zero.</string>
 
 
     <!-- FileKeys: -->

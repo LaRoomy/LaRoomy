@@ -277,6 +277,8 @@
     <string name="Error_ResumeFailedNoDevice">Wiederherstellen der Verbindung fehlgeschlagen: Gerät nicht vorhanden.</string>
     <string name="Error_UnexpectedBindingKeyMissing">Unerwarteter Fehler: Interner Bindungsschlüssel fehlt.</string>
     <string name="Error_UnknownError">Unbekannter Fehler aufgetreten.</string>
+    <string name="Error_InitFailed_NoProperties">Initialisierung fehlgeschlagen. Anzahl der Geräte-Eigenschaften: 0.</string>
+
 
 
     <!-- FileKeys: -->

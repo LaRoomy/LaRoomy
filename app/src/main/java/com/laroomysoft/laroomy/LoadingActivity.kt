@@ -371,6 +371,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING -> {
                 getString(R.string.CA_TransmissionTimeoutOccurred)
             }
+            BLE_INIT_NO_PROPERTIES -> {
+                getString(R.string.Error_InitFailed_NoProperties)
+            }
             else -> {
                 getString(R.string.Error_UnknownError)
             }

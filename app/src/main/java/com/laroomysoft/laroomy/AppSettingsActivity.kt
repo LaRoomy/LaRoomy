@@ -93,9 +93,6 @@ class AppSettingsActivity : AppCompatActivity() {
                 Handler(Looper.getMainLooper()).postDelayed({
                     setShowLogButtonVisibility(state)
                 }, 200)
-
-                (applicationContext as ApplicationProperty).logRecordingTime = ""
-                (applicationContext as ApplicationProperty).connectionLog.clear()
             }
         this.keepScreenActiveSwitchCompat =
             findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
@@ -236,6 +233,12 @@ class AppSettingsActivity : AppCompatActivity() {
             setShowLogButtonVisibility(b)
 
             (this.applicationContext as ApplicationProperty).eventLogEnabled = b
+
+            // delete log data if the switch is set to off state
+            if(!b) {
+                (applicationContext as ApplicationProperty).logRecordingTime = ""
+                (applicationContext as ApplicationProperty).connectionLog.clear()
+            }
         }
         this.keepScreenActiveSwitchCompat.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
 
