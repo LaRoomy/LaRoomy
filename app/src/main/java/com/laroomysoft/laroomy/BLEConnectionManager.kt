@@ -73,6 +73,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var complexStateLoopActive = false
     private var complexStatePropertyIndexes = ArrayList<Int>()
 
+    // parameter regarding the fragmented transmission?
+    private val openFragmentedTransmissionData = ArrayList<FragmentTransmissionData>()
+
 
     // Callbacks
     private lateinit var callback: BleEventCallback
@@ -383,9 +386,121 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // fast data setter
                     dataProcessed = readFastDataSetterTransmission(data, dataSize)
                 }
+                '9' -> {
+                    // fragmented fast data setter
+                }
+                'a' -> {
+                    // fragmented property definition data
+                    dataProcessed = readFragmentedTransmission(data)
+                }
+                else -> {
+                    // TODO: error invalid character
+                }
             }
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
             return dataProcessed
+        }
+    }
+
+    private fun readFragmentedTransmission(data: String) : Boolean {
+
+        notifyLoopIsWorking(this.timeoutWatcherData.currentIndex)
+
+        if(verboseLog){
+            Log.d("readFragmentTransMsn", "Transmission fragment received. Data was: $data")
+        }
+        applicationProperty.logControl("I: Transmission fragment received. Data was: $data")
+
+        val header = data.removeRange(8, data.length)
+        var handled = false
+        var indexToRemove = -1
+
+        // first check if there are preliminary fragments
+        this.openFragmentedTransmissionData.forEachIndexed { index, fragmentTransmissionData ->
+
+            if(fragmentTransmissionData.transmissionString.startsWith(header)){
+                // extract user-data
+                var tData = data.removeRange(0, 8)
+                tData = tData.removeSuffix("\r")
+
+                // add the user-data
+                fragmentTransmissionData.transmissionString += tData
+
+                // check if the fragmentation is complete
+                val dataSize =
+                    a2CharHexValueToIntValue(fragmentTransmissionData.transmissionString[4], fragmentTransmissionData.transmissionString[5])
+
+                if(verboseLog){
+                    Log.d("readFragmentTransMsn", "New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
+                    Log.d("readFragmentTransMsn", "New fragment added. DataSize is: ${dataSize - 1} | User-data length is: ${fragmentTransmissionData.transmissionString.length - 8}")
+                }
+                applicationProperty.logControl("I: New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
+
+                // NOTE: the carriage-return delimiter is mission in the fragment assembly, but is calculated in the transmission size, so the dataSize must be decreased by 1 for comparison
+                if ((fragmentTransmissionData.transmissionString.length - 8) >= (dataSize - 1)) {
+                    // data size reached -> must be complete
+                    fragmentTransmissionData.transmissionString += '\r'
+                    dispatchFragmentedTransmission(fragmentTransmissionData.transmissionString)
+                    indexToRemove = index
+                }
+                handled = true
+            }
+        }
+
+        if(indexToRemove != -1){
+            this.openFragmentedTransmissionData.removeAt(indexToRemove)
+        }
+
+        if(!handled){
+            val stringToAdd = data.removeSuffix("\r")
+
+            if(verboseLog){
+                Log.d("readFragmentTransMsn", "Transmission fragment not added -> must be a new start-fragment. Adding data to list: $stringToAdd")
+            }
+            applicationProperty.logControl("I: Transmission fragment not added -> must be a new start-fragment. Adding data to list: $stringToAdd")
+
+            this.openFragmentedTransmissionData.add(
+                FragmentTransmissionData(stringToAdd)
+            )
+        }
+
+        // TODO: error handling??
+
+        return true
+    }
+
+    private fun dispatchFragmentedTransmission(transmission: String){
+
+        if(verboseLog){
+            Log.d("dispatchFragmentTransMsn", "Dispatching the assembled fragmented transmission. Transmission data: $transmission")
+        }
+
+        when(transmission[0]){
+            'a' -> {
+                this.readPropertyString(transmission, transmission.length - 8)
+            }
+            'b' -> {
+                this.readGroupString(transmission, transmission.length - 8)
+            }
+            'c' -> {
+                this.dispatchPropertyStateTransmission(transmission, transmission.length - 8)
+            }
+            'd' -> {
+                this.readPropertyExecutionResponse(transmission, transmission.length - 8)
+            }
+            'e' -> {
+                this.readDeviceNotification(transmission, transmission.length - 8)
+            }
+            'f' -> {
+                this.readBindingResponse(transmission, transmission.length - 8)
+            }
+            '9' -> {
+                this.readFastDataSetterTransmission(transmission, transmission.length - 8)
+            }
+            else -> {
+                Log.e("dispatchFragmentedTransMsn", "Error: Unknown header format character. Character was: ${transmission[0]}")
+                applicationProperty.logControl("E: Unknown header format character. Character was: ${transmission[0]}")
+            }
         }
     }
 
@@ -824,6 +939,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         callback.onInitializationSuccessful()
                     }
                 }
+
+                // TODO: remove the length iteration and change it at the beginning of the method (only made to remain compatible with the FSC device - temporary!)
+                if(data.length >= 13){
+                    // check if the remote device needs fragmented transmission
+                    if(data[14] == '1'){
+                        bleDeviceData.fragmentedTransmissionRequired = true
+                    }
+                }
             }
         }
         return true
@@ -1091,7 +1214,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
 
                     val devicePropertyCacheData = DevicePropertyCacheData()
-                    DevicePropertyCacheData().generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
+                    devicePropertyCacheData.generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
 
                     PropertyCacheManager(applicationProperty.applicationContext)
                         .savePCacheData(

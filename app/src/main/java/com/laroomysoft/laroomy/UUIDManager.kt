@@ -13,7 +13,7 @@ const val PROFILE_NAME_ALREADY_EXIST = 1
 const val UUID_FORMAT_INVALID = 2
 const val INVALID_INDEX = 3
 
-const val FIRST_USERPROFILE_INDEX = 2
+const val FIRST_USERPROFILE_INDEX = 3
 
 const val UUID_File_UserProfiles = "uuidUserProfiles"
 
@@ -31,6 +31,9 @@ class UUIDManager(private var appContext: Context) {
     private val hmModulesServiceUUID: UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     private val hmModulesCharacteristicUUID: UUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
 
+    private val commonAppAccessServiceUUID: UUID = UUID.fromString("b47f725f-5fca-45b9-998f-f828388d044f")
+    private val commonAppAccessCharacteristicUUID: UUID = UUID.fromString("124c0402-da98-4d2b-8492-e712f8036997")
+
     //val rn4870_service_one = "00001800-0000-1000-8000-00805f9b34fb"
     //val rn4870_service_two = "00001801-0000-1000-8000-00805f9b34fb"
     //val rn4870_service_three = "0000180a-0000-1000-8000-00805f9b34fb"
@@ -44,14 +47,19 @@ class UUIDManager(private var appContext: Context) {
 
         // add the common profiles
         val hmXXProfile = UUIDProfile()
-        hmXXProfile.profileName = "Huamao HMxx - Modules"
+        hmXXProfile.profileName = "HMxx - Modules"
         hmXXProfile.serviceUUID = hmModulesServiceUUID
         hmXXProfile.characteristicUUID = hmModulesCharacteristicUUID
         val rn48xxProfile = UUIDProfile()
-        rn48xxProfile.profileName = "Microchip RN48xx Modules"
+        rn48xxProfile.profileName = "RN48xx Modules (Microchip)"
         rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
         rn48xxProfile.characteristicUUID = rn4870CharacteristicUUID1
+        val commonAccessProfile = UUIDProfile()
+        commonAccessProfile.profileName = "Common Access Profile"
+        commonAccessProfile.serviceUUID = commonAppAccessServiceUUID
+        commonAccessProfile.characteristicUUID = commonAppAccessCharacteristicUUID
 
+        this.add(commonAccessProfile)
         this.add(rn48xxProfile)
         this.add(hmXXProfile)
 
@@ -90,7 +98,12 @@ class UUIDManager(private var appContext: Context) {
                 rn48xxProfile.profileName = "Microchip RN48xx Modules"
                 rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
                 rn48xxProfile.characteristicUUID = rn4870CharacteristicUUID1
+                val commonAccessProfile = UUIDProfile()
+                commonAccessProfile.profileName = "Common Access Profile"
+                commonAccessProfile.serviceUUID = commonAppAccessServiceUUID
+                commonAccessProfile.characteristicUUID = commonAppAccessCharacteristicUUID
 
+                this.add(commonAccessProfile)
                 this.add(rn48xxProfile)
                 this.add(hmXXProfile)
             }
