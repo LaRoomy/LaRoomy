@@ -436,7 +436,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 applicationProperty.logControl("I: New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
 
-                // NOTE: the carriage-return delimiter is mission in the fragment assembly, but is calculated in the transmission size, so the dataSize must be decreased by 1 for comparison
+                // NOTE: the carriage-return delimiter is missing in the fragment assembly, but is calculated in the transmission size, so the dataSize must be decreased by 1 for comparison
                 if ((fragmentTransmissionData.transmissionString.length - 8) >= (dataSize - 1)) {
                     // data size reached -> must be complete
                     fragmentTransmissionData.transmissionString += '\r'
