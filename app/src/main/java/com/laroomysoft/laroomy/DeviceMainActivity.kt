@@ -351,6 +351,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private fun getBackgroundDrawableFromElementIndex(index: Int){}
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun reloadProperties(){
 
         // TODO: log
@@ -366,7 +367,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         runOnUiThread {
             this.propertyLoadingFinished = false
             this.propertyList.clear()
-            //this.devicePropertyListViewAdapter.notifyDataSetChanged()
+            this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
 
             val deviceHeaderData = DeviceInfoHeaderData()

@@ -388,9 +388,30 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '9' -> {
                     // fragmented fast data setter
+                    dataProcessed = readFragmentedTransmission(data)
                 }
                 'a' -> {
                     // fragmented property definition data
+                    dataProcessed = readFragmentedTransmission(data)
+                }
+                'b' -> {
+                    // fragmented group definition data
+                    dataProcessed = readFragmentedTransmission(data)
+                }
+                'c' -> {
+                    // fragmented state data
+                    dataProcessed = readFragmentedTransmission(data)
+                }
+                'd' -> {
+                    // fragmented execution command
+                    dataProcessed = readFragmentedTransmission(data)
+                }
+                'e' -> {
+                    // fragmented notification/command
+                    dataProcessed = readFragmentedTransmission(data)
+                }
+                'f' -> {
+                    // fragmented binding transmission
                     dataProcessed = readFragmentedTransmission(data)
                 }
                 else -> {
@@ -1212,6 +1233,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                 // save data to cache if permitted
                 if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+
+                    if(verboseLog){
+                        Log.d("sendNextPropRQ", "Data caching is permitted. Saving property-data to cache.")
+                    }
+                    applicationProperty.logControl("I: Data caching is permitted. Saving property-data to cache.")
 
                     val devicePropertyCacheData = DevicePropertyCacheData()
                     devicePropertyCacheData.generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
@@ -2214,7 +2240,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
 
-            if(laRoomyDeviceProperty.propertyIndex == devicePropertyListContentInformation.internalElementIndex){
+            if((laRoomyDeviceProperty.propertyIndex == devicePropertyListContentInformation.internalElementIndex) && devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT){
 
                 devicePropertyListContentInformation.elementText = laRoomyDeviceProperty.propertyDescriptor
                 devicePropertyListContentInformation.canNavigateForward = laRoomyDeviceProperty.needNavigation()
@@ -2236,7 +2262,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
 
-            if(laRoomyDevicePropertyGroup.groupIndex == devicePropertyListContentInformation.internalElementIndex){
+            if((laRoomyDevicePropertyGroup.groupIndex == devicePropertyListContentInformation.internalElementIndex) && devicePropertyListContentInformation.elementType == GROUP_ELEMENT){
 
                 devicePropertyListContentInformation.elementType = GROUP_ELEMENT
                 devicePropertyListContentInformation.canNavigateForward = false
