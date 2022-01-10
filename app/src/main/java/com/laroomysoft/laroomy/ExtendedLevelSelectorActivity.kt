@@ -3,9 +3,11 @@ package com.laroomysoft.laroomy
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.ramotion.fluidslider.FluidSlider
 
 class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
@@ -14,13 +16,29 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var currentLevel = 0
+    private var minValue = 0
+    private var maxValue = 100
     private var onOffState = false
+    private var showOnOffSwitch = true
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+    private val total: Int
+    get() {
+        return when {
+            (this.maxValue < this.minValue) -> 0
+            ((this.minValue == 0)&&(this.maxValue > 0)) -> this.maxValue
+            ((this.maxValue == 0)&&(this.minValue < 0)) -> -(this.minValue)
+            ((this.minValue < 0)&&(this.maxValue > 0)) -> (this.maxValue + (-(this.minValue)))
+            ((this.minValue < 0)&&(this.maxValue < 0)) -> ((-(this.minValue)) - (-(this.maxValue)))
+            ((this.minValue > 0)&&(this.maxValue > 0)) -> (this.maxValue - this.minValue)
+            else -> 0
+        }
+    }
 
     private lateinit var onOffSwitch: SwitchCompat
     private lateinit var fluidLevelSlider: FluidSlider
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
+    private lateinit var switchContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +69,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
+        // get the UI Elements
+        this.switchContainer = findViewById(R.id.elsSwitchContainer)
+        this.notificationTextView = findViewById(R.id.elsUserNotificationTextView)
+        this.onOffSwitch = findViewById(R.id.elsSwitch)
+        this.fluidLevelSlider = findViewById(R.id.exLevelSlider)
+
         // get the related complex state object
         val exLevelState = ExtendedLevelSelectorState()
         exLevelState.fromComplexPropertyState(
@@ -60,9 +84,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // save the ex level data
         this.currentLevel = exLevelState.levelValue
         this.onOffState = exLevelState.onOffState
+        this.minValue = exLevelState.minValue
+        this.maxValue = exLevelState.maxValue
+        this.showOnOffSwitch = exLevelState.showOnOffSwitch
 
-        // get the uiElements and set the initial values
-        this.onOffSwitch = findViewById(R.id.elsSwitch)
+
+        // configure UI Elements
         this.onOffSwitch.apply {
 
             setOnClickListener {
@@ -77,19 +104,26 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             isChecked = exLevelState.onOffState
         }
 
-        this.notificationTextView = findViewById(R.id.elsUserNotificationTextView)
-
-        this.fluidLevelSlider =
-            findViewById(R.id.exLevelSlider)
-
         this.fluidLevelSlider.apply {
-            position = get8BitValueAsPartOfOne(exLevelState.levelValue)
+            // apply values
+            if(total != 0){
+                this.startText = "$minValue"
+                this.endText = "$maxValue"
+                position = levelToSliderPosition(exLevelState.levelValue)
+                this.bubbleText = "${exLevelState.levelValue}"
+            } else {
+                // invalid data
+                position = 0f
+                this.bubbleText = "E!"
+            }
+            // set listener
             positionListener = {
+                val realPos = sliderPositionToLevelValue(it)
                 onSliderPositionChanged(
-                    percentTo8Bit(
-                        (100 * it).toInt()
-                    )
+                    realPos
                 )
+                bubbleText = "$realPos"
+                currentLevel = realPos
             }
         }
     }
@@ -151,11 +185,30 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(extendedLevelSelectorState: ExtendedLevelSelectorState){
-        // set slider position
-        this.fluidLevelSlider.position = get8BitValueAsPartOfOne(extendedLevelSelectorState.levelValue)
-        // set switch state
-        this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState
 
+        // save the data to local
+        this.onOffState = extendedLevelSelectorState.onOffState
+        this.currentLevel = extendedLevelSelectorState.levelValue
+        this.minValue = extendedLevelSelectorState.minValue
+        this.maxValue = extendedLevelSelectorState.maxValue
+        this.showOnOffSwitch = extendedLevelSelectorState.showOnOffSwitch
+
+        // set the switch visibility
+        this.switchContainer.visibility = if(this.showOnOffSwitch){
+            // set switch state
+            this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState
+            // set visible
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        this.fluidLevelSlider.apply {
+            this.startText = "${extendedLevelSelectorState.minValue}"
+            this.endText = "${extendedLevelSelectorState.maxValue}"
+            position = levelToSliderPosition(extendedLevelSelectorState.levelValue)
+            this.bubbleText = "${extendedLevelSelectorState.levelValue}"
+        }
         // TODO: check if the onChecked event is triggered by the setting process
     }
 
@@ -166,13 +219,54 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
     }
 
+    private fun sliderPositionToLevelValue(pos: Float) : Int {
+        return (this.minValue + (this.total * pos)).toInt()
+    }
+
+    private fun levelToSliderPosition(level: Int) : Float {
+        return when {
+            (level == this.minValue) -> 0f
+            (level == this.maxValue) -> 1f
+            else -> {
+                val realLevel = when {
+                    ((this.minValue < 0)&&(this.maxValue == 0)) -> {
+                        (-(level)) - (-(this.minValue))
+                    }
+                    ((this.minValue < 0)&&(this.maxValue < 0)) -> {
+                        (-(level)) - (-(this.minValue))
+                    }
+                    ((this.minValue == 0)&&(this.maxValue > 0)) -> {
+                        level
+                    }
+                    ((this.minValue > 0)&&(this.maxValue > 0)) -> {
+                        level - this.minValue
+                    }
+                    ((this.minValue < 0)&&(this.maxValue > 0)) -> {
+                        when {
+                            (level < 0) -> {
+                                (-(level)) - (-(this.minValue))
+                            }
+                            (level == 0) -> {
+                                -(this.minValue)
+                            }
+                            else -> {
+                                (-(this.minValue)) + level
+                            }
+                        }
+                    }
+                    else -> 0
+                }
+                (realLevel / this.total).toFloat()
+            }
+        }
+    }
+
     private fun onOffSwitchClicked(){
         this.onOffState = this.onOffSwitch.isChecked
         this.collectDataSendCommandAndUpdateState()
     }
 
     private fun onSliderPositionChanged(value: Int){
-        // the value must be in 0..255 (8bit) format
         if(verboseLog) {
             Log.d(
                 "M:CB:ELS:SliderPosC",

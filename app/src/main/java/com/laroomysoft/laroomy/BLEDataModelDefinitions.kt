@@ -300,10 +300,19 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
 
     var onOffState = false
     var levelValue = -1
+    var minValue = 0
+    var maxValue = 100
+    var showOnOffSwitch = true;
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         this.onOffState = complexPropertyState.onOffState
         this.levelValue = complexPropertyState.valueOne
+        this.minValue = complexPropertyState.valueTwo
+        this.maxValue = complexPropertyState.valueThree
+        this.showOnOffSwitch = when(complexPropertyState.valueFour){
+            1 -> true
+            else -> false
+        }
     }
 
     override fun isValid(): Boolean {
@@ -314,11 +323,17 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
         val cState = ComplexPropertyState()
         cState.onOffState = this.onOffState
         cState.valueOne = this.levelValue
+        cState.valueTwo = this.minValue
+        cState.valueThree = this.maxValue
+        cState.valueFour = when(this.showOnOffSwitch){
+            true -> 1
+            else -> 0
+        }
         return cState
     }
 
     override fun fromString(data: String): Boolean {
-        return if (data.length < 12) {
+        return if (data.length < 21) {
             if (verboseLog) {
                 Log.e(
                     "ExLevelData:fromString",
@@ -328,7 +343,10 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             false
         } else {
             this.onOffState = (data[8]) == '1'
-            this.levelValue = a2CharHexValueToIntValue(data[9], data[10])
+            this.levelValue = a4CharHexValueToSignedIntValue(data[9], data[10], data[11], data[12])
+            this.minValue = a4CharHexValueToSignedIntValue(data[13], data[14], data[15], data[16])
+            this.maxValue = a4CharHexValueToSignedIntValue(data[17], data[18], data[19], data[20])
+            this.showOnOffSwitch = data[21] == '1'
             true
         }
     }
@@ -346,7 +364,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             } else {
                 '0'
             }
-        executionString += a8bitValueTo2CharHexValue(this.levelValue)
+        executionString += aSigned16bitValueto4CharHexValue(this.levelValue)
         executionString += '\r'
         return executionString
     }

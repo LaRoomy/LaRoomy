@@ -489,9 +489,84 @@ fun a8bitValueTo2CharHexValue(bVal: Int) : String {
     }
 }
 
+fun aSigned16bitValueto4CharHexValue(bVal: Int): String {
+    return if ((bVal > 32766) || (bVal < -32766)) {
+        "EEEE"
+    } else {
+        val hl = bVal.or(0xF000).shr(12)
+        val hr = bVal.or(0x0F00).shr(8)
+        val ll = bVal.or(0x00F0).shr(4)
+        val lr = bVal.or(0x000F)
+        "${numberToHexChar(hl)}${numberToHexChar(hr)}${numberToHexChar(ll)}${numberToHexChar(lr)}"
+    }
+}
+
 fun a2CharHexValueToIntValue(c_left: Char, c_right: Char) : Int {
     val valueStr = "0x$c_left$c_right"
     return Integer.decode(valueStr)
+}
+
+fun a4CharHexValueToSignedIntValue(hl: Char, hr: Char, ll: Char, lr: Char) : Int {
+
+    val highLeft = hexCharToNumber(hl)
+    val highRight = hexCharToNumber(hr)
+    val lowLeft = hexCharToNumber(ll)
+    val lowRight = hexCharToNumber(lr)
+
+    return highLeft.shl(12).or(highRight.shl(8)).or(lowLeft.shl(4).or(lowRight))
+
+    //val valueStr = "0x$hl$hr$ll$lr"
+    //return Integer.decode(valueStr)
+}
+
+fun hexCharToNumber(c: Char) : Int {
+    return when(c){
+        '0' -> 0
+        '1' -> 1
+        '2' -> 2
+        '3' -> 3
+        '4' -> 4
+        '5' -> 5
+        '6' -> 6
+        '7' -> 7
+        '8' -> 8
+        '9' -> 9
+        'a' -> 10
+        'b' -> 11
+        'c' -> 12
+        'd' -> 13
+        'e' -> 14
+        'f' -> 15
+        'A' -> 10
+        'B' -> 11
+        'C' -> 12
+        'D' -> 13
+        'E' -> 14
+        'F' -> 15
+        else -> 0
+    }
+}
+
+fun numberToHexChar(n: Int) : Char {
+    return when(n){
+        0 -> '0'
+        1 -> '1'
+        2 -> '2'
+        3 -> '3'
+        4 -> '4'
+        5 -> '5'
+        6 -> '6'
+        7 -> '7'
+        8 -> '8'
+        9 -> '9'
+        10 -> 'a'
+        11 -> 'b'
+        12 -> 'c'
+        13 -> 'd'
+        14 -> 'e'
+        15 -> 'f'
+        else -> 'f'
+    }
 }
 
 fun createRandomPasskey(keyLength: Int): String {
