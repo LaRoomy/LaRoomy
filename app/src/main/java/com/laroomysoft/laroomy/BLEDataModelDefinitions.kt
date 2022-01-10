@@ -343,9 +343,9 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             false
         } else {
             this.onOffState = (data[8]) == '1'
-            this.levelValue = a4CharHexValueToSignedIntValue(data[9], data[10], data[11], data[12])
-            this.minValue = a4CharHexValueToSignedIntValue(data[13], data[14], data[15], data[16])
-            this.maxValue = a4CharHexValueToSignedIntValue(data[17], data[18], data[19], data[20])
+            this.levelValue = a4CharHexValueToSignedIntValue(data[9], data[10], data[11], data[12]).toInt()
+            this.minValue = a4CharHexValueToSignedIntValue(data[13], data[14], data[15], data[16]).toInt()
+            this.maxValue = a4CharHexValueToSignedIntValue(data[17], data[18], data[19], data[20]).toInt()
             this.showOnOffSwitch = data[21] == '1'
             true
         }
@@ -364,7 +364,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             } else {
                 '0'
             }
-        executionString += aSigned16bitValueto4CharHexValue(this.levelValue)
+        executionString += aSigned16bitValueTo4CharHexValue(this.levelValue)
         executionString += '\r'
         return executionString
     }

@@ -111,6 +111,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                 this.endText = "$maxValue"
                 position = levelToSliderPosition(exLevelState.levelValue)
                 this.bubbleText = "${exLevelState.levelValue}"
+                invalidate()
             } else {
                 // invalid data
                 position = 0f
@@ -256,7 +257,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                     }
                     else -> 0
                 }
-                (realLevel / this.total).toFloat()
+                val totalValue = this.total.toFloat()
+                if(totalValue != 0f) {
+                    (realLevel.toFloat() / totalValue)
+                } else {
+                    0f
+                }
             }
         }
     }

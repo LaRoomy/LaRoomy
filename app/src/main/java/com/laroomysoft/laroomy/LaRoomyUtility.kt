@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.graphics.Color
+import kotlin.experimental.or
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -489,15 +490,15 @@ fun a8bitValueTo2CharHexValue(bVal: Int) : String {
     }
 }
 
-fun aSigned16bitValueto4CharHexValue(bVal: Int): String {
+fun aSigned16bitValueTo4CharHexValue(bVal: Short): String {
     return if ((bVal > 32766) || (bVal < -32766)) {
         "EEEE"
     } else {
-        val hl = bVal.or(0xF000).shr(12)
-        val hr = bVal.or(0x0F00).shr(8)
-        val ll = bVal.or(0x00F0).shr(4)
-        val lr = bVal.or(0x000F)
-        "${numberToHexChar(hl)}${numberToHexChar(hr)}${numberToHexChar(ll)}${numberToHexChar(lr)}"
+        val hl = bVal.or((0xf000).toShort()) //shr 12)//.shr((12).toShort())
+        val hr = bVal.or((0x0f00).toShort()) //(0x0f00).shr(8)
+        val ll = bVal.or((0x00f0).toShort())//.shr(4)
+        val lr = bVal.or((0x000f).toShort())
+        "${numberToHexChar(hl.toInt())}${numberToHexChar(hr.toInt())}${numberToHexChar(ll.toInt())}${numberToHexChar(lr.toInt())}"
     }
 }
 
@@ -506,14 +507,14 @@ fun a2CharHexValueToIntValue(c_left: Char, c_right: Char) : Int {
     return Integer.decode(valueStr)
 }
 
-fun a4CharHexValueToSignedIntValue(hl: Char, hr: Char, ll: Char, lr: Char) : Int {
+fun a4CharHexValueToSignedIntValue(hl: Char, hr: Char, ll: Char, lr: Char) : Short {
 
     val highLeft = hexCharToNumber(hl)
     val highRight = hexCharToNumber(hr)
     val lowLeft = hexCharToNumber(ll)
     val lowRight = hexCharToNumber(lr)
 
-    return highLeft.shl(12).or(highRight.shl(8)).or(lowLeft.shl(4).or(lowRight))
+    return  (highLeft.shl(12).or(highRight.shl(8)).or(lowLeft.shl(4).or(lowRight))).toShort()
 
     //val valueStr = "0x$hl$hr$ll$lr"
     //return Integer.decode(valueStr)
