@@ -302,7 +302,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
     var levelValue = -1
     var minValue = 0
     var maxValue = 100
-    var showOnOffSwitch = true;
+    var showOnOffSwitch = true
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         this.onOffState = complexPropertyState.onOffState
@@ -316,7 +316,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
     }
 
     override fun isValid(): Boolean {
-        return levelValue >= 0
+        return (((this.minValue < this.maxValue)&&(this.levelValue >= this.minValue)&&(this.levelValue <= this.maxValue)))
     }
 
     override fun toComplexPropertyState(): ComplexPropertyState {
@@ -364,7 +364,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             } else {
                 '0'
             }
-        executionString += aSigned16bitValueTo4CharHexValue(this.levelValue)
+        executionString += aSigned16bitValueTo4CharHexValue(this.levelValue.toShort())
         executionString += '\r'
         return executionString
     }

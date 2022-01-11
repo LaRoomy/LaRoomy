@@ -491,14 +491,16 @@ fun a8bitValueTo2CharHexValue(bVal: Int) : String {
 }
 
 fun aSigned16bitValueTo4CharHexValue(bVal: Short): String {
-    return if ((bVal > 32766) || (bVal < -32766)) {
-        "EEEE"
-    } else {
-        val hl = bVal.or((0xf000).toShort()) //shr 12)//.shr((12).toShort())
-        val hr = bVal.or((0x0f00).toShort()) //(0x0f00).shr(8)
-        val ll = bVal.or((0x00f0).toShort())//.shr(4)
-        val lr = bVal.or((0x000f).toShort())
-        "${numberToHexChar(hl.toInt())}${numberToHexChar(hr.toInt())}${numberToHexChar(ll.toInt())}${numberToHexChar(lr.toInt())}"
+    val a = bVal.toUShort()
+    val hexString =
+        Integer.toHexString(a.toInt())
+    return when (hexString.length) {
+        0 -> "eeee"
+        1 -> "000$hexString"
+        2 -> "00$hexString"
+        3 -> "0$hexString"
+        4 -> hexString
+        else -> "over"
     }
 }
 
