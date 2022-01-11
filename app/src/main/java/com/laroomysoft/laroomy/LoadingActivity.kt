@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.TextView
+import com.github.ybq.android.spinkit.SpinKitView
 import java.lang.IndexOutOfBoundsException
 import java.util.*
 import java.util.concurrent.Executors
@@ -27,6 +29,8 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     private var connectionMustResetDueToOnPauseExecution = false
     private var preventNormalOnPauseExecution = false
     //private var authenticationAttemptCounter = 0
+
+    private lateinit var spinKitView: SpinKitView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +59,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         }
 
         this.curDeviceListIndex = this.intent.getIntExtra("DeviceListIndex", -1)
+
+        // get UI Element(s)
+        this.spinKitView = findViewById(R.id.loadingActivitySpinKitView)
 
         when(this.curDeviceListIndex){
             -1 -> {
@@ -392,6 +399,10 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
+
+        runOnUiThread {
+            this.spinKitView.visibility = View.INVISIBLE
+        }
 
         this.preventNormalOnPauseExecution = true
 

@@ -347,6 +347,11 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             this.minValue = a4CharHexValueToSignedIntValue(data[13], data[14], data[15], data[16]).toInt()
             this.maxValue = a4CharHexValueToSignedIntValue(data[17], data[18], data[19], data[20]).toInt()
             this.showOnOffSwitch = data[21] == '1'
+            // make sure the level value is in scope:
+            when {
+                (this.levelValue < this.minValue) -> this.levelValue = this.minValue
+                (this.levelValue > this.maxValue) -> this.levelValue = this.maxValue
+            }
             true
         }
     }
@@ -365,6 +370,9 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
                 '0'
             }
         executionString += aSigned16bitValueTo4CharHexValue(this.levelValue.toShort())
+
+        // TODO: add the other values to conform to the state transmission???
+
         executionString += '\r'
         return executionString
     }

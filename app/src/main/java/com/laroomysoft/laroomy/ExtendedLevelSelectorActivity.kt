@@ -88,6 +88,11 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.maxValue = exLevelState.maxValue
         this.showOnOffSwitch = exLevelState.showOnOffSwitch
 
+        // hide the switch if requested
+        if(!this.showOnOffSwitch){
+            this.switchContainer.visibility = View.GONE
+        }
+
 
         // configure UI Elements
         this.onOffSwitch.apply {
@@ -234,7 +239,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                         (-(level)) - (-(this.minValue))
                     }
                     ((this.minValue < 0)&&(this.maxValue < 0)) -> {
-                        (-(level)) - (-(this.minValue))
+                        (-(this.minValue)) - (-(level))
                     }
                     ((this.minValue == 0)&&(this.maxValue > 0)) -> {
                         level
@@ -288,6 +293,9 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         val exLevelState = ExtendedLevelSelectorState()
         exLevelState.levelValue = this.currentLevel
         exLevelState.onOffState = this.onOffState
+        exLevelState.maxValue = this.maxValue
+        exLevelState.minValue = this.minValue
+        exLevelState.showOnOffSwitch = this.showOnOffSwitch
 
         ApplicationProperty.bluetoothConnectionManager.sendData(
             exLevelState.toExecutionString(this.relatedElementID)
