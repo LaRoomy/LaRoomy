@@ -9,6 +9,8 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.ramotion.fluidslider.FluidSlider
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -125,12 +127,26 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             }
             // set listener
             positionListener = {
-                val realPos = sliderPositionToLevelValue(it)
+                val realPos =
+                    sliderPositionToLevelValue(it)
+
+                if(realPos != currentLevel) {
+                    onSliderPositionChanged(
+                        realPos
+                    )
+                    bubbleText = "$realPos"
+                    currentLevel = realPos
+                }
+            }
+            // set end tracking listener
+            this.endTrackingListener = {
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                val realPos = sliderPositionToLevelValue(fluidLevelSlider.position)
                 onSliderPositionChanged(
                     realPos
                 )
-                bubbleText = "$realPos"
                 currentLevel = realPos
+                }, 100, TimeUnit.MILLISECONDS)
             }
         }
     }

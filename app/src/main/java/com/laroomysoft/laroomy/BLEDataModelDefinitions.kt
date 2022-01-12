@@ -370,13 +370,16 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
                 '0'
             }
         executionString += aSigned16bitValueTo4CharHexValue(this.levelValue.toShort())
-        executionString += aSigned16bitValueTo4CharHexValue(this.minValue.toShort())
+
+        // The transmission to the device should not exceed 20byte!!
+
+        /*executionString += aSigned16bitValueTo4CharHexValue(this.minValue.toShort())
         executionString += aSigned16bitValueTo4CharHexValue(this.maxValue.toShort())
         executionString += if(this.showOnOffSwitch){
             '1'
         } else {
             '0'
-        }
+        }*/
         executionString += '\r'
         return executionString
     }
