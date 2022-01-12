@@ -90,6 +90,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
         // hide the switch if requested
         if(!this.showOnOffSwitch){
+            // TODO: the slider must be shifted up if the switch is not visible!
             this.switchContainer.visibility = View.GONE
         }
 
@@ -206,6 +207,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             // set visible
             View.VISIBLE
         } else {
+            // TODO: the slider must be shifted up if the switch is not visible!
             View.GONE
         }
 

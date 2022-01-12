@@ -360,7 +360,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
         // generate transmission header:
         var executionString = "43"
         executionString += a8bitValueTo2CharHexValue(propertyIndex)
-        executionString += "0400"
+        executionString += "0f00"
 
         // add ex level selector specific data
         executionString +=
@@ -370,9 +370,13 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
                 '0'
             }
         executionString += aSigned16bitValueTo4CharHexValue(this.levelValue.toShort())
-
-        // TODO: add the other values to conform to the state transmission???
-
+        executionString += aSigned16bitValueTo4CharHexValue(this.minValue.toShort())
+        executionString += aSigned16bitValueTo4CharHexValue(this.maxValue.toShort())
+        executionString += if(this.showOnOffSwitch){
+            '1'
+        } else {
+            '0'
+        }
         executionString += '\r'
         return executionString
     }
