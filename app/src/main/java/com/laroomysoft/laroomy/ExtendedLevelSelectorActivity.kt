@@ -8,9 +8,14 @@ import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import com.ramotion.fluidslider.FluidSlider
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+
+const val TM_NONE = 0
+const val TM_START = 1
+const val TM_END = 2
 
 class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -22,6 +27,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private var maxValue = 100
     private var onOffState = false
     private var showOnOffSwitch = true
+    private var transmitOnlyStartEndIndication = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private val total: Int
     get() {
@@ -89,11 +95,13 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.minValue = exLevelState.minValue
         this.maxValue = exLevelState.maxValue
         this.showOnOffSwitch = exLevelState.showOnOffSwitch
+        this.transmitOnlyStartEndIndication = exLevelState.transmitOnlyStartEndOfTracking
 
         // hide the switch if requested
         if(!this.showOnOffSwitch){
             // TODO: the slider must be shifted up if the switch is not visible!
             this.switchContainer.visibility = View.GONE
+            this.setSliderUpDown(true)
         }
 
 
@@ -127,26 +135,30 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             }
             // set listener
             positionListener = {
-                val realPos =
-                    sliderPositionToLevelValue(it)
+                if(!transmitOnlyStartEndIndication) {
+                    val realPos =
+                        sliderPositionToLevelValue(it)
 
-                if(realPos != currentLevel) {
-                    onSliderPositionChanged(
-                        realPos
-                    )
-                    bubbleText = "$realPos"
-                    currentLevel = realPos
+                    if (realPos != currentLevel) {
+                        onSliderPositionChanged(
+                            realPos
+                        )
+                        bubbleText = "$realPos"
+                        //currentLevel = realPos // done in onSliderPositionChanged(..)
+                    }
                 }
             }
             // set end tracking listener
             this.endTrackingListener = {
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                val realPos = sliderPositionToLevelValue(fluidLevelSlider.position)
-                onSliderPositionChanged(
-                    realPos
-                )
-                currentLevel = realPos
-                }, 100, TimeUnit.MILLISECONDS)
+                    val realPos = sliderPositionToLevelValue(fluidLevelSlider.position)
+                    currentLevel = realPos
+                    collectDataSendCommandAndUpdateState(TM_END, true)
+                }, 200, TimeUnit.MILLISECONDS)
+            }
+            // set begin tracking listener
+            this.beginTrackingListener = {
+                collectDataSendCommandAndUpdateState(TM_START, false)
             }
         }
     }
@@ -215,15 +227,21 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.minValue = extendedLevelSelectorState.minValue
         this.maxValue = extendedLevelSelectorState.maxValue
         this.showOnOffSwitch = extendedLevelSelectorState.showOnOffSwitch
+        this.transmitOnlyStartEndIndication = extendedLevelSelectorState.transmitOnlyStartEndOfTracking
 
         // set the switch visibility
-        this.switchContainer.visibility = if(this.showOnOffSwitch){
+        this.switchContainer.visibility = if (this.showOnOffSwitch) {
             // set switch state
             this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState
+            // set slider constraint
+            this.setSliderUpDown(false)
             // set visible
             View.VISIBLE
         } else {
             // TODO: the slider must be shifted up if the switch is not visible!
+            // set slider constraint
+            this.setSliderUpDown(true)
+            // set visibility to gone
             View.GONE
         }
 
@@ -240,6 +258,34 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         runOnUiThread {
             notificationTextView.setTextColor(getColor(colorID))
             notificationTextView.text = message
+        }
+    }
+
+    private fun setSliderUpDown(setUp: Boolean) {
+        if (setUp) {
+            val constraintLayout =
+                findViewById<ConstraintLayout>(R.id.extendedLevelSelectorActivityControllerContainer)
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            constraintSet.connect(
+                R.id.extendedLevelSelectorActivityControllerContainer,
+                ConstraintSet.TOP,
+                R.id.extendedLevelSelectorActivityParentContainer,
+                ConstraintSet.TOP
+            )
+            constraintSet.applyTo(constraintLayout)
+        } else {
+            val constraintLayout =
+                findViewById<ConstraintLayout>(R.id.extendedLevelSelectorActivityControllerContainer)
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            constraintSet.connect(
+                R.id.extendedLevelSelectorActivityControllerContainer,
+                ConstraintSet.TOP,
+                R.id.elsHeaderContainer,
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.applyTo(constraintLayout)
         }
     }
 
@@ -292,7 +338,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     private fun onOffSwitchClicked(){
         this.onOffState = this.onOffSwitch.isChecked
-        this.collectDataSendCommandAndUpdateState()
+        this.collectDataSendCommandAndUpdateState(TM_NONE, true)
     }
 
     private fun onSliderPositionChanged(value: Int){
@@ -304,10 +350,10 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
         // save the new value
         this.currentLevel = value
-        this.collectDataSendCommandAndUpdateState()
+        this.collectDataSendCommandAndUpdateState(TM_NONE, true)
     }
 
-    private fun collectDataSendCommandAndUpdateState(){
+    private fun collectDataSendCommandAndUpdateState(transmissionType: Int, updateState: Boolean){
         val exLevelState = ExtendedLevelSelectorState()
         exLevelState.levelValue = this.currentLevel
         exLevelState.onOffState = this.onOffState
@@ -315,14 +361,21 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         exLevelState.minValue = this.minValue
         exLevelState.showOnOffSwitch = this.showOnOffSwitch
 
+        when {
+            (transmissionType == TM_START) -> exLevelState.isStart = true
+            (transmissionType == TM_END) -> exLevelState.isEnd = true
+        }
+
         ApplicationProperty.bluetoothConnectionManager.sendData(
             exLevelState.toExecutionString(this.relatedElementID)
         )
 
-        ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
-            exLevelState.toComplexPropertyState(),
-            this.relatedElementID
-        )
+        if(updateState) {
+            ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
+                exLevelState.toComplexPropertyState(),
+                this.relatedElementID
+            )
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

@@ -303,6 +303,9 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
     var minValue = 0
     var maxValue = 100
     var showOnOffSwitch = true
+    var transmitOnlyStartEndOfTracking = false
+    var isEnd = false
+    var isStart = false
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
         this.onOffState = complexPropertyState.onOffState
@@ -310,6 +313,10 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
         this.minValue = complexPropertyState.valueTwo
         this.maxValue = complexPropertyState.valueThree
         this.showOnOffSwitch = when(complexPropertyState.valueFour){
+            1 -> true
+            else -> false
+        }
+        this.transmitOnlyStartEndOfTracking = when(complexPropertyState.valueFive){
             1 -> true
             else -> false
         }
@@ -329,11 +336,15 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             true -> 1
             else -> 0
         }
+        cState.valueFive = when(this.transmitOnlyStartEndOfTracking){
+            true -> 1
+            else -> 0
+        }
         return cState
     }
 
     override fun fromString(data: String): Boolean {
-        return if (data.length < 21) {
+        return if (data.length < 23) {
             if (verboseLog) {
                 Log.e(
                     "ExLevelData:fromString",
@@ -346,7 +357,11 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
             this.levelValue = a4CharHexValueToSignedIntValue(data[9], data[10], data[11], data[12]).toInt()
             this.minValue = a4CharHexValueToSignedIntValue(data[13], data[14], data[15], data[16]).toInt()
             this.maxValue = a4CharHexValueToSignedIntValue(data[17], data[18], data[19], data[20]).toInt()
-            this.showOnOffSwitch = data[21] == '1'
+            // check flags
+            val flags = a2CharHexValueToIntValue(data[21], data[22])
+            this.showOnOffSwitch = (flags and 0x01) == 0                // if the flag is NOT set the switch must be shown (true)
+            this.transmitOnlyStartEndOfTracking = (flags and 0x02) != 0 // if the flag is NOT set the param must be false
+
             // make sure the level value is in scope:
             when {
                 (this.levelValue < this.minValue) -> this.levelValue = this.minValue
@@ -360,7 +375,18 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
         // generate transmission header:
         var executionString = "43"
         executionString += a8bitValueTo2CharHexValue(propertyIndex)
-        executionString += "0f00"
+        executionString += "0f0"
+
+        // set start/end flag
+        executionString += when {
+            this.isStart -> '3'
+            this.isEnd -> '4'
+            else -> '0'
+        }
+
+        // reset start/end marker
+        this.isEnd = false
+        this.isStart = false
 
         // add ex level selector specific data
         executionString +=
@@ -372,6 +398,7 @@ class ExtendedLevelSelectorState : IComplexPropertySubTypeProtocolClass() {
         executionString += aSigned16bitValueTo4CharHexValue(this.levelValue.toShort())
 
         // The transmission to the device should not exceed 20byte!!
+        // transmitting the min+max value makes no sense here
 
         /*executionString += aSigned16bitValueTo4CharHexValue(this.minValue.toShort())
         executionString += aSigned16bitValueTo4CharHexValue(this.maxValue.toShort())

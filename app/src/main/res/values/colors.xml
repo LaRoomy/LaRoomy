@@ -51,6 +51,7 @@
     <color name="unLockCtrlActivityPopupEditTextBackground">#555555</color>
     <color name="unLockCtrlActivityStatusPanelBackgroundColor">#FF222222</color>
     <color name="deviceMainActivityUserNotificationHeaderBackgroundColor">#FF404040</color>
+    <color name="extendedLevelSelectorActivitySliderBackgroundColor">#FF666666</color>
 
     <!-- List Elements -->
     <color name="addDeviceListElementBackgroundColor">#FF444444</color>

@@ -65,6 +65,8 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_nolog.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_withlog.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable-v24/add_device_activity_bonding_hint_background.xml" value="0.25925925925925924" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ex_level_slider_background.xml" value="0.2564814814814815" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/general_rounded_button_background.xml" value="0.2564814814814815" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/inside_group_property_last_list_element_selected_background.xml" value="0.2513888888888889" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/my_devices_list_element_background.xml" value="0.2449074074074074" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/unlock_control_popup_edittext_background.xml" value="0.25925925925925924" />
@@ -75,7 +77,7 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_settings.xml" value="0.23472222222222222" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_device_main.xml" value="0.5" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_device_settings.xml" value="0.22546296296296298" />
-        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_extended_level_selector.xml" value="0.24953703703703703" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_extended_level_selector.xml" value="0.33" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_line_graph.xml" value="0.33" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_navigator_control.xml" value="0.24861111111111112" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_reset_app_data.xml" value="0.33" />
