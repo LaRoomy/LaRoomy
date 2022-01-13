@@ -88,6 +88,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:id="@+id/extendedLevelSelectorSliderOverlayView"
             android:background="@drawable/ex_level_slider_background"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"

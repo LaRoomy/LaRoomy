@@ -135,15 +135,15 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             }
             // set listener
             positionListener = {
-                if(!transmitOnlyStartEndIndication) {
-                    val realPos =
-                        sliderPositionToLevelValue(it)
+                val realPos =
+                    sliderPositionToLevelValue(it)
+                bubbleText = "$realPos"
 
+                if(!transmitOnlyStartEndIndication) {
                     if (realPos != currentLevel) {
                         onSliderPositionChanged(
                             realPos
                         )
-                        bubbleText = "$realPos"
                         //currentLevel = realPos // done in onSliderPositionChanged(..)
                     }
                 }
@@ -230,26 +230,29 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.transmitOnlyStartEndIndication = extendedLevelSelectorState.transmitOnlyStartEndOfTracking
 
         // set the switch visibility
-        this.switchContainer.visibility = if (this.showOnOffSwitch) {
-            // set switch state
-            this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState
-            // set slider constraint
-            this.setSliderUpDown(false)
-            // set visible
-            View.VISIBLE
-        } else {
-            // TODO: the slider must be shifted up if the switch is not visible!
-            // set slider constraint
-            this.setSliderUpDown(true)
-            // set visibility to gone
-            View.GONE
-        }
+        runOnUiThread {
+            this.switchContainer.visibility = if (this.showOnOffSwitch) {
+                // set switch state
+                this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState
+                // set slider constraint
+                this.setSliderUpDown(false)
+                // set visible
+                View.VISIBLE
+            } else {
+                // TODO: the slider must be shifted up if the switch is not visible!
+                // set slider constraint
+                this.setSliderUpDown(true)
+                // set visibility to gone
+                View.GONE
+            }
 
-        this.fluidLevelSlider.apply {
-            this.startText = "${extendedLevelSelectorState.minValue}"
-            this.endText = "${extendedLevelSelectorState.maxValue}"
-            position = levelToSliderPosition(extendedLevelSelectorState.levelValue)
-            this.bubbleText = "${extendedLevelSelectorState.levelValue}"
+            this.fluidLevelSlider.apply {
+                this.startText = "${extendedLevelSelectorState.minValue}"
+                this.endText = "${extendedLevelSelectorState.maxValue}"
+                position = levelToSliderPosition(extendedLevelSelectorState.levelValue)
+                this.bubbleText = "${extendedLevelSelectorState.levelValue}"
+                this.invalidate()
+            }
         }
         // TODO: check if the onChecked event is triggered by the setting process
     }
@@ -264,7 +267,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private fun setSliderUpDown(setUp: Boolean) {
         if (setUp) {
             val constraintLayout =
-                findViewById<ConstraintLayout>(R.id.extendedLevelSelectorActivityControllerContainer)
+                findViewById<ConstraintLayout>(R.id.extendedLevelSelectorActivityParentContainer)
             val constraintSet = ConstraintSet()
             constraintSet.clone(constraintLayout)
             constraintSet.connect(
@@ -276,7 +279,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             constraintSet.applyTo(constraintLayout)
         } else {
             val constraintLayout =
-                findViewById<ConstraintLayout>(R.id.extendedLevelSelectorActivityControllerContainer)
+                findViewById<ConstraintLayout>(R.id.extendedLevelSelectorActivityParentContainer)
             val constraintSet = ConstraintSet()
             constraintSet.clone(constraintLayout)
             constraintSet.connect(
@@ -314,7 +317,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                     ((this.minValue < 0)&&(this.maxValue > 0)) -> {
                         when {
                             (level < 0) -> {
-                                (-(level)) - (-(this.minValue))
+                                (-(this.minValue)) - (-(level))
                             }
                             (level == 0) -> {
                                 -(this.minValue)
