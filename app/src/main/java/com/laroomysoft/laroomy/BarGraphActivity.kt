@@ -169,6 +169,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.numBars = barGraphState.numBars
         this.barDataList = barGraphState.getBarGraphDataList()
 
+        // if value as bar-descriptor is requested override the barText
+        if(this.useValueAsBarDescriptor){
+            this.barDataList.forEach {
+                it.barText = it.barValue.toString()
+            }
+        }
+
         if(barGraphState.useFixedMaximumValue){
             this.barGraph.fixedMaximumValue = barGraphState.fixedMaximumValue.toInt()
         }
