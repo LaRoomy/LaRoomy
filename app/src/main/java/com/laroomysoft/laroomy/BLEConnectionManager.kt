@@ -51,8 +51,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     val initializationSuccess : Boolean
         get() = this.bleDeviceData.authenticationSuccess
 
-    var isBindingRequired = false
-        private set
+    val isBindingRequired
+    get() = this.bleDeviceData.isBindingRequired
 
     private var connectionSuspended = false
 
@@ -1561,7 +1561,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.isResumeConnectionAttempt = false
         this.suspendedDeviceAddress = ""
 
-        this.isBindingRequired = false
         this.invokeCallbackLoopAfterUIDataGeneration = false
 
         // loops
@@ -2109,7 +2108,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // if a shared binding key for the mac address exists, the key is preferred,
         // because a key from a sharing link will only be saved if it defers from the main key
 
-        passKey = if (sharedKey.isNotEmpty()) {
+        passKey = if (sharedKey.isNotEmpty() && (sharedKey != ERROR_NOTFOUND)) {
+
+            // TODO: if the address is invalid, the shared key is not empty (it is ERROR_NOT_FOUND), but there is no shared key used. so this must be handled
+
             bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_SHARED
             sharedKey
         } else {
@@ -2174,12 +2176,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun enableDeviceBinding(passKey: String){
         // build enable binding string
-        var bindingString = "6000"
+        var bindingString = "6100"
         bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
         bindingString += "001$passKey\r"
         // send it
         this.sendData(bindingString)
-        this.isBindingRequired = true
+        this.bleDeviceData.isBindingRequired = true
     }
 
     fun releaseDeviceBinding(passKey: String){
@@ -2189,7 +2191,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         bindingString += "000$passKey\r"
         // send it
         this.sendData(bindingString)
-        this.isBindingRequired = false
+        this.bleDeviceData.isBindingRequired = false
     }
 
     private fun propertyTypeFromIndex(propertyIndex: Int) : Int {

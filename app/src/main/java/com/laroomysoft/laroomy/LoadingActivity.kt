@@ -307,11 +307,15 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
             override fun run() {
                 if(counter < 8) {
-                    if (!ApplicationProperty.bluetoothConnectionManager.initializationSuccess) {
-                        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
-                        counter++
-                    } else {
+                    if(!ApplicationProperty.bluetoothConnectionManager.isConnected){
                         cancel()
+                    } else {
+                        if (!ApplicationProperty.bluetoothConnectionManager.initializationSuccess) {
+                            ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
+                            counter++
+                        } else {
+                            cancel()
+                        }
                     }
                 } else {
                     // all attempts to init are failed

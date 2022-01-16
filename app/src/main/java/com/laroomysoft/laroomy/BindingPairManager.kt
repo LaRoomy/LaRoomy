@@ -59,15 +59,12 @@ class BindingPairManager(private val appContext: Context) {
     }
 
     fun lookUpForPassKeyWithMacAddress(mac: String) : String {
-        val result =
-            ERROR_NOTFOUND
-
         this.bindingPairs.forEach{
             if(it.macAddress == mac){
                 return it.passKey
             }
         }
-        return result
+        return ERROR_NOTFOUND
     }
 
     private fun save() {
