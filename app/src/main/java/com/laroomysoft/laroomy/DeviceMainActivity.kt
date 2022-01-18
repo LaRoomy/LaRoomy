@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
@@ -61,6 +63,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var levelSelectorPopUpOpen = false
     private var optionSelectorPopUpOpen = false
     private var deviceMenuOpen = false
+    private var expectedConnectionLoss = false
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -141,6 +144,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     "onPause executed in DeviceMainActivity - User left the app or navigated back - suspend connection"
                 )
             }
+            // mark this connection break as expected
+            this.expectedConnectionLoss = true
 
             // suspend connection
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
@@ -170,6 +175,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             )
         }
 
+        // reset parameter(s) anyway
+        this.expectedConnectionLoss = false
+
         // at first check if this callback will be invoked due to a back-navigation from a property sub-page
         // or if it was invoked on creation or a resume from outside of the application
         if ((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
@@ -195,47 +203,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     (applicationContext as ApplicationProperty).resetControlParameter()
                     ApplicationProperty.bluetoothConnectionManager.clear()
                     finish()
-                }, 1500)
+                }, 1000)
 
             } else {
-                // do a complex state- update if required...
-/*
-                if ((this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired) {
-                    if(verboseLog) {
-                        Log.d(
-                            "M:onResume",
-                            "Complex-State-Update required for Property-Index ${(this.applicationContext as ApplicationProperty).complexUpdateIndex}"
-                        )
-                    }
-
-                    (applicationContext as ApplicationProperty).logControl("Resumed Device Main Activity: Complex-State-Update required for Index: ${(this.applicationContext as ApplicationProperty).complexUpdateIndex}")
-
-                    (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired =
-                        false
-
-                    if (ApplicationProperty.bluetoothConnectionManager.isMultiComplexProperty((this.applicationContext as ApplicationProperty).complexUpdateIndex)) {
-                        // delay the complex state update
-                        Handler(Looper.getMainLooper()).postDelayed(
-                            {
-                                ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForPropertyIndex(
-                                    (this.applicationContext as ApplicationProperty).complexUpdateIndex
-                                )
-                                (this.applicationContext as ApplicationProperty).complexUpdateIndex =
-                                    -1
-                            },
-                            500
-                        )
-                    } else {
-                        // this is not a multicomplex property, do the complex state update immediately
-                        ApplicationProperty.bluetoothConnectionManager.doComplexPropertyStateRequestForPropertyIndex(
-                            (this.applicationContext as ApplicationProperty).complexUpdateIndex
-                        )
-                        (this.applicationContext as ApplicationProperty).complexUpdateIndex = -1
-                    }
-                }
-*/
-
-
                 // realign the context objects to the bluetoothManager
                 ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
                 ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -998,28 +968,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun hideNotificationHeader(){
-
-//        val translateAnimation = TranslateAnimation(0f,0f, 0f, -(this.deviceHeaderNotificationContainer.height.toFloat()))
-//        translateAnimation.duration = 500
-//        translateAnimation.fillAfter = false
-
-        //val scaleAnimation = ScaleAnimation(0f, 0f, 0f, this.deviceHeaderNotificationContainer.height.toFloat())
-        //scaleAnimation.duration = 500
-
-
-        //this.deviceHeaderNotificationContainer.startAnimation(scaleAnimation)
-
-//        val transition = Slide(Gravity.TOP)
-//        transition.duration = 600
-//        transition.addTarget(this.deviceHeaderNotificationContainer)
-//
-//        TransitionManager.beginDelayedTransition(findViewById(R.id.deviceMainParentContainer), transition)
-
-        //this.deviceHeaderNotificationTextView.visibility = View.GONE
-
-
-        //this.deviceHeaderNotificationContainer.visibility = View.GONE
-
         runOnUiThread {
             this.deviceHeaderNotificationTextView.text = ""
 
@@ -1028,13 +976,37 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
+    private fun connectionLossAlertDialog(){
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setMessage(R.string.GeneralString_UnexpectedConnectionLossMessage)
+            dialog.setTitle(R.string.GeneralString_ConnectionLossDialogTitle)
+            dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                // try to reconnect
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                dialogInterface.dismiss()
+            }
+            dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
+                // cancel action
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                    finish()
+                }, 500, TimeUnit.MILLISECONDS)
+                dialogInterface.dismiss()
+            }
+            dialog.create()
+            dialog.show()
+        }
+    }
+
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
-        // this callback will only invoked in this activity if this is a re-connect-process (the initial connection attempt will be executed in the loading activity!)
-
+        // this callback will only invoked in this activity if:
+        // - this is a connection-suspension or a re-connect-process (the initial connection attempt will be executed in the loading activity!)
+        // - or the remote device is disconnected unexpectedly
         (applicationContext as ApplicationProperty).logControl("I: Connection State changed in DeviceMainActivity to $state")
 
-        // set the UI State to connected:
+        // set the UI State:
         val conStatus = if(state){
             STATUS_CONNECTED
         } else {
@@ -1044,27 +1016,26 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // stop the loading circle and set the info-header
         if(state) {
-
-
-            // send a test command // FIXME: why?
-            //ApplicationProperty.bluetoothConnectionManager.testConnection(200)// TODO: this must be tested
-
-
             // check if the property-loading was successful finished
             if(!this.propertyLoadingFinished){
                 // property-loading must have been interrupted - start again!
                 this.reloadProperties()
             } else {
-                // stop spinner and set info header
+                // stop loading circle
                 runOnUiThread {
                     this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-
-                    //val deviceHeaderData = DeviceInfoHeaderData()
-                    //deviceHeaderData.message = getString(R.string.DMA_Ready)
-                    //this.showNotificationHeaderAndPostMessage(deviceHeaderData)
-
-                    //this.hideNotificationHeader()
                 }
+            }
+        } else {
+            // the connection is lost, check if this was expected
+            if(!this.expectedConnectionLoss){
+                // the loss of the connection is unexpected, display popup
+                if(verboseLog){
+                    Log.d("DMA:onConStateChange", "Unexpected loss of connection in DeviceMainActivity.")
+                }
+                (applicationContext as ApplicationProperty).logControl("W: Unexpected loss of connection. Remote device not reachable.")
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+                this.connectionLossAlertDialog()
             }
         }
     }

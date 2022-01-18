@@ -192,7 +192,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // notify the remote device
                         Handler(Looper.getMainLooper()).postDelayed({
                             sendData(deviceReconnectedNotification)
-                        }, 200)
+                        }, 500)
                     }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {

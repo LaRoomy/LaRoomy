@@ -86,6 +86,9 @@
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Cancel</string>
+    <string name="GeneralString_UnexpectedConnectionLossMessage">The connection was interrupted. Try to connect again?</string>
+    <string name="GeneralString_ConnectionLossDialogTitle">Connection Error</string>
+
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamic Remote Control</string>

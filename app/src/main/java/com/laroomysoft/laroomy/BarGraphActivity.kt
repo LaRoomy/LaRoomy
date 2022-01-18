@@ -1,11 +1,15 @@
 package com.laroomysoft.laroomy
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import java.lang.Exception
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -23,6 +27,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     private var numBars = -1
 
     private var useValueAsBarDescriptor = false
+    private var expectedConnectionLoss = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,6 +104,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 )
             }
             // suspend connection and set indication-parameter
+            this.expectedConnectionLoss = true
             this.mustReconnect = true
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
@@ -110,6 +116,9 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         if(verboseLog) {
             Log.d("M:BGD:onResume", "onResume executed in Bar-Graph Activity")
         }
+
+        // reset parameter anyway
+        this.expectedConnectionLoss = false
 
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -162,6 +171,38 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.barGraph.invalidate()
     }
 
+    private fun connectionLossAlertDialog(){
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setMessage(R.string.GeneralString_UnexpectedConnectionLossMessage)
+            dialog.setTitle(R.string.GeneralString_ConnectionLossDialogTitle)
+            dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                // try to reconnect
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                dialogInterface.dismiss()
+            }
+            dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
+                // cancel action
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    finish()
+                    if(!isStandAlonePropertyMode) {
+                        // only set slide transition if the activity was invoked from the deviceMainActivity
+                        overridePendingTransition(
+                            R.anim.finish_activity_slide_animation_in,
+                            R.anim.finish_activity_slide_animation_out
+                        )
+                    }
+                }, 300, TimeUnit.MILLISECONDS)
+                dialogInterface.dismiss()
+            }
+            dialog.create()
+            dialog.show()
+        }
+    }
+
+
     private fun setCurrentViewStateFromComplexPropertyState(barGraphState: BarGraphState){
         // set bar-graph properties
         this.useValueAsBarDescriptor = barGraphState.useValueAsBarDescriptor
@@ -203,6 +244,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
         } else {
             notifyUser(getString(R.string.GeneralMessage_connectionSuspended), R.color.disconnectedTextColor)
+
+            if(!expectedConnectionLoss){
+                // unexpected loss of connection
+                (applicationContext as ApplicationProperty).logControl("W: Unexpected loss of connection. Remote device not reachable.")
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+                this.connectionLossAlertDialog()
+            }
         }
     }
 

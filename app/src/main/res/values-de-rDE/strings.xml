@@ -42,6 +42,9 @@
     <string name="DMA_PopUpMenuText_DiscardDevice">Gerät schließen</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Eigenschaften neu laden</string>
     <string name="DMA_ReconnectDevice">Verbindung wird wiederhergestellt..</string>
+    <string name="GeneralString_UnexpectedConnectionLossMessage">Die Verbindung wurde unerwartet unterbrochen. Erneut versuchen?</string>
+    <string name="GeneralString_ConnectionLossDialogTitle">Verbindungsfehler</string>
+
 
 
 
