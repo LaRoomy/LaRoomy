@@ -64,6 +64,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var optionSelectorPopUpOpen = false
     private var deviceMenuOpen = false
     private var expectedConnectionLoss = false
+    private var propertyStateUpdateRequired = false
 
     private val propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -983,6 +984,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             dialog.setTitle(R.string.GeneralString_ConnectionLossDialogTitle)
             dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
                 // try to reconnect
+                this.propertyStateUpdateRequired = true
                 ApplicationProperty.bluetoothConnectionManager.resumeConnection()
                 dialogInterface.dismiss()
             }
@@ -1025,13 +1027,20 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 runOnUiThread {
                     this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
                 }
+                // start updating properties if required
+                if(this.propertyStateUpdateRequired) {
+                    this.propertyStateUpdateRequired = false
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        ApplicationProperty.bluetoothConnectionManager.updatePropertyStates()
+                    }, TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT, TimeUnit.MILLISECONDS)
+                }
             }
         } else {
             // the connection is lost, check if this was expected
             if(!this.expectedConnectionLoss){
                 // the loss of the connection is unexpected, display popup
                 if(verboseLog){
-                    Log.d("DMA:onConStateChange", "Unexpected loss of connection in DeviceMainActivity.")
+                    Log.d("onConnectionStateChanged", "Unexpected loss of connection in DeviceMainActivity.")
                 }
                 (applicationContext as ApplicationProperty).logControl("W: Unexpected loss of connection. Remote device not reachable.")
                 ApplicationProperty.bluetoothConnectionManager.suspendConnection()

@@ -15,6 +15,8 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -28,6 +30,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private lateinit var deviceAddressTextView: AppCompatTextView
     private lateinit var deviceServiceUUIDTextView: AppCompatTextView
     private lateinit var deviceCharacteristicUUIDTextView: AppCompatTextView
+
+    private var expectedConnectionLoss = false
+    private var propertyStateUpdateRequired = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,6 +159,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
+            this.expectedConnectionLoss = true
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
@@ -163,6 +169,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         if(verboseLog) {
             Log.d("M:DSPPage:onResume", "onResume executed in Device Settings Activity")
         }
+
+        // reset parameter anyway
+        this.expectedConnectionLoss = false
 
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -207,6 +216,31 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
     }
 
+    private fun connectionLossAlertDialog(){
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setMessage(R.string.GeneralString_UnexpectedConnectionLossMessage)
+            dialog.setTitle(R.string.GeneralString_ConnectionLossDialogTitle)
+            dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                // try to reconnect
+                this.propertyStateUpdateRequired = true
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                dialogInterface.dismiss()
+            }
+            dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
+                // cancel action
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    finish()
+                }, 300, TimeUnit.MILLISECONDS)
+                dialogInterface.dismiss()
+            }
+            dialog.create()
+            dialog.show()
+        }
+    }
+
     fun onFactoryResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
         factoryResetAlertDialog()
     }
@@ -217,7 +251,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         findViewById<ConstraintLayout>(R.id.deviceSettingsActivityDeviceInfoParentContainer).visibility = View.VISIBLE
 
     }
-
 
     private fun factoryResetAlertDialog(){
         val dialog = AlertDialog.Builder(this)
@@ -247,9 +280,25 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         if(state){
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
             setUIElementsEnabledState(state)
+
+            if(this.propertyStateUpdateRequired){
+                this.propertyStateUpdateRequired = false
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    ApplicationProperty.bluetoothConnectionManager.updatePropertyStates()
+                }, TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT, TimeUnit.MILLISECONDS)
+            }
         } else {
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
             setUIElementsEnabledState(state)
+
+            if(!this.expectedConnectionLoss) {
+                // unexpected loss of connection
+                if(verboseLog){
+                    Log.d("onConnectionStateChanged", "Unexpected loss of connection in DeviceSettingsActivity.")
+                }
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+                this.connectionLossAlertDialog()
+            }
         }
     }
 

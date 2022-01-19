@@ -1,11 +1,15 @@
 package com.laroomysoft.laroomy
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import java.lang.Exception
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
@@ -13,6 +17,8 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+    private var expectedConnectionLoss = false
+    private var propertyStateUpdateRequired = false
 
     private lateinit var lineGraph: LineGraph
     private var lineDataList = ArrayList<LineGraphData>()
@@ -97,6 +103,7 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
+            this.expectedConnectionLoss = true
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
@@ -107,6 +114,9 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
         if(verboseLog) {
             Log.d("M:LGA:onResume", "onResume executed in Line-Graph Activity")
         }
+
+        // reset parameter anyway
+        this.expectedConnectionLoss = false
 
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -151,6 +161,38 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
         }
     }
 
+    private fun connectionLossAlertDialog(){
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setMessage(R.string.GeneralString_UnexpectedConnectionLossMessage)
+            dialog.setTitle(R.string.GeneralString_ConnectionLossDialogTitle)
+            dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                // try to reconnect
+                this.propertyStateUpdateRequired = true
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                dialogInterface.dismiss()
+            }
+            dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
+                // cancel action
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    finish()
+                    if(!isStandAlonePropertyMode) {
+                        // only set slide transition if the activity was invoked from the deviceMainActivity
+                        overridePendingTransition(
+                            R.anim.finish_activity_slide_animation_in,
+                            R.anim.finish_activity_slide_animation_out
+                        )
+                    }
+                }, 300, TimeUnit.MILLISECONDS)
+                dialogInterface.dismiss()
+            }
+            dialog.create()
+            dialog.show()
+        }
+    }
+
     override fun onConnectionStateChanged(state: Boolean) {
         super.onConnectionStateChanged(state)
         if(verboseLog) {
@@ -161,8 +203,25 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
         }
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
+
+            if(this.propertyStateUpdateRequired){
+                this.propertyStateUpdateRequired = false
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    ApplicationProperty.bluetoothConnectionManager.updatePropertyStates()
+                }, TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT, TimeUnit.MILLISECONDS)
+            }
         } else {
             notifyUser(getString(R.string.GeneralMessage_connectionSuspended), R.color.disconnectedTextColor)
+
+            if(!expectedConnectionLoss){
+                // unexpected loss of connection
+                if(verboseLog){
+                    Log.d("onConnectionStateChanged", "Unexpected loss of connection in LineGraphActivity.")
+                }
+                (applicationContext as ApplicationProperty).logControl("W: Unexpected loss of connection. Remote device not reachable.")
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+                this.connectionLossAlertDialog()
+            }
         }
     }
 

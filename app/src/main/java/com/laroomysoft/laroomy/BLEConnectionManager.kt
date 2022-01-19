@@ -1998,6 +1998,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
+    fun updatePropertyStates(){
+        // start the simple-state loop, the complex-state loop will start automatically after this loop
+        this.startSimpleStateDataLoop()
+    }
+
     private fun startSimpleStateDataLoop(){
         if(verboseLog) {
             Log.d(

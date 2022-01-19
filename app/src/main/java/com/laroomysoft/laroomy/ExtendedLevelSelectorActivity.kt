@@ -1,10 +1,12 @@
 package com.laroomysoft.laroomy
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -29,6 +31,8 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private var showOnOffSwitch = true
     private var transmitOnlyStartEndIndication = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+    private var expectedConnectionLoss = false
+    private var propertyStateUpdateRequired = false
     private val total: Int
     get() {
         return when {
@@ -192,6 +196,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             }
             // suspend connection and set indication-parameter
             this.mustReconnect = true
+            expectedConnectionLoss = true
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
         }
     }
@@ -202,6 +207,9 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         if(verboseLog) {
             Log.d("M:ELSPage:onResume", "onResume executed in Extended Level Selector Control")
         }
+
+        // reset parameter anyway
+        this.expectedConnectionLoss = false
 
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
@@ -261,6 +269,38 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         runOnUiThread {
             notificationTextView.setTextColor(getColor(colorID))
             notificationTextView.text = message
+        }
+    }
+
+    private fun connectionLossAlertDialog(){
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setMessage(R.string.GeneralString_UnexpectedConnectionLossMessage)
+            dialog.setTitle(R.string.GeneralString_ConnectionLossDialogTitle)
+            dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                // try to reconnect
+                this.propertyStateUpdateRequired = true
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                dialogInterface.dismiss()
+            }
+            dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
+                // cancel action
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    finish()
+                    if(!isStandAlonePropertyMode) {
+                        // only set slide transition if the activity was invoked from the deviceMainActivity
+                        overridePendingTransition(
+                            R.anim.finish_activity_slide_animation_in,
+                            R.anim.finish_activity_slide_animation_out
+                        )
+                    }
+                }, 300, TimeUnit.MILLISECONDS)
+                dialogInterface.dismiss()
+            }
+            dialog.create()
+            dialog.show()
         }
     }
 
@@ -393,8 +433,25 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
         if(state){
             notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
+
+            if(this.propertyStateUpdateRequired){
+                this.propertyStateUpdateRequired = false
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    ApplicationProperty.bluetoothConnectionManager.updatePropertyStates()
+                }, TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT, TimeUnit.MILLISECONDS)
+            }
         } else {
             notifyUser(getString(R.string.GeneralMessage_connectionSuspended), R.color.disconnectedTextColor)
+
+            if(!expectedConnectionLoss){
+                // unexpected loss of connection
+                if(verboseLog){
+                    Log.d("onConnectionStateChanged", "Unexpected loss of connection in ExtendedLevelSelectorActivity.")
+                }
+                (applicationContext as ApplicationProperty).logControl("W: Unexpected loss of connection. Remote device not reachable.")
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+                this.connectionLossAlertDialog()
+            }
         }
     }
 
