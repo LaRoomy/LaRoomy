@@ -1278,6 +1278,7 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener {
     var handler: OnPropertyClickListener? = null
 
     var canNavigateForward = false
+    var hasChanged = false
     var isGroupMember = false
     var isLastInGroup = false
     var elementType = -1 //SEPARATOR_ELEMENT

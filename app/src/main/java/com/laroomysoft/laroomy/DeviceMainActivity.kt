@@ -239,6 +239,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                     // TODO: update data in a loop!? or is this not necessary anymore????
 
+                    // TODO: currently the parameter 'hasChanged' is always false!
+
+                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                        if(devicePropertyListContentInformation.hasChanged){
+                            ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged = false
+                            this.propertyList[index] = devicePropertyListContentInformation
+                            this.devicePropertyListViewAdapter.notifyItemChanged(index)
+                        }
+                    }
+
+                    // TODO: what must be marked as changed in the bleManager? And when?
+
                 }
 
 
