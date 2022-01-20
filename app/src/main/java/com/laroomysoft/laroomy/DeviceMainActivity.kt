@@ -231,30 +231,24 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
 
 
-
-
-
                 if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
                     (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
 
-                    // TODO: update data in a loop!? or is this not necessary anymore????
-
-                    // TODO: currently the parameter 'hasChanged' is always false!
+                    if(verboseLog) {
+                        Log.d("DMA:onResume", "UI-Adapter has changed. Start updating elements with the changed marker:")
+                    }
 
                     ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                         if(devicePropertyListContentInformation.hasChanged){
+                            if(verboseLog){
+                                Log.d("DMA:onResume", "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}")
+                            }
                             ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged = false
                             this.propertyList[index] = devicePropertyListContentInformation
                             this.devicePropertyListViewAdapter.notifyItemChanged(index)
                         }
                     }
-
-                    // TODO: what must be marked as changed in the bleManager? And when?
-
                 }
-
-
-                // TODO: detect state-changes and update the property-list-items
             }
 
         } else {
