@@ -593,8 +593,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         newState: ComplexPropertyState
     ) {
         super.onComplexPropertyStateChanged(UIAdapterElementIndex, newState)
-        // mark the property as changed for the back-navigation-update
-        (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
@@ -620,6 +618,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
+        ApplicationProperty.bluetoothConnectionManager.uIAdapterList[UIAdapterElementIndex].hasChanged = true
     }
 
     override fun onPropertyInvalidated() {

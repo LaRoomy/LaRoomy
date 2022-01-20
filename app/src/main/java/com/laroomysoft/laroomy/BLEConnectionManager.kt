@@ -885,9 +885,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
             } else {
                 if(verboseLog){
-                    Log.d("readPropertyString", "Property-Transmission received. Loop not active. Update the element with index: ${laRoomyDeviceProperty.propertyIndex}")
+                    Log.d("readPropertyString", "Property-Transmission received. Loop not active. Update element with index: ${laRoomyDeviceProperty.propertyIndex}")
                 }
-                applicationProperty.logControl("I: Property-Transmission received. Loop not active. Update the element with index: ${laRoomyDeviceProperty.propertyIndex}")
+                applicationProperty.logControl("I: Property-Transmission received. Loop not active. Update element with index: ${laRoomyDeviceProperty.propertyIndex}")
 
                 // if the loop is not active, this must be an update-transmission, so replace the property
                 if (this.laRoomyDevicePropertyList.size > laRoomyDeviceProperty.propertyIndex) {
@@ -2259,7 +2259,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.propertyType = laRoomyDeviceProperty.propertyType
                 devicePropertyListContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
 
-                this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
+                    applicationProperty.uiAdapterChanged = true
+                    devicePropertyListContentInformation.hasChanged = true
+                } else {
+                    this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                }
                 return@forEachIndexed
             }
         }
@@ -2276,7 +2281,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.elementText = laRoomyDevicePropertyGroup.groupName
                 devicePropertyListContentInformation.imageID = laRoomyDevicePropertyGroup.imageID
 
-                this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                if(propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
+                    applicationProperty.uiAdapterChanged = true
+                    devicePropertyListContentInformation.hasChanged = true
+                } else {
+                    this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                }
                 return@forEachIndexed
             }
         }

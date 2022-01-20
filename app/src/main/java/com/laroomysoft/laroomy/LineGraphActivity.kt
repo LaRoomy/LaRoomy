@@ -269,8 +269,6 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
             newState: ComplexPropertyState
     ) {
         super.onComplexPropertyStateChanged(UIAdapterElementIndex, newState)
-        // mark the property as changed for the back-navigation-update
-        (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
 
         val element =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
@@ -292,6 +290,7 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
+        ApplicationProperty.bluetoothConnectionManager.uIAdapterList[UIAdapterElementIndex].hasChanged = true
     }
 
     override fun onFastDataPipeInvoked(propertyID: Int, data: String) {

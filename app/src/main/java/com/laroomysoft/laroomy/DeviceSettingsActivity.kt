@@ -322,6 +322,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         notifyUserWithDelayedReset(deviceHeaderData.message, R.color.InfoColor)
     }
 
+    override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
+        return DEVICE_SETTINGS_ACTIVITY_ELEMENT_INDEX_DUMMY
+    }
+
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
@@ -335,6 +339,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
         // mark the property as changed for the back-navigation-update
         (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
+        ApplicationProperty.bluetoothConnectionManager.uIAdapterList[UIAdapterElementIndex].hasChanged = true
     }
 
     override fun onBindingResponse(responseID: Int) {

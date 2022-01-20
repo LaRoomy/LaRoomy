@@ -35,6 +35,7 @@ const val COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR = 12
 const val COMPLEX_PROPERTY_TYPE_ID_BARGRAPH = 13
 const val COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH = 14
 
+const val DEVICE_SETTINGS_ACTIVITY_ELEMENT_INDEX_DUMMY = 1025
 
 // change this to true to enable an internal verbose log output (this means not the user-log!)
 const val verboseLog = true
