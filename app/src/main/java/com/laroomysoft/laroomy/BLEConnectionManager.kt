@@ -2248,10 +2248,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
 
             if((laRoomyDeviceProperty.propertyIndex == devicePropertyListContentInformation.internalElementIndex) && devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT){
-
+                // NOTE: the complex state is not included in the transmission so it remains 'unset' at this point
                 devicePropertyListContentInformation.elementText = laRoomyDeviceProperty.propertyDescriptor
                 devicePropertyListContentInformation.canNavigateForward = laRoomyDeviceProperty.needNavigation()
-                //devicePropertyListContentInformation.complexPropertyState = laRoomyDeviceProperty.complexPropertyState// the complex state is not included in the transmission, so it is not initialized, yet
                 devicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
                 devicePropertyListContentInformation.isGroupMember = laRoomyDeviceProperty.isGroupMember
                 devicePropertyListContentInformation.imageID = laRoomyDeviceProperty.imageID
