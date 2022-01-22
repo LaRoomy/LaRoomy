@@ -852,6 +852,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.laRoomyPropertyGroupList.add(laRoomyDevicePropertyGroup)
                 this.sendNextGroupRequest(laRoomyDevicePropertyGroup.groupIndex)
             } else {
+
+                // TODO: this could be a update, insert or remove transmission. So update, insert or remove data and launch event respectively
+
                 // if the loop is not active this must be an update-transmission, so replace the group
                 if(this.laRoomyPropertyGroupList.size > laRoomyDevicePropertyGroup.groupIndex){
                     this.laRoomyPropertyGroupList[laRoomyDevicePropertyGroup.groupIndex] =
@@ -884,6 +887,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
                 this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
             } else {
+
+
+                // TODO: this could be a update, insert or remove transmission. So update, insert or remove data and launch event respectively
+
+
                 if(verboseLog){
                     Log.d("readPropertyString", "Property-Transmission received. Loop not active. Update element with index: ${laRoomyDeviceProperty.propertyIndex}")
                 }
@@ -897,9 +905,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // update ui-adapter-list
                     this.updatePropertyElementInUIList(laRoomyDeviceProperty)
                     // save property to cache, but only if this is requested (field 1)
-                    if(data[1] == '4') {
-                        this.savePropertyDataToCacheIfPermitted()
-                    }
+//                    if(data[1] == '4') {
+//                        this.savePropertyDataToCacheIfPermitted()
+//                    }
                 }
             }
             return true
@@ -2479,6 +2487,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>){}
         fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation){}
         fun onUIAdaptableArrayItemChanged(index: Int){}
+        fun onUIAdaptableArrayItemInserted(index: Int){}
+        fun onUIAdaptableArrayItemRemoved(index: Int){}
         fun onPropertyInvalidated(){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
@@ -2486,7 +2496,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onFastDataPipeInvoked(propertyID: Int, data: String){}
         fun onBindingResponse(responseID: Int){}
         fun getCurrentOpenComplexPropPagePropertyIndex() : Int {
-            // if overwritten, do not return the super method!
+            // NOTE: if overwritten, do not return the super method!
             return -1
         }
     }

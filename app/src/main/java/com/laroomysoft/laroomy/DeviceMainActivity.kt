@@ -1129,6 +1129,30 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
+    override fun onUIAdaptableArrayItemInserted(index: Int) {
+
+        // TODO: if this is a new group or inserted at the end of the group, make sure to redraw other impacted items to keep the visual state
+
+        runOnUiThread {
+            devicePropertyListViewAdapter.notifyItemRemoved(index)
+        }
+    }
+
+    override fun onUIAdaptableArrayItemRemoved(index: Int) {
+
+        // TODO: if this is the last of a group or other case which impacts the visual state of other items, make sure to redraw them!
+
+        runOnUiThread {
+            devicePropertyListViewAdapter.notifyItemInserted(index)
+        }
+    }
+
+    override fun onUIAdaptableArrayItemChanged(index: Int) {
+        runOnUiThread {
+            devicePropertyListViewAdapter.notifyItemChanged(index)
+        }
+    }
+
     override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
         super.onSimplePropertyStateChanged(UIAdapterElementIndex, newState)
 
@@ -1219,12 +1243,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
         // no complex property page is open
         return -1
-    }
-
-    override fun onUIAdaptableArrayItemChanged(index: Int) {
-        runOnUiThread {
-            devicePropertyListViewAdapter.notifyItemChanged(index)
-        }
     }
 
     // device property list adapter:
