@@ -66,7 +66,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
 
-    private val propertyList = ArrayList<DevicePropertyListContentInformation>()
+    private var propertyList = ArrayList<DevicePropertyListContentInformation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,11 +106,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 */
 
         // TODO: this is a new way, must be tested, if the ui-array is complete, copy it
-        if(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.isNotEmpty()){
+        /*if(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.isNotEmpty()){
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEach {
                 this.propertyList.add(it)
             }
-        }
+        }*/
+        //this.propertyList = ApplicationProperty.bluetoothConnectionManager.uIAdapterList
 
         // bind array to adapter
         this.devicePropertyListViewAdapter =
@@ -1134,7 +1135,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // TODO: if this is a new group or inserted at the end of the group, make sure to redraw other impacted items to keep the visual state
 
         runOnUiThread {
-            devicePropertyListViewAdapter.notifyItemRemoved(index)
+            devicePropertyListViewAdapter.notifyItemInserted(index)
         }
     }
 
@@ -1142,8 +1143,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // TODO: if this is the last of a group or other case which impacts the visual state of other items, make sure to redraw them!
 
+        // - remove the item from the list in this class
+        // - redraw the element before and after the element
+        // - bring the internal element indexes of the ui-list in the correct order (use the list in bleManager)
+
+        this.propertyList.removeAt(index)
+        //this.propertyList.clear()
+        //this.propertyList = ApplicationProperty.bluetoothConnectionManager.uIAdapterList
+
+
+        // TODO: update the all indexes (global + internal) in the propertyList or use the uIAdapter direct!?
+
         runOnUiThread {
-            devicePropertyListViewAdapter.notifyItemInserted(index)
+            devicePropertyListViewAdapter.notifyItemRemoved(index)
+            //devicePropertyListViewAdapter.notifyDataSetChanged()
+
+
+
+            //devicePropertyListViewAdapter.notifyItemChanged(index)
+
+            //for(i in index until this.propertyList.size){
+            devicePropertyListViewAdapter.notifyItemRangeChanged(index, ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size)
+            //}
         }
     }
 
