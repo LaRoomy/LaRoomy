@@ -29,7 +29,7 @@ const val STATUS_DISCONNECTED = 0
 const val STATUS_CONNECTED = 1
 const val STATUS_CONNECTING = 2
 
-class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener {
+class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener, SeekBar.OnSeekBarChangeListener {
 
     // device property list elements
     private lateinit var devicePropertyListRecyclerView: DeviceMainPropertyRecyclerView
@@ -56,6 +56,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     //private var buttonRecoveryRequired = false
     private var restoreIndex = -1
     //private var deviceImageResourceId = -1
+    private var currentSeekBarPopUpRelatedGlobalIndex = -1
     private var propertyLoadingFinished = true
     private var levelSelectorPopUpOpen = false
     private var optionSelectorPopUpOpen = false
@@ -372,11 +373,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 //       // }
 //    }
 
-    override fun onPropertyElementButtonClick(
-        index: Int,
-        devicePropertyListContentInformation: DevicePropertyListContentInformation
-    ) {
+    override fun onPropertyElementButtonClick(index: Int) {
         if(verboseLog) {
+            val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
             Log.d(
                 "M:CB:onPropBtnClk",
                 "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
@@ -394,12 +393,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         )
     }
 
-    override fun onPropertyElementSwitchClick(
-        index: Int,
-        devicePropertyListContentInformation: DevicePropertyListContentInformation,
-        switch: SwitchCompat
-    ) {
+    override fun onPropertyElementSwitchClick(index: Int, state: Boolean) {
         if(verboseLog) {
+            val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
             Log.d(
                 "M:CB:onPropSwitchClk",
                 "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
@@ -411,7 +407,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
         // TODO: check if the newState comes with the right terminology
 
-        val c = when(switch.isChecked){
+        val c = when(state){
             true -> 1
             else -> 0
         }
@@ -421,10 +417,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     @SuppressLint("InflateParams")
-    override fun onPropertyLevelSelectButtonClick(
-        index: Int,
-        devicePropertyListContentInformation: DevicePropertyListContentInformation
-    ) {
+    override fun onPropertyLevelSelectButtonClick(index: Int) {
+
+        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+
         if(verboseLog) {
             Log.d(
                 "M:CB:onPropLevelSelClk",
@@ -444,6 +440,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyListRecyclerView.alpha = 0.2f
 
         this.levelSelectorPopUpOpen = true
+        this.currentSeekBarPopUpRelatedGlobalIndex = devicePropertyListContentInformation.globalIndex
 
         val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -461,6 +458,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.popUpWindow.setOnDismissListener {
             devicePropertyListRecyclerView.alpha = 1f
             levelSelectorPopUpOpen = false
+            currentSeekBarPopUpRelatedGlobalIndex = -1
         }
 
         this.popUpWindow.showAtLocation(this.devicePropertyListRecyclerView, Gravity.CENTER, 0, 0)
@@ -475,19 +473,19 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             percentageLevelPropertyGenerator.percentageString
 
         // add the handler to the element
-        devicePropertyListContentInformation.handler = this
+        //devicePropertyListContentInformation.handler = this
         // set seekbar properties
         this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).apply {
             this.progress = percentageLevelPropertyGenerator.percentageValue
-            this.setOnSeekBarChangeListener(devicePropertyListContentInformation)
+            this.setOnSeekBarChangeListener(this@DeviceMainActivity)
         }
     }
 
     @SuppressLint("InflateParams")
-    override fun onPropertyOptionSelectButtonClick(
-        index: Int,
-        devicePropertyListContentInformation: DevicePropertyListContentInformation
-    ) {
+    override fun onPropertyOptionSelectButtonClick(index: Int) {
+
+        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+
         if(verboseLog) {
             Log.d(
                 "M:CB:onPropOptionSelClk",
@@ -581,6 +579,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        this.onSeekBarPositionChange(
+            this.currentSeekBarPopUpRelatedGlobalIndex,
+            progress,
+            SEEK_BAR_PROGRESS_CHANGING
+        )
+    }
+
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+        this.onSeekBarPositionChange(this.currentSeekBarPopUpRelatedGlobalIndex, -1, SEEK_BAR_START_TRACK)
+    }
+
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        this.onSeekBarPositionChange(this.currentSeekBarPopUpRelatedGlobalIndex, -1, SEEK_BAR_STOP_TRACK)
+    }
+
+
     override fun onSeekBarPositionChange(
         index: Int,
         newValue: Int,
@@ -634,10 +649,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    override fun onNavigatableElementClick(
-        index: Int,
-        devicePropertyListContentInformation: DevicePropertyListContentInformation
-    ) {
+    override fun onNavigatableElementClick(index: Int) {
+
+        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+
         if(verboseLog) {
             Log.d(
                 "M:CB:onNavElementClk",
@@ -1279,12 +1294,39 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             private val listener: OnPropertyClickListener
             )
             : RecyclerView.ViewHolder(linearLayout) {
+                private var pType = -1
                 private val elementButton: AppCompatButton = linearLayout.findViewById(R.id.elementButton)
+                private val elementSwitch: SwitchCompat = linearLayout.findViewById(R.id.elementSwitch)
 
             init {
                 elementButton.setOnClickListener {
-                    listener.onPropertyElementButtonClick(bindingAdapterPosition)
+                    when(pType) {
+                        PROPERTY_TYPE_BUTTON -> {
+                            listener.onPropertyElementButtonClick(bindingAdapterPosition)
+                        }
+                        PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                            listener.onPropertyLevelSelectButtonClick(bindingAdapterPosition)
+                        }
+                        PROPERTY_TYPE_OPTION_SELECTOR -> {
+                            listener.onPropertyOptionSelectButtonClick(bindingAdapterPosition)
+                        }
+                    }
                 }
+                elementSwitch.setOnCheckedChangeListener { _, b ->
+                    if(pType == PROPERTY_TYPE_SWITCH){
+                        listener.onPropertyElementSwitchClick(bindingAdapterPosition, b)
+                    }
+                }
+                linearLayout.setOnClickListener {
+                    if(pType >= COMPLEX_PROPERTY_START_INDEX){
+                        listener.onNavigatableElementClick(bindingAdapterPosition)
+                    }
+                }
+
+            }
+
+            fun activateListenerFromType(propertyType: Int){
+                this.pType = propertyType
             }
 
 //            fun bind(data: DevicePropertyListContentInformation, itemClick: OnPropertyClickListener, position: Int){
@@ -1300,10 +1342,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return DPLViewHolder(linearLayout, itemClickListener)
         }
 
-        //@SuppressLint("CutPasteId")
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
 
+
+
             val elementToRender = devicePropertyAdapter.elementAt(position)
+
+            holder.activateListenerFromType(elementToRender.propertyType)
+
+
             val rootContentHolder = holder.linearLayout
 
             when(elementToRender.elementType) {

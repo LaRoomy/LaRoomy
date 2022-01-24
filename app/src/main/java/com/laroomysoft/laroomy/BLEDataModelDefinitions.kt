@@ -1277,10 +1277,9 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 }
 
 
-class DevicePropertyListContentInformation(val elementType: Int) : SeekBar.OnSeekBarChangeListener {
+class DevicePropertyListContentInformation(val elementType: Int) {
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivity
 
-    var handler: OnPropertyClickListener? = null
 
     var canNavigateForward = false
     var hasChanged = false
@@ -1323,6 +1322,8 @@ class DevicePropertyListContentInformation(val elementType: Int) : SeekBar.OnSee
     var navigationImageVisibility = View.GONE
     private set
 
+
+    // TODO: call update after creation or when the object data changes!
 
     fun update(context: Context){
         when(this.elementType){
@@ -1381,6 +1382,9 @@ class DevicePropertyListContentInformation(val elementType: Int) : SeekBar.OnSee
                         this.levelIndicationTextViewVisibility = View.GONE
                         this.buttonVisibility = View.GONE
                         this.switchVisibility = View.VISIBLE
+
+                        // reset element sub-text ??
+
                     }
                     PROPERTY_TYPE_LEVEL_SELECTOR -> {}
                     PROPERTY_TYPE_LEVEL_INDICATOR -> {}
@@ -1409,21 +1413,6 @@ class DevicePropertyListContentInformation(val elementType: Int) : SeekBar.OnSee
         this.isAccessible = true
     }
 
-    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        this.handler?.onSeekBarPositionChange(
-            this.globalIndex,
-            progress,
-            SEEK_BAR_PROGRESS_CHANGING
-        )
-    }
-
-    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_START_TRACK)
-    }
-
-    override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
-    }
 
 //    fun clear() {
 //        this.handler = null

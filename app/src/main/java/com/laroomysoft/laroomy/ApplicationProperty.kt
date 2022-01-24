@@ -373,10 +373,10 @@ interface OnUUIDProfileListItemClickListener {
 
 interface OnPropertyClickListener {
     //fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation)
-    fun onPropertyElementButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
-    fun onPropertyElementSwitchClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation, switch: SwitchCompat)
-    fun onPropertyLevelSelectButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
-    fun onPropertyOptionSelectButtonClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
+    fun onPropertyElementButtonClick(index: Int)
+    fun onPropertyElementSwitchClick(index: Int, state: Boolean)
+    fun onPropertyLevelSelectButtonClick(index: Int)
+    fun onPropertyOptionSelectButtonClick(index: Int)
     fun onSeekBarPositionChange(index: Int, newValue: Int, changeType: Int)
-    fun onNavigatableElementClick(index: Int, devicePropertyListContentInformation: DevicePropertyListContentInformation)
+    fun onNavigatableElementClick(index: Int)
 }
