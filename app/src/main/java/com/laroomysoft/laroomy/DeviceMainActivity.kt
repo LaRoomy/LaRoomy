@@ -14,10 +14,7 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -119,8 +116,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 //ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
                 this.propertyList,
                 this,
-                this@DeviceMainActivity,
-                this)
+                this@DeviceMainActivity
+            )
+
+                //this)
 
         this.devicePropertyListViewAdapter.setHasStableIds(true)
 
@@ -1271,14 +1270,22 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         private val devicePropertyAdapter: ArrayList<DevicePropertyListContentInformation>,
         private val itemClickListener: OnPropertyClickListener,
         private val activityContext: Context,
-        private val callingActivity: DeviceMainActivity
     ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
 
 
 
         class DPLViewHolder(
-            val linearLayout: LinearLayout)
+            val linearLayout: LinearLayout,
+            private val listener: OnPropertyClickListener
+            )
             : RecyclerView.ViewHolder(linearLayout) {
+                private val elementButton: AppCompatButton = linearLayout.findViewById(R.id.elementButton)
+
+            init {
+                elementButton.setOnClickListener {
+                    listener.onPropertyElementButtonClick(bindingAdapterPosition)
+                }
+            }
 
 //            fun bind(data: DevicePropertyListContentInformation, itemClick: OnPropertyClickListener, position: Int){
 //                itemClick.onPropertyClicked(position, data)
@@ -1290,7 +1297,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.device_property_list_element, parent, false) as LinearLayout
 
-            return DPLViewHolder(linearLayout)
+            return DPLViewHolder(linearLayout, itemClickListener)
         }
 
         //@SuppressLint("CutPasteId")

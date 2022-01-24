@@ -1,8 +1,13 @@
 package com.laroomysoft.laroomy
 
+import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.util.Log
+import android.view.View
 import android.widget.SeekBar
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.DrawableUtils
 
 const val PASSKEY_TYPE_NONE = 0
 const val PASSKEY_TYPE_SHARED = 1
@@ -1272,7 +1277,7 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 }
 
 
-class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener {
+class DevicePropertyListContentInformation(val elementType: Int) : SeekBar.OnSeekBarChangeListener {
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivity
 
     var handler: OnPropertyClickListener? = null
@@ -1281,18 +1286,128 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener {
     var hasChanged = false
     var isGroupMember = false
     var isLastInGroup = false
-    var elementType = -1 //SEPARATOR_ELEMENT
+    //var elementType = -1 //SEPARATOR_ELEMENT
+    var isAccessible = false
 
     //var indexInsideGroup = -1
     var globalIndex = -1
+
+    // this is the main text of the always visible element-textView
     var elementText = ""
+    // this is the text of the button
+    var elementSubText = ""
+
+
     var internalElementIndex = -1
-    var imageID = -1
+    //var imageID = -1
     var propertyType = -1
+
+    var imageID = R.drawable.image_error_state
+    set(value) {
+        field = resourceIdForImageId(value)
+    }
 
     //var initialElementValue = -1
     var simplePropertyState = -1
     var complexPropertyState = ComplexPropertyState()
+
+    // resources for the visual state of the item
+    lateinit var backgroundDrawable : Drawable //= R.drawable.single_property_list_element_background
+    private set
+    var switchVisibility = View.GONE
+    private set
+    var buttonVisibility = View.GONE
+    private set
+    var levelIndicationTextViewVisibility = View.GONE
+    private set
+    var navigationImageVisibility = View.GONE
+    private set
+
+
+    fun update(context: Context){
+        when(this.elementType){
+            GROUP_ELEMENT -> {
+                // define the background
+                this.backgroundDrawable = AppCompatResources.getDrawable(
+                    context,
+                    R.drawable.property_list_group_header_element_background
+                )!!
+                // define the visibility of the optional items
+                this.switchVisibility = View.GONE
+                this.buttonVisibility = View.GONE
+                this.levelIndicationTextViewVisibility = View.GONE
+                this.navigationImageVisibility = View.GONE
+            }
+            PROPERTY_ELEMENT -> {
+                // define the background
+                if(!this.isGroupMember){
+                    // draw the normal property element
+                    this.backgroundDrawable = AppCompatResources.getDrawable(
+                        context,
+                        R.drawable.single_property_list_element_background
+                    )!!
+                } else {
+                    if(this.isLastInGroup){
+                        // draw the closing group-member background
+                        this.backgroundDrawable = AppCompatResources.getDrawable(
+                            context,
+                            R.drawable.inside_group_property_last_list_element_background
+                        )!!
+                    } else {
+                        // draw the inside group-member background
+                        this.backgroundDrawable = AppCompatResources.getDrawable(
+                            context,
+                            R.drawable.inside_group_property_list_element_background
+                        )!!
+                    }
+                }
+
+                when(this.propertyType){
+                    PROPERTY_TYPE_BUTTON -> {
+                        this.navigationImageVisibility = View.GONE
+                        this.levelIndicationTextViewVisibility = View.GONE
+                        this.buttonVisibility = View.VISIBLE
+                        this.switchVisibility = View.GONE
+
+                        val dd = checkForDualDescriptor(this.elementText)
+                        if(dd.isDual){
+                            this.elementSubText = dd.actionText
+                            this.elementText = dd.elementText
+                        }
+
+                    }
+                    PROPERTY_TYPE_SWITCH -> {
+                        this.navigationImageVisibility = View.GONE
+                        this.levelIndicationTextViewVisibility = View.GONE
+                        this.buttonVisibility = View.GONE
+                        this.switchVisibility = View.VISIBLE
+                    }
+                    PROPERTY_TYPE_LEVEL_SELECTOR -> {}
+                    PROPERTY_TYPE_LEVEL_INDICATOR -> {}
+                    PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY ->{}
+                    PROPERTY_TYPE_OPTION_SELECTOR -> {}
+                    else -> {
+                        // must be complex type, show the nav-arrow and hide the remaining
+                        this.navigationImageVisibility = View.VISIBLE
+                        this.levelIndicationTextViewVisibility = View.GONE
+                        this.buttonVisibility = View.GONE
+                        this.switchVisibility = View.GONE
+                        // canNavigateForward ???
+                    }
+                }
+            }
+            else -> {
+                Log.e("updatePGItemData", "Error: unknown element type")
+                // draw error state background
+                this.backgroundDrawable = AppCompatResources.getDrawable(
+                    context,
+                    R.drawable.error_property_list_element_background
+                )!!
+            }
+        }
+
+        this.isAccessible = true
+    }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         this.handler?.onSeekBarPositionChange(
@@ -1310,20 +1425,20 @@ class DevicePropertyListContentInformation : SeekBar.OnSeekBarChangeListener {
         this.handler?.onSeekBarPositionChange(this.globalIndex, -1, SEEK_BAR_STOP_TRACK)
     }
 
-    fun clear() {
-        this.handler = null
-        this.canNavigateForward = false
-        this.isGroupMember = false
-        this.isLastInGroup = false
-        this.elementType = -1
-        this.globalIndex = -1
-        this.elementText = ""
-        this.internalElementIndex = -1
-        this.imageID = -1
-        this.propertyType = -1
-        this.simplePropertyState = -1
-        this.complexPropertyState = ComplexPropertyState()
-    }
+//    fun clear() {
+//        this.handler = null
+//        this.canNavigateForward = false
+//        this.isGroupMember = false
+//        this.isLastInGroup = false
+//        this.elementType = -1
+//        this.globalIndex = -1
+//        this.elementText = ""
+//        this.internalElementIndex = -1
+//        this.imageID = -1
+//        this.propertyType = -1
+//        this.simplePropertyState = -1
+//        this.complexPropertyState = ComplexPropertyState()
+//    }
 }
 
 class BLEDeviceData {
