@@ -1953,7 +1953,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             currentGroup = -1
                             expectedGroupIndex++
                             // the last element must have been the last in group
-                            this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
+                            this.uIAdapterList.elementAt(globalIndex - 1)
+                                .apply {
+                                    this.isLastInGroup = true
+                                    this.update(applicationProperty.applicationContext)
+                                }
                             return@forEachIndexed // TODO: check if this will work!!!
                         }
 
@@ -1965,7 +1969,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             currentGroup = -1
                             expectedGroupIndex++
                             // the last element must have been the last in group
-                            this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
+                            this.uIAdapterList.elementAt(globalIndex - 1)
+                                .apply {
+                                    this.isLastInGroup = true
+                                    this.update(applicationProperty.applicationContext)
+                                }
                         }
 
                         // create the entry

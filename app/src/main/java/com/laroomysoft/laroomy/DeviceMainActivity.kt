@@ -252,8 +252,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // creation or resume action:
 
             // make sure to set the right Name and image for the device
-            this.deviceTypeHeaderTextView.text =
-                ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+            try {
+                this.deviceTypeHeaderTextView.text =
+                    ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+            } catch (e: SecurityException) {
+
+                // TODO: notify user!!!!!!!!
+
+                ApplicationProperty.bluetoothConnectionManager.clear()
+                finish()
+            }
 
             // show the loading circle
             //this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
@@ -348,8 +356,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onPropertyElementButtonClick(index: Int) {
+        val devicePropertyListContentInformation =
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+
         if(verboseLog) {
-            val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
             Log.d(
                 "M:CB:onPropBtnClk",
                 "Property element was clicked. Element-Type is BUTTON at index: $index\n\nData is:\n" +
@@ -363,13 +373,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // send execution command
         ApplicationProperty.bluetoothConnectionManager.sendData(
-            makeSimplePropertyExecutionString(index, 0)
+            makeSimplePropertyExecutionString(
+                devicePropertyListContentInformation.internalElementIndex,
+                0
+            )
         )
     }
 
     override fun onPropertyElementSwitchClick(index: Int, state: Boolean) {
+        val devicePropertyListContentInformation =
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+
         if(verboseLog) {
-            val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
             Log.d(
                 "M:CB:onPropSwitchClk",
                 "Property element was clicked. Element-Type is SWITCH at index: $index\n\nData is:\n" +
@@ -386,7 +401,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             else -> 0
         }
         ApplicationProperty.bluetoothConnectionManager.sendData(
-            makeSimplePropertyExecutionString(index, c)
+            makeSimplePropertyExecutionString(devicePropertyListContentInformation.internalElementIndex, c)
         )
         ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).apply {
             this.simplePropertyState = c
