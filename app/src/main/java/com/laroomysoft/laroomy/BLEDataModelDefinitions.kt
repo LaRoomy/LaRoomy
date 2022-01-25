@@ -5,9 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.View
-import android.widget.SeekBar
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.DrawableUtils
 
 const val PASSKEY_TYPE_NONE = 0
 const val PASSKEY_TYPE_SHARED = 1
@@ -1279,34 +1277,56 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 
 class DevicePropertyListContentInformation(val elementType: Int) {
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivity
-
-
     var canNavigateForward = false
+    private set
+
     var hasChanged = false
+
     var isGroupMember = false
+    set(value) {
+        this.isAccessible = false
+        field = value
+    }
+
     var isLastInGroup = false
+    set(value) {
+        this.isAccessible = false
+        field = value
+    }
+
     //var elementType = -1 //SEPARATOR_ELEMENT
     var isAccessible = false
+    private set
 
     //var indexInsideGroup = -1
     var globalIndex = -1
 
     // this is the main text of the always visible element-textView
     var elementText = ""
+    private set
     // this is the text of the button
     var elementSubText = ""
+    private set
 
+    var elementDescriptorText = ""
+    set(value) {
+        this.isAccessible = false
+        field = value
+    }
 
     var internalElementIndex = -1
-    //var imageID = -1
+
     var propertyType = -1
+    set(value) {
+        this.isAccessible = false
+        field = value
+    }
 
     var imageID = R.drawable.image_error_state
     set(value) {
         field = resourceIdForImageId(value)
     }
 
-    //var initialElementValue = -1
     var simplePropertyState = -1
     var complexPropertyState = ComplexPropertyState()
 
@@ -1322,8 +1342,8 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     var navigationImageVisibility = View.GONE
     private set
 
-
-    // TODO: call update after creation or when the object data changes!
+    // NOTE: call update after creation or when the object data changes!
+    // NOTE: when creating an object, do only set the descriptor, the elementText will be set automatically
 
     fun update(context: Context){
         when(this.elementType){
@@ -1338,6 +1358,11 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                 this.buttonVisibility = View.GONE
                 this.levelIndicationTextViewVisibility = View.GONE
                 this.navigationImageVisibility = View.GONE
+                // define the element-text
+                this.elementText = this.elementDescriptorText
+                this.elementSubText = ""
+                // other values
+                this.canNavigateForward = false
             }
             PROPERTY_ELEMENT -> {
                 // define the background
@@ -1370,12 +1395,17 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                         this.buttonVisibility = View.VISIBLE
                         this.switchVisibility = View.GONE
 
-                        val dd = checkForDualDescriptor(this.elementText)
+                        this.canNavigateForward = false
+
+                        // decrypt the descriptor and set element and sub text
+                        val dd = checkForDualDescriptor(this.elementDescriptorText)
                         if(dd.isDual){
                             this.elementSubText = dd.actionText
                             this.elementText = dd.elementText
+                        } else {
+                            this.elementText = this.elementDescriptorText
+                            this.elementSubText = "<- ->"
                         }
-
                     }
                     PROPERTY_TYPE_SWITCH -> {
                         this.navigationImageVisibility = View.GONE
@@ -1383,20 +1413,88 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                         this.buttonVisibility = View.GONE
                         this.switchVisibility = View.VISIBLE
 
-                        // reset element sub-text ??
+                        this.canNavigateForward = false
 
+                        // set the text-properties
+                        this.elementText = elementDescriptorText
+                        this.elementSubText = ""
                     }
-                    PROPERTY_TYPE_LEVEL_SELECTOR -> {}
-                    PROPERTY_TYPE_LEVEL_INDICATOR -> {}
-                    PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY ->{}
-                    PROPERTY_TYPE_OPTION_SELECTOR -> {}
+                    PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                        this.navigationImageVisibility = View.GONE
+                        this.levelIndicationTextViewVisibility = View.GONE
+                        this.buttonVisibility = View.VISIBLE
+                        this.switchVisibility = View.GONE
+
+                        this.canNavigateForward = false
+
+                        // set the element-text
+                        this.elementText = this.elementDescriptorText
+                        // convert the state-value to the button text
+                        this.elementSubText = PercentageLevelPropertyGenerator(this.simplePropertyState).percentageString ?: ""
+                    }
+
+                    PROPERTY_TYPE_LEVEL_INDICATOR -> {
+                        this.navigationImageVisibility = View.GONE
+                        this.levelIndicationTextViewVisibility = View.VISIBLE
+                        this.buttonVisibility = View.GONE
+                        this.switchVisibility = View.GONE
+
+                        this.canNavigateForward = false
+
+                        // set the element text
+                        this.elementText = this.elementDescriptorText
+                        // convert the state to the string for the level-textView
+                        this.elementSubText = PercentageLevelPropertyGenerator(this.simplePropertyState).percentageString ?: ""
+                    }
+                    PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY ->{
+                        this.navigationImageVisibility = View.GONE
+                        this.levelIndicationTextViewVisibility = View.GONE
+                        this.buttonVisibility = View.GONE
+                        this.switchVisibility = View.GONE
+
+                        this.canNavigateForward = false
+
+                        // set the element text
+                        this.elementText = this.elementDescriptorText
+                        this.elementSubText = ""
+                    }
+                    PROPERTY_TYPE_OPTION_SELECTOR -> {
+                        this.navigationImageVisibility = View.GONE
+                        this.levelIndicationTextViewVisibility = View.GONE
+                        this.buttonVisibility = View.VISIBLE
+                        this.switchVisibility = View.GONE
+
+                        this.canNavigateForward = false
+
+                        val oss = decryptOptionSelectorString(this.elementDescriptorText)
+                        // set the element text
+                        if(oss.size > 0) {
+                            // the first element is the element text
+                            this.elementText = oss.elementAt(0)
+                            // remove it to get the pure options
+                            oss.removeAt(0)
+                            // get the selected index (state) and set the appropriate string
+                            if(this.simplePropertyState < oss.size){
+                                this.elementSubText = oss.elementAt(this.simplePropertyState)
+                            } else {
+                                this.elementSubText = "invalid index"
+                            }
+                        } else {
+                            this.elementText = ""
+                            this.elementSubText = ""
+                        }
+                    }
                     else -> {
                         // must be complex type, show the nav-arrow and hide the remaining
                         this.navigationImageVisibility = View.VISIBLE
                         this.levelIndicationTextViewVisibility = View.GONE
                         this.buttonVisibility = View.GONE
                         this.switchVisibility = View.GONE
-                        // canNavigateForward ???
+
+                        this.canNavigateForward = true
+
+                        this.elementText = this.elementDescriptorText
+                        this.elementSubText = ""
                     }
                 }
             }
@@ -1409,7 +1507,6 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                 )!!
             }
         }
-
         this.isAccessible = true
     }
 

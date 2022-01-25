@@ -1891,7 +1891,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         "Group Index was: ${laRoomyDeviceProperty.groupIndex} - Expected index: $expectedGroupIndex - " +
                                         "The visual state may not be as expected!"
                             )
-                            // TODO: maybe fix the inconsistency?? laRoomyDeviceProperty.groupIndex = expectedGroupIndex ???
+                            // TODO: maybe fix the inconsistency automatically?? laRoomyDeviceProperty.groupIndex = expectedGroupIndex ???
                         }
 
                         // check if this element is part of the next group
@@ -1914,14 +1914,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                                 // create the group entry
                                 val dpl = DevicePropertyListContentInformation(GROUP_ELEMENT)
-                                //dpl.elementType = GROUP_ELEMENT
-                                dpl.canNavigateForward = false
                                 dpl.internalElementIndex = laRoomyDevicePropertyGroup.groupIndex
-                                dpl.elementText = laRoomyDevicePropertyGroup.groupName
+                                dpl.elementDescriptorText = laRoomyDevicePropertyGroup.groupName
                                 dpl.imageID = laRoomyDevicePropertyGroup.imageID
                                 // add the global index of the position in the array
                                 dpl.globalIndex = globalIndex
                                 globalIndex++
+                                // generate internal data and resources
+                                dpl.update(applicationProperty.applicationContext)
                                 // add the group to the list
                                 this.uIAdapterList.add(dpl)
                             } else {
@@ -1934,11 +1934,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                         // add the property element(s) to the group
                         val propertyEntry = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
-                        //propertyEntry.elementType = PROPERTY_ELEMENT
-                        propertyEntry.canNavigateForward =
-                            laRoomyDeviceProperty.needNavigation()
                         propertyEntry.isGroupMember = true
-                        propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
+                        propertyEntry.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
                         propertyEntry.imageID = laRoomyDeviceProperty.imageID
                         propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
                         propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
@@ -1946,6 +1943,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // set global index
                         propertyEntry.globalIndex = globalIndex
                         globalIndex++
+                        // generate internal data and resources
+                        propertyEntry.update(applicationProperty.applicationContext)
                         // add it to the list
                         this.uIAdapterList.add(propertyEntry)
 
@@ -1971,17 +1970,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                         // create the entry
                         val propertyEntry = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
-                        //propertyEntry.elementType = PROPERTY_ELEMENT
-                        propertyEntry.canNavigateForward = laRoomyDeviceProperty.needNavigation()
                         propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
                         propertyEntry.imageID = laRoomyDeviceProperty.imageID
-                        propertyEntry.elementText = laRoomyDeviceProperty.propertyDescriptor
-                        //propertyEntry.indexInsideGroup = index
+                        propertyEntry.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
                         propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
                         propertyEntry.simplePropertyState = laRoomyDeviceProperty.propertyState
                         // set global index
                         propertyEntry.globalIndex = globalIndex
                         globalIndex++
+                        // generate internal data and resources
+                        propertyEntry.update(applicationProperty.applicationContext)
                         // add it to the list
                         this.uIAdapterList.add(propertyEntry)
                     }
@@ -2315,9 +2313,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             if((laRoomyDeviceProperty.propertyIndex == devicePropertyListContentInformation.internalElementIndex) && devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT){
                 // NOTE: the complex state is not included in the transmission so it remains 'unset' at this point
-                devicePropertyListContentInformation.elementText = laRoomyDeviceProperty.propertyDescriptor
-                devicePropertyListContentInformation.canNavigateForward = laRoomyDeviceProperty.needNavigation()
-                //devicePropertyListContentInformation.elementType = PROPERTY_ELEMENT
+                devicePropertyListContentInformation.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
                 devicePropertyListContentInformation.isGroupMember = laRoomyDeviceProperty.isGroupMember
                 devicePropertyListContentInformation.imageID = laRoomyDeviceProperty.imageID
                 devicePropertyListContentInformation.internalElementIndex = laRoomyDeviceProperty.propertyIndex
@@ -2330,6 +2326,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 } else {
                     this.propertyCallback.onUIAdaptableArrayItemChanged(index)
                 }
+                // update the internal generated parameter and resources
+                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
                 return@forEachIndexed
             }
         }
@@ -2341,9 +2339,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             if((laRoomyDevicePropertyGroup.groupIndex == devicePropertyListContentInformation.internalElementIndex) && devicePropertyListContentInformation.elementType == GROUP_ELEMENT){
 
-                //devicePropertyListContentInformation.elementType = GROUP_ELEMENT
-                devicePropertyListContentInformation.canNavigateForward = false
-                devicePropertyListContentInformation.elementText = laRoomyDevicePropertyGroup.groupName
+                devicePropertyListContentInformation.elementDescriptorText = laRoomyDevicePropertyGroup.groupName
                 devicePropertyListContentInformation.imageID = laRoomyDevicePropertyGroup.imageID
 
                 if(propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
@@ -2352,6 +2348,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 } else {
                     this.propertyCallback.onUIAdaptableArrayItemChanged(index)
                 }
+                // update the internal generated parameter and resources
+                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
                 return@forEachIndexed
             }
         }

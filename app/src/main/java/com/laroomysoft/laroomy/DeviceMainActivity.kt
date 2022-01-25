@@ -1,11 +1,9 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,17 +11,16 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
-import java.lang.Exception
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
 const val STATUS_DISCONNECTED = 0
 const val STATUS_CONNECTED = 1
@@ -64,7 +61,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
 
-    private var propertyList = ArrayList<DevicePropertyListContentInformation>()
+    //private var propertyList = ArrayList<DevicePropertyListContentInformation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,10 +111,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // bind array to adapter
         this.devicePropertyListViewAdapter =
             DevicePropertyListAdapter(
-                //ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
-                this.propertyList,
-                this,
-                this@DeviceMainActivity
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
+                //this.propertyList,
+                this
             )
 
                 //this)
@@ -245,7 +241,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                 Log.d("DMA:onResume", "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}")
                             }
                             ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged = false
-                            this.propertyList[index] = devicePropertyListContentInformation
+                            //this.propertyList[index] = devicePropertyListContentInformation
                             this.devicePropertyListViewAdapter.notifyItemChanged(index)
                         }
                     }
@@ -297,16 +293,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    private fun setItemBackgroundColor(index: Int, colorID: Int){
-        val linearLayout = this.devicePropertyListLayoutManager.findViewByPosition(index) as? LinearLayout
-        linearLayout?.setBackgroundColor(getColor(colorID))
-
-        // maybe get the sub holder constraintLayout (ID: contentHolderLayout) ????
-    }
-
     private fun setPropertyToSelectedState(index: Int){
         val element =
-            this.propertyList.elementAt(index)
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+            //this.propertyList.elementAt(index)
 
         if(element.elementType == PROPERTY_ELEMENT){
             val rootLayoutElement =
@@ -327,8 +317,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
     }
 
-    private fun getBackgroundDrawableFromElementIndex(index: Int){}
-
     @SuppressLint("NotifyDataSetChanged")
     private fun reloadProperties(){
 
@@ -344,7 +332,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // at first update the UI
         runOnUiThread {
             this.propertyLoadingFinished = false
-            this.propertyList.clear()
+            //this.propertyList.clear()
             this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
 
@@ -358,20 +346,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ApplicationProperty.bluetoothConnectionManager.reloadProperties()
         }, 500) // TODO: shorter time?
     }
-
-//    override fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation) {
-//
-//        Log.d("M:onPropEntryClk", "Property list entry was clicked at index: $index")
-//
-//        //if(devicePropertyList.elementAt(index).canNavigateForward && (devicePropertyList.elementAt(index).elementType == PROPERTY_ELEMENT)){
-//
-//            // navigate to the appropriate property-page
-//
-//            // make sure the onPause routine does not disconnect the device
-//
-//            // animate the element to indicate the press
-//       // }
-//    }
 
     override fun onPropertyElementButtonClick(index: Int) {
         if(verboseLog) {
@@ -414,6 +388,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         ApplicationProperty.bluetoothConnectionManager.sendData(
             makeSimplePropertyExecutionString(index, c)
         )
+        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).apply {
+            this.simplePropertyState = c
+            //this.update() - not necessary on a switch
+        }
     }
 
     @SuppressLint("InflateParams")
@@ -503,23 +481,23 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // get the options array
         val options =
-            decryptOptionSelectorString(devicePropertyListContentInformation.elementText)
+            decryptOptionSelectorString(devicePropertyListContentInformation.elementDescriptorText)
 
         if(options.isEmpty()){
+            Log.e("decryptOptions", "Error on decrypting options for option-selector from property descriptor!")
             return
         }
 
         // shade the background
         this.devicePropertyListRecyclerView.alpha = 0.2f
 
-        // TODO: block the activation of background (list) elements during popup-lifecycle
+        // block the activation of background (list) elements during popup-lifecycle
         this.optionSelectorPopUpOpen = true
 
-        val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
+        val layoutInflater =
+            getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val popUpView =
             layoutInflater.inflate(R.layout.device_main_option_selector_popup, null)
-
         this.popUpWindow =
             PopupWindow(
                 popUpView,
@@ -551,32 +529,30 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         // set picker values
-        this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker).apply {
-            minValue = 0
-            maxValue = options.size - 1
+        this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker)
+            .apply {
+                minValue = 0
+                maxValue = options.size - 1
+                displayedValues = strArray
 
-            displayedValues = strArray
+                if(devicePropertyListContentInformation.simplePropertyState < options.size) {
+                    value = devicePropertyListContentInformation.simplePropertyState
+                }
 
-//            setFormatter {
-//                options.elementAt(it)
-//            }
-
-            if(devicePropertyListContentInformation.simplePropertyState < options.size) {
-                value = devicePropertyListContentInformation.simplePropertyState
+                setOnValueChangedListener { _, _, newVal ->
+                    // send execution command
+                    ApplicationProperty.bluetoothConnectionManager.sendData(
+                        makeSimplePropertyExecutionString(devicePropertyListContentInformation.internalElementIndex, newVal)
+                    )
+                    // update list element
+                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+                        .apply {
+                            this.simplePropertyState = newVal
+                            this.update(applicationContext)
+                        }
+                    devicePropertyListViewAdapter.notifyItemChanged(index)
+                }
             }
-
-            setOnValueChangedListener { _, _, newVal ->
-
-                // send execution command
-                ApplicationProperty.bluetoothConnectionManager.sendData(
-                    makeSimplePropertyExecutionString(devicePropertyListContentInformation.internalElementIndex, newVal)
-                )
-
-                // update list element
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).simplePropertyState = newVal
-                devicePropertyListViewAdapter.notifyItemChanged(index)
-            }
-        }
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -630,7 +606,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 percentTo8Bit(newValue)
 
             // update list element
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).simplePropertyState = bitValue
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+                .apply {
+                    this.simplePropertyState = bitValue
+                    this.update(applicationContext)
+                }
             this.devicePropertyListViewAdapter.notifyItemChanged(index)
 
             if(levelSelectorPopUpOpen){
@@ -665,15 +645,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         // set it to selected color
-
-        //TODO: set item drawable to selected state
-
         setPropertyToSelectedState(index)
-
-        //setItemBackgroundColor(index, R.color.DMA_ItemSelectedColor)
-        //setItemSeparatorViewColors(index, R.color.selectedSeparatorColor)
-        //setItemTopSeparatorColor(index, R.color.selectedSeparatorColor)
-        //setItemBottomSeparatorColor(index, R.color.selectedSeparatorColor)
 
         // save the index of the highlighted item to reset it on back-navigation
         restoreIndex = index
@@ -1125,10 +1097,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onUIAdaptableArrayListItemAdded(item: DevicePropertyListContentInformation) {
-        super.onUIAdaptableArrayListItemAdded(item)
+        // check if the internal parameter and resources are generated
+        if(!item.isAccessible){
+            // if not -> update it
+            item.update(applicationContext)
+        }
 
         // add the data to the UI-List
-        this.propertyList.add(item)
+        //this.propertyList.add(item)
 
         try {
             runOnUiThread {
@@ -1161,7 +1137,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // - redraw the element before and after the element
         // - bring the internal element indexes of the ui-list in the correct order (use the list in bleManager)
 
-        this.propertyList.removeAt(index)
+        //this.propertyList.removeAt(index)
+
         //this.propertyList.clear()
         //this.propertyList = ApplicationProperty.bluetoothConnectionManager.uIAdapterList
 
@@ -1183,6 +1160,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onUIAdaptableArrayItemChanged(index: Int) {
+        // if the element is not accessible -> update it!
+        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+            .apply {
+                if (!this.isAccessible) {
+                    this.update(applicationContext)
+                }
+            }
+        // apply changes to list
         runOnUiThread {
             devicePropertyListViewAdapter.notifyItemChanged(index)
         }
@@ -1202,10 +1187,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     //Log.e("onSimpleStateChanged", "Callback invoked: type is: ${uIElement.propertyType}")
 
 
-                    val linearLayout =
-                        this.devicePropertyListLayoutManager.findViewByPosition(
-                            UIAdapterElementIndex
-                        ) as? LinearLayout
+//                    val linearLayout =
+//                        this.devicePropertyListLayoutManager.findViewByPosition(
+//                            UIAdapterElementIndex
+//                        ) as? LinearLayout
 
                     // update the appropriate element
                     when (uIElement.propertyType) {
@@ -1283,11 +1268,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     // device property list adapter:
     class DevicePropertyListAdapter(
         private val devicePropertyAdapter: ArrayList<DevicePropertyListContentInformation>,
-        private val itemClickListener: OnPropertyClickListener,
-        private val activityContext: Context,
+        private val itemClickListener: OnPropertyClickListener
     ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
-
-
 
         class DPLViewHolder(
             val linearLayout: LinearLayout,
@@ -1322,16 +1304,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         listener.onNavigatableElementClick(bindingAdapterPosition)
                     }
                 }
-
             }
 
             fun activateListenerFromType(propertyType: Int){
                 this.pType = propertyType
             }
-
-//            fun bind(data: DevicePropertyListContentInformation, itemClick: OnPropertyClickListener, position: Int){
-//                itemClick.onPropertyClicked(position, data)
-//            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DPLViewHolder {
@@ -1344,14 +1321,70 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
 
-
-
+            // get regarding element
             val elementToRender = devicePropertyAdapter.elementAt(position)
 
+            // enable the listener for the regarding property type
             holder.activateListenerFromType(elementToRender.propertyType)
 
+            // set background
+            holder.linearLayout.background = elementToRender.backgroundDrawable
 
-            val rootContentHolder = holder.linearLayout
+            // set property image
+            holder.linearLayout.findViewById<AppCompatImageView>(R.id.devicePropertyIdentificationImage)
+                .apply {
+                    setBackgroundResource(
+                        elementToRender.imageID
+                    )
+                }
+
+            // set element text properties
+            holder.linearLayout.findViewById<AppCompatTextView>(R.id.devicePropertyNameTextView)
+                .apply {
+                    this.text = elementToRender.elementText
+                    if(elementToRender.elementType == GROUP_ELEMENT){
+                        this.textSize = 18F
+                        setTypeface(typeface, Typeface.BOLD)
+                    } else {
+                        this.textSize = 14F
+                        setTypeface(typeface, Typeface.NORMAL)
+                    }
+                }
+
+            // button properties
+            holder.linearLayout.findViewById<AppCompatButton>(R.id.elementButton)
+                .apply {
+                    this.visibility = elementToRender.buttonVisibility
+                    if(elementToRender.buttonVisibility == View.VISIBLE){
+                        this.text = elementToRender.elementSubText
+                    } else {
+                        this.text = ""
+                    }
+                }
+
+            // switch properties
+            holder.linearLayout.findViewById<SwitchCompat>(R.id.elementSwitch)
+                .apply {
+                    this.visibility = elementToRender.switchVisibility
+                    this.isChecked = elementToRender.simplePropertyState > 0
+                }
+
+            // level textView properties
+            holder.linearLayout.findViewById<AppCompatTextView>(R.id.levelIndicationTextView)
+                .apply {
+                    this.visibility = elementToRender.levelIndicationTextViewVisibility
+                    if(elementToRender.levelIndicationTextViewVisibility == View.VISIBLE){
+                        this.text = elementToRender.elementSubText
+                    } else {
+                        this.text = ""
+                    }
+                }
+
+            // navigation image properties
+            holder.linearLayout.findViewById<AppCompatImageView>(R.id.forwardImage).visibility = elementToRender.navigationImageVisibility
+        }
+
+            /*
 
             when(elementToRender.elementType) {
                 UNDEFINED_ELEMENT -> {
@@ -1636,7 +1669,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             }
             // bind it!
             //holder.bind(elementToRender, itemClickListener, position)
-        }
+        }*/
 
         override fun getItemCount(): Int {
             return devicePropertyAdapter.size

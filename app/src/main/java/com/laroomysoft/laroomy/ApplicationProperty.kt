@@ -372,7 +372,6 @@ interface OnUUIDProfileListItemClickListener {
 }
 
 interface OnPropertyClickListener {
-    //fun onPropertyClicked(index: Int, data: DevicePropertyListContentInformation)
     fun onPropertyElementButtonClick(index: Int)
     fun onPropertyElementSwitchClick(index: Int, state: Boolean)
     fun onPropertyLevelSelectButtonClick(index: Int)
