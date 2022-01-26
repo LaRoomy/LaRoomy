@@ -2534,7 +2534,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if (uIIndexToDelete > 0) {
                         if (this.uIAdapterList.elementAt(uIIndexToDelete - 1).elementType == GROUP_ELEMENT) {
                             // the previous element is the group header and the removed item was the last in group, so the group consists of only one item, this makes the group empty, so remove it too!
-                            this.removeGroupElement(this.uIAdapterList.elementAt(uIIndexToDelete).internalElementIndex)
+                            this.removeGroupElement(this.uIAdapterList.elementAt(uIIndexToDelete - 1).internalElementIndex)
                         } else {
                             // the previous element is a property element, check if it is part of the group (must be?) and set isGroupMember to true, then launch changed event
                             this.uIAdapterList.elementAt(uIIndexToDelete - 1).isLastInGroup = true

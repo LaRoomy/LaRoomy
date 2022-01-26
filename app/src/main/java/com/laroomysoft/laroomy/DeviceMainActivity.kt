@@ -342,6 +342,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         runOnUiThread {
             this.propertyLoadingFinished = false
             //this.propertyList.clear()
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.clear()
             this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
 
