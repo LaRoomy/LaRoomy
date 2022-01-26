@@ -1,11 +1,15 @@
 package com.laroomysoft.laroomy
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.app.Activity
 import android.bluetooth.*
+import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import java.io.Serializable
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -26,6 +30,9 @@ const val BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED = 3
 const val BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING = 4
 const val BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING = 5
 const val BLE_INIT_NO_PROPERTIES = 6
+const val BLE_BLUETOOTH_PERMISSION_MISSING = 7
+
+const val IS_OK = 0
 
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
@@ -86,9 +93,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var bluetoothGatt: BluetoothGatt? = null
     lateinit var gattCharacteristic: BluetoothGattCharacteristic
     // --
-    private val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
-        this.bleAdapter?.bondedDevices
-    }
+//    val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
+//        this.bleAdapter?.bondedDevices
+//    }
     // --
     private val bleAdapter: BluetoothAdapter? by lazy(LazyThreadSafetyMode.NONE){
         val bluetoothManager =
@@ -121,13 +128,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             field.clear()
 
             // add the data
-            this.bleAdapter?.bondedDevices?.forEach {
-                val device = LaRoomyDevicePresentationModel()
-                device.name = it.name
-                device.address = it.address
-                device.image = 0
-
-                field.add(device)
+            try {
+                this.bleAdapter?.bondedDevices?.forEach {
+                    val device = LaRoomyDevicePresentationModel()
+                    device.name = it.name
+                    device.address = it.address
+                    device.image = 0
+                    field.add(device)
+                }
+            } catch (e: SecurityException){
+                Log.e("GetBondedDevices", "Security Exception: $e")
+                applicationProperty.logControl("E: Security Exception: $e")
             }
             return field
         }
@@ -142,13 +153,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     // callback implementation for BluetoothGatt
     private val gattCallback = object : BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
 
             when(newState){
                 BluetoothProfile.STATE_CONNECTED -> {
 
-                    // if successful connected reset the device-data
+                    // if successful connected reset the device-data??
                     //bleDeviceData.clear()
 
                     isConnected = true
@@ -207,6 +219,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
 
+        @SuppressLint("MissingPermission")
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
 
@@ -1609,7 +1622,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         } else {
             if(verboseLog){
-                Log.e("initDeviceTransmsn", "Init failed - no connection/ dev-info: address: ${this.currentDevice?.address} dev-type: ${this.currentDevice?.type} ?: ${this.currentDevice}")
+                try {
+                    Log.e(
+                        "initDeviceTransmsn",
+                        "Init failed - no connection/ dev-info: address: ${this.currentDevice?.address} dev-type: ${this.currentDevice?.type} ?: ${this.currentDevice}"
+                    )
+                } catch (e: SecurityException){
+                    Log.e("initDeviceTransmission", "Security Exception: $e")
+                }
             }
             applicationProperty.logControl("E: Init failed - no connection")
         }
@@ -1617,7 +1637,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
 
     fun clear(){
-        this.bluetoothGatt?.close()
+        try {
+            this.bluetoothGatt?.close()
+        } catch(e: SecurityException){
+            Log.e("BleManager:Clear()", "BleManager:onClear - $e")
+            applicationProperty.logControl("E: Missing permission - $e")
+        }
         this.bluetoothGatt = null
 
         this.currentDevice = null
@@ -1696,23 +1721,41 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun connectToRemoteDevice(macAddress: String?){
-        this.currentDevice =
-            (applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter.getRemoteDevice(
-                macAddress
-            )
+        try {
+            this.currentDevice =
+                (applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter.getRemoteDevice(
+                    macAddress
+                )
 
-        // old:
+            // old:
             //BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
-        this.bluetoothGatt = this.currentDevice?.connectGatt(applicationProperty.applicationContext, false, this.gattCallback)
+            this.bluetoothGatt = this.currentDevice?.connectGatt(
+                applicationProperty.applicationContext,
+                false,
+                this.gattCallback
+            )
+        } catch (e: SecurityException){
+            Log.e("connectToRemoteDevice", "Security Exception occurred while trying to connect to remote device: ${e.message}")
+            this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+        }
     }
 
     fun connectToBondedDeviceWithMacAddress(macAddress: String?){
-        this.bondedList?.forEach {
-            if(it.address == macAddress){
-                this.currentDevice = it
+        try {
+            this.bleAdapter?.bondedDevices?.forEach {
+                if (it.address == macAddress) {
+                    this.currentDevice = it
+                }
             }
+            this.bluetoothGatt = this.currentDevice?.connectGatt(
+                applicationProperty.applicationContext,
+                false,
+                this.gattCallback
+            )
+        } catch (e: SecurityException){
+            Log.e("conToBondedDevWithMacAddress", "Security Exception occurred while trying to connect to bonded device with mac-address: ${e.message}")
+            this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
         }
-        this.bluetoothGatt = this.currentDevice?.connectGatt(applicationProperty.applicationContext, false, this.gattCallback)
     }
 
 /*
@@ -1728,59 +1771,83 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun sendData(data: String){
 
-        if(!this.isConnected){
-            Log.e("M:sendData", "Unexpected error, bluetooth device not connected")
-            applicationProperty.logControl("E: Unexpected: sendData invoked, but device not connected")
+        try {
+            if (!this.isConnected) {
+                Log.e("M:sendData", "Unexpected error, bluetooth device not connected")
+                applicationProperty.logControl("E: Unexpected: sendData invoked, but device not connected")
 
-            this.callback.onConnectionError(BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED)
-        }
-        else {
-            if(verboseLog) {
-                Log.d("M:sendData", "writing characteristic: data: $data")
-            }
-
-            // make sure the passkey is hidden in the connection log
-            if (data.elementAt(0) == '6') {
-                // must be a binding transmission -> hide passkey (if there is one)
-                var logData = data
-                if (logData.length > 9) {
-                    logData = logData.removeRange(9, logData.length - 1)
-                    logData += "<passkey hidden!>"
-                }
-                applicationProperty.logControl("I: Send Data: $logData")
+                this.callback.onConnectionError(BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED)
             } else {
-                applicationProperty.logControl("I: Send Data: $data")
+                if (verboseLog) {
+                    Log.d("M:sendData", "writing characteristic: data: $data")
+                }
+
+                // make sure the passkey is hidden in the connection log
+                if (data.elementAt(0) == '6') {
+                    // must be a binding transmission -> hide passkey (if there is one)
+                    var logData = data
+                    if (logData.length > 9) {
+                        logData = logData.removeRange(9, logData.length - 1)
+                        logData += "<passkey hidden!>"
+                    }
+                    applicationProperty.logControl("I: Send Data: $logData")
+                } else {
+                    applicationProperty.logControl("I: Send Data: $data")
+                }
+
+                this.gattCharacteristic.setValue(data)
+
+                if (this.bluetoothGatt == null) {
+                    Log.e("M:sendData", "Member bluetoothGatt was null!")
+                }
+
+                try {
+                    this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
+                } catch (e: SecurityException){
+                    Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
+                    this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+                }
             }
-
-            this.gattCharacteristic.setValue(data)
-
-            if (this.bluetoothGatt == null) {
-                Log.e("M:sendData", "Member bluetoothGatt was null!")
-            }
-
-            this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
+        } catch (e: Exception){
+            Log.e("BLEManager:sendData", "Unexpected Error: $e")
         }
     }
 
-    fun checkBluetoothEnabled(caller: Activity){
+    fun checkBluetoothEnabled(caller: Activity) : Int{
         if(verboseLog) {
             Log.d("M:bluetoothEnabled?", "Check if bluetooth is enabled")
         }
-        bleAdapter?.takeIf{it.isDisabled}?.apply{
-            // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            caller.startActivityForResult(enableBtIntent, requestEnableBT)
+        try {
+            bleAdapter?.takeIf { it.isDisabled }?.apply {
+                // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
+                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                caller.startActivityForResult(enableBtIntent, requestEnableBT)
+            }
+        } catch (e: SecurityException){
+            Log.e("checkBluetoothEnabled", "Error, while checking if bluetooth is enabled: $e")
+            return BLE_BLUETOOTH_PERMISSION_MISSING
         }
+        return IS_OK
     }
 
     fun close(){
-        this.bluetoothGatt?.close()
+        try {
+            this.bluetoothGatt?.close()
+        } catch (e: SecurityException){
+            Log.e("BLEManager:onClose()", "Security Exception: ${e.message}")
+            this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+        }
         this.bluetoothGatt = null
         this.isConnected = false
     }
 
     fun disconnect(){
-        this.bluetoothGatt?.disconnect()
+        try {
+            this.bluetoothGatt?.disconnect()
+        } catch (e: SecurityException){
+            Log.e("BLEManager:disconnect()", "Security Exception: ${e.message}")
+            this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+        }
         this.isConnected = false
     }
 
@@ -1808,16 +1875,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
             applicationProperty.logControl("I: Connection was suspended: trying to resume connection")
 
-            this.bluetoothGatt?.connect()
+            try {
+                this.bluetoothGatt?.connect()
 
-            // set up a handler to check if the connection works
-            Executors.newSingleThreadScheduledExecutor().schedule({
-                if(!isConnected){
-                    callback.onConnectionError(
-                        BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE)
-                }
-            }, 10000, TimeUnit.MILLISECONDS)
+                // set up a handler to check if the connection works
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    if (!isConnected) {
+                        callback.onConnectionError(
+                            BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE
+                        )
+                    }
+                }, 10000, TimeUnit.MILLISECONDS)
 
+            } catch (e: SecurityException){
+                Log.e("resumeConnection", "Error while trying to resume connection")
+                this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+            }
         } else {
             Log.e("M:Bmngr:resumeC", "BluetoothManager: Internal Device Address invalid- trying to connect to saved address")
             this.callback.onConnectionError(

@@ -1,8 +1,10 @@
 package com.laroomysoft.laroomy
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +17,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -156,7 +160,17 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
 
         // check if bluetooth is enabled
-        ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
+        if(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this) == BLE_BLUETOOTH_PERMISSION_MISSING){
+
+            // TODO: show permission-request-popup, and if granted, check again if bluetooth is enabled
+           if(ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED
+            ) {
+
+            }
+        }
 
         // normalize controls on back navigation
         if(addButtonNormalizationRequired){

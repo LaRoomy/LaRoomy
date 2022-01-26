@@ -261,6 +261,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                 ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()
+                return
             }
 
             // show the loading circle
@@ -458,15 +459,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set the appropriate image and seekbar position
         this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.levelSelectorPopUpImageView).setImageResource(
-            resourceIdForImageId(devicePropertyListContentInformation.imageID)
+            devicePropertyListContentInformation.imageID
         )
         val percentageLevelPropertyGenerator =
             PercentageLevelPropertyGenerator(devicePropertyListContentInformation.simplePropertyState)
         this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text =
             percentageLevelPropertyGenerator.percentageString
 
-        // add the handler to the element
-        //devicePropertyListContentInformation.handler = this
         // set seekbar properties
         this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).apply {
             this.progress = percentageLevelPropertyGenerator.percentageValue
@@ -530,7 +529,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set the appropriate image and option selection
         this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.optionSelectorPopUpImageView).setImageResource(
-            resourceIdForImageId(devicePropertyListContentInformation.imageID)
+            devicePropertyListContentInformation.imageID
         )
 
         this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.optionSelectorPopUpTextView).text =

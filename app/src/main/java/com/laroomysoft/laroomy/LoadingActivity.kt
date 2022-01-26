@@ -324,9 +324,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     // log
                     Log.e(
                         "M:CB:InitTryout",
-                        "Timeout for the initialization process. Remote device not responding. Stoping process.."
+                        "Timeout for the initialization process. Remote device not responding. Stopping process.."
                     )
-                    (applicationContext as ApplicationProperty).logControl("E: Timeout for the initialization process. Remote device not responding. Stoping process..")
+                    (applicationContext as ApplicationProperty).logControl("E: Timeout for the initialization process. Remote device not responding. Stopping process..")
 
                     // notify user
                     runOnUiThread {
