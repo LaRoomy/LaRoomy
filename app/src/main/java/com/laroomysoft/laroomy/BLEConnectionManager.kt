@@ -717,6 +717,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // make sure the element is a property element,
                             // -> otherwise the internal element index of a group could be used, and this is an invalid operation
                     devicePropertyListContentInformation.simplePropertyState = newState
+                    devicePropertyListContentInformation.update(applicationProperty.applicationContext)
                     uiChangeIndex = index
                     return@forEachIndexed
                 }
