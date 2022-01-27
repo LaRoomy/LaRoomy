@@ -6,11 +6,13 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -42,6 +44,23 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         return field
     }
 
+    val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                // Permission is granted. Continue the action or workflow in your app.
+                ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
+            } else {
+                // Explain to the user that the feature is unavailable because the
+                // features requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+            }
+        }
+
+
     private lateinit var availableDevicesRecyclerView: RecyclerView
     private lateinit var availableDevicesViewAdapter: RecyclerView.Adapter<*>
     private lateinit var availableDevicesViewManager: RecyclerView.LayoutManager
@@ -57,6 +76,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     private var addButtonNormalizationRequired = false
     private var preventListSelection = false
     private var preventMenuButtonDoubleExecution = false
+    private var bluetoothPermissionGranted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -162,14 +182,34 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         // check if bluetooth is enabled
         if(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this) == BLE_BLUETOOTH_PERMISSION_MISSING){
 
+            // TODO: make this api-level related?
             // TODO: show permission-request-popup, and if granted, check again if bluetooth is enabled
-           if(ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-            ) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // FIXME: this is not the best practice, better: set UI to permission-missing state and implement an action button to start this action by user
+                    this.requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                }
 
             }
+
+            // TODO: check permission missing on devices lower than api-level 31
+
+            // TODO: set UI-state to missing permission state
+            // - disable add button
+            // - hide recyclerView
+            // - show no-content image and change it to missing permission image!
+
+            // or show a dialog??
+
+            this.bluetoothPermissionGranted = false
+
+        } else {
+            this.bluetoothPermissionGranted = true
         }
 
         // normalize controls on back navigation
@@ -206,6 +246,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 //    }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
+
+        // TODO: check if all conditions are fulfilled to work with bluetooth!
 
         if(!preventListSelection) {
 
@@ -369,11 +411,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     fun onMainActivityAddDeviceButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
-        addDeviceButton.setImageResource(R.drawable.ic_add_yellow_36dp)
-        addButtonNormalizationRequired = true
+        if(this.bluetoothPermissionGranted) {
 
-        val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
-        startActivity(intent)
+            addDeviceButton.setImageResource(R.drawable.ic_add_yellow_36dp)
+            addButtonNormalizationRequired = true
+
+            val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     fun onMainActivityPopUpButtonClick(view: View) {
@@ -404,7 +449,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         } catch(e: Exception){}
     }
 
-    fun noMainActivityNoContentContainerClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onMainActivityNoContentContainerClick(@Suppress("UNUSED_PARAMETER")view: View) {
 
         val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
         startActivity(intent)

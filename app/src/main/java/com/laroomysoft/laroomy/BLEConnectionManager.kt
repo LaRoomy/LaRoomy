@@ -386,7 +386,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // is remove transmission, so remove
                         dataProcessed = true
                         this.removeGroupElement(
-                            a2CharHexValueToIntValue(data[2], data[3])
+                            a2CharHexValueToIntValue(data[2], data[3]),
+                            true
                         )
                     } else {
                         // must be a response, update or insert transmission
@@ -2502,9 +2503,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             var newPropertyIndex = 0
 
             this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-
-                // TODO: update the global indexes !!!!!!
-
                 // search for the real index in the UI-Array
                 if(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT) {
                     if (devicePropertyListContentInformation.internalElementIndex == pIndex) {
@@ -2534,7 +2532,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if (uIIndexToDelete > 0) {
                         if (this.uIAdapterList.elementAt(uIIndexToDelete - 1).elementType == GROUP_ELEMENT) {
                             // the previous element is the group header and the removed item was the last in group, so the group consists of only one item, this makes the group empty, so remove it too!
-                            this.removeGroupElement(this.uIAdapterList.elementAt(uIIndexToDelete - 1).internalElementIndex)
+                            this.removeGroupElement(this.uIAdapterList.elementAt(uIIndexToDelete - 1).internalElementIndex, false)
                         } else {
                             // the previous element is a property element, check if it is part of the group (must be?) and set isGroupMember to true, then launch changed event
                             this.uIAdapterList.elementAt(uIIndexToDelete - 1).isLastInGroup = true
@@ -2542,16 +2540,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
+                // finally bring the global indexes in the right order
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    devicePropertyListContentInformation.globalIndex = index
+                }
             }
 
-            // TODO: what if the removed command comes on a property sub page?
+            // TODO: what if the remove command comes on a property sub page?
 
         } catch (e: Exception) {
-            // TODO: log
+            Log.e("removePropertyElement", "Exception: $e")
         }
     }
 
-    private fun removeGroupElement(pIndex: Int){
+    private fun removeGroupElement(pIndex: Int, rearrangeGlobalIndexes: Boolean){
         if (verboseLog) {
             Log.d(
                 "removeGroupElement",
@@ -2573,9 +2575,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             var newGroupIndex = 0
 
             this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-
-                // TODO: update the global indexes!!!!!!
-
                 // search group element
                 if(devicePropertyListContentInformation.elementType == GROUP_ELEMENT) {
                     if (devicePropertyListContentInformation.internalElementIndex == pIndex) {
@@ -2612,35 +2611,32 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.uIAdapterList.removeAt(i)
                     this.propertyCallback.onUIAdaptableArrayItemRemoved(i)
                 }
-                // re-order the indexes in UI-List
-                var newIndex = 0
-                this.uIAdapterList.forEach {
-                    if(it.elementType == PROPERTY_ELEMENT){
-                        it.internalElementIndex = newIndex
-                        newIndex++
+                // re-order the internal and global indexes in UI-List
+                var newInternalIndex = 0
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if(rearrangeGlobalIndexes) {
+                        devicePropertyListContentInformation.globalIndex = index
+                    }
+                    if(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT){
+                        devicePropertyListContentInformation.internalElementIndex = newInternalIndex
+                        newInternalIndex++
                     }
                 }
+
                 // delete the properties in the prop-list
-                for(i in (propListIndexes.size - 1) downTo 0){
-                    this.laRoomyDevicePropertyList.removeAt(i)
+                if(propListIndexes.isNotEmpty()) {
+                    for (i in (propListIndexes.size - 1) downTo 0) {
+                        this.laRoomyDevicePropertyList.removeAt(i)
+                    }
+                    // reorder the indexes
+                    this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                        laRoomyDeviceProperty.propertyIndex = index
+                    }
                 }
-                // reorder the indexes
-                this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-                    laRoomyDeviceProperty.propertyIndex = index
-                }
-/*
-                if(uIIndexList.size > 1){
-                    this.uIAdapterList.remove
-                } else {
-                    this.uIAdapterList.removeAt(uIIndexList.elementAt(0))
-                }
-*/
-
-
             }
 
         } catch(e: Exception){
-            // TODO: log
+            Log.e("removeGroupElement", "Exception: $e")
         }
     }
 
