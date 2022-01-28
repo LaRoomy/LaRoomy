@@ -25,6 +25,7 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_menu_yellow_36dp.xml" value="0.37824074074074077" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_settings_bluetooth_pressed_48dp.xml" value="0.3736111111111111" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/ic_settings_bluetooth_white_48dp.xml" value="0.3736111111111111" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/information_topic_background.xml" value="0.364" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/inside_group_property_last_list_element_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/inside_group_property_last_list_element_selected_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/inside_group_property_list_element_background.xml" value="0.36203703703703705" />
@@ -42,7 +43,7 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_device_settings.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_edit_u_u_i_d_profile.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_extended_level_selector.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_information.xml" value="0.37592592592592594" />
+        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_information.xml" value="0.5" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_line_graph.xml" value="0.31342592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_loading.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_main.xml" value="0.33" />

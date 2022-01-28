@@ -7,14 +7,20 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class InformationActivity : AppCompatActivity() {
 
     lateinit var versionTextView: AppCompatTextView
+    lateinit var privacyProtectionSubContainer: ConstraintLayout
+    lateinit var termsOfSeviceSubContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_information)
+
+        this.privacyProtectionSubContainer = findViewById(R.id.infoActivityPrivacyPolicySubContainer)
+        this.termsOfSeviceSubContainer = findViewById(R.id.infoActivityTermsOfServiceSubContainer)
 
 //        val pInfo =
 //            packageManager.getPackageInfo(packageName, 0)
@@ -39,5 +45,27 @@ class InformationActivity : AppCompatActivity() {
         val openUrl = Intent(ACTION_VIEW)
         openUrl.data = Uri.parse("https://policies.google.com/terms")
         startActivity(openUrl)
+    }
+
+    fun onPrivacyProtectionFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        when {
+            (this.privacyProtectionSubContainer.visibility == View.VISIBLE) -> {
+                this.privacyProtectionSubContainer.visibility = View.GONE
+            }
+            else -> {
+                this.privacyProtectionSubContainer.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    fun onTermsOfServiceFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        when{
+            (this.termsOfSeviceSubContainer.visibility == View.VISIBLE) -> {
+                this.termsOfSeviceSubContainer.visibility = View.GONE
+            }
+            else -> {
+                this.termsOfSeviceSubContainer.visibility = View.VISIBLE
+            }
+        }
     }
 }
