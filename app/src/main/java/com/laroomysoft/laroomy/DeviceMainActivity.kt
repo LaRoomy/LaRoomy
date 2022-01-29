@@ -223,26 +223,34 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                     this.reloadProperties()
 
-                    (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage =
-                        false
-                }
-
-
-                if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
+                    (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = false
                     (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
+                } else {
 
-                    if(verboseLog) {
-                        Log.d("DMA:onResume", "UI-Adapter has changed. Start updating elements with the changed marker:")
-                    }
 
-                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                        if(devicePropertyListContentInformation.hasChanged){
-                            if(verboseLog){
-                                Log.d("DMA:onResume", "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}")
+                    if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
+                        (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
+
+                        if (verboseLog) {
+                            Log.d(
+                                "DMA:onResume",
+                                "UI-Adapter has changed. Start updating elements with the changed marker:"
+                            )
+                        }
+
+                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                            if (devicePropertyListContentInformation.hasChanged) {
+                                if (verboseLog) {
+                                    Log.d(
+                                        "DMA:onResume",
+                                        "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}"
+                                    )
+                                }
+                                ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged =
+                                    false
+                                //this.propertyList[index] = devicePropertyListContentInformation
+                                this.devicePropertyListViewAdapter.notifyItemChanged(index)
                             }
-                            ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged = false
-                            //this.propertyList[index] = devicePropertyListContentInformation
-                            this.devicePropertyListViewAdapter.notifyItemChanged(index)
                         }
                     }
                 }
