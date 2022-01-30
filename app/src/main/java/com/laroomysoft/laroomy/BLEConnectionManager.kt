@@ -1743,11 +1743,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun connectToBondedDeviceWithMacAddress(macAddress: String?){
         try {
+            var deviceFound = false
+
             this.bleAdapter?.bondedDevices?.forEach {
                 if (it.address == macAddress) {
                     this.currentDevice = it
+                    deviceFound = true
                 }
             }
+
+            if(!deviceFound){
+                // device not found, the requested device is maybe not bonded anymore, but remains in the myDeviceList !
+                this.currentDevice =
+                    (applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter.getRemoteDevice(
+                        macAddress
+                    )
+            }
+
             this.bluetoothGatt = this.currentDevice?.connectGatt(
                 applicationProperty.applicationContext,
                 false,
