@@ -1298,7 +1298,6 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     var isAccessible = false
     private set
 
-    //var indexInsideGroup = -1
     var globalIndex = -1
 
     // this is the main text of the always visible element-textView

@@ -76,12 +76,14 @@ class ApplicationProperty : Application() {
     var navigatedFromPropertySubPage = false
     var noConnectionKillOnPauseExecution = false
     var uiAdapterChanged = false
+    var uiAdapterInvalidatedOnPropertySubPage = false
     var complexPropertyUpdateRequired = false
     var appSettingsResetDone = false
     var eventLogEnabled = false
     var mainActivityListElementWasAdded = false
     var complexUpdateIndex = -1
     var propertyInvalidatedOnSubPage = false
+
 
     //var userNavigatedFromCommActivity = false
 

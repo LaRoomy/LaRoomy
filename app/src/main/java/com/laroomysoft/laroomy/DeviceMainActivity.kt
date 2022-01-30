@@ -118,16 +118,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                 //this)
 
-        this.devicePropertyListViewAdapter.setHasStableIds(true)
+        //this.devicePropertyListViewAdapter.setHasStableIds(true)
 
         // bind the elements to the recycler
         this.devicePropertyListRecyclerView =
             findViewById<DeviceMainPropertyRecyclerView>(R.id.devicePropertyListView)
                 .apply {
-                    setHasFixedSize(true)
+                    //setHasFixedSize(true)
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
-                    itemAnimator = null
+                    //itemAnimator = null
                 }
     }
 
@@ -163,6 +163,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         finish()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
 
@@ -216,40 +217,57 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                 // reset the parameter
                 restoreIndex = -1
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
-                    false
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
 
+                // check if the whole property was invalidated
                 if ((this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage) {
 
+                    // reload properties from remote device
                     this.reloadProperties()
 
+                    // reset all parameter regarding the update-functionality caused by navigation
                     (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = false
                     (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
+                    (this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage = false
                 } else {
-
-
-                    if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
-                        (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
-
+                    // check if the adapter data is valid or not, if not update
+                    if((this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage){
+                        // this is the last resort, but the adapter data must be considered as completely out of date
                         if (verboseLog) {
                             Log.d(
                                 "DMA:onResume",
-                                "UI-Adapter has changed. Start updating elements with the changed marker:"
+                                "UI-Adapter was invalidated. Update complete data-set!!"
                             )
                         }
+                        this.devicePropertyListViewAdapter.notifyDataSetChanged()
+                        (this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage = false
+                    } else {
+                        // one or more single items in the adapter have changed, so update them
+                        if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
+                            // reset parameter
+                            (this.applicationContext as ApplicationProperty).uiAdapterChanged =
+                                false
 
-                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                            if (devicePropertyListContentInformation.hasChanged) {
-                                if (verboseLog) {
-                                    Log.d(
-                                        "DMA:onResume",
-                                        "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}"
-                                    )
+                            if (verboseLog) {
+                                Log.d(
+                                    "DMA:onResume",
+                                    "UI-Adapter has changed. Start updating elements with the changed marker:"
+                                )
+                            }
+
+                            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                                if (devicePropertyListContentInformation.hasChanged) {
+                                    if (verboseLog) {
+                                        Log.d(
+                                            "DMA:onResume",
+                                            "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}"
+                                        )
+                                    }
+                                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged =
+                                        false
+                                    //this.propertyList[index] = devicePropertyListContentInformation
+                                    this.devicePropertyListViewAdapter.notifyItemChanged(index)
                                 }
-                                ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged =
-                                    false
-                                //this.propertyList[index] = devicePropertyListContentInformation
-                                this.devicePropertyListViewAdapter.notifyItemChanged(index)
                             }
                         }
                     }
@@ -1149,6 +1167,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         runOnUiThread {
             devicePropertyListViewAdapter.notifyItemInserted(index)
+            //devicePropertyListViewAdapter.notifyItemRangeChanged(index, ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - index)
         }
     }
 
@@ -1698,9 +1717,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return devicePropertyAdapter.size
         }
 
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
+//        override fun getItemId(position: Int): Long {
+//            return position.toLong()
+//        }
 
         override fun getItemViewType(position: Int): Int {
             return position

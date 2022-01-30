@@ -948,7 +948,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             } else {
 
 
-                // TODO: this could be a update, insert or remove transmission. So update, insert or remove data and launch event respectively
+                // TODO: this could be a update or insert transmission. So update or insert data and launch event respectively
 
                 when(data[1]) {
                     '4' -> {
@@ -960,7 +960,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         applicationProperty.logControl("I: Property-Transmission received. Loop not active. UPDATE element with index: ${laRoomyDeviceProperty.propertyIndex}")
 
-                        // if the loop is not active, this must be an update-transmission, so replace the property
+                        // the loop is not active and the sub-type is update, so replace the property
                         if (this.laRoomyDevicePropertyList.size > laRoomyDeviceProperty.propertyIndex) {
                             // update internal array-list
                             this.laRoomyDevicePropertyList[laRoomyDeviceProperty.propertyIndex] =
@@ -978,9 +978,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         applicationProperty.logControl("I: Property-Transmission received. Loop not active. INSERT element with index: ${laRoomyDeviceProperty.propertyIndex}")
 
-
-
-
+                        // the loop is not active and the sub-type is insert, so insert at the specified index
+                        this.insertPropertyElement(laRoomyDeviceProperty)
                     }
                 }
             }
@@ -1938,6 +1937,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun generateUIAdaptableArrayListFromDeviceProperties(addInALoop: Boolean, isCacheLoadingOperation: Boolean){
 
         this.uIAdapterList.clear()
+        val tempList = ArrayList<DevicePropertyListContentInformation>()
 
         try {
             if (this.laRoomyDevicePropertyList.size > 0) {
@@ -1998,7 +1998,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 // generate internal data and resources
                                 dpl.update(applicationProperty.applicationContext)
                                 // add the group to the list
-                                this.uIAdapterList.add(dpl)
+                                if(addInALoop){
+                                    tempList.add(dpl)
+                                } else {
+                                    this.uIAdapterList.add(dpl)
+                                }
                             } else {
                                 if(verboseLog){
                                     Log.e("generateUIArray", "Error: group index out of range")
@@ -2021,18 +2025,30 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // generate internal data and resources
                         propertyEntry.update(applicationProperty.applicationContext)
                         // add it to the list
-                        this.uIAdapterList.add(propertyEntry)
+                        if(addInALoop){
+                            tempList.add(propertyEntry)
+                        } else {
+                            this.uIAdapterList.add(propertyEntry)
+                        }
 
                         // check if this is the last property element
                         if(laRoomyDevicePropertyList.size == index + 1){
                             currentGroup = -1
                             expectedGroupIndex++
                             // the last element must have been the last in group
-                            this.uIAdapterList.elementAt(globalIndex - 1)
-                                .apply {
-                                    this.isLastInGroup = true
-                                    this.update(applicationProperty.applicationContext)
-                                }
+                            if(addInALoop){
+                                tempList.elementAt(globalIndex - 1)
+                                    .apply {
+                                        this.isLastInGroup = true
+                                        this.update(applicationProperty.applicationContext)
+                                    }
+                            } else {
+                                this.uIAdapterList.elementAt(globalIndex - 1)
+                                    .apply {
+                                        this.isLastInGroup = true
+                                        this.update(applicationProperty.applicationContext)
+                                    }
+                            }
                             return@forEachIndexed // TODO: check if this will work!!!
                         }
 
@@ -2044,11 +2060,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             currentGroup = -1
                             expectedGroupIndex++
                             // the last element must have been the last in group
-                            this.uIAdapterList.elementAt(globalIndex - 1)
-                                .apply {
-                                    this.isLastInGroup = true
-                                    this.update(applicationProperty.applicationContext)
-                                }
+                            if(addInALoop){
+                                tempList.elementAt(globalIndex - 1)
+                                    .apply {
+                                        this.isLastInGroup = true
+                                        this.update(applicationProperty.applicationContext)
+                                    }
+                            } else {
+                                this.uIAdapterList.elementAt(globalIndex - 1)
+                                    .apply {
+                                        this.isLastInGroup = true
+                                        this.update(applicationProperty.applicationContext)
+                                    }
+                            }
                         }
 
                         // create the entry
@@ -2064,7 +2088,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // generate internal data and resources
                         propertyEntry.update(applicationProperty.applicationContext)
                         // add it to the list
-                        this.uIAdapterList.add(propertyEntry)
+                        if(addInALoop){
+                            tempList.add(propertyEntry)
+                        } else {
+                            this.uIAdapterList.add(propertyEntry)
+                        }
                     }
                 }
             } else {
@@ -2090,15 +2118,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 object : TimerTask() {
                     override fun run() {
                         try {
+
+                            uIAdapterList.add(tempList.elementAt(uIItemAddCounter))
+
                             propertyCallback.onUIAdaptableArrayListItemAdded(
-                                uIAdapterList.elementAt(
+                                tempList.elementAt(
                                     uIItemAddCounter
                                 )
                             )
 
                             uIItemAddCounter++
 
-                            if (uIItemAddCounter == uIAdapterList.size) {
+                            if (uIItemAddCounter == tempList.size) {
                                 // cancel timer
                                 cancel()
                                 uIItemAddCounter = -1
@@ -2126,7 +2157,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                 },
                 (0).toLong(),
-                (150).toLong()
+                (100).toLong()
             )// 300 or higher is the best (frame-skipping problem) // but 210 does not show any skipped frame with the parameter 5 frames set!
         } else {
             propertyCallback.onUIAdaptableArrayListGenerationComplete(
@@ -2403,14 +2434,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.propertyType = laRoomyDeviceProperty.propertyType
                 devicePropertyListContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
 
+                // update the internal generated parameter and resources
+                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
+
                 if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
                     applicationProperty.uiAdapterChanged = true
                     devicePropertyListContentInformation.hasChanged = true
                 } else {
                     this.propertyCallback.onUIAdaptableArrayItemChanged(index)
                 }
-                // update the internal generated parameter and resources
-                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
                 return@forEachIndexed
             }
         }
@@ -2425,14 +2457,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.elementDescriptorText = laRoomyDevicePropertyGroup.groupName
                 devicePropertyListContentInformation.imageID = laRoomyDevicePropertyGroup.imageID
 
+                // update the internal generated parameter and resources
+                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
+
                 if(propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
                     applicationProperty.uiAdapterChanged = true
                     devicePropertyListContentInformation.hasChanged = true
                 } else {
                     this.propertyCallback.onUIAdaptableArrayItemChanged(index)
                 }
-                // update the internal generated parameter and resources
-                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
                 return@forEachIndexed
             }
         }
@@ -2478,166 +2511,318 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun removePropertyElement(pIndex: Int){
-        if (verboseLog) {
-            Log.d(
-                "removePropertyElement",
-                "REMOVE element with index: $pIndex"
-            )
-        }
-        applicationProperty.logControl("I: Property-Remove. REMOVE element with index: $pIndex")
+    private fun insertPropertyElement(laRoomyDeviceProperty: LaRoomyDeviceProperty){
+        if(laRoomyDeviceProperty.propertyIndex >= this.laRoomyDevicePropertyList.size){
+            // error out of bounds
+            Log.e("insertPropertyElement", "Error: invalid index for insert operation. Index was: ${laRoomyDeviceProperty.propertyIndex}. Property-Count is ${this.laRoomyDevicePropertyList.size}")
+            applicationProperty.logControl("E: Invalid index for insert operation. Index was: ${laRoomyDeviceProperty.propertyIndex}. Property-Count is ${this.laRoomyDevicePropertyList.size}")
+        } else {
+            if (verboseLog) {
+                Log.d(
+                    "insertPropertyElement",
+                    "INSERT element at index: ${laRoomyDeviceProperty.propertyIndex}"
+                )
+            }
+            applicationProperty.logControl("I: Property-Insert. INSERT element with index: ${laRoomyDeviceProperty.propertyIndex}")
 
-        try {
-            // necessary information
-            val isGroupMember = this.laRoomyDevicePropertyList.elementAt(pIndex).isGroupMember
-            var isLastInGroup = false
+            // at first check if the property must be a group member
+            val precedingElementGroupIndex = when{
+                (laRoomyDeviceProperty.propertyIndex <= 0) -> -1
+                this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex - 1).isGroupMember -> laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex - 1).groupIndex
+                else -> -1
+            }
+            val tailingElementGroupIndex = when{
+                (laRoomyDeviceProperty.propertyIndex < 0) -> -1
+                this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).isGroupMember -> this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).groupIndex
+                else -> -1
+            }
+            if(precedingElementGroupIndex == tailingElementGroupIndex){
+                // the new element must be a member of that group otherwise this would be an error
+                if(laRoomyDeviceProperty.groupIndex != precedingElementGroupIndex) {
+                    Log.e(
+                        "insertPropertyElement",
+                        "Error: The element to insert between index $precedingElementGroupIndex and index $tailingElementGroupIndex must be a member of the group with index ${
+                            this.laRoomyDevicePropertyList.elementAt(tailingElementGroupIndex).groupIndex
+                        } since both are part of that group. Auto-correction fixed this!"
+                    )
 
-            // delete property element
-            this.laRoomyDevicePropertyList.removeAt(pIndex)
-            // reorder the indexes of the property list
-            this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-                laRoomyDeviceProperty.propertyIndex = index
+                    applicationProperty.logControl(
+                        "E: The element to insert between index $precedingElementGroupIndex and index $tailingElementGroupIndex must be a member of the group with index ${
+                            this.laRoomyDevicePropertyList.elementAt(
+                                tailingElementGroupIndex
+                            ).groupIndex
+                        } since both are part of that group. Auto-correction fixed this!"
+                    )
+                    // auto correct the issue
+                    laRoomyDeviceProperty.isGroupMember = true
+                    laRoomyDeviceProperty.groupIndex =
+                        this.laRoomyDevicePropertyList.elementAt(tailingElementGroupIndex).groupIndex
+                }
             }
 
-            // delete element in UI-List
-            var uIIndexToDelete = -1
-            var newPropertyIndex = 0
+            // insert in internal property list
+            this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty.propertyIndex, laRoomyDeviceProperty)
 
+            // update the internal property-indexes
+            this.laRoomyDevicePropertyList.forEachIndexed { index, p ->
+                p.propertyIndex = index
+            }
+
+            // define element to insert in UI-List
+            val uIElementContentInformation = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
+            uIElementContentInformation.imageID = laRoomyDeviceProperty.imageID
+            uIElementContentInformation.isGroupMember = laRoomyDeviceProperty.isGroupMember
+            uIElementContentInformation.internalElementIndex = laRoomyDeviceProperty.propertyIndex// obsolete
+            uIElementContentInformation.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
+            uIElementContentInformation.propertyType = laRoomyDeviceProperty.propertyType
+            uIElementContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
+            // check for last element inside group
+            if(laRoomyDeviceProperty.isGroupMember && laRoomyDeviceProperty.groupIndex != tailingElementGroupIndex){
+                // the next item is not part of the group so this is the last in group
+                uIElementContentInformation.isLastInGroup = true
+            }
+            // generate internal object resources
+            uIElementContentInformation.update(applicationProperty.applicationContext)
+
+            // find the index to insert
+            var uIIndexToInsert = -1
             this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                // search for the real index in the UI-Array
-                if(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT) {
-                    if (devicePropertyListContentInformation.internalElementIndex == pIndex) {
-                        isLastInGroup = devicePropertyListContentInformation.isLastInGroup
-                        uIIndexToDelete = index
+                if((devicePropertyListContentInformation.internalElementIndex == laRoomyDeviceProperty.propertyIndex) && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
+                    uIIndexToInsert = if((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)){
+                        // if the shifted item is inside group, insert it before the group-header
+                        index - 1
                     } else {
-                        // reorder the internal index of the property elements
-                        //if (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT) {
-                            devicePropertyListContentInformation.internalElementIndex =
-                                newPropertyIndex
-                            newPropertyIndex++
-                        //}
+                        index
                     }
-                }
-            }
-            // if the element exists, remove it
-            if(uIIndexToDelete != -1) {
-                this.uIAdapterList.removeAt(uIIndexToDelete)
-                this.propertyCallback.onUIAdaptableArrayItemRemoved(uIIndexToDelete)
-
-                if (isGroupMember && isLastInGroup) {
-                    // - when it is not the last in group, the other items can remain unchanged
-                    // - when it is the last in group, then the previous item must be changed >>
-                    // - except, the item was the only item in group, then the group must be removed
-
-                    // make sure the index is in range
-                    if (uIIndexToDelete > 0) {
-                        if (this.uIAdapterList.elementAt(uIIndexToDelete - 1).elementType == GROUP_ELEMENT) {
-                            // the previous element is the group header and the removed item was the last in group, so the group consists of only one item, this makes the group empty, so remove it too!
-                            this.removeGroupElement(this.uIAdapterList.elementAt(uIIndexToDelete - 1).internalElementIndex, false)
-                        } else {
-                            // the previous element is a property element, check if it is part of the group (must be?) and set isGroupMember to true, then launch changed event
-                            this.uIAdapterList.elementAt(uIIndexToDelete - 1).isLastInGroup = true
-                            this.propertyCallback.onUIAdaptableArrayItemChanged(uIIndexToDelete - 1)
-                        }
-                    }
-                }
-                // finally bring the global indexes in the right order
-                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    devicePropertyListContentInformation.globalIndex = index
+                    return@forEachIndexed
                 }
             }
 
-            // TODO: what if the remove command comes on a property sub page?
+            // insert it if applicable
+            if(uIIndexToInsert != -1){
+                this.uIAdapterList.add(uIIndexToInsert, uIElementContentInformation)
 
-        } catch (e: Exception) {
-            Log.e("removePropertyElement", "Exception: $e")
-        }
-    }
-
-    private fun removeGroupElement(pIndex: Int, rearrangeGlobalIndexes: Boolean){
-        if (verboseLog) {
-            Log.d(
-                "removeGroupElement",
-                "REMOVE element with index: $pIndex"
-            )
-        }
-        applicationProperty.logControl("I: Group-Remove. REMOVE element with index: $pIndex")
-
-        try {
-            // delete group element
-            this.laRoomyPropertyGroupList.removeAt(pIndex)
-            // re-order the indexes of the group list
-            this.laRoomyPropertyGroupList.forEachIndexed { index, laRoomyDevicePropertyGroup ->
-                laRoomyDevicePropertyGroup.groupIndex = index
-            }
-
-            // delete elements in UI-List
-            var uIIndexToDelete = -1
-            var newGroupIndex = 0
-
-            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                // search group element
-                if(devicePropertyListContentInformation.elementType == GROUP_ELEMENT) {
-                    if (devicePropertyListContentInformation.internalElementIndex == pIndex) {
-                        uIIndexToDelete = index
-                    } else {
-                        // re-order the internal element-indexes of the groups
-                        //if (devicePropertyListContentInformation.elementType == GROUP_ELEMENT) {
-                            devicePropertyListContentInformation.internalElementIndex =
-                                newGroupIndex
-                            newGroupIndex++
-                        //}
-                    }
-                }
-            }
-            // if found, remove it and launch event
-            if(uIIndexToDelete != -1) {
-                this.uIAdapterList.removeAt(uIIndexToDelete)
-                this.propertyCallback.onUIAdaptableArrayItemRemoved(uIIndexToDelete)
-
-                // check if the group had properties and remove them too:
-                val uIIndexList = ArrayList<Int>()
-                val propListIndexes = ArrayList<Int>()
-
-                for(i in uIIndexToDelete until this.uIAdapterList.size){
-                    if(this.uIAdapterList.elementAt(i).isGroupMember){
-                        uIIndexList.add(i)
-                        propListIndexes.add(this.uIAdapterList.elementAt(i).internalElementIndex)
-                    } else {
-                        break
-                    }
-                }
-                // delete the properties in UI-List
-                for(i in (uIIndexList.size - 1) downTo 0){
-                    this.uIAdapterList.removeAt(i)
-                    this.propertyCallback.onUIAdaptableArrayItemRemoved(i)
-                }
-                // re-order the internal and global indexes in UI-List
+                // reorder internal and global indexes in UI-List
                 var newInternalIndex = 0
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                    if(rearrangeGlobalIndexes) {
-                        devicePropertyListContentInformation.globalIndex = index
-                    }
+                    devicePropertyListContentInformation.globalIndex = index
                     if(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT){
                         devicePropertyListContentInformation.internalElementIndex = newInternalIndex
                         newInternalIndex++
                     }
                 }
 
-                // delete the properties in the prop-list
-                if(propListIndexes.isNotEmpty()) {
-                    for (i in (propListIndexes.size - 1) downTo 0) {
-                        this.laRoomyDevicePropertyList.removeAt(i)
-                    }
-                    // reorder the indexes
-                    this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
-                        laRoomyDeviceProperty.propertyIndex = index
+                // launch event or invalidate adapter
+                if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
+                    applicationProperty.uiAdapterInvalidatedOnPropertySubPage = true
+                } else {
+                    this.propertyCallback.onUIAdaptableArrayItemInserted(uIIndexToInsert)
+                }
+            } else {
+                Log.e("insertPropertyElement", "Critical error: index to insert not found in UI-List!")
+            }
+        }
+    }
+
+    private fun removePropertyElement(pIndex: Int){
+        if(pIndex >= this.laRoomyDevicePropertyList.size){
+            // error out of bounds
+            Log.e("removePropertyElement", "Error: invalid index for remove operation. Index was $pIndex. Property-Count is ${this.laRoomyDevicePropertyList.size}")
+            applicationProperty.logControl("E: Invalid index for remove operation. Index was $pIndex. Property-Count is ${this.laRoomyDevicePropertyList.size}")
+        } else {
+            if (verboseLog) {
+                Log.d(
+                    "removePropertyElement",
+                    "REMOVE element with index: $pIndex"
+                )
+            }
+            applicationProperty.logControl("I: Property-Remove. REMOVE element with index: $pIndex")
+
+            try {
+                // necessary information
+                val isGroupMember = this.laRoomyDevicePropertyList.elementAt(pIndex).isGroupMember
+                var isLastInGroup = false
+
+                // delete property element
+                this.laRoomyDevicePropertyList.removeAt(pIndex)
+                // reorder the indexes of the property list
+                this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                    laRoomyDeviceProperty.propertyIndex = index
+                }
+
+                // delete element in UI-List
+                var uIIndexToDelete = -1
+                var newPropertyIndex = 0
+
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    // search for the real index in the UI-Array
+                    if (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT) {
+                        if (devicePropertyListContentInformation.internalElementIndex == pIndex) {
+                            isLastInGroup = devicePropertyListContentInformation.isLastInGroup
+                            uIIndexToDelete = index
+                        } else {
+                            // reorder the internal index of the property elements
+                            devicePropertyListContentInformation.internalElementIndex =
+                                newPropertyIndex
+                            newPropertyIndex++
+                        }
                     }
                 }
-            }
+                // if the element exists, remove it
+                if (uIIndexToDelete != -1) {
+                    // get indication if this occurred on deviceMainActivity or not
+                    val isOtherThanDeviceMain =
+                        this.isOtherThanDeviceMainActivity()
 
-        } catch(e: Exception){
-            Log.e("removeGroupElement", "Exception: $e")
+                    // remove the UI-Item
+                    this.uIAdapterList.removeAt(uIIndexToDelete)
+
+                    // notify the deviceMainActivity or if not open, invalidate the adapter
+                    if (isOtherThanDeviceMain) {
+                        applicationProperty.uiAdapterInvalidatedOnPropertySubPage = true
+                    } else {
+                        this.propertyCallback.onUIAdaptableArrayItemRemoved(uIIndexToDelete)
+                    }
+
+                    if (isGroupMember && isLastInGroup) {
+                        // - when it is not the last in group, the other items can remain unchanged
+                        // - when it is the last in group, then the previous item must be changed >>
+                        // - except, the item was the only item in group, then the group must be removed
+
+                        // make sure the index is in range
+                        if (uIIndexToDelete > 0) {
+                            if (this.uIAdapterList.elementAt(uIIndexToDelete - 1).elementType == GROUP_ELEMENT) {
+                                // the previous element is the group header and the removed item was the last in group, so the group consists of only one item, this makes the group empty, so remove it too!
+                                this.removeGroupElement(
+                                    this.uIAdapterList.elementAt(uIIndexToDelete - 1).internalElementIndex,
+                                    false
+                                )
+                            } else {
+                                // the previous element is a property element, check if it is part of the group (must be?) and set isGroupMember to true, then launch changed event
+                                this.uIAdapterList.elementAt(uIIndexToDelete - 1).isLastInGroup =
+                                    true
+                                if (!isOtherThanDeviceMain) {
+                                    this.propertyCallback.onUIAdaptableArrayItemChanged(
+                                        uIIndexToDelete - 1
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    // finally bring the global indexes in the right order
+                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                        devicePropertyListContentInformation.globalIndex = index
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("removePropertyElement", "Exception: $e")
+            }
+        }
+    }
+
+    private fun removeGroupElement(pIndex: Int, rearrangeGlobalIndexes: Boolean){
+        if(pIndex >= this.laRoomyPropertyGroupList.size){
+            // error out of bounds
+            Log.e("removeGroupElement", "Error: invalid index for removing group. Index was $pIndex. Group-Count is ${this.laRoomyPropertyGroupList.size}")
+            applicationProperty.logControl("E: Invalid index for removing group. Index was $pIndex. Group-count is ${this.laRoomyPropertyGroupList.size}")
+        } else {
+            if (verboseLog) {
+                Log.d(
+                    "removeGroupElement",
+                    "REMOVE element with index: $pIndex"
+                )
+            }
+            applicationProperty.logControl("I: Group-Remove. REMOVE element with index: $pIndex")
+
+            try {
+                // delete group element
+                this.laRoomyPropertyGroupList.removeAt(pIndex)
+                // re-order the indexes of the group list
+                this.laRoomyPropertyGroupList.forEachIndexed { index, laRoomyDevicePropertyGroup ->
+                    laRoomyDevicePropertyGroup.groupIndex = index
+                }
+
+                // delete elements in UI-List
+                var uIIndexToDelete = -1
+                var newGroupIndex = 0
+
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    // search group element
+                    if (devicePropertyListContentInformation.elementType == GROUP_ELEMENT) {
+                        if (devicePropertyListContentInformation.internalElementIndex == pIndex) {
+                            uIIndexToDelete = index
+                        } else {
+                            // re-order the internal element-indexes of the groups
+                            devicePropertyListContentInformation.internalElementIndex =
+                                newGroupIndex
+                            newGroupIndex++
+                        }
+                    }
+                }
+                // if found, remove it and launch event
+                if (uIIndexToDelete != -1) {
+                    // get indication if this occurred on deviceMainActivity or not
+                    val isOtherThanDeviceMain =
+                        this.isOtherThanDeviceMainActivity()
+
+                    // delete UI-Element
+                    this.uIAdapterList.removeAt(uIIndexToDelete)
+
+                    // trigger event or invalidate adapter, in relation to the open activity
+                    if (isOtherThanDeviceMain) {
+                        applicationProperty.uiAdapterInvalidatedOnPropertySubPage = true
+                    } else {
+                        this.propertyCallback.onUIAdaptableArrayItemRemoved(uIIndexToDelete)
+                    }
+
+                    // check if the group had properties and remove them too:
+                    val uIIndexList = ArrayList<Int>()
+                    val propListIndexes = ArrayList<Int>()
+
+                    for (i in uIIndexToDelete until this.uIAdapterList.size) {
+                        if (this.uIAdapterList.elementAt(i).isGroupMember) {
+                            uIIndexList.add(i)
+                            propListIndexes.add(this.uIAdapterList.elementAt(i).internalElementIndex)
+                        } else {
+                            break
+                        }
+                    }
+                    // delete the properties in UI-List
+                    for (i in (uIIndexList.size - 1) downTo 0) {
+                        // delete element
+                        this.uIAdapterList.removeAt(i)
+                        // only launch event if the receiver(deviceMainActivity) is open
+                        if (!isOtherThanDeviceMain) {
+                            this.propertyCallback.onUIAdaptableArrayItemRemoved(i)
+                        }
+                    }
+                    // re-order the internal and global indexes in UI-List
+                    var newInternalIndex = 0
+                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                        if (rearrangeGlobalIndexes) {
+                            devicePropertyListContentInformation.globalIndex = index
+                        }
+                        if (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT) {
+                            devicePropertyListContentInformation.internalElementIndex =
+                                newInternalIndex
+                            newInternalIndex++
+                        }
+                    }
+
+                    // delete the properties in the prop-list
+                    if (propListIndexes.isNotEmpty()) {
+                        for (i in (propListIndexes.size - 1) downTo 0) {
+                            this.laRoomyDevicePropertyList.removeAt(i)
+                        }
+                        // reorder the indexes
+                        this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+                            laRoomyDeviceProperty.propertyIndex = index
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("removeGroupElement", "Exception: $e")
+            }
         }
     }
 
@@ -2773,6 +2958,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.timeoutWatcherData.clear()
             this.timeoutTimer.cancel()
         }
+    }
+
+    private fun isOtherThanDeviceMainActivity() : Boolean {
+        return (this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1)
     }
 
     // the callback definition for the event handling in the calling class
