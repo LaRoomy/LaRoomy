@@ -2553,22 +2553,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(laRoomyDeviceProperty.groupIndex != precedingElementGroupIndex) {
                     Log.e(
                         "insertPropertyElement",
-                        "Error: The element to insert between index $precedingElementGroupIndex and index $tailingElementGroupIndex must be a member of the group with index ${
-                            this.laRoomyDevicePropertyList.elementAt(tailingElementGroupIndex).groupIndex
-                        } since both are part of that group. Auto-correction fixed this!"
+                        "Error: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
                     )
 
                     applicationProperty.logControl(
-                        "E: The element to insert between index $precedingElementGroupIndex and index $tailingElementGroupIndex must be a member of the group with index ${
-                            this.laRoomyDevicePropertyList.elementAt(
-                                tailingElementGroupIndex
-                            ).groupIndex
-                        } since both are part of that group. Auto-correction fixed this!"
+                        "E: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
                     )
                     // auto correct the issue
                     laRoomyDeviceProperty.isGroupMember = true
-                    laRoomyDeviceProperty.groupIndex =
-                        this.laRoomyDevicePropertyList.elementAt(tailingElementGroupIndex).groupIndex
+                    laRoomyDeviceProperty.groupIndex = tailingElementGroupIndex
                 }
             }
 
@@ -2589,7 +2582,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             uIElementContentInformation.propertyType = laRoomyDeviceProperty.propertyType
             uIElementContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
             // check for last element inside group
-            if(laRoomyDeviceProperty.isGroupMember && laRoomyDeviceProperty.groupIndex != tailingElementGroupIndex){
+            if(laRoomyDeviceProperty.isGroupMember && (laRoomyDeviceProperty.groupIndex != tailingElementGroupIndex)){
                 // the next item is not part of the group so this is the last in group
                 uIElementContentInformation.isLastInGroup = true
             }

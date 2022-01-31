@@ -1144,6 +1144,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             item.update(applicationContext)
         }
 
+        if(item.globalIndex == -1){
+            Log.e("itemAdded", "severe error, invalid index! globalIndex: ${item.globalIndex} | Internal index: ${item.internalElementIndex}")
+        }
+
         // add the data to the UI-List
         //this.propertyList.add(item)
 
@@ -1717,16 +1721,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             return devicePropertyAdapter.size
         }
 
-//        override fun getItemId(position: Int): Long {
-//            return position.toLong()
-//        }
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
 
         override fun getItemViewType(position: Int): Int {
             return position
         }
 
-        fun getElementAt(index: Int) : DevicePropertyListContentInformation{
-            return devicePropertyAdapter.elementAt(index)
-        }
+//        fun getElementAt(index: Int) : DevicePropertyListContentInformation{
+//            return devicePropertyAdapter.elementAt(index)
+//        }
     }
 }
