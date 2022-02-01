@@ -60,6 +60,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var deviceMenuOpen = false
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var scrollToTop = false
 
     //private var propertyList = ArrayList<DevicePropertyListContentInformation>()
 
@@ -91,7 +92,24 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         //this.deviceSettingsButton = findViewById(R.id.deviceMainActivityDeviceSettingsButton)
 
         // init recycler view!!
-        this.devicePropertyListLayoutManager = LinearLayoutManager(this)
+        this.devicePropertyListLayoutManager = object : LinearLayoutManager(this) {
+            override fun supportsPredictiveItemAnimations(): Boolean {
+                return false
+            }
+
+            override fun onItemsAdded(
+                recyclerView: RecyclerView,
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemsAdded(recyclerView, positionStart, itemCount)
+
+                if(scrollToTop){
+                    scrollToTop = false
+                    this.scrollToPosition(0)
+                }
+            }
+        }
 
         // set empty list placeholder in array-list
 /*
@@ -1172,6 +1190,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         runOnUiThread {
             devicePropertyListViewAdapter.notifyItemInserted(index)
             //devicePropertyListViewAdapter.notifyItemRangeChanged(index, ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - index)
+
+            if(index == 0){
+                val scrollPosition = this.devicePropertyListRecyclerView.computeVerticalScrollOffset()
+                if(scrollPosition == 0){
+                    scrollToTop = true
+
+                }
+            }
         }
     }
 

@@ -329,7 +329,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if (verboseLog) {
                     Log.e(
                         "onCharacteristicChanged",
-                        "Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}"
+                        "Exception while dispatching the incoming transmission. Exception: $e Transmission-Data: $dataAsString"
                     )
                 }
                 applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
@@ -2549,20 +2549,32 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 else -> -1
             }
             if(precedingElementGroupIndex == tailingElementGroupIndex){
-                // the new element must be a member of that group otherwise this would be an error
-                if(laRoomyDeviceProperty.groupIndex != precedingElementGroupIndex) {
-                    Log.e(
-                        "insertPropertyElement",
-                        "Error: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
-                    )
+                // both can be -1, so make sure this is not the case
+                if(precedingElementGroupIndex > -1) {
+                    // the new element must be a member of that group otherwise this would be an error
+                    if (laRoomyDeviceProperty.groupIndex != precedingElementGroupIndex) {
+                        Log.e(
+                            "insertPropertyElement",
+                            "Error: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
+                        )
 
-                    applicationProperty.logControl(
-                        "E: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
-                    )
-                    // auto correct the issue
-                    laRoomyDeviceProperty.isGroupMember = true
-                    laRoomyDeviceProperty.groupIndex = tailingElementGroupIndex
+                        applicationProperty.logControl(
+                            "E: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
+                        )
+                        // auto correct the issue
+                        laRoomyDeviceProperty.isGroupMember = true
+                        laRoomyDeviceProperty.groupIndex = tailingElementGroupIndex
+                    }
                 }
+            }
+
+            // check if to be a group member makes sense, if not remove the group status!
+            if((precedingElementGroupIndex == -1) && (tailingElementGroupIndex == -1) && laRoomyDeviceProperty.isGroupMember){
+
+                // TODO: log notify!!!
+
+                laRoomyDeviceProperty.isGroupMember = false
+                laRoomyDeviceProperty.groupIndex = -1
             }
 
             // insert in internal property list
@@ -2592,13 +2604,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // find the index to insert
             var uIIndexToInsert = -1
             this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                if((devicePropertyListContentInformation.internalElementIndex == laRoomyDeviceProperty.propertyIndex) && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
-                    uIIndexToInsert = if((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)){
-                        // if the shifted item is inside group, insert it before the group-header
-                        index - 1
-                    } else {
-                        index
-                    }
+                if ((devicePropertyListContentInformation.internalElementIndex == laRoomyDeviceProperty.propertyIndex) && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)) {
+                    uIIndexToInsert =
+                        if ((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)) {
+                            // if the shifted item is inside group, insert it before the group-header, but only if the new item is NOT part of this group
+                            if (uIElementContentInformation.isGroupMember && devicePropertyListContentInformation.isGroupMember
+                                && (laRoomyDeviceProperty.groupIndex == this.laRoomyDevicePropertyList.elementAt(
+                                    devicePropertyListContentInformation.internalElementIndex
+                                ).groupIndex)
+                            ) {
+                                // insert inside the group as a member
+                                index
+                            } else {
+                                // insert before group header
+                                index - 1
+                            }
+                        } else {
+                            index
+                        }
                     return@forEachIndexed
                 }
             }
@@ -2621,6 +2644,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
                     applicationProperty.uiAdapterInvalidatedOnPropertySubPage = true
                 } else {
+                    // if this is a group member, and if it is the last in the group, the previous item is no longer the last in group, so it must be changed
+                    if (uIIndexToInsert > 0) {
+                        val previousElement =
+                            this.uIAdapterList.elementAt(uIIndexToInsert - 1)
+                        if (previousElement.isGroupMember && previousElement.isLastInGroup && (previousElement.elementType == PROPERTY_ELEMENT)) {
+                            this.uIAdapterList[uIIndexToInsert - 1].isLastInGroup = false
+                            this.propertyCallback.onUIAdaptableArrayItemChanged(uIIndexToInsert - 1)
+                        }
+                    }
+                    // notify the insertion
                     this.propertyCallback.onUIAdaptableArrayItemInserted(uIIndexToInsert)
                 }
             } else {
