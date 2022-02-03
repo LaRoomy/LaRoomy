@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -1162,9 +1163,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             item.update(applicationContext)
         }
 
-        if(item.globalIndex == -1){
-            Log.e("itemAdded", "severe error, invalid index! globalIndex: ${item.globalIndex} | Internal index: ${item.internalElementIndex}")
-        }
+//        if(item.globalIndex == -1){
+//            Log.e("itemAdded", "severe error, invalid index! globalIndex: ${item.globalIndex} | Internal index: ${item.internalElementIndex}")
+//        }
 
         // add the data to the UI-List
         //this.propertyList.add(item)
@@ -1354,6 +1355,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             init {
                 elementButton.setOnClickListener {
+
+                    val buttonAnimation = AnimationUtils.loadAnimation(it.context, R.anim.bounce)
+                    it.startAnimation(buttonAnimation)
+
                     when(pType) {
                         PROPERTY_TYPE_BUTTON -> {
                             listener.onPropertyElementButtonClick(bindingAdapterPosition)

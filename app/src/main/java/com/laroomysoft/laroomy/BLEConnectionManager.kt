@@ -2570,9 +2570,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // check if to be a group member makes sense, if not remove the group status!
             if((precedingElementGroupIndex == -1) && (tailingElementGroupIndex == -1) && laRoomyDeviceProperty.isGroupMember){
-
-                // TODO: log notify!!!
-
+                Log.e("insertPropertyElement", "Inconsistency detected while inserting property: Element defined as group-member of group with index: ${laRoomyDeviceProperty.groupIndex}. This makes no sense at index: ${laRoomyDeviceProperty.propertyIndex}. Auto correction fixed this!")
+                applicationProperty.logControl("W: Inconsistency detected while inserting property: Element defined as group-member of group with index: ${laRoomyDeviceProperty.groupIndex}. This makes no sense at index: ${laRoomyDeviceProperty.propertyIndex}. Auto correction fixed this!")
                 laRoomyDeviceProperty.isGroupMember = false
                 laRoomyDeviceProperty.groupIndex = -1
             }

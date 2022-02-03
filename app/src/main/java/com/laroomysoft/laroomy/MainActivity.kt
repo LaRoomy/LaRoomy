@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,6 +13,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.*
 import android.widget.*
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -44,7 +46,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         return field
     }
 
-    val requestPermissionLauncher =
+    private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -60,6 +62,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             }
         }
 
+    private var requestEnableBluetoothtLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if(it.resultCode == Activity.RESULT_CANCELED){
+                // the user reclined the request to enable bluetooth
+            }
+        }
+    
 
     private lateinit var availableDevicesRecyclerView: RecyclerView
     private lateinit var availableDevicesViewAdapter: RecyclerView.Adapter<*>
@@ -235,6 +244,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         // reset the selection in the recyclerView
         this.resetSelectionInDeviceListView()
     }
+
 
 //    override fun onPause() {
 //        super.onPause()
