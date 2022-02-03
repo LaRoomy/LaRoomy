@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 // the user reclined the request to enable bluetooth
             }
         }
-    
+
 
     private lateinit var availableDevicesRecyclerView: RecyclerView
     private lateinit var availableDevicesViewAdapter: RecyclerView.Adapter<*>
