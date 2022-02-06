@@ -91,6 +91,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onMainActivityNoContentContainerClick"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
 
         android:visibility="gone"
 
@@ -112,11 +114,9 @@
             android:id="@+id/mainActivityNoContentTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp"
             android:gravity="center"
             android:singleLine="false"
-            android:text="@string/Ma_NoContentUserHintText"
+            android:text="@string/MA_NoContentUserHintText"
             android:textColor="@color/fullWhiteTextColor"
             android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"

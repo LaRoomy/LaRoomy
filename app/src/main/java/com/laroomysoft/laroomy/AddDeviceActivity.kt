@@ -42,10 +42,12 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         // get UI Elements
         this.bottomSeparator = findViewById(R.id.addDeviceActivityBottomSeparator)
 
+/*
         // hide the bonding-hint container if requested
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_DoNotShowBondingHint)){
             findViewById<ConstraintLayout>(R.id.addDeviceActivityBondingHintContainer).visibility = View.GONE
         }
+*/
 
         // initialize the recycler-view
         bondedDevicesListViewManager = LinearLayoutManager(this)
@@ -80,7 +82,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
             findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_white_48dp)
             findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.fullWhiteTextColor))
 
-            findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_white_48dp)
+            //findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_white_48dp)
         }
     }
 
@@ -151,10 +153,12 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         startActivity(intent)
     }
 
+/*
     fun onAddDeviceActivityDoNotShowAgainButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_yellow_48dp)
         (applicationContext as ApplicationProperty).saveBooleanData(true, R.string.FileKey_AppSettings, R.string.DataKey_DoNotShowBondingHint)
 
         findViewById<ConstraintLayout>(R.id.addDeviceActivityBondingHintContainer).visibility = View.GONE
     }
+*/
 }

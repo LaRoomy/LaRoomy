@@ -10,7 +10,8 @@
     <string name="MA_PopUp_ShowLogTitle">Show Log</string>
     <string name="MA_PopUp_ReloadList">Reload List</string>
     <string name="MA_UserNotificationDialogTitle">Notification</string>
-    <string name="Ma_NoContentUserHintText">Nothing to show.\nAdd your first device.</string>
+    <string name="MA_NoContentUserHintText">Nothing to show.\nAdd your first device.</string>
+    <string name="MA_BluetoothNotEnabledHintText">The base functionality of this App is to connect to bluetooth devices. Therefore bluetooth must be enabled. Tap here to enable bluetooth.</string>
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
@@ -289,7 +290,6 @@
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
     <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>
     <string name="DataKey_KeepScreenActive" translatable="false">keepScreenActiveKey</string>
-    <string name="DataKey_DoNotShowBondingHint" translatable="false">doNotShowBondingHintAgain</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

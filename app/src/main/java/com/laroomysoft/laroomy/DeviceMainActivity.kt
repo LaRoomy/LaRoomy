@@ -1,6 +1,8 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
@@ -11,6 +13,7 @@ import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -62,8 +65,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
     private var scrollToTop = false
-
-    //private var propertyList = ArrayList<DevicePropertyListContentInformation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -196,7 +197,21 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // reset parameter(s) anyway
         this.expectedConnectionLoss = false
 
-        // at first check if this callback will be invoked due to a back-navigation from a property sub-page
+        // check if bluetooth was disabled while the app was in suspended state
+        when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()){
+            BLE_BLUETOOTH_PERMISSION_MISSING -> {
+                // permission was revoked while app was in suspended state
+                ApplicationProperty.bluetoothConnectionManager.clear()
+                finish()
+            }
+            BLE_IS_DISABLED -> {
+                // bluetooth was disabled while app was in suspended state
+                ApplicationProperty.bluetoothConnectionManager.clear()
+                finish()
+            }
+        }
+
+        // check if this callback will be invoked due to a back-navigation from a property sub-page
         // or if it was invoked on creation or a resume from outside of the application
         if ((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
 

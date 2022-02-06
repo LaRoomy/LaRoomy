@@ -24,6 +24,9 @@ const val BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY = 4
 const val BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR = 5
 const val BINDING_RESPONSE_RELEASE_BINDING_SUCCESS = 6
 
+const val BLE_IS_DISABLED = 0
+const val BLE_IS_ENABLED = 1
+
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE = 1
 const val BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE = 2
 const val BLE_UNEXPECTED_BLUETOOTH_DEVICE_NOT_CONNECTED = 3
@@ -1826,21 +1829,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    fun checkBluetoothEnabled(caller: Activity) : Int{
+    fun checkBluetoothEnabled() : Int{
         if(verboseLog) {
             Log.d("M:bluetoothEnabled?", "Check if bluetooth is enabled")
         }
         try {
-            bleAdapter?.takeIf { it.isDisabled }?.apply {
-                // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
-                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                caller.startActivityForResult(enableBtIntent, requestEnableBT)
+
+            return if(bleAdapter?.isEnabled == true){
+                BLE_IS_ENABLED
+            } else {
+                BLE_IS_DISABLED
             }
+
+//            bleAdapter?.takeIf { it.isDisabled }?.apply {
+//                // this lambda expression will be applied to the object(bleAdapter) (but only if "isDisabled" == true)
+//                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+//                caller.startActivityForResult(enableBtIntent, requestEnableBT)
+//            }
         } catch (e: SecurityException){
             Log.e("checkBluetoothEnabled", "Error, while checking if bluetooth is enabled: $e")
             return BLE_BLUETOOTH_PERMISSION_MISSING
         }
-        return IS_OK
     }
 
     fun close(){

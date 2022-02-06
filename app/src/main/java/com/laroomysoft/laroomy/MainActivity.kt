@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,16 +14,15 @@ import android.os.Handler
 import android.os.Looper
 import android.view.*
 import android.widget.*
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -52,7 +52,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         ) { isGranted: Boolean ->
             if (isGranted) {
                 // Permission is granted. Continue the action or workflow in your app.
-                ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this)
+                when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()){
+                    BLE_IS_ENABLED -> {
+                        // TODO!
+                    }
+                    BLE_IS_DISABLED -> {
+                        // TODO!
+                    }
+                }
             } else {
                 // Explain to the user that the feature is unavailable because the
                 // features requires a permission that the user has denied. At the
@@ -62,10 +69,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             }
         }
 
-    private var requestEnableBluetoothtLauncher =
+    private var requestEnableBluetoothLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if(it.resultCode == Activity.RESULT_CANCELED){
                 // the user reclined the request to enable bluetooth
+                this.activatingBluetoothReclined = true
+            } else {
+                this.isBluetoothEnabled = true
+                this.activatingBluetoothReclined = false
             }
         }
 
@@ -78,6 +89,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     private lateinit var bottomSeparator: View
     private lateinit var headerSeparator: View
     private lateinit var noContentContainer: ConstraintLayout
+    private lateinit var noContentImageView: AppCompatImageView
+    private lateinit var noContentTextView: AppCompatTextView
     private lateinit var popUpWindow: PopupWindow
 
     //private var buttonNormalizationRequired = false
@@ -86,6 +99,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     private var preventListSelection = false
     private var preventMenuButtonDoubleExecution = false
     private var bluetoothPermissionGranted = false
+
+    private var activatingBluetoothReclined = false
+
+    private var isBluetoothEnabled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -100,6 +117,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         this.bottomSeparator = findViewById(R.id.mainActivityBottomSeparatorView)
         this.headerSeparator = findViewById(R.id.mainActivityHeaderSeparatorView)
         this.noContentContainer = findViewById(R.id.mainActivityNoContentContainer)
+        this.noContentImageView = findViewById(R.id.mainActivityNoContentImageView)
+        this.noContentTextView = findViewById(R.id.mainActivityNoContentTextView)
 
         this.availableDevicesViewManager = LinearLayoutManager(this)
 
@@ -173,87 +192,94 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//
-//        //ApplicationProperty.bluetoothConnectionManger.checkBluetoothEnabled()
-//    }
-
     override fun onResume() {
         super.onResume()
 
         // control bottom separator in alignment to the screen orientation
-        bottomSeparator.visibility = when(this.resources.configuration.orientation){
+        bottomSeparator.visibility = when (this.resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> View.GONE
             else -> View.VISIBLE
         }
 
         // check if bluetooth is enabled
-        if(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled(this) == BLE_BLUETOOTH_PERMISSION_MISSING){
+        when (ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
+            BLE_BLUETOOTH_PERMISSION_MISSING -> {
 
-            // TODO: make this api-level related?
-            // TODO: show permission-request-popup, and if granted, check again if bluetooth is enabled
+                // TODO: make this api-level related?
+                // TODO: show permission-request-popup, and if granted, check again if bluetooth is enabled
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    // FIXME: this is not the best practice, better: set UI to permission-missing state and implement an action button to start this action by user
-                    this.requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (ActivityCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.BLUETOOTH_CONNECT
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        // FIXME: this is not the best practice, better: set UI to permission-missing state and implement an action button to start this action by user
+                        this.requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                    }
+
                 }
 
+                // TODO: check permission missing on devices lower than api-level 31
+
+                // TODO: set UI-state to missing permission state
+                // - disable add button
+                // - hide recyclerView
+                // - show no-content image and change it to missing permission image!
+
+                // or show a dialog??
+
+                this.bluetoothPermissionGranted = false
+
             }
+            BLE_IS_ENABLED -> {
+                this.bluetoothPermissionGranted = true
+                this.isBluetoothEnabled = true
+                this.setUIToBluetoothEnabledState(true)
+            }
+            BLE_IS_DISABLED -> {
+                this.bluetoothPermissionGranted = true
 
-            // TODO: check permission missing on devices lower than api-level 31
-
-            // TODO: set UI-state to missing permission state
-            // - disable add button
-            // - hide recyclerView
-            // - show no-content image and change it to missing permission image!
-
-            // or show a dialog??
-
-            this.bluetoothPermissionGranted = false
-
-        } else {
-            this.bluetoothPermissionGranted = true
+                // the permission is ok, but is bluetooth enabled?
+                if(!this.activatingBluetoothReclined) {
+                    // the request to enable bluetooth was not previously displayed, so do it now
+                    val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    requestEnableBluetoothLauncher.launch(intent)
+                } else {
+                    // set UI State to bluetooth disabled, because the user reclined the request to enable
+                    this.setUIToBluetoothEnabledState(false)
+                    this.isBluetoothEnabled = false
+                }
+            }
         }
 
         // normalize controls on back navigation
-        if(addButtonNormalizationRequired){
+        if (addButtonNormalizationRequired) {
             addButtonNormalizationRequired = false
             addDeviceButton.setImageResource(R.drawable.ic_add_white_36dp)
         }
 
-        // show or hide the no-content hint if the list is empty or not
-        if(this.availableDevices.isEmpty()){
-            this.availableDevicesRecyclerView.visibility = View.GONE
-            this.noContentContainer.visibility = View.VISIBLE
-        } else {
-            this.availableDevicesRecyclerView.visibility = View.VISIBLE
-            this.noContentContainer.visibility = View.GONE
+        // show or hide the no-content hint if the list is empty or not, but only if bluetooth is enabled, otherwise this must be displayed
+        if(isBluetoothEnabled) {
+            if (this.availableDevices.isEmpty()) {
+                this.availableDevicesRecyclerView.visibility = View.GONE
+                this.noContentContainer.visibility = View.VISIBLE
+            } else {
+                this.availableDevicesRecyclerView.visibility = View.VISIBLE
+                this.noContentContainer.visibility = View.GONE
+            }
         }
 
-        if((applicationContext as ApplicationProperty).mainActivityListElementWasAdded){
-            (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = false
+        // this param is set by the add-device-activity to add the new item on back-navigation
+        if ((applicationContext as ApplicationProperty).mainActivityListElementWasAdded) {
+            (applicationContext as ApplicationProperty).mainActivityListElementWasAdded =
+                false
             this.availableDevicesViewAdapter.notifyItemInserted(this.availableDevices.size - 1)
         }
 
         // reset the selection in the recyclerView
         this.resetSelectionInDeviceListView()
     }
-
-
-//    override fun onPause() {
-//        super.onPause()
-//
-//        // TODO: if the loading activity fails, the main activity must be re-initiated
-//
-//        //finish()// questionable!!!!!!!!!!!!!!!
-//
-//    }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
 
@@ -353,21 +379,32 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     }
 
+    private fun setUIToBluetoothEnabledState(enabled: Boolean){
+        if(enabled){
+            this.availableDevicesRecyclerView.visibility = View.VISIBLE
+            this.noContentContainer.visibility = View.GONE
+
+            this.noContentImageView.setImageResource(R.drawable.ic_list_add_white_48dp)
+            this.noContentTextView.text = getString(R.string.MA_NoContentUserHintText)
+            this.noContentTextView.textSize = 22F
+        } else {
+            this.availableDevicesRecyclerView.visibility = View.GONE
+            this.noContentContainer.visibility = View.VISIBLE
+
+            this.noContentImageView.setImageResource(R.drawable.ic_bluetooth_disabled_white_48dp)
+            this.noContentTextView.text = getString(R.string.MA_BluetoothNotEnabledHintText)
+            this.noContentTextView.textSize = 18F
+        }
+    }
+
     private fun setItemColors(index: Int, textColorID: Int, backGroundDrawable: Int){
         val ll = availableDevicesViewManager.findViewByPosition(index) as? ConstraintLayout
-        //val leftView = ll?.findViewById<View>(R.id.leftBorderView)
-        //val rightView = ll?.findViewById<View>(R.id.rightBorderView)
 
         val textView = ll?.findViewById<AppCompatTextView>(R.id.deviceNameTextView)
-
-        //leftView?.setBackgroundColor(getColor(colorID))
-        //rightView?.setBackgroundColor(getColor(colorID))
 
         textView?.setTextColor(getColor(textColorID))
 
         ll?.background = AppCompatResources.getDrawable(this, backGroundDrawable)
-
-
     }
 
     private fun resetSelectionInDeviceListView(){
@@ -461,7 +498,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     fun onMainActivityNoContentContainerClick(@Suppress("UNUSED_PARAMETER")view: View) {
 
-        val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
-        startActivity(intent)
+        if(this.isBluetoothEnabled) {
+            val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
+            startActivity(intent)
+        } else {
+            // if bluetooth is not enabled the UI is expected to be in activate bluetooth request mode
+            val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            requestEnableBluetoothLauncher.launch(intent)
+        }
     }
 }
