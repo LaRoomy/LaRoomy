@@ -201,164 +201,148 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()){
             BLE_BLUETOOTH_PERMISSION_MISSING -> {
                 // permission was revoked while app was in suspended state
+                Log.e("DMA:onResume", "Bluetooth permission was revoked while app was in suspended mode.")
+                (applicationContext as ApplicationProperty).logControl("E: Bluetooth permission was revoked while app was in suspended mode.")
                 ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()
             }
             BLE_IS_DISABLED -> {
                 // bluetooth was disabled while app was in suspended state
+                Log.e("DMA:onResume", "Bluetooth was disabled while app was in suspended mode.")
+                (applicationContext as ApplicationProperty).logControl("E: Bluetooth was disabled while app was in suspended mode.")
                 ApplicationProperty.bluetoothConnectionManager.clear()
                 finish()
             }
-        }
+            else -> {
+                // ******************************************************************************************
+                // check if this callback will be invoked due to a back-navigation from a property sub-page
+                // or if it was invoked on creation or a resume from outside of the application
+                // ******************************************************************************************
+                if ((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                    // **************************************************************************************
+                    // THIS IS A BACK NAVIGATION FROM A PROPERTY SUB-PAGE
+                    // **************************************************************************************
 
-        // check if this callback will be invoked due to a back-navigation from a property sub-page
-        // or if it was invoked on creation or a resume from outside of the application
-        if ((this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                    // if the device was disconnected on a property sub-page, navigate back with delay
+                    if (!ApplicationProperty.bluetoothConnectionManager.isConnected) {
 
-            // this is a back navigation from a property sub-page
+                        // set UI visual state
+                        resetSelectedItemBackground()
+                        setUIConnectionStatus(STATUS_DISCONNECTED)
 
-            // if the device was disconnected on a property sub-page, navigate back with delay
-            if (!ApplicationProperty.bluetoothConnectionManager.isConnected) {
+                        // schedule back-navigation
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            (applicationContext as ApplicationProperty).resetControlParameter()
+                            ApplicationProperty.bluetoothConnectionManager.clear()
+                            finish()
+                        }, 1000)
 
-                // set UI visual state
-                resetSelectedItemBackground()
-                setUIConnectionStatus(STATUS_DISCONNECTED)
-
-                // TODO: or show a dialog ??
-
-                // try to reconnect ??? try it several times like in loading activity
-
-
-                //showNotificationHeaderAndPostMessage(30, getString(R.string.DMA_NoConnection))
-
-                // schedule back-navigation
-                Handler(Looper.getMainLooper()).postDelayed({
-                    (applicationContext as ApplicationProperty).resetControlParameter()
-                    ApplicationProperty.bluetoothConnectionManager.clear()
-                    finish()
-                }, 1000)
-
-            } else {
-                // realign the context objects to the bluetoothManager
-                ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
-                ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
-
-                // notify the device that the user navigated back to the device main page
-                ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
-
-                // set property-item to normal background
-                resetSelectedItemBackground()
-
-                // reset the parameter
-                restoreIndex = -1
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
-
-                // check if the whole property was invalidated
-                if ((this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage) {
-
-                    // reload properties from remote device
-                    this.reloadProperties()
-
-                    // reset all parameter regarding the update-functionality caused by navigation
-                    (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = false
-                    (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
-                    (this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage = false
-                } else {
-                    // check if the adapter data is valid or not, if not update
-                    if((this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage){
-                        // this is the last resort, but the adapter data must be considered as completely out of date
-                        if (verboseLog) {
-                            Log.d(
-                                "DMA:onResume",
-                                "UI-Adapter was invalidated. Update complete data-set!!"
-                            )
-                        }
-                        this.devicePropertyListViewAdapter.notifyDataSetChanged()
-                        (this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage = false
                     } else {
-                        // one or more single items in the adapter have changed, so update them
-                        if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
-                            // reset parameter
-                            (this.applicationContext as ApplicationProperty).uiAdapterChanged =
-                                false
+                        // realign the context objects to the bluetoothManager
+                        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
+                        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
-                            if (verboseLog) {
-                                Log.d(
-                                    "DMA:onResume",
-                                    "UI-Adapter has changed. Start updating elements with the changed marker:"
-                                )
-                            }
+                        // notify the remote device that the user navigated back to the device main page
+                        ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
 
-                            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                                if (devicePropertyListContentInformation.hasChanged) {
+                        // set property-item to normal background
+                        resetSelectedItemBackground()
+
+                        // reset the parameter
+                        restoreIndex = -1
+                        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = false
+
+                        // check if the whole property was invalidated
+                        if ((this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage) {
+
+                            // reload properties from remote device
+                            this.reloadProperties()
+
+                            // reset all parameter regarding the update-functionality caused by navigation
+                            (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = false
+                            (this.applicationContext as ApplicationProperty).uiAdapterChanged = false
+                            (this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage = false
+                        } else {
+                            // check if the adapter data is valid or not, if not update
+                            if((this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage){
+                                // this is the last resort, but the adapter data must be considered as completely out of date
+                                if (verboseLog) {
+                                    Log.d(
+                                        "DMA:onResume",
+                                        "UI-Adapter was invalidated. Update complete data-set!!"
+                                    )
+                                }
+                                this.devicePropertyListViewAdapter.notifyDataSetChanged()
+                                (this.applicationContext as ApplicationProperty).uiAdapterInvalidatedOnPropertySubPage = false
+                            } else {
+                                // one or more single items in the adapter have changed, so update them
+                                if ((this.applicationContext as ApplicationProperty).uiAdapterChanged) {
+                                    // reset parameter
+                                    (this.applicationContext as ApplicationProperty).uiAdapterChanged =
+                                        false
+
                                     if (verboseLog) {
                                         Log.d(
                                             "DMA:onResume",
-                                            "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}"
+                                            "UI-Adapter has changed. Start updating elements with the changed marker:"
                                         )
                                     }
-                                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged =
-                                        false
-                                    //this.propertyList[index] = devicePropertyListContentInformation
-                                    this.devicePropertyListViewAdapter.notifyItemChanged(index)
+
+                                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                                        if (devicePropertyListContentInformation.hasChanged) {
+                                            if (verboseLog) {
+                                                Log.d(
+                                                    "DMA:onResume",
+                                                    "Updating element: ${devicePropertyListContentInformation.elementText} with internal index: ${devicePropertyListContentInformation.internalElementIndex}"
+                                                )
+                                            }
+                                            ApplicationProperty.bluetoothConnectionManager.uIAdapterList[index].hasChanged =
+                                                false
+                                            this.devicePropertyListViewAdapter.notifyItemChanged(index)
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                } else {
+                    // ********************************************************************
+                    // CREATION OR RESUME ACTION
+                    // ********************************************************************
+
+                    // make sure to set the right Name and image for the device
+                    try {
+                        this.deviceTypeHeaderTextView.text =
+                            ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+                    } catch (e: SecurityException) {
+                        Log.e("DMA:onResume", "Exception while trying to access the current device: $e")
+                        (applicationContext as ApplicationProperty).logControl("E: onResume: Exception while trying to access the current device: $e")
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                        finish()
+                        return
+                    }
+
+                    // check if this is a call on creation or resume:
+                    if (this.activityWasSuspended) {
+                        // must be RESUME
+
+                        // try to reconnect
+                        ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                        this.activityWasSuspended = false
+
+                    } else {
+                        // must be CREATION
+                        // Update the connection status
+                        setUIConnectionStatus(
+                            if(ApplicationProperty.bluetoothConnectionManager.isConnected){
+                                STATUS_CONNECTED
+                            } else {
+                                STATUS_DISCONNECTED
+                            }
+                        )
+                    }
                 }
             }
-
-        } else {
-            // creation or resume action:
-
-            // make sure to set the right Name and image for the device
-            try {
-                this.deviceTypeHeaderTextView.text =
-                    ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
-            } catch (e: SecurityException) {
-
-                // TODO: notify user!!!!!!!!
-
-                ApplicationProperty.bluetoothConnectionManager.clear()
-                finish()
-                return
-            }
-
-            // show the loading circle
-            //this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
-
-            // check if this is a call on creation or resume:
-            if (this.activityWasSuspended) {
-                // must be a resume action
-
-                // Update the connection status
-                //setUIConnectionStatus(STATUS_CONNECTING)  // ?????????
-
-
-                // realign objects is not necessary here!
-                //ApplicationProperty.bluetoothConnectionManger.reAlignContextObjects(this@DeviceMainActivity, this)
-                //ApplicationProperty.bluetoothConnectionManger.setPropertyEventHandler(this)
-
-                // try to reconnect
-                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
-                this.activityWasSuspended = false
-
-            } else {
-                // Update the connection status
-                setUIConnectionStatus(
-                    if(ApplicationProperty.bluetoothConnectionManager.isConnected){
-                        STATUS_CONNECTED
-                    } else {
-                        STATUS_DISCONNECTED
-                    }
-                )
-
-                // must be the creation process -> start property listing
-                //ApplicationProperty.bluetoothConnectionManager.startPropertyListing()
-            }
-
-            // TODO: how to confirm the device-properties
-            // maybe make a changed-parameter in the device firmware and call that to upgrade performance and hold the line clear for communication?
         }
     }
 

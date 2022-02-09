@@ -228,21 +228,38 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // reset parameter anyway
         this.expectedConnectionLoss = false
 
-        ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
-        ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
-
-        // TODO: test if the dualContainer will be set visible on reConnection (otherwise make the visibility secure here)
-
-        // reconnect to the device if necessary (if the user has left the application)
-        if(this.mustReconnect){
-            if(verboseLog) {
-                Log.d("M:RGBPage:onResume", "The connection was suspended -> try to reconnect")
+        when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
+            BLE_BLUETOOTH_PERMISSION_MISSING -> {
+                // permission was revoked while app was in suspended state
+                finish()
             }
-            ApplicationProperty.bluetoothConnectionManager.resumeConnection()
-            this.mustReconnect = false
-        } else {
-            // notify the remote device of the invocation of this property-page
-            ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(this.relatedElementIndex)
+            BLE_IS_DISABLED -> {
+                // bluetooth was disabled while app was in suspended state
+                finish()
+            }
+            else -> {
+                ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
+                ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
+
+                // TODO: test if the dualContainer will be set visible on reConnection (otherwise make the visibility secure here)
+
+                // reconnect to the device if necessary (if the user has left the application)
+                if (this.mustReconnect) {
+                    if (verboseLog) {
+                        Log.d(
+                            "M:RGBPage:onResume",
+                            "The connection was suspended -> try to reconnect"
+                        )
+                    }
+                    ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+                    this.mustReconnect = false
+                } else {
+                    // notify the remote device of the invocation of this property-page
+                    ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(
+                        this.relatedElementIndex
+                    )
+                }
+            }
         }
     }
 

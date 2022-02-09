@@ -269,7 +269,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         29 -> R.drawable.warning_white
         30 -> R.drawable.warning_yellow
         31 -> R.drawable.warning_red
-        32 -> R.drawable.settings_blue_white
+        32 -> R.drawable.ic_setting_blue_white_vect //settings_blue_white
         33 -> R.drawable.settings1_white
         34 -> R.drawable.settings1_blue
         35 -> R.drawable.settings2_blue_white
