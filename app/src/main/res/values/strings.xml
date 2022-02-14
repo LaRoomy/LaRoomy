@@ -216,6 +216,7 @@
     <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Binding Data successful saved.</string>
     <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Error: Invalid data format.</string>
+    <string name="DataSharingActivity_Message_YouAreOriginator">You are the originator of the device binding. Implementing the key as a sharing receiver is not necessary.</string>
 
     <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profile</string>
     <string name="EditUUIDProfileActivityHeaderEditModeText">Edit UUID Profile</string>

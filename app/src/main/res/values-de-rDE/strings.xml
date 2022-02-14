@@ -232,6 +232,7 @@
     <string name="DataSharingActivity_GoToMainButtonText">Zurück zur App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Geräte-Bindung erfolgreich gespeichert.</string>
     <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Fehler: Ungültiges Daten-Format.</string>
+    <string name="DataSharingActivity_Message_YouAreOriginator">Sie sind der Inhaber der Gerätebindung. Den Bindungsschlüssel als Empfänger einer geteilten Gerätebindung zu speichern ist nicht notwendig.</string>
 
 
 

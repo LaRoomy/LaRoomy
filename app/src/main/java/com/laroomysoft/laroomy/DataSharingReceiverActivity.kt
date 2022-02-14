@@ -43,6 +43,8 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                     Log.w("KeySharing", "The shared passkey was not saved, because it equals the key in use")
                 }
                 (applicationContext as ApplicationProperty).logControl("W: The shared passkey was NOT saved, because it equals the key in use.")
+                // notify user
+                notifyUser(getString(R.string.DataSharingActivity_Message_YouAreOriginator), R.color.normalTextColor)
             } else {
 
                 if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
@@ -77,8 +79,14 @@ class DataSharingReceiverActivity : AppCompatActivity() {
     fun onDataSharingActivityGoToMainButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         // navigate back to App...
         val intent: Intent = Intent(this@DataSharingReceiverActivity, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            //flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP // old
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+
+            // NOTE: CLEAR_TOP closes all other activities on the top of the main activity
+            // https://developer.android.com/guide/components/activities/tasks-and-back-stack#ManagingTasks
+
         }
         startActivity(intent)
+        finish()
     }
 }
