@@ -192,6 +192,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // the app was brought to foreground by the sharingReceiverActivity
+        // if there was an activity on top of the stack, it was killed without clearing data, so here we make sure the bleManager is cleared
+        ApplicationProperty.bluetoothConnectionManager.clear()
+    }
+
     override fun onResume() {
         super.onResume()
 
