@@ -170,11 +170,13 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_unlocked_sq128)
                 this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
                 this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Unlocked)
+                this.notifyUser(getString(R.string.UnlockCtrl_LockHintMessageText), R.color.successLightColor)
             } else {
                 this.lockState = UC_STATE_LOCKED
                 this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_locked_sq128)
                 this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
                 this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Locked)
+                this.notifyUser("", R.color.normalTextColor)
             }
         }
     }

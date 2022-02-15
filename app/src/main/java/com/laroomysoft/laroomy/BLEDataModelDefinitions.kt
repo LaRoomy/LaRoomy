@@ -1321,7 +1321,7 @@ class DevicePropertyListContentInformation(val elementType: Int) {
         field = value
     }
 
-    var imageID = R.drawable.image_error_state
+    var imageID = R.drawable.ic_00_image_error_state_vect
     set(value) {
         field = resourceIdForImageId(value)
     }

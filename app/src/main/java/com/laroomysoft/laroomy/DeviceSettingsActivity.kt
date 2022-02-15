@@ -18,6 +18,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+const val DB_NONE = 0
+const val DB_ENABLE = 1
+const val DB_RELEASE = 2
+
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var mustReconnect = false
@@ -33,6 +37,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+
+    private var pendingBindingTransmission = DB_NONE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +65,15 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         deviceCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoCharacteristicUUIDTextView)
 
         // set device info
-        deviceNameTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+        try {
+            deviceNameTextView.text =
+                ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+        } catch (e: SecurityException){
+            // further execution makes no sense, so navigate back
+                // (DeviceMainActivity::onResume) will check the permission again and will go navigate back to main to request the permission
+            deviceNameTextView.text = getString(R.string.TextResourceErrorState)
+            finish()
+        }
         deviceAddressTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
         deviceServiceUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedServiceUUID
         deviceCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedCharacteristicUUID
@@ -124,6 +138,24 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
                     // show the share-button
                     shareBindingContainer.visibility = View.VISIBLE
+
+                    // schedule a timeout control for the response
+                    this.pendingBindingTransmission = DB_ENABLE
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        if(pendingBindingTransmission == DB_ENABLE){
+                            pendingBindingTransmission = DB_NONE
+
+                            if(verboseLog){
+                                Log.d("EnableDeviceBinding", "Unexpected Timeout for enable response.")
+                            }
+                            (applicationContext as ApplicationProperty).logControl("W: Unexpected Timeout for enable response.")
+
+                            notifyUser(
+                                getString(R.string.DeviceSettingsActivity_BindingNotConfirmed),
+                                R.color.warningLightColor
+                            )
+                        }
+                    }, 2000, TimeUnit.MILLISECONDS)
                 }
                 else -> {
                     // release the device binding
@@ -134,6 +166,24 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
                     // hide the share-button
                     shareBindingContainer.visibility = View.GONE
+
+                    // schedule a timeout control for the response
+                    this.pendingBindingTransmission = DB_RELEASE
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        if(pendingBindingTransmission == DB_RELEASE){
+                            pendingBindingTransmission = DB_NONE
+
+                            if(verboseLog){
+                                Log.d("ReleaseDeviceBinding", "Unexpected Timeout for release response.")
+                            }
+                            (applicationContext as ApplicationProperty).logControl("W: Unexpected Timeout for release response.")
+
+                            notifyUser(
+                                getString(R.string.DeviceSettingsActivity_ReleaseNotConfirmed),
+                                R.color.warningLightColor
+                            )
+                        }
+                    }, 2000, TimeUnit.MILLISECONDS)
                 }
             }
         }
@@ -344,6 +394,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onBindingResponse(responseID: Int) {
         super.onBindingResponse(responseID)
+        // response received, reset timeout param
+        this.pendingBindingTransmission = DB_NONE
+
         // look for a rejected/error/success setting notification
         when (responseID) {
             BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {

@@ -79,7 +79,7 @@
 
     <string name="UnlockCtrl_HeaderText">Entsperren</string>
     <string name="UnlockCtrl_ConditionText_Locked">Verriegelt</string>
-    <string name="UnlockCtrl_ConditionText_Unlocked">Entriegelt - Zum verriegeln Symbol berühren</string>
+    <string name="UnlockCtrl_ConditionText_Unlocked">Entriegelt</string>
     <string name="UnlockCtrl_PinEntryText">PIN:</string>
     <string name="UnlockCtrl_ButtonText_Show">Anzeigen</string>
     <string name="UnlockCtrl_ButtonText_Hide">Verbergen</string>
@@ -89,6 +89,8 @@
     <string name="UnlockCtrl_PopupRepeatNewPinDescriptorText">Neue Pin wiederholen:</string>
     <string name="UnlockCtrl_PopupCancelButtonText">Abbrechen</string>
     <string name="UnlockCtrl_PopupPositiveButtonText">Ändern</string>
+    <string name="UnlockCtrl_LockHintMessageText">Zum Verriegeln Symbol berühren</string>
+
 
 
 
@@ -195,6 +197,8 @@
     <string name="DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText">Fehler beim Lösen der Geräte-Bindung: Falscher Schlüssel.</string>
     <string name="DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText">Fehler beim Lösen der Geräte-Bindung: Unbekannter Fehler.</string>
     <string name="DeviceSettingsActivity_ShowDeviceInfoButtonText">Geräte-Info anzeigen</string>
+    <string name="DeviceSettingsActivity_BindingNotConfirmed">Bestätigung nicht empfangen. Geräte-Bindung nicht sichergestellt.</string>
+    <string name="DeviceSettingsActivity_ReleaseNotConfirmed">Bestätigung nicht empfangen. Lösen der Geräte-Bindung nicht sichergestellt.</string>
 
 
 

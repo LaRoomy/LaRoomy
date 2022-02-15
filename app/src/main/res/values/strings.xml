@@ -70,7 +70,7 @@
 
     <string name="UnlockCtrl_HeaderText">Unlock Control</string>
     <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
-    <string name="UnlockCtrl_ConditionText_Unlocked">Unlocked - Tap Image to lock</string>
+    <string name="UnlockCtrl_ConditionText_Unlocked">Unlocked</string>
     <string name="UnlockCtrl_PinEntryText">PIN:</string>
     <string name="UnlockCtrl_ButtonText_Show">Show</string>
     <string name="UnlockCtrl_ButtonText_Hide">Hide</string>
@@ -80,6 +80,7 @@
     <string name="UnlockCtrl_PopupRepeatNewPinDescriptorText">Repeat new Pin:</string>
     <string name="UnlockCtrl_PopupCancelButtonText">Cancel</string>
     <string name="UnlockCtrl_PopupPositiveButtonText">Change</string>
+    <string name="UnlockCtrl_LockHintMessageText">Tap image to lock</string>
 
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>
@@ -187,6 +188,8 @@
     <string name="DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText">Release binding failed. Wrong passkey!</string>
     <string name="DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText">Release binding failed. Unknown error!</string>
     <string name="DeviceSettingsActivity_ShowDeviceInfoButtonText">Show device info</string>
+    <string name="DeviceSettingsActivity_BindingNotConfirmed">No response received from remote device. Binding not confirmed.</string>
+    <string name="DeviceSettingsActivity_ReleaseNotConfirmed">No response received from remote device. Release of device-binding not confirmed.</string>
 
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>
@@ -307,5 +310,6 @@
     <string name="UUIDFormatHint" translatable="false">0000ffff–0000-1000-8000-00805f9b34fb</string>
     <string name="UUIDDefaultFill" translatable="false">00000000-0000-1000-8000-00805f9b34fb</string>
     <string name="ConnectionLog_NoContent">Nothing to show..</string>
+    <string name="TextResourceErrorState" translatable="false">Resource::Error</string>
 
 </resources>

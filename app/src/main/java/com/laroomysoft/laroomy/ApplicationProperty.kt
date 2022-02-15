@@ -3,7 +3,6 @@ package com.laroomysoft.laroomy
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.appcompat.widget.SwitchCompat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -236,14 +235,14 @@ class ApplicationProperty : Application() {
 
 fun resourceIdForImageId(imageID: Int): Int {
     return when (imageID) {
-        -1 -> R.drawable.image_error_state
-        0 -> R.drawable.image_error_state
-        1 -> R.drawable.placeholder_blue_white
-        2 -> R.drawable.rgb_control_colored
+        -1 -> R.drawable.ic_00_image_error_state_vect       // done
+        0 -> R.drawable.ic_00_image_error_state_vect        // done
+        1 -> R.drawable.ic_01_placeholder_image_vect        // done
+        2 -> R.drawable.ic_02_adjust_vect                   // done
         3 -> R.drawable.lightbulb_darkblue
         4 -> R.drawable.lightbulb_lightblue
         5 -> R.drawable.lightbulb_monocrom
-        6 -> R.drawable.lightbulb_scheme
+        6 -> R.drawable.ic_06_lightbulb_blue_white_vect     // done
         7 -> R.drawable.sun_yellow
         8 -> R.drawable.sun_white
         9 -> R.drawable.sun_blue
@@ -269,7 +268,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         29 -> R.drawable.warning_white
         30 -> R.drawable.warning_yellow
         31 -> R.drawable.warning_red
-        32 -> R.drawable.ic_setting_blue_white_vect //settings_blue_white
+        32 -> R.drawable.ic_32_settings_blue_white_vect //settings_blue_white
         33 -> R.drawable.settings1_white
         34 -> R.drawable.settings1_blue
         35 -> R.drawable.settings2_blue_white
@@ -353,10 +352,11 @@ fun resourceIdForImageId(imageID: Int): Int {
         113 -> R.drawable.add_white_sq48_simple
         114 -> R.drawable.add_blue_sq48_simple
         115 -> R.drawable.rgb_circles
+        116 -> R.drawable.ic_116_rgb_bars_vect
 
         // TODO: implement all new image resources here...
 
-        else -> R.drawable.image_error_state
+        else -> R.drawable.ic_00_image_error_state_vect
     }
 }
 
