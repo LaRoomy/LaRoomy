@@ -12,6 +12,7 @@
     <string name="MA_UserNotificationDialogTitle">Notification</string>
     <string name="MA_NoContentUserHintText">Nothing to show.\nAdd your first device.</string>
     <string name="MA_BluetoothNotEnabledHintText">The base functionality of this App is to connect to bluetooth devices. Therefore bluetooth must be enabled. Tap here to enable bluetooth.</string>
+    <string name="MA_BluetoothPermissionMissionHintText">The base functionality of this App is to connect to bluetooth devices. Therefore it needs your permission to access bluetooth devices on this phone and connect to it. Tap here to grant the permission.</string>
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Connected">Connected</string>
