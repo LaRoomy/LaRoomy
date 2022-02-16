@@ -243,19 +243,19 @@ fun resourceIdForImageId(imageID: Int): Int {
         4 -> R.drawable.lightbulb_lightblue
         5 -> R.drawable.lightbulb_monocrom
         6 -> R.drawable.ic_06_lightbulb_blue_white_vect     // done
-        7 -> R.drawable.sun_yellow
-        8 -> R.drawable.sun_white
-        9 -> R.drawable.sun_blue
-        10 -> R.drawable.sun_blue_monocrom
-        11 -> R.drawable.clock_reload
-        12 -> R.drawable.time_setup_white
-        13 -> R.drawable.property_group_blue_white
-        14 -> R.drawable.reload_turnleft_blue
-        15 -> R.drawable.reload_turnleft_white
-        16 -> R.drawable.reload_turnright_white
-        17 -> R.drawable.segmented_circle_blue_white
-        18 -> R.drawable.sync_white
-        19 -> R.drawable.sync_blue_white
+        7 -> R.drawable.ic_07_sun_yellow_vect               // done - with errors
+        8 -> R.drawable.ic_08_sun_white_vect                // done - with errors
+        9 -> R.drawable.ic_09_sun_blue_vect                 // done - with errors
+        10 -> R.drawable.ic_10_conjunction_blue_white_vect  // done - with errors
+        11 -> R.drawable.ic_11_clock_reload_blue_white_vect // done
+        12 -> R.drawable.ic_12_time_setup_white_vect        // done
+        13 -> R.drawable.ic_13_property_group_blue_white_vect// done - with errors
+        14 -> R.drawable.ic_14_reload_turnleft_blue_vect    // done
+        15 -> R.drawable.ic_15_reload_turnleft_white_vect   // done
+        16 -> R.drawable.ic_16_reload_turnright_white_vect  // done - with errors
+        17 -> R.drawable.ic_17_segmented_circle_blue_white_vect // done
+        18 -> R.drawable.ic_18_sync_white_vect              // done
+        19 -> R.drawable.ic_19_sync_blue_white_vect         // done
         20 -> R.drawable.scale_up_white_blue
         21 -> R.drawable.bars_indef_white
         22 -> R.drawable.bars_increasing_blue
@@ -268,7 +268,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         29 -> R.drawable.warning_white
         30 -> R.drawable.warning_yellow
         31 -> R.drawable.warning_red
-        32 -> R.drawable.ic_32_settings_blue_white_vect //settings_blue_white
+        32 -> R.drawable.ic_32_settings_blue_white_vect     // done
         33 -> R.drawable.settings1_white
         34 -> R.drawable.settings1_blue
         35 -> R.drawable.settings2_blue_white
