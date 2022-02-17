@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,11 +58,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
+            if(verboseLog){
+                Log.d("MA:requestPermissionLauncher", "Permission-Request result is: $isGranted")
+            }
             this.bluetoothPermissionGranted = isGranted
-            this.grantPermissionRequestReclined = !isGranted    // prevent a request loop
-
+            this.grantPermissionRequestReclined = !isGranted    // prevent a request loop in onResume
             // if the permission dialog is dismissed, the onResume method is invoked again, and bluetooth enabled state is checked
-            // when the permission request is reclined, the UI must go in missing-permission-state
+            // when the permission request is reclined, the UI must go in missing-permission-state, and prevent the invocation
+            // of the permission request launcher in onResume, otherwise there will be an infinite loop between onResume and permission launcher
         }
 
     private var requestEnableBluetoothLauncher =
@@ -69,7 +73,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             if(it.resultCode == Activity.RESULT_CANCELED){
                 // the user reclined the request to enable bluetooth
                 this.activatingBluetoothReclined = true
+                if(verboseLog){
+                    Log.d("MA:BluetoothEnableRequest", "User reclined the request to enable Bluetooth.")
+                }
             } else {
+                if(verboseLog){
+                    Log.d("MA:onResume", "User has accepted the request to enable Bluetooth.")
+                }
                 this.isBluetoothEnabled = true
                 this.activatingBluetoothReclined = false
             }
@@ -195,6 +205,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     override fun onResume() {
         super.onResume()
 
+        if(verboseLog){
+            Log.d("MA:onResume", "onResume executed in MainActivity")
+        }
+
         // control bottom separator in alignment to the screen orientation
         bottomSeparator.visibility = when (this.resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> View.GONE
@@ -203,16 +217,25 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
         // check bluetooth connect permission:
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if(!this.grantPermissionRequestReclined) {
+            if(verboseLog){
+                Log.d("MA:onResume", "This is Android 12 or higher, so permission checkup is required")
+            }
+
+            if(!this.grantPermissionRequestReclined) {// prevent a successive permission request, if the user has reclined
                 this.bluetoothPermissionGranted = if (ActivityCompat.checkSelfPermission(
                         this,
                         Manifest.permission.BLUETOOTH_CONNECT
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    // FIXME: this is not the best practice, better: set UI to permission-missing state and implement an action button to start this action by user
+                    if(verboseLog){
+                        Log.d("MA:onResume", "Permission is not granted. Execution permission request to user.")
+                    }
                     this.requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
                     false
                 } else {
+                    if(verboseLog){
+                        Log.d("MA:onResume", "Permission is granted.")
+                    }
                     true
                 }
             }
@@ -220,40 +243,43 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
         // proceed after permission checkup
         if(this.bluetoothPermissionGranted) {
+            if(verboseLog){
+                Log.d("MA:onResume", "Check bluetooth enabled state")
+            }
             // check if bluetooth is enabled
             when (ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
                 BLE_BLUETOOTH_PERMISSION_MISSING -> {
-
-                    // TODO: make this api-level related?
-                    // TODO: show permission-request-popup, and if granted, check again if bluetooth is enabled
-
-
-                    // TODO: check permission missing on devices lower than api-level 31
-
-                    // TODO: set UI-state to missing permission state
-                    // - disable add button
-                    // - hide recyclerView
-                    // - show no-content image and change it to missing permission image!
-
-                    // or show a dialog??
-
                     this.bluetoothPermissionGranted = false
-
+                    if(verboseLog){
+                        Log.e("MA:onResume", "Unexpected error while check bluetooth enabled state!")
+                    }
                 }
                 BLE_IS_ENABLED -> {
+                    if(verboseLog){
+                        Log.d("MA:onResume", "Bluetooth is enabled!")
+                    }
                     this.bluetoothPermissionGranted = true
                     this.isBluetoothEnabled = true
                     this.setUIState(mainActivityNormalState)
                 }
                 BLE_IS_DISABLED -> {
+                    if(verboseLog){
+                        Log.d("MA:onResume", "Bluetooth is disabled!")
+                    }
                     this.bluetoothPermissionGranted = true
 
                     // the permission is ok, but is bluetooth enabled?
                     if (!this.activatingBluetoothReclined) {
+                        if(verboseLog){
+                            Log.d("MA:onResume", "Launching request to enable Bluetooth.")
+                        }
                         // the request to enable bluetooth was not previously displayed, so do it now
                         val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                         requestEnableBluetoothLauncher.launch(intent)
                     } else {
+                        if(verboseLog){
+                            Log.d("MA:onResume", "Request to enable Bluetooth was previously reclined. Setting UI-State to Bluetooth-Disabled-State!")
+                        }
                         // set UI State to bluetooth disabled, because the user reclined the request to enable
                         this.setUIState(mainActivityBluetoothNotEnabledState)
                         this.isBluetoothEnabled = false
@@ -294,11 +320,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
-
-        // TODO: check if all conditions are fulfilled to work with bluetooth!
-
         if(!preventListSelection) {
-
             setItemColors(
                 index,
                 R.color.fullWhiteTextColor,
@@ -309,8 +331,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 Intent(this@MainActivity, LoadingActivity::class.java)
             intent.putExtra("DeviceListIndex", index)
             startActivity(intent)
-
-            //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 
@@ -369,16 +389,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     }
 
     private fun notifyUser(message: String){
-//        val notificationView = findViewById<TextView>(R.id.MA_UserNotificationView)
-//        notificationView.text = message
-//
-//        when(type){
-//            ERROR_MESSAGE -> notificationView.setTextColor(getColor(R.color.ErrorColor))
-//            WARNING_MESSAGE -> notificationView.setTextColor(getColor(R.color.WarningColor))
-//            INFO_MESSAGE -> notificationView.setTextColor(getColor(R.color.InfoColor))
-//            else -> notificationView.setTextColor(getColor(R.color.InfoColor))
-//        }
-
         val dialog = AlertDialog.Builder(this)
         dialog.setMessage(message)
         dialog.setIcon(R.drawable.ic_announcement_white_36dp)
@@ -388,7 +398,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
         dialog.create()
         dialog.show()
-
     }
 
     private fun setUIState(state: Int){
@@ -521,6 +530,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     fun onMainActivityNoContentContainerClick(@Suppress("UNUSED_PARAMETER")view: View) {
 
+        if(verboseLog){
+            Log.d("MA:noContentContainerClicked", "The no content container was clicked. Execution the appropriate action.")
+        }
+
         if(this.isBluetoothEnabled && this.bluetoothPermissionGranted) {
             val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
             startActivity(intent)
@@ -533,16 +546,12 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
                     try {
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-
                         val uri: Uri = Uri.fromParts("package", packageName, null)
                         intent.data = uri
-
                         startActivity(intent)
                     } catch (e: java.lang.Exception){
-                        // TODO: log
+                        Log.e("noContentContainerClicked", "Exception occurred while trying to launch settings app. E: $e")
                     }
-                    //requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), )
-
                 }
             } else {
                 // if bluetooth is not enabled the UI is expected to be in activate bluetooth request mode

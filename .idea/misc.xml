@@ -75,10 +75,14 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_08_sun_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_09_sun_blue_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_10_conjunction_blue_white_vect.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_115_rgb_circles_vect.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_117_rgb_point_circle_vect.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_118_tool_circle_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_13_property_group_blue_white.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_16_reload_turnright_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_17_segmented_circle_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_32_settings_blue_white_vect.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_37_conjunction_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_add_white_36dp.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/inside_group_property_last_list_element_selected_background.xml" value="0.2513888888888889" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/my_devices_list_element_background.xml" value="0.2449074074074074" />
@@ -87,7 +91,7 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/unlock_control_popup_edittext_error_background.xml" value="0.25925925925925924" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout-land/activity_unlock_control.xml" value="0.18" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_add_device.xml" value="0.2351851851851852" />
-        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_help.xml" value="0.23055555555555557" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_help.xml" value="0.5" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_settings.xml" value="0.23472222222222222" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_device_main.xml" value="0.33" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_device_settings.xml" value="0.22546296296296298" />
@@ -106,7 +110,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

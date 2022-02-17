@@ -246,7 +246,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         7 -> R.drawable.ic_07_sun_yellow_vect               // done - with errors
         8 -> R.drawable.ic_08_sun_white_vect                // done - with errors
         9 -> R.drawable.ic_09_sun_blue_vect                 // done - with errors
-        10 -> R.drawable.ic_10_conjunction_blue_white_vect  // done - with errors
+        10 -> R.drawable.ic_10_clock_running_blue_white_vect// done
         11 -> R.drawable.ic_11_clock_reload_blue_white_vect // done
         12 -> R.drawable.ic_12_time_setup_white_vect        // done
         13 -> R.drawable.ic_13_property_group_blue_white_vect// done - with errors
@@ -256,36 +256,36 @@ fun resourceIdForImageId(imageID: Int): Int {
         17 -> R.drawable.ic_17_segmented_circle_blue_white_vect // done
         18 -> R.drawable.ic_18_sync_white_vect              // done
         19 -> R.drawable.ic_19_sync_blue_white_vect         // done
-        20 -> R.drawable.scale_up_white_blue
-        21 -> R.drawable.bars_indef_white
-        22 -> R.drawable.bars_increasing_blue
-        23 -> R.drawable.bars_increasing_white
-        24 -> R.drawable.level_75percent
-        25 -> R.drawable.level_50percent
-        26 -> R.drawable.level_25percent
-        27 -> R.drawable.level_0percent
-        28 -> R.drawable.warning_white_blue
-        29 -> R.drawable.warning_white
-        30 -> R.drawable.warning_yellow
-        31 -> R.drawable.warning_red
+        20 -> R.drawable.ic_20_scale_up_blue_white_vect     // done
+        21 -> R.drawable.ic_21_bars_indifferent_white_vect  // done
+        22 -> R.drawable.ic_22_increasing_bars_blue_vect    // done
+        23 -> R.drawable.ic_23_level_100p_white_vect        // done
+        24 -> R.drawable.ic_24_level_75p_vect               // done
+        25 -> R.drawable.ic_25_level_50p_vect               // done
+        26 -> R.drawable.ic_26_level_25p_vect               // done
+        27 -> R.drawable.ic_27_level_0p_vect                // done
+        28 -> R.drawable.ic_28_warning_blue_white_vect      // done
+        29 -> R.drawable.ic_29_warning_white_vect           // done
+        30 -> R.drawable.ic_30_warning_yellow_vect          // done
+        31 -> R.drawable.ic_31_warning_red_vect             // done
         32 -> R.drawable.ic_32_settings_blue_white_vect     // done
-        33 -> R.drawable.settings1_white
-        34 -> R.drawable.settings1_blue
-        35 -> R.drawable.settings2_blue_white
-        36 -> R.drawable.settings3_blue_white
-        37 -> R.drawable.tool_blue_white
-        38 -> R.drawable.human_setup_blue_white
-        39 -> R.drawable.human_setup2_blue_white
-        40 -> R.drawable.star_blue
-        41 -> R.drawable.check_mark_blue
-        42 -> R.drawable.star_white
-        43 -> R.drawable.check_mark_white
-        44 -> R.drawable.helpcircle_white
-        45 -> R.drawable.helpcircle_blue
-        46 -> R.drawable.star_round_white
-        47 -> R.drawable.star_round_blue
-        48 -> R.drawable.lock_blue_white
-        49 -> R.drawable.location_blue_white
+        33 -> R.drawable.ic_33_settings1_white_vect         // done
+        34 -> R.drawable.ic_34_settings1_blue_vect          // done
+        35 -> R.drawable.ic_35_settings2_blue_white_vect    // done
+        36 -> R.drawable.ic_36_settings3_blue_white_vect    // done
+        37 -> R.drawable.ic_37_conjunction_blue_white_vect  // done
+        38 -> R.drawable.ic_38_human_setup1_blue_white_vect // done
+        39 -> R.drawable.ic_39_human_setup2_blue_white_vect // done
+        40 -> R.drawable.ic_40_star_blue_vect               // done
+        41 -> R.drawable.ic_41_checkmark_blue_vect          // done
+        42 -> R.drawable.ic_42_star_white_vect              // done
+        43 -> R.drawable.ic_43_checkmark_white_vect         // done
+        44 -> R.drawable.ic_44_question_circle_white_vect   // done
+        45 -> R.drawable.ic_45_question_circle_blue_vect    // done
+        46 -> R.drawable.ic_46_trash_blue_white_vect        // done
+        47 -> R.drawable.ic_47_lock_opened_blue_white_vect  // done
+        48 -> R.drawable.ic_48_lock_closed_blue_white_vect  // done
+        49 -> R.drawable.ic_49_location_blue_white_vect     // done
         50 -> R.drawable.printer_blue_white
         51 -> R.drawable.listing_items_white_blue
         52 -> R.drawable.world_blue_white
@@ -351,8 +351,12 @@ fun resourceIdForImageId(imageID: Int): Int {
         112 -> R.drawable.flash_yellow
         113 -> R.drawable.add_white_sq48_simple
         114 -> R.drawable.add_blue_sq48_simple
-        115 -> R.drawable.rgb_circles
+        115 -> R.drawable.ic_115_rgb_circles_vect               // done - with errors
         116 -> R.drawable.ic_116_rgb_bars_vect
+        117 -> R.drawable.ic_117_rgb_point_circle_vect          // done - with errors
+
+        118 -> R.drawable.ic_118_tool_circle_blue_white_vect    // done
+        119 -> R.drawable.ic_119_tools_blue_white_vect          // done
 
         // TODO: implement all new image resources here...
 
