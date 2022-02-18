@@ -1028,6 +1028,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     (data[13] == '1') -> {
                         this.bleDeviceData.isBindingRequired = true
 
+                        if(verboseLog){
+                            Log.d("onInitTransmission", "Binding is required. Searching the appropriate key for the mac address.")
+                        }
+                        applicationProperty.logControl("I: Binding is required. Searching the appropriate key for the mac address")
+
                         // binding is required, so send the binding request on basis of the passkey setup
                         val useCustomKeyForBinding =
                             applicationProperty.loadBooleanData(
@@ -1092,7 +1097,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             }
                         true
                     } else {
-                        // binding success
+                        // binding authentication success
+                        if(verboseLog){
+                            Log.d("Binding Response", "Binding Authentication successful!")
+                        }
+                        applicationProperty.logControl("I: Binding Authentication successful!")
+
                         saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
                         bleDeviceData.authenticationSuccess = true
                         callback.onInitializationSuccessful()

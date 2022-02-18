@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckBox
@@ -109,11 +110,16 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     }
 
     fun resetAppActivityOnCancelButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
         finish()
         overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
     }
 
     fun resetAppActivityOnResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+
+        val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
 
         if(this.resetAppSettingsCheckBox.isChecked || this.resetBindingDataCheckBox.isChecked || this.resetUUIDProfilesCheckBox.isChecked || this.resetDefaultBindingKeyCheckBox.isChecked || this.resetPropertyCacheCheckBox.isChecked) {
             val dialog = AlertDialog.Builder(this)

@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
@@ -292,6 +293,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     }
 
     fun onFactoryResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+        val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
         factoryResetAlertDialog()
     }
 
@@ -470,6 +473,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     }
 
     fun deviceSettingsActivityShareBindingButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+
+        val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
 
         // make sure there is a connected device
         if(ApplicationProperty.bluetoothConnectionManager.isConnected){

@@ -357,8 +357,19 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         val headerViewPos = intArrayOf(0, 0)
         this.headerSeparator.getLocationInWindow(headerViewPos)
 
+        val layoutToUse = if ((applicationContext as ApplicationProperty).loadBooleanData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_EnableLog
+            )
+        ) {
+            R.layout.main_activity_popup_flyout
+        } else {
+            R.layout.main_activity_popup_without_log_flyout
+        }
+
         val popUpView =
-            layoutInflater.inflate(R.layout.main_activity_popup_flyout, null)
+            layoutInflater.inflate(layoutToUse, null)
+
         this.popUpWindow =
             PopupWindow(
                 popUpView,

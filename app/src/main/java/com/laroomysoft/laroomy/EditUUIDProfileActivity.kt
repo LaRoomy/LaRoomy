@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
@@ -96,6 +97,9 @@ class EditUUIDProfileActivity : AppCompatActivity() {
 
     fun onEditUUIDActivityDeleteButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
+        val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
+
         if(this.mode.startsWith("edit")){
             (applicationContext as ApplicationProperty).uuidManager.deleteExistingProfile(
                 this.elementIndex
@@ -105,6 +109,9 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         finish()
     }
     fun onEditUUIDActivitySaveButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+
+        val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+        view.startAnimation(buttonAnimation)
 
         if(this.mode.startsWith("edit")){
 
