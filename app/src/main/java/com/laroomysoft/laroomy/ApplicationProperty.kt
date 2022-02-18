@@ -286,37 +286,37 @@ fun resourceIdForImageId(imageID: Int): Int {
         47 -> R.drawable.ic_47_lock_opened_blue_white_vect  // done
         48 -> R.drawable.ic_48_lock_closed_blue_white_vect  // done
         49 -> R.drawable.ic_49_location_blue_white_vect     // done
-        50 -> R.drawable.printer_blue_white
-        51 -> R.drawable.listing_items_white_blue
-        52 -> R.drawable.world_blue_white
-        53 -> R.drawable.globe_blue_white
-        54 -> R.drawable.battery_loading
-        55 -> R.drawable.battery_100_perc
-        56 -> R.drawable.battery_75_perc
-        57 -> R.drawable.battery_50_perc
-        58 -> R.drawable.battery_25_perc
-        59 -> R.drawable.battery_empty_white
-        60 -> R.drawable.battery_empty_red
-        61 -> R.drawable.rectangle_empty_white
-        62 -> R.drawable.rectangle_white_checked_blue
-        63 -> R.drawable.rectangle_white_crossed_blue
-        64 -> R.drawable.circle_empty_white
-        65 -> R.drawable.circle_checked_blue_white
-        66 -> R.drawable.circle_crossed_blue_white
-        67 -> R.drawable.cloud_white
-        68 -> R.drawable.cloud_blue_white
-        69 -> R.drawable.home
-        70 -> R.drawable.house_white
-        71 -> R.drawable.house_blue_white
-        72 -> R.drawable.share
-        73 -> R.drawable.wifi
-        74 -> R.drawable.calculator
-        75 -> R.drawable.people_blue_white
-        76 -> R.drawable.search
-        77 -> R.drawable.hierachy_blue_white
-        78 -> R.drawable.double_helix_white_blue
-        79 -> R.drawable.at_blue
-        80 -> R.drawable.at_white
+        50 -> R.drawable.ic_50_printer_blue_white_vect      // done -
+        51 -> R.drawable.ic_51_listing_items_blue_white_vect// done
+        52 -> R.drawable.ic_52_world_blue_white_vect        // done
+        53 -> R.drawable.ic_53_globe_blue_white_vect        // done
+        54 -> R.drawable.ic_54_battery_loading_blue_white_vect// done
+        55 -> R.drawable.ic_55_battery_100p_blue_white_vect // done
+        56 -> R.drawable.ic_56_battery_75p_blue_white_vect  // done
+        57 -> R.drawable.ic_57_battery_50p_blue_white_vect  // done
+        58 -> R.drawable.ic_58_battery_25p_blue_white_vect  // done
+        59 -> R.drawable.ic_59_battery_empty_white_vect     // done
+        60 -> R.drawable.ic_60_battery_dead_red_vect        // done
+        61 -> R.drawable.ic_61_rectangle_empty_white_vect   // done
+        62 -> R.drawable.ic_62_rectangle_checked_blue_white_vect// done
+        63 -> R.drawable.ic_63_rectangle_crossed_blue_white_vect// done
+        64 -> R.drawable.ic_64_circle_empty_white_vect      // done
+        65 -> R.drawable.ic_65_circle_checked_blue_white_vect// done
+        66 -> R.drawable.ic_66_circle_crossed_blue_white_vect// done
+        67 -> R.drawable.ic_67_cloud_white_vect             // done
+        68 -> R.drawable.ic_68_cloud_blue_white_vect        // done
+        69 -> R.drawable.ic_69_home_blue_vect               // done
+        70 -> R.drawable.ic_70_home_white_vect              // done
+        71 -> R.drawable.ic_71_home_blue_white_vect         // done
+        72 -> R.drawable.ic_72_share_blue_white_vect        // done
+        73 -> R.drawable.ic_73_wifi_blue_white_vect         // done
+        74 -> R.drawable.ic_74_calculator_blue_white_vect   // done
+        75 -> R.drawable.ic_75_people_blue_white_vect       // done
+        76 -> R.drawable.ic_76_search_blue_white_vect       // done
+        77 -> R.drawable.ic_77_hierachy_blue_white_vect     // done
+        78 -> R.drawable.ic_78_doublehelix_blue_white_vect  // done
+        79 -> R.drawable.ic_79_at_blue_vect                 // done
+        80 -> R.drawable.ic_80_at_white_vect                // done
         81 -> R.drawable.one_circle_blue
         82 -> R.drawable.two_circle_blue
         83 -> R.drawable.three_circle_blue
