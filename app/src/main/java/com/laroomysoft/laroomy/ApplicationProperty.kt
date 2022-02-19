@@ -286,7 +286,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         47 -> R.drawable.ic_47_lock_opened_blue_white_vect  // done
         48 -> R.drawable.ic_48_lock_closed_blue_white_vect  // done
         49 -> R.drawable.ic_49_location_blue_white_vect     // done
-        50 -> R.drawable.ic_50_printer_blue_white_vect      // done -
+        50 -> R.drawable.ic_50_printer_blue_white_vect      // done
         51 -> R.drawable.ic_51_listing_items_blue_white_vect// done
         52 -> R.drawable.ic_52_world_blue_white_vect        // done
         53 -> R.drawable.ic_53_globe_blue_white_vect        // done
@@ -317,20 +317,20 @@ fun resourceIdForImageId(imageID: Int): Int {
         78 -> R.drawable.ic_78_doublehelix_blue_white_vect  // done
         79 -> R.drawable.ic_79_at_blue_vect                 // done
         80 -> R.drawable.ic_80_at_white_vect                // done
-        81 -> R.drawable.one_circle_blue
-        82 -> R.drawable.two_circle_blue
-        83 -> R.drawable.three_circle_blue
-        84 -> R.drawable.one_circle_white
-        85 -> R.drawable.two_circle_white
-        86 -> R.drawable.three_circle_white
-        87 -> R.drawable.arrow_up_white
-        88 -> R.drawable.arrow_right_white
-        89 -> R.drawable.arrow_down_white
-        90 -> R.drawable.arrow_left_white
-        91 -> R.drawable.arrow_up_blue
-        92 -> R.drawable.arrow_right_blue
-        93 -> R.drawable.arrow_down_blue
-        94 -> R.drawable.arrow_left_blue
+        81 -> R.drawable.ic_81_circle_1_blue_vect           // done -
+        82 -> R.drawable.ic_82_circle_2_blue_vect           // done
+        83 -> R.drawable.ic_83_circle_3_blue_vect           // done
+        84 -> R.drawable.ic_84_circle_1_white_vect          // done
+        85 -> R.drawable.ic_85_circle_2_white_vect          // done
+        86 -> R.drawable.ic_86_circle_3_white_vect          // done
+        87 -> R.drawable.ic_87_arrow_up_white_vect          // done
+        88 -> R.drawable.ic_88_arrow_right_white_vect       // done
+        89 -> R.drawable.ic_89_arrow_down_white_vect        // done
+        90 -> R.drawable.ic_90_arrow_left_white_vect        // done
+        91 -> R.drawable.ic_91_arrow_up_blue_vect           // done
+        92 -> R.drawable.ic_92_arrow_right_blue_vect        // done
+        93 -> R.drawable.ic_93_arrow_down_blue_vect         // done
+        94 -> R.drawable.ic_94_arrow_left_blue_vect         // done
         95 -> R.drawable.tv_white
         96 -> R.drawable.tv_white_blue
         97 -> R.drawable.arrow_up_down_blue_white
