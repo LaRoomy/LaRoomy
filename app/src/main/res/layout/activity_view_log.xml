@@ -6,16 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".ViewLogActivity">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/viewLogActivityHeaderTextView"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/viewLogActivityHeaderContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ViewLogActivity_HeaderText"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/viewLogActivityBackButton"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/transparentColor"
+            android:contentDescription="@string/GeneralBackButtonLabel"
+            android:src="@drawable/ic_arrow_back_white_24dp"
+            android:onClick="onViewLogActivityBackButtonClick"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/viewLogActivityHeaderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ViewLogActivity_HeaderText"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/viewLogActivityHeaderSeparator"
@@ -26,33 +54,31 @@
         android:background="@color/separatorColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewLogActivityHeaderTextView" />
+        app:layout_constraintTop_toBottomOf="@id/viewLogActivityHeaderContainer" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/viewLogActivityNotificationTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/viewLogActivityNotificationTextView"
-        android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewLogActivityHeaderSeparator"
-        />
+        app:layout_constraintTop_toBottomOf="@id/viewLogActivityHeaderSeparator" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/viewLogActivityLogDataListView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/viewLogActivityLogDataListView"
-        android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        app:layout_constraintTop_toBottomOf="@id/viewLogActivityNotificationTextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/viewLogActivityNotificationTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

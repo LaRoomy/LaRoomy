@@ -11,16 +11,46 @@
         android:layout_height="wrap_content"
         android:paddingBottom="100dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/setupActivityHeaderTextView"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/SetupActivity_Header"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            android:id="@+id/setupActivityHeaderContainer"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            >
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/setupActivityBackButton"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:background="@color/transparentColor"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_arrow_back_white_24dp"
+                android:contentDescription="@string/GeneralBackButtonLabel"
+                android:onClick="onSetupActivityBackButtonClick"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityHeaderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/SetupActivity_Header"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:id="@+id/setupActivityHeaderSeparator"
@@ -31,7 +61,7 @@
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityHeaderTextView" />
+            app:layout_constraintTop_toBottomOf="@id/setupActivityHeaderContainer" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setupActivityAutoConnectContainer"

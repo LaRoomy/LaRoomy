@@ -13,33 +13,40 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/appHelpActivityHeaderContainer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:orientation="horizontal"
-            android:layout_marginStart="30dp"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/appHelpActivityHeaderImage"
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_44_question_circle_white_vect"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/appHelpActivityBackButton"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/transparentColor"
+                android:src="@drawable/ic_arrow_back_white_24dp"
+                android:contentDescription="@string/GeneralBackButtonLabel"
+                android:onClick="onAppHelpActivityBackButtonClick"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/appHelpActivityHeaderTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
                 android:text="@string/AppHelpActivityHeaderText"
                 android:textSize="@dimen/helpActivity_textSizeHeaderText"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/appHelpActivityHeaderImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -49,7 +56,6 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"

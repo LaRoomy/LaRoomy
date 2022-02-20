@@ -393,5 +393,9 @@ class AppSettingsActivity : AppCompatActivity() {
         startActivity(intent)
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
     }
+
+    fun onSetupActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.onBackPressed()
+    }
 }
 

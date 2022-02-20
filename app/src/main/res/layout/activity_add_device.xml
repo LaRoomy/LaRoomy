@@ -10,11 +10,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
+        android:orientation="horizontal"
         android:id="@+id/addDeviceActivityHeaderContainer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         >
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/addDeviceActivityBackButton"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_arrow_back_white_24dp"
+            android:background="@color/transparentColor"
+            android:onClick="onAddDeviceActivityBackButtonClick"
+            android:contentDescription="@string/GeneralBackButtonLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
@@ -23,8 +41,8 @@
             android:text="@string/AddDeviceActivityHeaderText"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginStart="10dp"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />

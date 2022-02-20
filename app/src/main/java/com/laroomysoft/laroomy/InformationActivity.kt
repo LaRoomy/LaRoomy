@@ -68,4 +68,8 @@ class InformationActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun onInfoActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.onBackPressed()
+    }
 }

@@ -71,4 +71,8 @@ class AppHelpActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun onAppHelpActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.onBackPressed()
+    }
 }

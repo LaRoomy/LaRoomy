@@ -153,6 +153,10 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         startActivity(intent)
     }
 
+    fun onAddDeviceActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.onBackPressed()
+    }
+
 /*
     fun onAddDeviceActivityDoNotShowAgainButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
         findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_yellow_48dp)
