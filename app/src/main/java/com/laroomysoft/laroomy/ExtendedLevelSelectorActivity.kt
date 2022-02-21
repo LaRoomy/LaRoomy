@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -51,6 +52,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var switchContainer: ConstraintLayout
+    private lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +88,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.notificationTextView = findViewById(R.id.elsUserNotificationTextView)
         this.onOffSwitch = findViewById(R.id.elsSwitch)
         this.fluidLevelSlider = findViewById(R.id.exLevelSlider)
+        this.backButton = findViewById(R.id.elsBackButton)
 
         // get the related complex state object
         val exLevelState = ExtendedLevelSelectorState()
@@ -122,6 +125,10 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                 onOffSwitchClicked()
             }
             isChecked = exLevelState.onOffState
+        }
+
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
         }
 
         this.fluidLevelSlider.apply {

@@ -538,4 +538,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             R.anim.finish_activity_slide_animation_out
         )
     }
+
+    fun onDeviceSettingsActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.onBackPressed()
+    }
 }

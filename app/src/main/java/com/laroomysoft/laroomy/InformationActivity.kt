@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -14,6 +15,7 @@ class InformationActivity : AppCompatActivity() {
     lateinit var versionTextView: AppCompatTextView
     lateinit var privacyProtectionSubContainer: ConstraintLayout
     lateinit var termsOfSeviceSubContainer: ConstraintLayout
+    lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +23,12 @@ class InformationActivity : AppCompatActivity() {
 
         this.privacyProtectionSubContainer = findViewById(R.id.infoActivityPrivacyPolicySubContainer)
         this.termsOfSeviceSubContainer = findViewById(R.id.infoActivityTermsOfServiceSubContainer)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.infoActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
 //        val pInfo =
 //            packageManager.getPackageInfo(packageName, 0)
@@ -67,9 +75,5 @@ class InformationActivity : AppCompatActivity() {
                 this.termsOfSeviceSubContainer.visibility = View.VISIBLE
             }
         }
-    }
-
-    fun onInfoActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
     }
 }

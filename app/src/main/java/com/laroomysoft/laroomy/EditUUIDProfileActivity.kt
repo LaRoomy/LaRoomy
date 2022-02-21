@@ -6,6 +6,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import java.util.*
 
@@ -18,6 +19,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
     private lateinit var deleteButton: AppCompatButton
     private lateinit var saveButton: AppCompatButton
     private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
 
     private var mode = ""
     private var elementIndex = -1
@@ -32,6 +34,12 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         deleteButton = findViewById(R.id.editUUIDActivityDeleteButton)
         saveButton = findViewById(R.id.editUUIDActivitySaveButton)
         notificationTextView = findViewById(R.id.editUUIDProfileActivityNotificationTextView)
+        backButton = findViewById(R.id.editUUIDActivityBackButton)
+
+        // add back button functionality
+        backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         mode = this.intent.getStringExtra("activity-mode") ?: "err"
 

@@ -4,8 +4,10 @@ import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import java.lang.Exception
 import java.util.concurrent.Executors
@@ -21,6 +23,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     private lateinit var barGraph: BarGraph
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
 
     private var barDataList = ArrayList<BarGraphData>()
     private var maxBarIndex = -1
@@ -52,6 +55,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                     relatedGlobalElementIndex
                 ).elementText
+        }
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.barGraphActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
         }
 
         // bind the callbacks of the bluetooth-manager to this activity
@@ -420,5 +429,9 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         } catch (e: Exception){
             Log.e("BarGraphDataPipe", "Exception occurred: $e")
         }
+    }
+
+    fun onBarGraphActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.onBackPressed()
     }
 }

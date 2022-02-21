@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import java.lang.Exception
 import java.util.concurrent.Executors
@@ -25,6 +26,7 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +45,11 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
+        // add back button functionality
+        this.backButton = findViewById(R.id.lineGraphActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // set the header-text to the property Name
         this.headerTextView = findViewById<AppCompatTextView>(R.id.lineGraphActivityHeaderTextView).apply {

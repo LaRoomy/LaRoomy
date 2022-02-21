@@ -28,6 +28,7 @@ class AppSettingsActivity : AppCompatActivity() {
     private lateinit var enableLogSwitch: SwitchCompat
     private lateinit var passKeyInputNotificationTextView: AppCompatTextView
     private lateinit var keepScreenActiveSwitchCompat: SwitchCompat
+    private lateinit var backButton: AppCompatImageButton
 
     private var buttonNormalizationRequired = false
 
@@ -41,6 +42,10 @@ class AppSettingsActivity : AppCompatActivity() {
         this.passwordContainer = findViewById(R.id.setupActivityBindingCodeContainer)
         this.passKeyInputNotificationTextView =
             findViewById(R.id.setupActivityBindingKeyNotificationTextView)
+        this.backButton = findViewById(R.id.setupActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         this.autoConnectSwitch =
             findViewById<SwitchCompat>(R.id.setupActivityAutoConnectSwitch).apply {
@@ -392,10 +397,6 @@ class AppSettingsActivity : AppCompatActivity() {
         val intent = Intent(this@AppSettingsActivity, ResetAppDataActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-    }
-
-    fun onSetupActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
     }
 }
 

@@ -4,42 +4,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BarGraphActivity">
-
+    tools:context="com.laroomysoft.laroomy.BarGraphActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bgdHeaderContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/barGraphActivityBackButton"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:background="@color/transparentColor"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_arrow_back_white_24dp"
+            android:contentDescription="@string/GeneralBackButtonLabel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bgdHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:text="@string/BarGraphActivity_HeaderText"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <View
-            android:id="@+id/bgdHeaderSeparator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="5dp"
-            android:background="@color/separatorColor"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bgdHeaderTextView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/bgdHeaderSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@color/separatorColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer" />
+
 
     <com.laroomysoft.laroomy.BarGraph
         android:id="@+id/bgdBarGraphView"
@@ -58,7 +75,7 @@
         app:layout_constraintBottom_toTopOf="@id/bgdActivityNotificationTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bgdHeaderContainer" />
+        app:layout_constraintTop_toBottomOf="@id/bgdHeaderSeparator" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bgdActivityNotificationTextView"

@@ -30,6 +30,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
     private lateinit var bondedDevicesListView: RecyclerView
     private lateinit var bondedDevicesListViewManager: RecyclerView.LayoutManager
     private lateinit var bondedDevicesListAdapter: RecyclerView.Adapter<*>
+    private lateinit var backButton: AppCompatImageButton
 
     private var listUpdateRequired = false
     private var imageRestoreRequired = false
@@ -41,6 +42,12 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
         // get UI Elements
         this.bottomSeparator = findViewById(R.id.addDeviceActivityBottomSeparator)
+        this.backButton = findViewById(R.id.addDeviceActivityBackButton)
+
+        // add back button functionality
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
 /*
         // hide the bonding-hint container if requested
@@ -153,9 +160,6 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         startActivity(intent)
     }
 
-    fun onAddDeviceActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
-    }
 
 /*
     fun onAddDeviceActivityDoNotShowAgainButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {

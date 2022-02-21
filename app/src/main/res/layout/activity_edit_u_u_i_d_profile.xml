@@ -16,20 +16,35 @@
             android:id="@+id/editUUIDActivityHeaderContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="40dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editUUIDActivityBackButton"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:background="@color/transparentColor"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/ic_arrow_back_white_24dp"
+                android:contentDescription="@string/GeneralBackButtonLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/editUUIDActivityHeaderTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
                 android:text="@string/EditUUIDProfileActivityHeaderPlaceholderText"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

@@ -31,7 +31,6 @@
                 android:background="@color/transparentColor"
                 android:src="@drawable/ic_arrow_back_white_24dp"
                 android:contentDescription="@string/GeneralBackButtonLabel"
-                android:onClick="onAppHelpActivityBackButtonClick"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

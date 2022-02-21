@@ -22,10 +22,19 @@ class AppHelpActivity : AppCompatActivity() {
     private lateinit var connectDeviceContentContainer: ConstraintLayout
     private lateinit var deviceBindingExpandImageView: AppCompatImageView
     private lateinit var deviceBindingContentContainer: ConstraintLayout
+    private lateinit var backButton: AppCompatImageButton
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_help)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.appHelpActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
+
 
         // connect device topic elements
         this.connectDeviceExpandImageView = findViewById(R.id.appHelpActivityConnectDeviceExpandImageView)
@@ -70,9 +79,5 @@ class AppHelpActivity : AppCompatActivity() {
                 Log.w("M:HA:onTopicClick", "Warning: ID not processed - ID: ${view.id}")
             }
         }
-    }
-
-    fun onAppHelpActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
     }
 }
