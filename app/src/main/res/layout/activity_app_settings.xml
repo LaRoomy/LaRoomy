@@ -359,7 +359,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityUUIDManagerButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -468,7 +468,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityShowLogButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -575,7 +575,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityResetDataButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/cmplx_prop_nav_arrow" />
+                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

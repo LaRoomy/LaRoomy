@@ -97,6 +97,6 @@
 
       android:visibility="gone"
 
-      app:srcCompat="@drawable/ic_navigate_next_white_48dp" />
+      app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
 
 </LinearLayout>

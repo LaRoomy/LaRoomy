@@ -47,10 +47,10 @@ class AppHelpActivity : AppCompatActivity() {
                 when(connectDeviceContentContainer.visibility){
                     View.GONE -> {
                         connectDeviceContentContainer.visibility = View.VISIBLE
-                        connectDeviceExpandImageView.setImageResource(R.drawable.exp_arrow_up)
+                        connectDeviceExpandImageView.setImageResource(R.drawable.ic_expand_arrow_up_sq32_vect)
                     } else -> {
                         connectDeviceContentContainer.visibility = View.GONE
-                        connectDeviceExpandImageView.setImageResource(R.drawable.exp_arrow_right)
+                        connectDeviceExpandImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
                     }
                 }
             }
@@ -58,10 +58,10 @@ class AppHelpActivity : AppCompatActivity() {
                 when(deviceBindingContentContainer.visibility){
                     View.GONE -> {
                         deviceBindingContentContainer.visibility = View.VISIBLE
-                        deviceBindingExpandImageView.setImageResource(R.drawable.exp_arrow_up)
+                        deviceBindingExpandImageView.setImageResource(R.drawable.ic_expand_arrow_up_sq32_vect)
                     } else -> {
                         deviceBindingContentContainer.visibility = View.GONE
-                        deviceBindingExpandImageView.setImageResource(R.drawable.exp_arrow_right)
+                        deviceBindingExpandImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
                     }
                 }
             }

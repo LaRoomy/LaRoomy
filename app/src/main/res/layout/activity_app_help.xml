@@ -93,7 +93,7 @@
                     android:id="@+id/appHelpActivityConnectDeviceExpandImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/exp_arrow_right"
+                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -229,7 +229,7 @@
                     android:id="@+id/appHelpActivityDeviceBindingExpandImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/exp_arrow_right"
+                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

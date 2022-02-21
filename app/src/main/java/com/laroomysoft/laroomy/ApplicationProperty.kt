@@ -243,16 +243,16 @@ fun resourceIdForImageId(imageID: Int): Int {
         4 -> R.drawable.lightbulb_lightblue
         5 -> R.drawable.lightbulb_monocrom
         6 -> R.drawable.ic_06_lightbulb_blue_white_vect     // done
-        7 -> R.drawable.ic_07_sun_yellow_vect               // done - with errors
-        8 -> R.drawable.ic_08_sun_white_vect                // done - with errors
-        9 -> R.drawable.ic_09_sun_blue_vect                 // done - with errors
+        7 -> R.drawable.ic_07_sun_yellow_vect               // done
+        8 -> R.drawable.ic_08_sun_white_vect                // done
+        9 -> R.drawable.ic_09_sun_blue_vect                 // done
         10 -> R.drawable.ic_10_clock_running_blue_white_vect// done
         11 -> R.drawable.ic_11_clock_reload_blue_white_vect // done
         12 -> R.drawable.ic_12_time_setup_white_vect        // done
-        13 -> R.drawable.ic_13_property_group_blue_white_vect// done - with errors
+        13 -> R.drawable.ic_13_property_group_blue_white_vect// done
         14 -> R.drawable.ic_14_reload_turnleft_blue_vect    // done
         15 -> R.drawable.ic_15_reload_turnleft_white_vect   // done
-        16 -> R.drawable.ic_16_reload_turnright_white_vect  // done - with errors
+        16 -> R.drawable.ic_16_reload_turnright_white_vect  // done - with errors (scaling of the stroke width)
         17 -> R.drawable.ic_17_segmented_circle_blue_white_vect // done
         18 -> R.drawable.ic_18_sync_white_vect              // done
         19 -> R.drawable.ic_19_sync_blue_white_vect         // done
@@ -331,32 +331,31 @@ fun resourceIdForImageId(imageID: Int): Int {
         92 -> R.drawable.ic_92_arrow_right_blue_vect        // done
         93 -> R.drawable.ic_93_arrow_down_blue_vect         // done
         94 -> R.drawable.ic_94_arrow_left_blue_vect         // done
-        95 -> R.drawable.tv_white
-        96 -> R.drawable.tv_white_blue
-        97 -> R.drawable.arrow_up_down_blue_white
-        98 -> R.drawable.arrow_left_right_blue_white
-        99 -> R.drawable.hand_blue_white
-        100 -> R.drawable.info_white_blue
-        101 -> R.drawable.stop_sign
-        102 -> R.drawable.shield_power
-        103 -> R.drawable.shield_ok
-        104 -> R.drawable.shield_attention
-        105 -> R.drawable.lock_unlocked_blue_white
-        106 -> R.drawable.key_white
-        107 -> R.drawable.key_blue
-        108 -> R.drawable.face_id_white
-        109 -> R.drawable.undo_white
-        110 -> R.drawable.redo_white
-        111 -> R.drawable.flash_blue
-        112 -> R.drawable.flash_yellow
-        113 -> R.drawable.add_white_sq48_simple
-        114 -> R.drawable.add_blue_sq48_simple
-        115 -> R.drawable.ic_115_rgb_circles_vect               // done - with errors
-        116 -> R.drawable.ic_116_rgb_bars_vect
-        117 -> R.drawable.ic_117_rgb_point_circle_vect          // done - with errors
-
-        118 -> R.drawable.ic_118_tool_circle_blue_white_vect    // done
-        119 -> R.drawable.ic_119_tools_blue_white_vect          // done
+        95 -> R.drawable.ic_95_tv_white_vect                // done -
+        96 -> R.drawable.ic_96_tv_blue_white_vect           // done
+        97 -> R.drawable.ic_97_arrows_up_down_blue_white_vect// done
+        98 -> R.drawable.ic_98_arrows_right_left_blue_white_vect// done
+        99 -> R.drawable.ic_99_hand_white_vect              // done
+        100 -> R.drawable.ic_100_hand_blue_white_vect       // done
+        101 -> R.drawable.ic_101_stop_sign_vect             // done
+        102 -> R.drawable.ic_102_shield_power_blue_white_vect// done
+        103 -> R.drawable.ic_103_shield_ok_blue_white_vect  // done
+        104 -> R.drawable.ic_104_shield_exclamation_blue_white_vect// done
+        105 -> R.drawable.ic_105_info_circle_blue_white_vect// done
+        106 -> R.drawable.ic_106_info_circle_white_vect     // done
+        107 -> R.drawable.ic_107_key_white_vect             // done
+        108 -> R.drawable.ic_108_key_blue_white_vect        // done
+        109 -> R.drawable.ic_109_undo_white                 // done
+        110 -> R.drawable.ic_110_redo_white                 // done
+        111 -> R.drawable.ic_111_flash_blue_vect            // done
+        112 -> R.drawable.ic_112_flash_yellow_vect          // done
+        113 -> R.drawable.ic_113_add_white_vect             // done
+        114 -> R.drawable.ic_114_add_blue_vect              // done
+        115 -> R.drawable.ic_115_rgb_circles_vect           // done
+        116 -> R.drawable.ic_116_rgb_bars_vect              // done - remove ???
+        117 -> R.drawable.ic_117_rgb_point_circle_vect      // done
+        118 -> R.drawable.ic_118_tool_circle_blue_white_vect// done
+        119 -> R.drawable.ic_119_tools_blue_white_vect      // done
 
         // TODO: implement all new image resources here...
 
