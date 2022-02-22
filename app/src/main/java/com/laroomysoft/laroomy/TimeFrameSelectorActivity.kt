@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.TimePicker
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -24,6 +25,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var toTimePicker: TimePicker
     private lateinit var fromTimePicker: TimePicker
+    private lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.tfsBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // set the header-text to the property Name
         this.headerTextView = findViewById<AppCompatTextView>(R.id.tfsHeaderTextView).apply {

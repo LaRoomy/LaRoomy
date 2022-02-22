@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils
 import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 
 class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChangeListener, DialogInterface.OnDismissListener {
@@ -21,6 +22,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     private lateinit var resetPropertyCacheCheckBox: AppCompatCheckBox
 
     private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
 
     private var blockInternalOnCheckExecution = false
     private var dataResetConfirmedByUser = false
@@ -28,6 +30,12 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reset_app_data)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.resetAppActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         (applicationContext as ApplicationProperty).appSettingsResetDone = false
 

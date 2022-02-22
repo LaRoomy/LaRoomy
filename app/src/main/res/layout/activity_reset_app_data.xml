@@ -11,16 +11,43 @@
         android:paddingBottom="100dp"
         tools:context=".ResetAppDataActivity">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/resetAppActivityHeaderTextView"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ResetAppActivity_HeaderText"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/resetAppActivityHeaderContainer"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            >
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/resetAppActivityBackButton"
+                android:minHeight="48dp"
+                android:minWidth="48dp"
+                android:layout_marginStart="10dp"
+                android:contentDescription="@string/GeneralBackButtonLabel"
+                android:background="@color/transparentColor"
+                android:src="@drawable/ic_arrow_back_white_24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/resetAppActivityHeaderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ResetAppActivity_HeaderText"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:id="@+id/resetAppActivityHeaderSeparator"
@@ -31,7 +58,7 @@
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/resetAppActivityHeaderTextView" />
+            app:layout_constraintTop_toBottomOf="@id/resetAppActivityHeaderContainer" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/resetAppActivityDataToResetTextView"

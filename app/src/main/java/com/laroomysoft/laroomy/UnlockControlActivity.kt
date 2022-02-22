@@ -43,6 +43,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private lateinit var parentContainer: ConstraintLayout
     private lateinit var popupWindow: PopupWindow
     private lateinit var lockConditionStatusContainer: ConstraintLayout
+    private lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +63,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.lockUnlockImageView = findViewById(R.id.ucLockConditionImageView)
         this.parentContainer = findViewById(R.id.unLockActivityParentContainer)
         this.lockConditionStatusContainer = findViewById(R.id.ucLockConditionStatusContainer)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.unlockControlBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)

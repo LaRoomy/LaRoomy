@@ -10,6 +10,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -34,6 +35,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private lateinit var onOffSwitchContainer: ConstraintLayout
     private lateinit var modeSelectorContainer: ConstraintLayout
     private lateinit var transitionTypeSetupContainer: ConstraintLayout
+    private lateinit var backButton: AppCompatImageButton
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
@@ -79,6 +81,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // add listeners
         colorPickerView.addOnColorSelectedListener(this)
         colorPickerView.addOnColorChangedListener(this)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.rgbBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // get the state for this RGB control
         val rgbState = RGBSelectorState()

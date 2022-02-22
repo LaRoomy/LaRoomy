@@ -30,7 +30,6 @@
                 android:minWidth="48dp"
                 android:background="@color/transparentColor"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
                 android:src="@drawable/ic_arrow_back_white_24dp"
                 android:contentDescription="@string/GeneralBackButtonLabel"
                 android:onClick="onDeviceSettingsActivityBackButtonClick"

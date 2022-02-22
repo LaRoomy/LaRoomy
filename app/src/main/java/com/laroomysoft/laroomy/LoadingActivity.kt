@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageButton
 import com.github.ybq.android.spinkit.SpinKitView
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -31,6 +32,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     //private var authenticationAttemptCounter = 0
 
     private lateinit var spinKitView: SpinKitView
+    private lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.loadingActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // if logging is enabled set the appropriate data
         if((applicationContext as ApplicationProperty).eventLogEnabled){

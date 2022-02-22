@@ -7,6 +7,7 @@ import android.view.WindowManager
 import android.widget.TimePicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -22,11 +23,10 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
 
-
-
     private lateinit var simpleTimePicker: TimePicker
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var notificationTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +43,12 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.stsBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // set the header-text to the property Name
         this.headerTextView = findViewById<AppCompatTextView>(R.id.stsHeaderTextView).apply {

@@ -26,6 +26,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
     private lateinit var userNotificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -54,6 +55,12 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         // get UI-Views
         this.userNotificationTextView = findViewById(R.id.navConUserNotificationTextView)
         this.headerTextView = findViewById(R.id.navConHeaderTextView)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.navConBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         // set header text to property name
         this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText

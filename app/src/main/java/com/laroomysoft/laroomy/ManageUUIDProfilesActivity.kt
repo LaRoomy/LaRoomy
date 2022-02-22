@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,12 +18,19 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
     private lateinit var uuidProfileListView: RecyclerView
     private lateinit var uuidProfileListAdapter: RecyclerView.Adapter<*>
     private lateinit var uuidProfileListViewManager: RecyclerView.LayoutManager
+    private lateinit var backButton: AppCompatImageButton
 
     private var internalBackNavigation = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_u_u_i_d_profiles)
+
+        // add back button functionality
+        this.backButton = findViewById(R.id.uuidProfileActivityBackButton)
+        this.backButton.setOnClickListener {
+            this.onBackPressed()
+        }
 
         this.uuidProfileListViewManager = LinearLayoutManager(this)
         this.uuidProfileListAdapter = ProfileListAdapter((applicationContext as ApplicationProperty).uuidManager.uUIDProfileList, this)
