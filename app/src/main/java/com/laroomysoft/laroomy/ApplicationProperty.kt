@@ -239,9 +239,9 @@ fun resourceIdForImageId(imageID: Int): Int {
         0 -> R.drawable.ic_00_image_error_state_vect        // done
         1 -> R.drawable.ic_01_placeholder_image_vect        // done
         2 -> R.drawable.ic_02_adjust_vect                   // done
-        3 -> R.drawable.lightbulb_darkblue
-        4 -> R.drawable.lightbulb_lightblue
-        5 -> R.drawable.lightbulb_monocrom
+        3 -> R.drawable.ic_03_adjust_2_blue_white_vect      // done
+        4 -> R.drawable.ic_04_lightbulb_white_vect          // done
+        5 -> R.drawable.ic_05_lightbulb_blue_white_vect     // done
         6 -> R.drawable.ic_06_lightbulb_blue_white_vect     // done
         7 -> R.drawable.ic_07_sun_yellow_vect               // done
         8 -> R.drawable.ic_08_sun_white_vect                // done
@@ -352,10 +352,14 @@ fun resourceIdForImageId(imageID: Int): Int {
         113 -> R.drawable.ic_113_add_white_vect             // done
         114 -> R.drawable.ic_114_add_blue_vect              // done
         115 -> R.drawable.ic_115_rgb_circles_vect           // done
-        116 -> R.drawable.ic_116_rgb_bars_vect              // done - remove ???
+        116 -> R.drawable.ic_116_rgb_slider_adjust_vect     // done
         117 -> R.drawable.ic_117_rgb_point_circle_vect      // done
         118 -> R.drawable.ic_118_tool_circle_blue_white_vect// done
         119 -> R.drawable.ic_119_tools_blue_white_vect      // done
+        120 -> R.drawable.ic_120_slider_adjust_blue_white_vect// done
+        121 -> R.drawable.ic_121_subtract_white_vect        // done
+        122 -> R.drawable.ic_122_subtract_blue_vect         // done
+        123 -> R.drawable.ic_123_brightness_white_vect      // done
 
         // TODO: implement all new image resources here...
 

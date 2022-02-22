@@ -309,7 +309,7 @@ class AppSettingsActivity : AppCompatActivity() {
             // the password is hidden -> show it
             passwordViewModeHidden -> {
                 // set the crossed eye image
-                passwordViewModeButton.setImageResource(R.drawable.eye_hide)
+                passwordViewModeButton.setImageResource(R.drawable.ic_visibility_off_gray)
                 // show the password
                 passwordBox.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 // save the state-var
@@ -318,7 +318,7 @@ class AppSettingsActivity : AppCompatActivity() {
             // the password is visible -> hide it
             passwordViewModeVisible -> {
                 // set the normal eye image
-                passwordViewModeButton.setImageResource(R.drawable.eye_show)
+                passwordViewModeButton.setImageResource(R.drawable.ic_visibility_gray)
                 // hide the password
                 passwordBox.transformationMethod = PasswordTransformationMethod.getInstance()
                 // save the state-var
