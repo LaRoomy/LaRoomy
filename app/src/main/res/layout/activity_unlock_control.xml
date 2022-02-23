@@ -77,7 +77,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="onLockImageClick"
-                android:src="@drawable/lock_blue_white_locked_sq128"
+                android:src="@drawable/ic_lock_blue_white_locked_sq128_vect"
+                android:contentDescription="@string/UnlockControlActivityLockImageLabel"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -100,7 +101,8 @@
                 android:layout_marginEnd="10dp"
                 android:background="@color/transparentViewColor"
                 android:onClick="onChangePinButtonClick"
-                android:src="@drawable/change_pin_blue_white_sq48"
+                android:src="@drawable/ic_change_pin_blue_white_sq48"
+                android:contentDescription="@string/UnlockControlActivityChangePinButtonLabel"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -165,6 +167,22 @@
                     app:layout_constraintStart_toEndOf="@id/ucPinEntryTextView"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ucShowPinButton"
+                    android:minHeight="48dp"
+                    android:minWidth="48dp"
+                    android:background="@color/transparentColor"
+                    android:src="@drawable/ic_visibility_gray"
+                    android:contentDescription="@string/UnlockControlActivityShowHidePinButtonLabel"
+                    app:layout_constraintStart_toEndOf="@id/ucCurrentPinDisplayTextView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+<!--
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucShowPinButton"
                     android:layout_width="wrap_content"
@@ -179,6 +197,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

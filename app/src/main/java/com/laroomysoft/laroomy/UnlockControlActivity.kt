@@ -36,7 +36,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
-    private lateinit var showHideButton: AppCompatButton
+    private lateinit var showHideButton: AppCompatImageButton
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var currentPinDisplayTextView: AppCompatTextView
     private lateinit var lockUnlockImageView: AppCompatImageView
@@ -68,6 +68,11 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.backButton = findViewById(R.id.unlockControlBackButton)
         this.backButton.setOnClickListener {
             this.onBackPressed()
+        }
+
+        // add show/hide pin button functionality
+        this.showHideButton.setOnClickListener {
+            this.onShowHideButtonClick(it)
         }
 
         // get the element ID + UI-Adapter Index
@@ -174,13 +179,13 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         if(unlockControlState.isValid()) {
             if(unlockControlState.unLocked){
                 this.lockState = UC_STATE_UNLOCKED
-                this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_unlocked_sq128)
+                this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_unlocked_sq128_vect)
                 this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
                 this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Unlocked)
                 this.notifyUser(getString(R.string.UnlockCtrl_LockHintMessageText), R.color.successLightColor)
             } else {
                 this.lockState = UC_STATE_LOCKED
-                this.lockUnlockImageView.setImageResource(R.drawable.lock_blue_white_locked_sq128)
+                this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_locked_sq128_vect)
                 this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
                 this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Locked)
                 this.notifyUser("", R.color.normalTextColor)
@@ -266,7 +271,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.updatePinDisplay()
     }
 
-    fun onShowHideButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    private fun onShowHideButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 
         showPin = when(showPin){
             true -> {
@@ -281,9 +286,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                     this.currentPinDisplayTextView.text = ""
                 }
 
-
-
-                this.showHideButton.text = getString(R.string.UnlockCtrl_ButtonText_Show)
+                this.showHideButton.setImageResource(R.drawable.ic_visibility_gray)
                 false
             }
             else -> {
@@ -294,7 +297,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                     this.currentPinDisplayTextView.text = ""
                 }
 
-                this.showHideButton.text = getString(R.string.UnlockCtrl_ButtonText_Hide)
+                this.showHideButton.setImageResource(R.drawable.ic_visibility_off_gray)
                 true
             }
         }

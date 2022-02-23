@@ -243,7 +243,7 @@
     <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Settings</string>
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
 
-    <!-- content descriptions and label -->
+    <!-- content descriptions and labels -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
     <string name="DeviceTypeHeaderImageButtonDescription">Remove the device and select a new device</string>
@@ -265,7 +265,10 @@
     <string name="DeviceMainActivityPropertyListDescription" translatable="false">Shows the properties of the remote device</string>
     <string name="AddDeviceListElementContentDescription" translatable="false">Adds the device to the known devices</string>
     <string name="GeneralBackButtonLabel" translatable="false">Goes back to previous activity</string>
-
+    <string name="GeneralForwardButtonLabel" translatable="false">Navigates to the next activity</string>
+    <string name="UnlockControlActivityChangePinButtonLabel" translatable="false">Change the pin of the remote device</string>
+    <string name="UnlockControlActivityLockImageLabel" translatable="false">This image indicates the lock-status of the remote device. If unlocked, the remote device can be locked by tapping this image.</string>
+    <string name="UnlockControlActivityShowHidePinButtonLabel" translatable="false">Show or hide the pin by pressing this image</string>
     <!-- Activity Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>

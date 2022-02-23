@@ -1,8 +1,6 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
@@ -12,8 +10,10 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.LinearLayout
+import android.widget.NumberPicker
+import android.widget.PopupWindow
+import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -22,7 +22,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
-import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 

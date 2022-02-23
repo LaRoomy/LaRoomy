@@ -91,11 +91,10 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     />
 
-
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/arrow_toright"
+                    android:src="@drawable/ic_arrow_toright_sq38px"
                     android:layout_marginStart="5dp"
                     android:id="@+id/fromImageView"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -139,7 +138,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/arrow_toleft"
+                    android:src="@drawable/ic_arrow_toleft_sq38px"
                     android:id="@+id/toImageView"
                     android:layout_marginStart="10dp"
                     app:layout_constraintStart_toEndOf="@id/toTextView"
