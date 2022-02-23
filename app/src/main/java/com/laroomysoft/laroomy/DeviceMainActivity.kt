@@ -1409,7 +1409,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             holder.linearLayout.findViewById<AppCompatImageView>(R.id.devicePropertyIdentificationImage)
                 .apply {
                     setBackgroundResource(
-                        elementToRender.imageID
+                        elementToRender.imageResourceID
                     )
                 }
 
@@ -1417,6 +1417,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             holder.linearLayout.findViewById<AppCompatTextView>(R.id.devicePropertyNameTextView)
                 .apply {
                     this.text = elementToRender.elementText
+                    this.setTextColor(elementToRender.textColorResource)
                     if(elementToRender.elementType == GROUP_ELEMENT){
                         this.textSize = 18F
                         setTypeface(typeface, Typeface.BOLD)
@@ -1431,6 +1432,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 .apply {
                     this.visibility = elementToRender.buttonVisibility
                     if(elementToRender.buttonVisibility == View.VISIBLE){
+                        this.isEnabled = elementToRender.isEnabled
                         this.text = elementToRender.elementSubText
                     } else {
                         this.text = ""

@@ -10,6 +10,7 @@
     <color name="WarningColor">#FFFF00</color>
     <color name="InfoColor">#FFFFFF</color>
     <color name="normalTextColor">#FFFFFF</color>
+    <color name="disabledTextColor">#888888</color>
     <color name="normalOutlineColor">#FFFFFF</color>
     <color name="selectedTextColor">#F5CD06</color>
     <color name="expectedBackground">#222222</color>

@@ -371,16 +371,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // evaluate transmission type
             when(data[0]){
                 '1' -> {
+                    val id =
+                        a2CharHexValueToIntValue(data[2], data[3])
                     // property definition data
-                    if(data[1] == '6'){
-                        // is remove transmission, so remove
-                        dataProcessed = true
-                        this.removePropertyElement(
-                            a2CharHexValueToIntValue(data[2], data[3])
-                        )
-                    } else {
-                        // must be response, update or insert transmission
-                        dataProcessed = readPropertyString(data, dataSize)
+                    when (data[1]) {
+                        '6' -> {
+                            // is remove transmission, so remove
+                            dataProcessed = true
+                            this.removePropertyElement(id)
+                        }
+                        '7' -> {
+                            // is enable transmission, so enable
+                            dataProcessed = true
+                            this.enablePropertyElement(id, true)
+                        }
+                        '8' -> {
+                            // is disable transmission, so disable
+                            dataProcessed = true
+                            this.enablePropertyElement(id, false)
+                        }
+                        else -> {
+                            // must be response, update or insert transmission
+                            dataProcessed = readPropertyString(data, dataSize)
+                        }
                     }
                 }
                 '2' -> {
@@ -2045,6 +2058,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // add the property element(s) to the group
                         val propertyEntry = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
                         propertyEntry.isGroupMember = true
+                        propertyEntry.isEnabled = laRoomyDeviceProperty.isEnabled
                         propertyEntry.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
                         propertyEntry.imageID = laRoomyDeviceProperty.imageID
                         propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
@@ -2109,6 +2123,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // create the entry
                         val propertyEntry = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
                         propertyEntry.internalElementIndex = laRoomyDeviceProperty.propertyIndex
+                        propertyEntry.isEnabled = laRoomyDeviceProperty.isEnabled
                         propertyEntry.imageID = laRoomyDeviceProperty.imageID
                         propertyEntry.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
                         propertyEntry.propertyType = laRoomyDeviceProperty.propertyType
@@ -2459,6 +2474,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             if((laRoomyDeviceProperty.propertyIndex == devicePropertyListContentInformation.internalElementIndex) && devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT){
                 // NOTE: the complex state is not included in the transmission so it remains 'unset' at this point
                 devicePropertyListContentInformation.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
+                devicePropertyListContentInformation.isEnabled = laRoomyDeviceProperty.isEnabled
                 devicePropertyListContentInformation.isGroupMember = laRoomyDeviceProperty.isGroupMember
                 devicePropertyListContentInformation.imageID = laRoomyDeviceProperty.imageID
                 devicePropertyListContentInformation.internalElementIndex = laRoomyDeviceProperty.propertyIndex
@@ -2606,6 +2622,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // define element to insert in UI-List
             val uIElementContentInformation = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
             uIElementContentInformation.imageID = laRoomyDeviceProperty.imageID
+            uIElementContentInformation.isEnabled = laRoomyDeviceProperty.isEnabled
             uIElementContentInformation.isGroupMember = laRoomyDeviceProperty.isGroupMember
             uIElementContentInformation.internalElementIndex = laRoomyDeviceProperty.propertyIndex// obsolete
             uIElementContentInformation.elementDescriptorText = laRoomyDeviceProperty.propertyDescriptor
@@ -2879,6 +2896,40 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             } catch (e: Exception) {
                 Log.e("removeGroupElement", "Exception: $e")
             }
+        }
+    }
+
+    private fun enablePropertyElement(propertyIndex: Int, enable: Boolean){
+
+        var wasFound = false
+
+        // at first update the element in the internal property list
+        this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
+            if(index == propertyIndex){
+                laRoomyDeviceProperty.isEnabled = enable
+                wasFound = true
+                return@forEachIndexed
+            }
+        }
+        if(wasFound){
+            // update the parameter in the ui-list
+            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                if((devicePropertyListContentInformation.internalElementIndex == propertyIndex)&&(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
+                    devicePropertyListContentInformation.isEnabled = enable
+
+                    // launch event if device main page is open or mark as changed for later update
+                    if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
+                        applicationProperty.uiAdapterChanged = true
+                        devicePropertyListContentInformation.hasChanged = true
+                    } else {
+                        this.propertyCallback.onUIAdaptableArrayItemChanged(index)
+                    }
+                    return@forEachIndexed
+                }
+            }
+        } else {
+            Log.e("enablePropertyElement", "Error: Request to update property element with index $propertyIndex failed. Index not found!")
+            applicationProperty.logControl("E: Request to update property element with index -$propertyIndex- failed. Index not found!")
         }
     }
 

@@ -1280,6 +1280,12 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     var canNavigateForward = false
     private set
 
+    var isEnabled = true
+    set(value) {
+        this.isAccessible = false
+        field = value
+    }
+
     var hasChanged = false
 
     var isGroupMember = false
@@ -1294,7 +1300,6 @@ class DevicePropertyListContentInformation(val elementType: Int) {
         field = value
     }
 
-    //var elementType = -1 //SEPARATOR_ELEMENT
     var isAccessible = false
     private set
 
@@ -1321,16 +1326,26 @@ class DevicePropertyListContentInformation(val elementType: Int) {
         field = value
     }
 
-    var imageID = R.drawable.ic_00_image_error_state_vect
-    set(value) {
-        field = resourceIdForImageId(value)
-    }
+    var imageID = 0
+
+//    set(value) {
+//        field = if(this.isEnabled) {
+//            resourceIdForImageId(value)
+//        } else {
+//            resourceIdForDisabledImageId(value)
+//        }
+//    }
+
+    var imageResourceID = R.drawable.ic_00_dis_image_error_state_vect
+    private set
 
     var simplePropertyState = -1
     var complexPropertyState = ComplexPropertyState()
 
     // resources for the visual state of the item
     lateinit var backgroundDrawable : Drawable //= R.drawable.single_property_list_element_background
+    private set
+    var textColorResource = 0
     private set
     var switchVisibility = View.GONE
     private set
@@ -1345,6 +1360,18 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     // NOTE: when creating an object, do only set the descriptor, the elementText will be set automatically
 
     fun update(context: Context){
+        // at first set the right image resource id
+        this.imageResourceID = if(this.isEnabled) {
+            resourceIdForImageId(this.imageID)
+        } else {
+            resourceIdForDisabledImageId(this.imageID)
+        }
+        // set the text color in relation to the enabled param
+        this.textColorResource = if(this.isEnabled){
+            context.getColor(R.color.normalTextColor)
+        } else {
+            context.getColor(R.color.disabledTextColor)
+        }
         when(this.elementType){
             GROUP_ELEMENT -> {
                 // define the background
@@ -1556,10 +1583,10 @@ class LaRoomyDeviceProperty {
     var isGroupMember = false
     var groupIndex = -1
     var imageID = -1
-    //var hasChanged = false
     var propertyState = -1
     var flags = -1
     var complexPropertyState = ComplexPropertyState()
+    var isEnabled = true
 
     override fun equals(other: Any?): Boolean {
 
@@ -1633,8 +1660,11 @@ class LaRoomyDeviceProperty {
                 this.flags = Integer.decode(fgs)
                 this.propertyState = Integer.decode(propState)
 
-                if ((this.flags and 0x01) != 0) {
+                if((this.flags and 0x01) != 0) {
                     this.isGroupMember = true
+                }
+                if((this.flags and 0x02) != 0) {
+                    this.isEnabled = false
                 }
 
                 if (verboseLog) {
