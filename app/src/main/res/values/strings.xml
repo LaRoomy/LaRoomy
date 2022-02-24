@@ -31,6 +31,7 @@
     <string name="CA_TransmissionTimeoutOccurred">Transmission timeout: Remote device not responding</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
+    <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">disconnected - trying to reconnect</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
     <string name="DMA_Ready">Ready</string>
     <string name="DMA_DeviceConnectionSuspended">Connection suspended</string>

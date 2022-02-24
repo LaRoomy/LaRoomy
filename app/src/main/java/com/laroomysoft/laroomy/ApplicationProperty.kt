@@ -233,8 +233,6 @@ class ApplicationProperty : Application() {
     }
 }
 
-
-
 interface OnDeviceListItemClickListener {
     fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel)
 }

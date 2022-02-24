@@ -87,6 +87,7 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_17_segmented_circle_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_32_settings_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_37_conjunction_blue_white_vect.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_41_checkmark_blue_vect.xml" value="0.2355" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_98_arrows_right_left_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_add_white_36dp.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_lock_blue_white_unlocked_sq128_vect.xml" value="0.2085" />
@@ -100,7 +101,7 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout-land/activity_unlock_control.xml" value="0.25" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_add_device.xml" value="0.2351851851851852" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_help.xml" value="0.5" />
-        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_settings.xml" value="0.23472222222222222" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_app_settings.xml" value="0.22" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_device_main.xml" value="0.33" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_device_settings.xml" value="0.22546296296296298" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/activity_extended_level_selector.xml" value="0.33" />
@@ -119,7 +120,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

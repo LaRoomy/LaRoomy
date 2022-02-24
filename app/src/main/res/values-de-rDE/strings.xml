@@ -35,6 +35,7 @@
 
 
     <string name="DMA_ConnectionStatus_disconnected">getrennt</string>
+    <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">getrennt - wird erneut versucht</string>
     <string name="DMA_ConnectionStatus_connected">verbunden</string>
     <string name="DMA_Ready">Bereit</string>
     <string name="DMA_DeviceConnectionSuspended">Verbindung unterbrochen</string>

@@ -45,6 +45,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private lateinit var deviceHeaderNotificationTextView: AppCompatTextView
     private lateinit var deviceHeaderNotificationContainer: ConstraintLayout
+    private lateinit var deviceHeaderNameContainer: ConstraintLayout
 
     //private lateinit var deviceSettingsButton: AppCompatImageButton
 
@@ -84,13 +85,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.deviceMenuButton = findViewById(R.id.deviceMenuImageButton)
         this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainActivityDeviceTypeHeaderNameTextView)
         this.deviceConnectionStatusTextView = findViewById(R.id.deviceMainActivityDeviceConnectionStatusTextView)
+        this.deviceHeaderNameContainer = findViewById(R.id.deviceMainActivityDeviceHeaderNameContainer)
 
-        //this.deviceHeaderNotificationImageView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderImageView)
+        // add on click listener to name-container
+        this.deviceHeaderNameContainer.setOnClickListener {
+            this.onReconnectDevice()
+        }
 
         this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
         this.deviceHeaderNotificationContainer = findViewById(R.id.deviceInfoSubHeaderContainer)
-
-        //this.deviceSettingsButton = findViewById(R.id.deviceMainActivityDeviceSettingsButton)
 
         // init recycler view!!
         this.devicePropertyListLayoutManager = object : LinearLayoutManager(this) {
@@ -111,21 +114,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
             }
         }
-
-        // set empty list placeholder in array-list
-/*
-        val dc = DevicePropertyListContentInformation()
-        dc.elementType = NO_CONTENT_ELEMENT
-        this.devicePropertyList.add(dc)
-*/
-
-        // TODO: this is a new way, must be tested, if the ui-array is complete, copy it
-        /*if(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.isNotEmpty()){
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.forEach {
-                this.propertyList.add(it)
-            }
-        }*/
-        //this.propertyList = ApplicationProperty.bluetoothConnectionManager.uIAdapterList
 
         // bind array to adapter
         this.devicePropertyListViewAdapter =
@@ -702,6 +690,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             )
         }
 
+        // if item is disabled skip execution of this method
+        if(!devicePropertyListContentInformation.isEnabled){
+            if(verboseLog){
+                Log.d("M:CB:onNavElementClk", "Navigatable element was clicked. Element is disabled. Skip execution!")
+            }
+            return
+        }
+
         // set it to selected color
         setPropertyToSelectedState(index)
 
@@ -892,18 +888,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
 
-    fun onReconnectDevice(@Suppress("UNUSED_PARAMETER")view: View){
-        // re-connect
-        // confirm device-properties???
-        // re-connect and re-new the device-properties???
-
+    private fun onReconnectDevice(){
         if(!ApplicationProperty.bluetoothConnectionManager.isConnected) {
-            ApplicationProperty.bluetoothConnectionManager.close()
-            ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
-        } else {
-            // TODO: remove this, this is temporary
-            //ApplicationProperty.bluetoothConnectionManager.sendData("D024$")
-            //this.reloadProperties()
+            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+
+            this.deviceConnectionStatusTextView.setTextColor(
+                getColor(R.color.disconnectedTextColor)
+            )
+            this.deviceConnectionStatusTextView.text = getString(R.string.DMA_ConnectionStatus_disconnected_tryToReconnect)
+
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                ApplicationProperty.bluetoothConnectionManager.resumeConnection()
+            }, 500, TimeUnit.MILLISECONDS)
         }
     }
 
@@ -1444,6 +1440,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 .apply {
                     this.visibility = elementToRender.switchVisibility
                     this.isChecked = elementToRender.simplePropertyState > 0
+                    this.isEnabled = elementToRender.isEnabled
                 }
 
             // level textView properties
@@ -1458,7 +1455,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
 
             // navigation image properties
-            holder.linearLayout.findViewById<AppCompatImageView>(R.id.forwardImage).visibility = elementToRender.navigationImageVisibility
+            holder.linearLayout.findViewById<AppCompatImageView>(R.id.forwardImage).apply {
+                visibility = elementToRender.navigationImageVisibility
+                if(elementToRender.isEnabled){
+                    setImageResource(R.drawable.ic_complex_property_navigation_arrow)
+                } else {
+                    setImageResource(R.drawable.ic_complex_property_disabled_navigation_arrow)
+                }
+            }
         }
 
             /*
