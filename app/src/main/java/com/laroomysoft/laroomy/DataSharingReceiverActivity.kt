@@ -47,6 +47,8 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                 notifyUser(getString(R.string.DataSharingActivity_Message_YouAreOriginator), R.color.normalTextColor)
             } else {
 
+                // TODO: look if the mac-address is saved before, check if the key changed and notify the user respectively! (key updated / key already saved!)
+
                 if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
                     // data valid: save the data
                     val pair = BindingPair()
@@ -80,7 +82,7 @@ class DataSharingReceiverActivity : AppCompatActivity() {
         // navigate back to App...
         val intent: Intent = Intent(this@DataSharingReceiverActivity, MainActivity::class.java).apply {
             //flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP // old
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
             // NOTE: CLEAR_TOP closes all other activities on the top of the main activity
             // https://developer.android.com/guide/components/activities/tasks-and-back-stack#ManagingTasks
