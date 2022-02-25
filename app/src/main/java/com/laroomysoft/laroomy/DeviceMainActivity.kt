@@ -119,13 +119,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.devicePropertyListViewAdapter =
             DevicePropertyListAdapter(
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList,
-                //this.propertyList,
                 this
             )
-
-                //this)
-
-        //this.devicePropertyListViewAdapter.setHasStableIds(true)
 
         // bind the elements to the recycler
         this.devicePropertyListRecyclerView =
@@ -491,7 +486,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set the appropriate image and seekbar position
         this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.levelSelectorPopUpImageView).setImageResource(
-            devicePropertyListContentInformation.imageID
+            resourceIdForImageId(devicePropertyListContentInformation.imageID)
         )
         val percentageLevelPropertyGenerator =
             PercentageLevelPropertyGenerator(devicePropertyListContentInformation.simplePropertyState)
@@ -561,7 +556,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set the appropriate image and option selection
         this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.optionSelectorPopUpImageView).setImageResource(
-            devicePropertyListContentInformation.imageID
+            resourceIdForImageId(devicePropertyListContentInformation.imageID)
         )
 
         this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.optionSelectorPopUpTextView).text =
