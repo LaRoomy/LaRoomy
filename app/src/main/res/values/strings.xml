@@ -195,6 +195,11 @@
 
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>
+
+    <string name="AppHelpTopic_TheConceptShortExplained_Header">The concept short explained</string>
+    <string name="AppHelpTopic_TheConceptShortExplained_P1">Different peripheral Bluetooth-devices require specific user-interfaces which are tailor-made for the particular hardware of the device. Therefore a purpose-made app is required for every device. The LaRoomy app provides a dynamic user-interface and is capable to adapt to the properties of a particular device. By implementing the LaRoomy transmission-protocol, every device with Bluetooth-GATT connectivity can be used in conjunction with the LaRoomy app. The creation and provisioning of a specific app for a device is not necessary and the implementation and control via Bluetooth can be provided quickly and efficiently.</string>
+    <string name="AppHelpTopic_TheConceptShortExplained_P3">Devices with implementation of the transmission protocol can transmit their capabilities (device-properties) at the beginning of the connection process. The app will show the appropriate control elements in alignment to the properties of the device. The visual state of the app is different for devices with different device-properties. This allows a wide support of device-types and applications providing a clean user-interface without unnecessary control elements.</string>
+
     <string name="AppHelpTopic_ConnectDevice">Connect new device</string>
     <string name="AppHelpActivityGotoBluetoothButtonText">Goto Bluetooth Settings</string>
     <string name="AppHelpActivity_Topic_ConnectDevice_Explanation">To get the remote device showing up in the list on the start page, the device must be bonded.</string>

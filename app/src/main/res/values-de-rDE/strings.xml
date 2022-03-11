@@ -207,6 +207,13 @@
 
 
     <string name="AppHelpActivityHeaderText">Hilfe-Themen</string>
+
+    <string name="AppHelpTopic_TheConceptShortExplained_Header">Das Konzept kurz erklärt</string>
+    <string name="AppHelpTopic_TheConceptShortExplained_P1">Verschiedene, über Bluetooth gesteuerte Peripherie-Geräte, erfordern auf die Hardware zugeschnittene Benutzeroberflächen wodurch für unterschiedliche Geräte jeweils eine eigenständige App erforderlich ist. Die LaRoomy App hat eine dynamische Benutzeroberfläche, welche sich den Eigenschaften eines spezifischen Gerätes anpassen kann. Durch die Implementierung des LaRoomy Übertragungsprotokolls  Anwendungsprotokolls kann jedes Gerät mit Bluetooth GATT Konnektivität in Verbindung mit der App genutzt werden. Die Bereitstellung einer spezifischen App für ein spezielles Gerät entfällt und die Anbindung und Steuerung über Bluetooth kann schnell und effizient realisiert werden.</string>
+    <string name="AppHelpTopic_TheConceptShortExplained_P3">Geräte deren Firmware über eine Implementierung dieses Protokolls verfügen können Ihre Fähigkeiten (Geräte-Eigenschaften) über eine Abfrage zum Zeitpunkt des Verbindungsaufbaues an die App mitteilen, wodurch innerhalb der App auf das Gerät angepasste Steuerelemente angezeigt werden. Der visuelle Zustand der App ist unterschiedlich für Geräte mit unterschiedlichen Geräte-Eigenschaften. Das ermöglicht die unterstützung vielfältiger Geräte-Typen und Anwendungen mit einer sauberen Benutzeroberfläche ohne unnötige Steuerelemente.</string>
+
+
+
     <string name="AppHelpTopic_ConnectDevice">Neues Gerät verbinden</string>
     <string name="AppHelpActivityGotoBluetoothButtonText">Bluetooth-Einstellungen öffnen</string>
     <string name="AppHelpActivity_Topic_ConnectDevice_Explanation">Um das Gerät verwenden zu können muss es vorher gekoppelt werden.</string>
