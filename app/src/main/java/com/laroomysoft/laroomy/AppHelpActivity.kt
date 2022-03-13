@@ -18,10 +18,22 @@ import androidx.constraintlayout.widget.ConstraintLayout
 class AppHelpActivity : AppCompatActivity() {
 
     // connect device topic
-    private lateinit var connectDeviceExpandImageView: AppCompatImageView
+
+    private lateinit var theConceptShortExplainedContentContainer: ConstraintLayout
+    private lateinit var theConceptShortExplainedImageView: AppCompatImageView
+
     private lateinit var connectDeviceContentContainer: ConstraintLayout
-    private lateinit var deviceBindingExpandImageView: AppCompatImageView
+    private lateinit var connectDeviceExpandImageView: AppCompatImageView
+
     private lateinit var deviceBindingContentContainer: ConstraintLayout
+    private lateinit var deviceBindingExpandImageView: AppCompatImageView
+
+    private lateinit var connectionProcessContentContainer: ConstraintLayout
+    private lateinit var connectionProcessImageView: AppCompatImageView
+
+    private lateinit var uuidProfileContentContainer: ConstraintLayout
+    private lateinit var uuidProfileImageView: AppCompatImageView
+
     private lateinit var backButton: AppCompatImageButton
 
 
@@ -37,21 +49,43 @@ class AppHelpActivity : AppCompatActivity() {
 
 
         // connect device topic elements
+
+        this.theConceptShortExplainedContentContainer = findViewById(R.id.appHelpActivityTheConceptShortExplainedContentContainer)
+        this.theConceptShortExplainedImageView = findViewById(R.id.appHelpActivityTheConceptShortExplainedImageView)
+
         this.connectDeviceExpandImageView = findViewById(R.id.appHelpActivityConnectDeviceExpandImageView)
-        this.connectDeviceContentContainer = findViewById(R.id.appHelpActivityConnectDeviceContentView)
+        this.connectDeviceContentContainer = findViewById(R.id.appHelpActivityConnectDeviceContentContainer)
 
         this.deviceBindingExpandImageView = findViewById(R.id.appHelpActivityDeviceBindingExpandImageView)
         this.deviceBindingContentContainer = findViewById(R.id.appHelpActivityDeviceBindingContentContainer)
+
+        this.connectionProcessContentContainer = findViewById(R.id.appHelpActivityConnectionProcessContentContainer)
+        this.connectionProcessImageView = findViewById(R.id.appHelpActivityConnectionProcessImageView)
+
+        this.uuidProfileContentContainer = findViewById(R.id.appHelpActivityUUIDProfilesContentContainer)
+        this.uuidProfileImageView = findViewById(R.id.appHelpActivityUUIDProfilesImageView)
     }
 
-    fun onGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-        val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-        startActivity(intent)
-    }
+//    fun onGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
+//        val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+//        startActivity(intent)
+//    }
 
     fun onTopicClick(view: View){
 
         when(view.id){
+            R.id.appHelpActivityTheConceptShortExplainedContainer -> {
+                when(theConceptShortExplainedContentContainer.visibility){
+                    View.GONE -> {
+                        theConceptShortExplainedContentContainer.visibility = View.VISIBLE
+                        theConceptShortExplainedImageView.setImageResource(R.drawable.ic_expand_arrow_up_sq32_vect)
+                    }
+                    else -> {
+                        theConceptShortExplainedContentContainer.visibility = View.GONE
+                        theConceptShortExplainedImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
+                    }
+                }
+            }
             R.id.appHelpActivityConnectDeviceContainer -> {
                 when(connectDeviceContentContainer.visibility){
                     View.GONE -> {
@@ -71,6 +105,30 @@ class AppHelpActivity : AppCompatActivity() {
                     } else -> {
                         deviceBindingContentContainer.visibility = View.GONE
                         deviceBindingExpandImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
+                    }
+                }
+            }
+            R.id.appHelpActivityConnectionProcessContainer -> {
+                when(connectionProcessContentContainer.visibility){
+                    View.GONE -> {
+                        connectionProcessContentContainer.visibility = View.VISIBLE
+                        connectionProcessImageView.setImageResource(R.drawable.ic_expand_arrow_up_sq32_vect)
+                    }
+                    else -> {
+                        connectionProcessContentContainer.visibility = View.GONE
+                        connectionProcessImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
+                    }
+                }
+            }
+            R.id.appHelpActivityUUIDProfilesContainer -> {
+                when(uuidProfileContentContainer.visibility){
+                    View.GONE -> {
+                        uuidProfileContentContainer.visibility = View.VISIBLE
+                        uuidProfileImageView.setImageResource(R.drawable.ic_expand_arrow_up_sq32_vect)
+                    }
+                    else -> {
+                        uuidProfileContentContainer.visibility = View.GONE
+                        uuidProfileImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
                     }
                 }
             }

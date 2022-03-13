@@ -14,4 +14,5 @@
     <dimen name="helpActivity_textSizeHeaderText">20sp</dimen>
     <dimen name="helpActivity_textSizeHelpTopicExpandButton">16sp</dimen>
     <dimen name="helpActivity_textSizeHelpTopicSubText">14sp</dimen>
+    <dimen name="helpActivity_textSizeHelpTopicImportantHintTextSize">12sp</dimen>
 </resources>

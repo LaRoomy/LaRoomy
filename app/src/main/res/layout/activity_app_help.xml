@@ -9,6 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
         tools:context="com.laroomysoft.laroomy.AppHelpActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,24 +17,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/appHelpActivityBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/appHelpActivityBackButton"
-                android:minHeight="48dp"
-                android:minWidth="48dp"
                 android:layout_marginStart="10dp"
                 android:background="@color/transparentColor"
-                android:src="@drawable/ic_arrow_back_white_24dp"
                 android:contentDescription="@string/GeneralBackButtonLabel"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:src="@drawable/ic_arrow_back_white_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/appHelpActivityHeaderTextView"
@@ -62,7 +62,7 @@
 
         <!-- Topic 1: *************************************************** -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/appHelpActivityConnectDeviceContainer"
+            android:id="@+id/appHelpActivityTheConceptShortExplainedContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -77,12 +77,102 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/appHelpActivityHeaderSeparator">
 
+            <!-- Topic 1 Header: *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityTheConceptShortExplainedHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/appHelpActivityTheConceptShortExplainedImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityTheConceptShortExplainedHeaderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/AppHelpTopic_TheConceptShortExplained_Header"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicExpandButton"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/appHelpActivityTheConceptShortExplainedImageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Topic 1 Content *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityTheConceptShortExplainedContentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appHelpActivityTheConceptShortExplainedHeader">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityTheConceptShortExplained_P1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpTopic_TheConceptShortExplained_P1"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityTheConceptShortExplained_P2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/AppHelpTopic_TheConceptShortExplained_P3"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityTheConceptShortExplained_P1" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Topic 2: *************************************************** -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/appHelpActivityConnectDeviceContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/help_topic_background"
+            android:minHeight="48dp"
+            android:onClick="onTopicClick"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appHelpActivityTheConceptShortExplainedContainer">
+
+            <!-- Topic 2 Header: *************************************************** -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/appHelpActivityConnectDeviceHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
                 android:layout_marginStart="20dp"
+                android:minHeight="48dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -108,11 +198,11 @@
                     app:layout_constraintStart_toEndOf="@id/appHelpActivityConnectDeviceExpandImageView"
                     app:layout_constraintTop_toTopOf="parent" />
 
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Topic 2 Content: *************************************************** -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/appHelpActivityConnectDeviceContentView"
+                android:id="@+id/appHelpActivityConnectDeviceContentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -124,27 +214,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceHeader">
 
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/appHelpActivityConnectDeviceExplanation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/AppHelpActivity_Topic_ConnectDevice_Explanation"
-                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/appHelpActivityConnectDeviceP1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="10dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_P1"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceExplanation" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/appHelpActivityConnectDeviceP2"
@@ -167,36 +245,42 @@
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP2" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/appHelpActivityConnectDeviceP4"
+                    android:id="@+id/appHelpActivityConnectDeviceBondingHint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/AppHelpActivity_Topic_ConnectDevice_P4"
-                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectDevice_BondingHint"
+                    android:textColor="@color/yellowAccentColor"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicImportantHintTextSize"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP3" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/appHelpGotoBluetoothButton"
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityConnectDeviceP4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:onClick="onGotoBluetoothButtonClick"
-                    android:text="@string/AppHelpActivityGotoBluetoothButtonText"
-                    android:textAllCaps="false"
-                    android:background="@drawable/general_rounded_button_background"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectDevice_P4"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceBondingHint" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityConnectDeviceP5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectDevice_P5"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP4" />
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Topic 2: *************************************************** -->
+        <!-- Topic 3: *************************************************** -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/appHelpActivityDeviceBindingContainer"
             android:layout_width="match_parent"
@@ -213,12 +297,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceContainer">
 
+            <!-- Topic 3 Header: *************************************************** -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/appHelpActivityDeviceBindingHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
                 android:layout_marginStart="20dp"
+                android:minHeight="48dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -246,12 +331,14 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Topic 3 Content: *************************************************** -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/appHelpActivityDeviceBindingContentContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
+                android:paddingBottom="15dp"
 
                 android:visibility="gone"
 
@@ -279,7 +366,6 @@
                     android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P1"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFirstHeadline" />
 
@@ -303,7 +389,6 @@
                     android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P2"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingSecondHeadline" />
 
@@ -352,7 +437,6 @@
                     android:layout_marginEnd="10dp"
                     android:text="@string/AppHelpActivity_Topic_DeviceBinding_P4"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingFourthHeadline" />
 
@@ -360,7 +444,194 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-        <!-- Topic 3: *************************************************** -->
+
+        <!-- Topic 4: *************************************************** -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/appHelpActivityConnectionProcessContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/help_topic_background"
+            android:minHeight="48dp"
+            android:onClick="onTopicClick"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appHelpActivityDeviceBindingContainer">
+
+            <!-- Topic 4 Header: *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityConnectionProcessHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/appHelpActivityConnectionProcessImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityConnectionProcessHeaderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectionProcess_HeaderText"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicExpandButton"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/appHelpActivityConnectionProcessImageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Topic 4 Content *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityConnectionProcessContentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectionProcessHeader">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityConnectionProcess_P1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectionProcess_P1"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityConnectionProcess_P2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectionProcess_P2"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectionProcess_P1" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityConnectionProcess_P3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/AppHelpActivity_Topic_ConnectionProcess_P3"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectionProcess_P2" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Topic 5: *************************************************** -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/appHelpActivityUUIDProfilesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/help_topic_background"
+            android:minHeight="48dp"
+            android:onClick="onTopicClick"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectionProcessContainer">
+
+            <!-- Topic 5 Header: *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityUUIDProfilesHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/appHelpActivityUUIDProfilesImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityUUIDProfilesHeaderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/AppHelpActivity_Topic_UUIDProfiles_HeaderText"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicExpandButton"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/appHelpActivityUUIDProfilesImageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Topic 5 Content *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityUUIDProfilesContentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appHelpActivityUUIDProfilesHeader">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityUUIDProfiles_P1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_UUIDProfiles_P1"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityUUIDProfiles_P2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/AppHelpActivity_Topic_UUIDProfiles_P2"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityUUIDProfiles_P1" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

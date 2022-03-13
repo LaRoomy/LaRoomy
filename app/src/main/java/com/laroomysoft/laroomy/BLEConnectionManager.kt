@@ -1360,9 +1360,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration, false)
 
                 // start retrieving the complex property states
-                Handler(Looper.getMainLooper()).postDelayed({
-                    this.startComplexStateDataLoop()
-                }, 1000)
+//                Handler(Looper.getMainLooper()).postDelayed({
+//                    this.startComplexStateDataLoop()
+//                }, 1000)
             }
         }
     }
@@ -1435,9 +1435,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.generateUIAdaptableArrayListFromDeviceProperties(this.invokeCallbackLoopAfterUIDataGeneration, false)
 
             // start retrieving the complex property states
-            Handler(Looper.getMainLooper()).postDelayed({
-                this.startComplexStateDataLoop()
-            }, 1000)
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                this.startComplexStateDataLoop()
+//            }, 1000)
         }
     }
 
@@ -1551,8 +1551,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // get the existing state
         if(this.uIAdapterList.size > 0){
             this.uIAdapterList.forEach {
-                if(it.internalElementIndex == propertyIndex){
+                if((it.internalElementIndex == propertyIndex)&&(it.elementType == PROPERTY_ELEMENT)){
                     barGraphState.fromComplexPropertyState(it.complexPropertyState)
+                    return@forEach
                 }
             }
         }
@@ -1584,8 +1585,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // get the existing state
         if(this.uIAdapterList.size > 0){
             this.uIAdapterList.forEach {
-                if(it.internalElementIndex == propertyIndex){
+                if((it.internalElementIndex == propertyIndex)&&(it.elementType == PROPERTY_ELEMENT)){
                     lineGraphState.fromComplexPropertyState(it.complexPropertyState)
+                    return@forEach
                 }
             }
         }
@@ -2188,6 +2190,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 } else {
                                     sendData(propertyLoadingCompleteNotification)
                                 }
+                                // start complex property state retrieving loop
+                                Executors.newSingleThreadScheduledExecutor().schedule({
+                                    startComplexStateDataLoop()
+                                }, 300, TimeUnit.MILLISECONDS)
                             }
                         } catch (e: IndexOutOfBoundsException) {
                             if (verboseLog) {
@@ -2218,6 +2224,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     sendData(propertyLoadingCompleteNotification)
                 }
 
+            }, 200, TimeUnit.MILLISECONDS)
+
+            // start complex property state retrieving loop
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                startComplexStateDataLoop()
             }, 500, TimeUnit.MILLISECONDS)
         }
     }
@@ -2528,9 +2539,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         // update the UI-Array
         this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-            if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
+            if((devicePropertyListContentInformation.internalElementIndex == propertyIndex)&&(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
                 uIElementIndex = index
                 devicePropertyListContentInformation.complexPropertyState = cState
+                return@forEachIndexed
             }
         }
 
@@ -2552,8 +2564,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         // update the UI-Array
         this.uIAdapterList.forEachIndexed { _, devicePropertyListContentInformation ->
-            if(devicePropertyListContentInformation.internalElementIndex == propertyIndex){
+            if((devicePropertyListContentInformation.internalElementIndex == propertyIndex)&&(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
                 devicePropertyListContentInformation.complexPropertyState = cState
+                return@forEachIndexed
             }
         }
     }
