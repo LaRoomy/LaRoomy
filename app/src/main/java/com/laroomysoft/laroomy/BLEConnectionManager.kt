@@ -614,7 +614,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '6' -> {
                     // refresh all property states notification
-                    this.startSimpleStateDataLoop()
+                    this.updatePropertyStates()
                 }
                 else -> {
                     if(verboseLog){
@@ -1252,13 +1252,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.laRoomyDevicePropertyList = propertyData.deviceProperties
                     this.laRoomyPropertyGroupList = propertyData.devicePropertyGroups
                     this.generateUIAdaptableArrayListFromDeviceProperties(addInALoopWhenReady, true)
+                    // NOTE:
+                    // the properties were loaded from cache, so the states couldn't be considered as valid
+                    // so the simple state data loop must be started, the preceding generation function will do that!
 
-                    if(!addInALoopWhenReady){
-
-                        // the properties were loaded from cache, so the states couldn't be considered as valid
-                        // so start the simple state data loop. If the loop is finished, the complex state loop will be started
-                        this.startSimpleStateDataLoop()
-                    }
+//
+//                    if(!addInALoopWhenReady){
+//
+//                        // the properties were loaded from cache, so the states couldn't be considered as valid
+//                        // so start the simple state data loop. If the loop is finished, the complex state loop will be started automatically
+//                        this.startSimpleStateDataLoop()
+//                    }
                     return
                 } else {
                     if(verboseLog){
@@ -2228,7 +2232,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // start complex property state retrieving loop
             Executors.newSingleThreadScheduledExecutor().schedule({
-                startComplexStateDataLoop()
+                if(isCacheLoadingOperation){
+                    // the properties were loaded from cache, so the states couldn't be considered as valid
+                    // so start the simple state data loop. If the loop is finished, the complex state loop will be started automatically
+                    startSimpleStateDataLoop()
+                } else {
+                    startComplexStateDataLoop()
+                }
             }, 500, TimeUnit.MILLISECONDS)
         }
     }
