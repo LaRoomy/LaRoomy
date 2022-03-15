@@ -34,6 +34,9 @@ class AppHelpActivity : AppCompatActivity() {
     private lateinit var uuidProfileContentContainer: ConstraintLayout
     private lateinit var uuidProfileImageView: AppCompatImageView
 
+    private lateinit var appResetContentContainer: ConstraintLayout
+    private lateinit var appResetImageView: AppCompatImageView
+
     private lateinit var backButton: AppCompatImageButton
 
 
@@ -64,6 +67,9 @@ class AppHelpActivity : AppCompatActivity() {
 
         this.uuidProfileContentContainer = findViewById(R.id.appHelpActivityUUIDProfilesContentContainer)
         this.uuidProfileImageView = findViewById(R.id.appHelpActivityUUIDProfilesImageView)
+
+        this.appResetContentContainer = findViewById(R.id.appHelpActivityAppResetContentContainer)
+        this.appResetImageView = findViewById(R.id.appHelpActivityAppResetImageView)
     }
 
 //    fun onGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
@@ -129,6 +135,18 @@ class AppHelpActivity : AppCompatActivity() {
                     else -> {
                         uuidProfileContentContainer.visibility = View.GONE
                         uuidProfileImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
+                    }
+                }
+            }
+            R.id.appHelpActivityAppResetContainer -> {
+                when(appResetContentContainer.visibility){
+                    View.GONE -> {
+                        appResetContentContainer.visibility = View.VISIBLE
+                        appResetImageView.setImageResource(R.drawable.ic_expand_arrow_up_sq32_vect)
+                    }
+                    else -> {
+                        appResetContentContainer.visibility = View.GONE
+                        appResetImageView.setImageResource(R.drawable.ic_expand_arrow_right_sq32_vect)
                     }
                 }
             }

@@ -13,8 +13,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 class InformationActivity : AppCompatActivity() {
 
     lateinit var versionTextView: AppCompatTextView
-    lateinit var privacyProtectionSubContainer: ConstraintLayout
-    lateinit var termsOfSeviceSubContainer: ConstraintLayout
+    private lateinit var privacyProtectionSubContainer: ConstraintLayout
+    private lateinit var termsOfServiceSubContainer: ConstraintLayout
+    private lateinit var creditsSubContainer: ConstraintLayout
     lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +23,8 @@ class InformationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_information)
 
         this.privacyProtectionSubContainer = findViewById(R.id.infoActivityPrivacyPolicySubContainer)
-        this.termsOfSeviceSubContainer = findViewById(R.id.infoActivityTermsOfServiceSubContainer)
+        this.termsOfServiceSubContainer = findViewById(R.id.infoActivityTermsOfServiceSubContainer)
+        this.creditsSubContainer = findViewById(R.id.infoActivityCreditsSubContainer)
 
         // add back button functionality
         this.backButton = findViewById(R.id.infoActivityBackButton)
@@ -68,12 +70,30 @@ class InformationActivity : AppCompatActivity() {
 
     fun onTermsOfServiceFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
         when{
-            (this.termsOfSeviceSubContainer.visibility == View.VISIBLE) -> {
-                this.termsOfSeviceSubContainer.visibility = View.GONE
+            (this.termsOfServiceSubContainer.visibility == View.VISIBLE) -> {
+                this.termsOfServiceSubContainer.visibility = View.GONE
             }
             else -> {
-                this.termsOfSeviceSubContainer.visibility = View.VISIBLE
+                this.termsOfServiceSubContainer.visibility = View.VISIBLE
             }
         }
+    }
+
+    fun onCreditsFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        when(this.creditsSubContainer.visibility){
+            View.GONE -> {
+                this.creditsSubContainer.visibility = View.VISIBLE
+            }
+            else -> {
+                this.creditsSubContainer.visibility = View.GONE
+            }
+        }
+    }
+
+    fun onYBQLinkClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        val openUrl = Intent(ACTION_VIEW)
+        openUrl.data = Uri.parse("https://github.com/ybq/Android-SpinKit")
+        startActivity(openUrl)
+
     }
 }

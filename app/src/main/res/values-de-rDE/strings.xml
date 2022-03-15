@@ -129,6 +129,13 @@
     <string name="InfoActivity_TS_ChangesToThisTermsContentText">Ich kann unsere Allgemeinen Geschäftsbedingungen von Zeit zu Zeit aktualisieren. Es wird daher empfohlen, diese Seite regelmäßig auf Änderungen zu überprüfen. Ich werde Sie über Änderungen informieren, indem ich die neuen Allgemeinen Geschäftsbedingungen auf dieser Seite veröffentliche. Diese Allgemeinen Geschäftsbedingungen gelten ab dem 20.10.2020</string>
     <string name="InfoActivity_TS_ContactHeaderText">Kontaktieren Sie uns</string>
     <string name="InfoActivity_TS_ContactContentText">Wenn Sie Fragen oder Anregungen zu meinen Nutzungsbedingunen haben, zögern Sie nicht, mich unter info@laroomy.de zu kontaktieren.</string>
+    <string name="InfoActivity_CR_HeaderText">Credits</string>
+    <string name="InfoActivity_CR_StartText">Dieses Projekt nutzt Open-Source Bibliotheken. Dies ist eine Liste aller Programmierer und/oder Gesellschaften die durch ihr Werk einen Beitrag zu dieser App geleistet haben.</string>
+    <string name="InfoActivity_CR_ThankYouHeaderText">Mein bester Dank geht an:</string>
+
+    <string name="InfoActivity_CR_SpinKit_Thx">Ybq - für die SpinKit Bibliothek. Super Android Loading Animationen:</string>
+    <string name="InfoActivity_CR_SpinKit_ActionLinkText">Quelle und Lizenz anzeigen</string>
+
 
     <string name="SetupActivity_Header">Einstellungen</string>
     <string name="SetupActivity_AutoConnectElementText">Automatisch verbinden</string>
@@ -236,7 +243,9 @@
     <string name="AppHelpActivity_Topic_UUIDProfiles_P1">Um Daten über Bluetooth mit Hilfe von Gatt(Generic Attribute Profile) auszutauschen sind eine Service- und eine Characteristic UUID erforderlich. Sollten die benötigten UUIDs von den Standard-Definitionen abweichen, können die bestehenden UUID-Profile beliebig erweitert werden wenn die Service- und Characteristic UUID des zu verbindenden Gerätes bekannt ist.</string>
     <string name="AppHelpActivity_Topic_UUIDProfiles_P2">Über \'Einstellungen > UUID Profile verwalten\' können die vorhandenen Profile eingesehen werden und bei Bedarf auch neue Profile angelegt werden.</string>
 
-
+    <string name="AppHelpActivity_Topic_AppReset_HeaderText">Einstellungen und Daten zurücksetzen</string>
+    <string name="AppHelpActivity_Topic_AppReset_P1">Einstellungen und lokal gespeicherte Daten können ganz oder teilweise gelöscht werden. Unter \'Einstellungen > App zurücksetzen\' können die zu löschenden Elemente ausgewählt werden.</string>
+    <string name="AppHelpActivity_Topic_AppReset_P2">Beim zurücksetzen des Standard-Bindungsschlüssels ist Vorsicht geboten. Wenn der dieser zurückgesetzt wird, dann wird ein neuer interner Schlüssel generiert. Sollten eventuelle nicht gelöste Bindungen zu Geräten bestehen, dann wird der Verbindungsprozess mit diesen Geräten fehlschlagen.</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
 

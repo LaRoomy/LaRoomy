@@ -633,6 +633,96 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Topic 6: *************************************************** -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/appHelpActivityAppResetContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/help_topic_background"
+            android:minHeight="48dp"
+            android:onClick="onTopicClick"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appHelpActivityUUIDProfilesContainer">
+
+            <!-- Topic 6 Header: *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityAppResetHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/appHelpActivityAppResetImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityAppResetHeaderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="@string/AppHelpActivity_Topic_AppReset_HeaderText"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicExpandButton"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/appHelpActivityAppResetImageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Topic 6 Content *************************************************** -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/appHelpActivityAppResetContentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appHelpActivityAppResetHeader">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityAppReset_P1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/AppHelpActivity_Topic_AppReset_P1"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/appHelpActivityAppReset_P2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="15dp"
+                    android:textColor="@color/yellowAccentColor"
+                    android:text="@string/AppHelpActivity_Topic_AppReset_P2"
+                    android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/appHelpActivityAppReset_P1" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

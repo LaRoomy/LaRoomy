@@ -7,6 +7,7 @@
     tools:context="com.laroomysoft.laroomy.InformationActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:paddingBottom="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -20,18 +21,17 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/infoActivityBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/infoActivityBackButton"
+                android:layout_marginStart="10dp"
+                android:background="@color/transparentColor"
+                android:contentDescription="@string/GeneralBackButtonLabel"
                 android:minWidth="48dp"
                 android:minHeight="48dp"
-                android:layout_marginStart="10dp"
-                android:contentDescription="@string/GeneralBackButtonLabel"
-                android:background="@color/transparentColor"
                 android:src="@drawable/ic_arrow_back_white_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/infoActivityHeaderImageView"
@@ -160,8 +160,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/information_topic_background"
             android:minHeight="60dp"
             android:onClick="onPrivacyProtectionFieldClick"
@@ -631,13 +631,132 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/infoActivityCreditsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/information_topic_background"
+            android:minHeight="60dp"
+            android:onClick="onCreditsFieldClick"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityTermsOfServiceContainer">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/infoActivityCreditsHeaderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/InfoActivity_CR_HeaderText"
+                android:textColor="@color/goldAccentColor"
+                android:textSize="@dimen/infoActivity_textSize_bigParagraphMainHeadlineText"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/infoActivityCreditsSubContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingBottom="15dp"
+
+                android:visibility="visible"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsHeaderTextView">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsStartText"
+                    android:text="@string/InfoActivity_CR_StartText"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsThanksText"
+                    android:text="@string/InfoActivity_CR_ThankYouHeaderText"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    android:layout_marginTop="20dp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsStartText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:id="@+id/infoActivityCreditsFirstSeparator"
+                    android:background="@color/separatorColor"
+                    android:layout_marginTop="15dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThanksText"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsYBQThanksText"
+                    android:text="@string/InfoActivity_CR_SpinKit_Thx"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsFirstSeparator"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:id="@+id/infoActivityCreditsYBQLinkTextView"
+                    android:text="@string/InfoActivity_CR_SpinKit_ActionLinkText"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/clickableTextColor"
+                    android:onClick="onYBQLinkClick"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsYBQThanksText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:id="@+id/infoActivityCreditsSecondSeparator"
+                    android:background="@color/separatorColor"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsYBQLinkTextView"
+                    />
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
         <!--
-        TODO:
-            - privacy policy!
-            - terms of service??
-            - imprint!
-            - thanks to 3rd party bundles!
-        -->
+            TODO:
+                - privacy policy!
+                - terms of service??
+                - imprint!
+                - thanks to 3rd party bundles! (Credits)
+            -->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
