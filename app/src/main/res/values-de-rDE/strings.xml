@@ -78,6 +78,12 @@
 
     <string name="LineGraphActivity_HeaderText">Diagramm Anzeige</string>
 
+    <string name="StringInterrogatorActivity_HeaderText">String abfrage</string>
+    <string name="StringInterrogatorActivity_FieldOneDescriptorPlaceholder">Feld 1</string>
+    <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Feld 2</string>
+    <string name="StringInterrogatorActivity_ButtonPlaceholderText">Absenden</string>
+
+
 
     <string name="UnlockCtrl_HeaderText">Entsperren</string>
     <string name="UnlockCtrl_ConditionText_Locked">Verriegelt</string>

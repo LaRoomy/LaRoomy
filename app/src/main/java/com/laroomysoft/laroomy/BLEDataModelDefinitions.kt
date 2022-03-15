@@ -1182,6 +1182,46 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
     }
 }
 
+class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
+
+    var numFields = -1
+    var buttonDescriptor = "OK"
+    var fieldOneDescriptor = "field 1"
+    var fieldTwoDescriptor = "field 2"
+
+    override fun isValid(): Boolean {
+        return ((numFields > 0) && (numFields < 3))
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+
+        // TODO!
+
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        var cState = ComplexPropertyState()
+
+        //  TODO!
+
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+
+        // TODO!
+
+        return true
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+
+        // TODO!
+
+        return "not implemented"
+    }
+}
+
 class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 
     var unLocked = false

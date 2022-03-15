@@ -70,6 +70,12 @@
 
     <string name="LineGraphActivity_HeaderText">Line Graph View</string>
 
+    <string name="StringInterrogatorActivity_HeaderText">String Interrogator</string>
+    <string name="StringInterrogatorActivity_FieldOneDescriptorPlaceholder">Field 1</string>
+    <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Field 2</string>
+    <string name="StringInterrogatorActivity_ButtonPlaceholderText">Submit</string>
+
+
     <string name="UnlockCtrl_HeaderText">Unlock Control</string>
     <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
     <string name="UnlockCtrl_ConditionText_Unlocked">Unlocked</string>
@@ -232,7 +238,7 @@
     <string name="AppHelpActivity_Topic_UUIDProfiles_HeaderText">UUID Profiles</string>
     <string name="AppHelpActivity_Topic_UUIDProfiles_P1">To exchange data via Bluetooth over GATT(Generic Attribute Profile) a service- and a characteristic UUID is required. If the required UUIDs differ from the default-definitions, the existing UUID-Profiles can be extended (when the service and characteristic UUID of the device are at hand).</string>
     <string name="AppHelpActivity_Topic_UUIDProfiles_P2">Go to \'Settings > Manage UUID Profiles\' to review the existing profiles or add your own ones.</string>
-    
+
     <string name="AppHelpActivity_Topic_AppReset_HeaderText">Reset settings and data</string>
     <string name="AppHelpActivity_Topic_AppReset_P1">All settings and local saved data can be partially or complete deleted. To do that, go to \'Settings > Reset App\' and select the data you want to reset or delete.</string>
     <string name="AppHelpActivity_Topic_AppReset_P2">Be careful when resetting the default binding key. If it is reset, a new internal key will be generated. If there are existing bindings to devices which require the old key, the connection process with these devices will fail.</string>
