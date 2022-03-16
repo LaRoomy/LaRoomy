@@ -32,6 +32,11 @@ const val LOOPTYPE_GROUP = 2
 const val LOOPTYPE_COMPLEXSTATE = 3
 const val LOOPTYPE_SIMPLESTATE = 4
 
+const val SI_INPUT_TYPE_TEXT = 0
+const val SI_INPUT_TYPE_TEXT_PASSWORD = 1
+const val SI_INPUT_TYPE_NUMBER = 2
+const val SI_INPUT_TYPE_NUMBER_PASSWORD = 3
+
 
 class LaRoomyDevicePresentationModel {
     // NOTE: This is the data-model for the DeviceListItem in the main-activity
@@ -1184,13 +1189,24 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
 
 class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
 
-    var numFields = -1
-    var buttonDescriptor = "OK"
-    var fieldOneDescriptor = "field 1"
-    var fieldTwoDescriptor = "field 2"
+    var buttonDescriptor = ""
+    var fieldOneDescriptor = ""
+    var fieldTwoDescriptor = ""
+    var fieldOneHint = ""
+    var fieldTwoHint = ""
+    var fieldOneContent = ""
+    var fieldTwoContent = ""
+
+    var fieldOneVisible = true
+    var fieldTwoVisible = true
+
+    var fieldOneInputType = -1
+    var fieldTwoInputType = -1
+
+    var navigateBackOnButtonPress = false
 
     override fun isValid(): Boolean {
-        return ((numFields > 0) && (numFields < 3))
+        return (fieldOneInputType != -1)&&(fieldTwoInputType != -1)
     }
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
@@ -1200,25 +1216,105 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
     }
 
     override fun toComplexPropertyState(): ComplexPropertyState {
-        var cState = ComplexPropertyState()
+
+        val cState = ComplexPropertyState()
+
+        cState.valueOne = if(fieldOneVisible){
+            1
+        } else {
+            0
+        }
+        cState.valueTwo = if(fieldTwoVisible){
+            1
+        } else {
+            0
+        }
+        cState.valueThree = this.fieldOneInputType
+        cState.valueFour = this.fieldTwoInputType
+        cState.valueFive = if(this.navigateBackOnButtonPress){
+            1
+        } else {
+            0
+        }
 
         //  TODO!
 
         return cState
     }
 
+    private fun fromComplexPropertyString(data: String){
+
+        // TODO !
+
+    }
+
     override fun fromString(data: String): Boolean {
+        return if (data.length < 13) {
+            if (verboseLog) {
+                Log.e(
+                    "StringInterrogator:fromString",
+                    "Error reading Data from String Interrogator Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
 
-        // TODO!
+            // visibilities
+            when(data[8]){
+                '0' -> {
+                    fieldOneVisible = true
+                    fieldTwoVisible = true
+                }
+                '1' -> {
+                    fieldOneVisible = true
+                    fieldTwoVisible = false
+                }
+                '2' -> {
+                    fieldOneVisible = false
+                    fieldTwoVisible = true
+                }
+            }
+            // field input types
+            this.fieldOneInputType = data[9].toString().toInt()
+            this.fieldTwoInputType = data[10].toString().toInt()
+            // button behavior
+            this.navigateBackOnButtonPress = data[11] != '0'
 
-        return true
+            // data[12] is reserved for future use !
+
+            // string definition data
+            val pureData = data.removeRange(0, 12)
+            this.fromComplexPropertyString(pureData)
+
+            true
+        }
     }
 
     override fun toExecutionString(propertyIndex: Int): String {
 
-        // TODO!
+        // define data string
+        var stringInterrogatorExecutionData = ""
 
-        return "not implemented"
+        if(this.fieldOneContent.isNotEmpty()){
+            stringInterrogatorExecutionData += "C1::${this.fieldOneContent};;"
+        }
+        if(this.fieldTwoContent.isNotEmpty()){
+            stringInterrogatorExecutionData += "C2::${this.fieldTwoContent}"
+        }
+
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += a8bitValueTo2CharHexValue(2 + stringInterrogatorExecutionData.length)
+        executionString += "00"
+
+        // add string interrogator specific data
+        executionString += stringInterrogatorExecutionData
+
+        // delimiter
+        executionString += '\r'
+
+        return executionString
     }
 }
 

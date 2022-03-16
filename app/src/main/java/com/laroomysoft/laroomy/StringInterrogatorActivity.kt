@@ -3,13 +3,17 @@ package com.laroomysoft.laroomy
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -24,10 +28,17 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
 
+    private lateinit var fieldOneDescriptor: AppCompatTextView
+    private lateinit var fieldTwoDescriptor: AppCompatTextView
+    private lateinit var fieldOneInputText: AppCompatEditText
+    private lateinit var fieldTwoInputText: AppCompatEditText
+    private lateinit var fieldOneContainer: ConstraintLayout
+    private lateinit var fieldTwoContainer: ConstraintLayout
     private lateinit var confirmButton: AppCompatButton
 
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var navigateBackOnButtonPress = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +80,25 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         // get UI Elements
         this.confirmButton = findViewById(R.id.stringInterrogatorPositiveButton)
+        this.fieldOneDescriptor = findViewById(R.id.stringInterrogatorFieldOneDescriptor)
+        this.fieldTwoDescriptor = findViewById(R.id.stringInterrogatorFieldTwoDescriptor)
+        this.fieldOneInputText = findViewById(R.id.stringInterrogatorFieldOneInput)
+        this.fieldTwoInputText = findViewById(R.id.stringInterrogatorFieldTwoInput)
+        this.fieldOneContainer = findViewById(R.id.stringInterrogatorFieldOneContainer)
+        this.fieldTwoContainer = findViewById(R.id.stringInterrogatorFieldTwoContainer)
+
+        // add confirm button onClick listener
+        this.confirmButton.setOnClickListener {
+            val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+            it.startAnimation(buttonAnimation)
+
+            this.collectDataAndSendCommand()
+
+            if(navigateBackOnButtonPress){
+                this.onBackPressed()
+            }
+        }
+
 
         val stringInterrogatorState = StringInterrogatorState()
         stringInterrogatorState.fromComplexPropertyState(
@@ -187,24 +217,95 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     private fun setCurrentViewStateFromComplexPropertyState(stringInterrogatorState: StringInterrogatorState){
 
-        // show/hide field 1 container
-        // set field 1 descriptor or hide it if there is no descriptor
+        // save action type on button press
+        this.navigateBackOnButtonPress = stringInterrogatorState.navigateBackOnButtonPress
 
-        // show/hide field 2 container
-        // set field 2 descriptor or hide if there is no descriptor
-        // set input type of inputText 2 !!! password or normal
-
-        // set button text
-
-        this.confirmButton.setOnClickListener {
-            val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
-            it.startAnimation(buttonAnimation)
-
-            // TODO: navigate back? depending on the defined behavior
-
+        // set button text (if there is one)
+        if(stringInterrogatorState.buttonDescriptor.isNotEmpty()){
+            this.confirmButton.text = stringInterrogatorState.buttonDescriptor
         }
 
+        // set field 1 container visibility and sub element properties
+        this.fieldOneContainer.visibility = if(stringInterrogatorState.fieldOneVisible){
+            // if the field descriptor is empty, hide it
+            this.fieldOneDescriptor.visibility = if(stringInterrogatorState.fieldOneDescriptor.isEmpty()){
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+            // if the hint is not empty set it
+            if(stringInterrogatorState.fieldOneHint.isNotEmpty()){
+                this.fieldOneInputText.hint = stringInterrogatorState.fieldOneHint
+            }
+            // if the content is not empty set it
+            if(stringInterrogatorState.fieldOneContent.isNotEmpty()){
+                this.fieldOneInputText.setText(stringInterrogatorState.fieldOneContent)
+            }
+            // set the input type of the field 1 editText
+            this.fieldOneInputText.inputType =
+                when(stringInterrogatorState.fieldOneInputType){
+                    SI_INPUT_TYPE_TEXT -> {
+                        InputType.TYPE_CLASS_TEXT
+                    }
+                    SI_INPUT_TYPE_TEXT_PASSWORD -> {
+                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                    }
+                    SI_INPUT_TYPE_NUMBER -> {
+                        InputType.TYPE_CLASS_NUMBER
+                    }
+                    SI_INPUT_TYPE_NUMBER_PASSWORD -> {
+                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                    }
+                    else -> {
+                        InputType.TYPE_CLASS_TEXT
+                    }
+                }
 
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        // set field 2 container visibility and sub element properties
+        this.fieldTwoContainer.visibility = if(stringInterrogatorState.fieldTwoVisible){
+            // if the field descriptor is empty, hide it
+            this.fieldTwoDescriptor.visibility = if(stringInterrogatorState.fieldTwoDescriptor.isEmpty()){
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+            // if the hint is not empty set it
+            if(stringInterrogatorState.fieldTwoHint.isNotEmpty()){
+                this.fieldTwoInputText.hint = stringInterrogatorState.fieldTwoHint
+            }
+            // if the content is not empty set it
+            if(stringInterrogatorState.fieldTwoContent.isNotEmpty()){
+                this.fieldTwoInputText.setText(stringInterrogatorState.fieldTwoContent)
+            }
+            // set the input type of the field 2 editText
+            this.fieldTwoInputText.inputType =
+                when(stringInterrogatorState.fieldTwoInputType){
+                    SI_INPUT_TYPE_TEXT -> {
+                        InputType.TYPE_CLASS_TEXT
+                    }
+                    SI_INPUT_TYPE_TEXT_PASSWORD -> {
+                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                    }
+                    SI_INPUT_TYPE_NUMBER -> {
+                        InputType.TYPE_CLASS_NUMBER
+                    }
+                    SI_INPUT_TYPE_NUMBER_PASSWORD -> {
+                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                    }
+                    else -> {
+                        InputType.TYPE_CLASS_TEXT
+                    }
+                }
+
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     private fun notifyUser(message: String, colorID: Int){
@@ -212,6 +313,16 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             notificationTextView.setTextColor(getColor(colorID))
             notificationTextView.text = message
         }
+    }
+
+    private fun collectDataAndSendCommand(){
+        val stringInterrogatorState = StringInterrogatorState()
+        stringInterrogatorState.fieldOneContent = this.fieldOneInputText.text.toString()
+        stringInterrogatorState.fieldTwoContent = this.fieldTwoInputText.text.toString()
+
+        ApplicationProperty.bluetoothConnectionManager.sendData(
+            stringInterrogatorState.toExecutionString(this.relatedElementID)
+        )
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

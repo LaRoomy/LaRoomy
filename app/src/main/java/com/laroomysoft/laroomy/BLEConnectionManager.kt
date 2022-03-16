@@ -833,6 +833,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH -> {
                 this.processLineGraphData(propertyIndex, data)
             }
+            COMPLEX_PROPERTY_TYPE_ID_STRING_INTERROGATOR -> {
+                this.processStringInterrogatorData(propertyIndex, data)
+            }
         }
 
         // check if the loop is active and send the next request if necessary
@@ -1611,6 +1614,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             val cState =
                 lineGraphState.toComplexPropertyState()
+
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
+    }
+
+    private fun processStringInterrogatorData(propertyIndex: Int, data: String){
+
+        val stringInterrogatorState = StringInterrogatorState()
+
+        // extract the data
+        if(!stringInterrogatorState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from StringInterrogatorState data transmission.")
+            return
+        } else {
+            val cState =
+                stringInterrogatorState.toComplexPropertyState()
 
             this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
         }
