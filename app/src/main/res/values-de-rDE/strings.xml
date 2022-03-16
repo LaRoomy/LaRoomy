@@ -111,12 +111,17 @@
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamische Fernsteuerung</string>
     <string name="InfoActivity_AppVersionEntry">App-Version </string>
-    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2022 Laroomy-Soft</string>
+    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2022 Hans Philipp Zimmermann</string>
     <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">Alle Rechte vorbehalten</string>
+
+    <string name="InfoActivity_ImprintAndContact">Impressum &amp; Kontakt</string>
+
+
     <string name="InfoActivity_MailTo">info@laroomy.de</string>
+
     <string name="InfoActivity_PrivacyPolicyHeader">Datenschutzerklärung</string>
-    <string name="InfoActivity_PrivacyPolicy_Text">Laroomy-Soft(Hans Philipp Zimmermann) hat die LaRoomy App als kostenlose App erstellt. Dieser SERVICE wird von Hans Philipp Zimmermann kostenlos zur Verfügung gestellt und ist für die unveränderte Verwendung vorgesehen. Auf dieser Seite werden Benutzer über meine Richtlinien zur Erfassung, Verwendung und Offenlegung persönlicher Informationen informiert, falls sich jemand für die Nutzung meines Service entschieden hat. Wenn Sie sich für die Nutzung meines Dienstes entscheiden, stimmen Sie der Erfassung und Verwendung von Informationen in Bezug auf diese Richtlinie zu.</string>
+    <string name="InfoActivity_PrivacyPolicy_Text">Hans Philipp Zimmermann hat die LaRoomy App als kostenlose App erstellt. Dieser SERVICE wird von Hans Philipp Zimmermann kostenlos zur Verfügung gestellt und ist für die unveränderte Verwendung vorgesehen. Auf dieser Seite werden Benutzer über meine Richtlinien zur Erfassung, Verwendung und Offenlegung persönlicher Informationen informiert, falls sich jemand für die Nutzung meines Service entschieden hat. Wenn Sie sich für die Nutzung meines Dienstes entscheiden, stimmen Sie der Erfassung und Verwendung von Informationen in Bezug auf diese Richtlinie zu.</string>
     <string name="InfoActivity_PP_InformationCollectionAndUse_Header">Sammlung und Verwendung von Informationen</string>
     <string name="InfoActivity_PP_InformationCollectionAndUse_Text">Die App sammelt keine persönlichen Daten. Die App verwendet jedoch Dienste von Drittanbietern, die möglicherweise Informationen sammeln, mit denen Sie identifiziert werden. Link zu Datenschutzbestimmungen von Drittanbietern, die von der App verwendet werden:</string>
     <string name="InfoActivity_PP_ThirdPartyServiceLink_one">Google Play Services</string>
@@ -141,6 +146,18 @@
 
     <string name="InfoActivity_CR_SpinKit_Thx">Ybq - für die SpinKit Bibliothek. Super Android Loading Animationen:</string>
     <string name="InfoActivity_CR_SpinKit_ActionLinkText">Quelle und Lizenz anzeigen</string>
+    <string name="InfoActivity_CR_ColorPicker_Thx">QuadFlask - für den tollen ColorPicker.\nAndroid Farbwähler mit Farbrad und Slider:</string>
+    <string name="InfoActivity_CR_ColorPicker_ActionLinkText">Quelle und Lizenz anzeigen</string>
+    <string name="InfoActivity_CR_FluidSlider_Thx">Ramotion - für den ausgefallenen Fluid-Slider.\nEin Slider Widget mit einer Popup-Blase und dem präzisen Wert:</string>
+    <string name="InfoActivity_CR_FluidSlider_ActionLinkText">Quelle und Lizenz anzeigen</string>
+    <string name="InfoActivity_CR_FluidSlider_RamotionBackLinkText">www.Ramotion.com</string>
+
+    <string name="InfoActivity_RS_HeaderText">Dokumentation &amp; Ressourcen</string>
+
+    <string name="InfoActivity_Disclaimer_HeaderText">Haftungsausschluss</string>
+    <string name="InfoActivity_Disclaimer_Text">Der Autor dieser Anwendung haftet nicht für Schäden an Software oder Hardware oder Sachschäden, die auf die Verwendung der Anwendung zurückzuführen ist. Der Autor übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Anwendung. Haftungsansprüche gegen den Autor, die sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung der dargebotenen Anwendung verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Autors kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt.</string>
+
+
 
 
     <string name="SetupActivity_Header">Einstellungen</string>

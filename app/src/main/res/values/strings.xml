@@ -103,12 +103,16 @@
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamic Remote Control</string>
     <string name="InfoActivity_AppVersionEntry">App-Version </string>
-    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2022 Laroomy-Soft</string>
+    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2022 Hans Philipp Zimmermann</string>
     <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">All rights reserved</string>
+
+    <string name="InfoActivity_ImprintAndContact">Imprint &amp; Contact</string>
+
     <string name="InfoActivity_MailTo">info@laroomy.de</string>
+
     <string name="InfoActivity_PrivacyPolicyHeader">Privacy Policy</string>
-    <string name="InfoActivity_PrivacyPolicy_Text">Laroomy-Soft(Hans Philipp Zimmermann) built the LaRoomy app as a Free app. This SERVICE is provided by Hans Philipp Zimmermann at no cost and is intended for use as is.This page is used to inform users regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service. If you choose to use my Service, then you agree to the collection and use of information in relation to this policy.</string>
+    <string name="InfoActivity_PrivacyPolicy_Text">Hans Philipp Zimmermann built the LaRoomy app as a free app. This SERVICE is provided by Hans Philipp Zimmermann at no cost and is intended for use as is.This page is used to inform users regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service. If you choose to use my Service, then you agree to the collection and use of information in relation to this policy.</string>
     <string name="InfoActivity_PP_InformationCollectionAndUse_Header">Information Collection and Use</string>
     <string name="InfoActivity_PP_InformationCollectionAndUse_Text">The app does not collect any personal data. But the app does use third party services that may collect information used to identify you. Link to privacy policy of third party service providers used by the app:</string>
     <string name="InfoActivity_PP_ThirdPartyServiceLink_one">Google Play Services</string>
@@ -132,8 +136,17 @@
     <string name="InfoActivity_CR_HeaderText">Credits</string>
     <string name="InfoActivity_CR_StartText">This project is using some open-source libraries. Here you can find a list of all programmers and/or companies which provisions contributed to this app.</string>
     <string name="InfoActivity_CR_ThankYouHeaderText">My biggest thanks goes to:</string>
-    <string name="InfoActivity_CR_SpinKit_Thx">Ybq - for the SpinKit Library.\nAmazing Android loading animations:</string>
+    <string name="InfoActivity_CR_SpinKit_Thx">Ybq - for the fantastic SpinKit Library.\nAmazing Android loading animations:</string>
     <string name="InfoActivity_CR_SpinKit_ActionLinkText">Show source and license on GitHub</string>
+    <string name="InfoActivity_CR_ColorPicker_Thx">QuadFlask - for the gorgeous ColorPicker.\nAndroid color picker with color wheel and lightness bar</string>
+    <string name="InfoActivity_CR_ColorPicker_ActionLinkText">Show source and licence on Github</string>
+    <string name="InfoActivity_CR_FluidSlider_Thx">Ramotion - for the fancy Fluid-Slider.\nA slider widget with a popup bubble displaying the precise value:</string>
+    <string name="InfoActivity_CR_FluidSlider_ActionLinkText">Show source and licence on Github</string>
+    <string name="InfoActivity_CR_FluidSlider_RamotionBackLinkText">www.Ramotion.com</string>
+
+    <string name="InfoActivity_RS_HeaderText">Documentation &amp; Resources</string>
+    <string name="InfoActivity_Disclaimer_HeaderText">Disclaimer</string>
+    <string name="InfoActivity_Disclaimer_Text">The author of this program is not liable for damages to software or hardware or property damage resulting from the use of the program. The author reserves the right not to be responsible for the topicality, correctness, completeness or quality of the provided application. Liability claims against the author, which relate to damages of material or ideal kind, caused by the use of the presented application, are fundamentally excluded, as long as the author has no proven intentional or grossly negligent fault.</string>
 
     <string name="SetupActivity_Header">Settings</string>
     <string name="SetupActivity_AutoConnectElementText">Auto-Connect</string>

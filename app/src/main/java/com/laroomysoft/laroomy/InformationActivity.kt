@@ -12,10 +12,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 
 class InformationActivity : AppCompatActivity() {
 
-    lateinit var versionTextView: AppCompatTextView
+    //lateinit var versionTextView: AppCompatTextView
+
     private lateinit var privacyProtectionSubContainer: ConstraintLayout
     private lateinit var termsOfServiceSubContainer: ConstraintLayout
     private lateinit var creditsSubContainer: ConstraintLayout
+    private lateinit var docuAndResourcesSubContainer: ConstraintLayout
+    private lateinit var imprintAndContactSubContainer: ConstraintLayout
+    private lateinit var disclaimerSubContainer: ConstraintLayout
+
     lateinit var backButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +30,9 @@ class InformationActivity : AppCompatActivity() {
         this.privacyProtectionSubContainer = findViewById(R.id.infoActivityPrivacyPolicySubContainer)
         this.termsOfServiceSubContainer = findViewById(R.id.infoActivityTermsOfServiceSubContainer)
         this.creditsSubContainer = findViewById(R.id.infoActivityCreditsSubContainer)
+        this.docuAndResourcesSubContainer = findViewById(R.id.infoActivityDocuAndResourcesSubContainer)
+        this.imprintAndContactSubContainer = findViewById(R.id.infoActivityImprintAndContactSubContainer)
+        this.disclaimerSubContainer = findViewById(R.id.infoActivityDisclaimerSubContainer)
 
         // add back button functionality
         this.backButton = findViewById(R.id.infoActivityBackButton)
@@ -95,5 +103,56 @@ class InformationActivity : AppCompatActivity() {
         openUrl.data = Uri.parse("https://github.com/ybq/Android-SpinKit")
         startActivity(openUrl)
 
+    }
+
+    fun onQuadFlaskLinkClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        val openUrl = Intent(ACTION_VIEW)
+        openUrl.data = Uri.parse("https://github.com/QuadFlask/colorpicker")
+        startActivity(openUrl)
+    }
+
+    fun onRamotionSourceLinkClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        val openUrl = Intent(ACTION_VIEW)
+        openUrl.data = Uri.parse("https://github.com/Ramotion/fluid-slider-android")
+        startActivity(openUrl)
+    }
+
+    fun onRamotionWebsiteLinkClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        val openUrl = Intent(ACTION_VIEW)
+        openUrl.data = Uri.parse("https://www.ramotion.com/")
+        startActivity(openUrl)
+    }
+
+    fun onDocuAndResourcesFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        when(this.docuAndResourcesSubContainer.visibility){
+            View.GONE -> {
+                this.docuAndResourcesSubContainer.visibility = View.VISIBLE
+            }
+            else -> {
+                this.docuAndResourcesSubContainer.visibility = View.GONE
+            }
+        }
+    }
+
+    fun onImprintAndContactFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        when(this.imprintAndContactSubContainer.visibility){
+            View.GONE -> {
+                this.imprintAndContactSubContainer.visibility = View.VISIBLE
+            }
+            else -> {
+                this.imprintAndContactSubContainer.visibility = View.GONE
+            }
+        }
+    }
+
+    fun onDisclaimerFieldClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        when(this.disclaimerSubContainer.visibility){
+            View.GONE -> {
+                this.disclaimerSubContainer.visibility = View.VISIBLE
+            }
+            else -> {
+                this.disclaimerSubContainer.visibility = View.GONE
+            }
+        }
     }
 }

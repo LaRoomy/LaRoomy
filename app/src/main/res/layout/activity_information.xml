@@ -114,60 +114,120 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/infoActivityCopyrightTextView" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/infoActivityMailToTextView"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/infoActivityImprintAndContactContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:onClick="onMailToLinkClick"
-            android:text="@string/InfoActivity_MailTo"
-            android:textColor="@color/clickableTextColor"
-            android:textSize="20sp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/information_topic_background"
+            android:minHeight="60dp"
+            android:onClick="onImprintAndContactFieldClick"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoActivityRightsReservedTextView" />
+            app:layout_constraintTop_toBottomOf="@id/infoActivityRightsReservedTextView">
 
-        <!--
-                <View
-                    android:id="@+id/infoActivitySecondSeparator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@color/separatorColor"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/infoActivityImprintAndContactHeaderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/InfoActivity_ImprintAndContact"
+                android:textColor="@color/goldAccentColor"
+                android:textSize="@dimen/infoActivity_textSize_bigParagraphMainHeadlineText"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/infoActivityImprintAndContactSubContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingBottom="15dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityImprintAndContactHeaderTextView">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/infoActivityMailToTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:onClick="onMailToLinkClick"
+                    android:text="@string/InfoActivity_MailTo"
+                    android:textColor="@color/clickableTextColor"
+                    android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/infoActivityMailToTextView" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <View
-                    android:id="@+id/infoActivityThirdSeparator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@color/separatorColor"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/infoActivitySecondSeparator" />
-        -->
+
+                <!--
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/infoActivityCreditsStartText"
+                                    android:text="@string/InfoActivity_CR_StartText"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/goldAccentColor"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/infoActivityCreditsThanksText"
+                                    android:text="@string/InfoActivity_CR_ThankYouHeaderText"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/goldAccentColor"
+                                    android:layout_marginTop="20dp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsStartText"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:id="@+id/infoActivityCreditsFirstSeparator"
+                                    android:background="@color/separatorColor"
+                                    android:layout_marginTop="15dp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThanksText"
+                                    />
+                -->
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/infoActivityPrivacyPolicyContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="10dp"
             android:background="@drawable/information_topic_background"
             android:minHeight="60dp"
             android:onClick="onPrivacyProtectionFieldClick"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoActivityMailToTextView">
+            app:layout_constraintTop_toBottomOf="@id/infoActivityImprintAndContactContainer">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/infoActivityPrivacyPolicyHeaderTextView"
@@ -667,7 +727,7 @@
                 android:layout_marginEnd="10dp"
                 android:paddingBottom="15dp"
 
-                android:visibility="visible"
+                android:visibility="gone"
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -715,7 +775,7 @@
                     android:text="@string/InfoActivity_CR_SpinKit_Thx"
                     android:textAlignment="center"
                     android:textColor="@color/goldAccentColor"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsFirstSeparator"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
@@ -743,6 +803,260 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsYBQLinkTextView"
                     />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsQuadFlaskThanksText"
+                    android:text="@string/InfoActivity_CR_ColorPicker_Thx"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsSecondSeparator"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:id="@+id/infoActivityCreditsQuadFlaskLinkTextView"
+                    android:text="@string/InfoActivity_CR_ColorPicker_ActionLinkText"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/clickableTextColor"
+                    android:onClick="onQuadFlaskLinkClick"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsQuadFlaskThanksText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:id="@+id/infoActivityCreditsThirdSeparator"
+                    android:background="@color/separatorColor"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsQuadFlaskLinkTextView"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsRamotionThanksText"
+                    android:text="@string/InfoActivity_CR_FluidSlider_Thx"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThirdSeparator"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:id="@+id/infoActivityCreditsRamotionLinkTextView"
+                    android:text="@string/InfoActivity_CR_FluidSlider_ActionLinkText"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/clickableTextColor"
+                    android:onClick="onRamotionSourceLinkClick"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsRamotionThanksText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:textSize="18sp"
+                    android:id="@+id/infoActivityCreditsRamotionBackLink"
+                    android:text="@string/InfoActivity_CR_FluidSlider_RamotionBackLinkText"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/clickableTextColor"
+                    android:onClick="onRamotionWebsiteLinkClick"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsRamotionLinkTextView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+<!--
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:id="@+id/infoActivityCreditsFourthSeparator"
+                    android:background="@color/separatorColor"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsRamotionBackLink"
+                    />
+-->
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/infoActivityDocuAndResourcesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/information_topic_background"
+            android:minHeight="60dp"
+            android:onClick="onDocuAndResourcesFieldClick"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsContainer">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/infoActivityDocuAndResourcesHeaderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/InfoActivity_RS_HeaderText"
+                android:textColor="@color/goldAccentColor"
+                android:textSize="@dimen/infoActivity_textSize_bigParagraphMainHeadlineText"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/infoActivityDocuAndResourcesSubContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingBottom="15dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityDocuAndResourcesHeaderTextView">
+
+<!--
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsStartText"
+                    android:text="@string/InfoActivity_CR_StartText"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityCreditsThanksText"
+                    android:text="@string/InfoActivity_CR_ThankYouHeaderText"
+                    android:textAlignment="center"
+                    android:textColor="@color/goldAccentColor"
+                    android:layout_marginTop="20dp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsStartText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:id="@+id/infoActivityCreditsFirstSeparator"
+                    android:background="@color/separatorColor"
+                    android:layout_marginTop="15dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThanksText"
+                    />
+-->
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/infoActivityDisclaimerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/information_topic_background"
+            android:minHeight="60dp"
+            android:onClick="onDisclaimerFieldClick"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoActivityDocuAndResourcesContainer">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/infoActivityDisclaimerHeaderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/InfoActivity_Disclaimer_HeaderText"
+                android:textColor="@color/goldAccentColor"
+                android:textSize="@dimen/infoActivity_textSize_bigParagraphMainHeadlineText"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/infoActivityDisclaimerSubContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:paddingBottom="15dp"
+
+                android:visibility="gone"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/infoActivityDisclaimerHeaderTextView">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/infoActivityDisclaimerText"
+                        android:text="@string/InfoActivity_Disclaimer_Text"
+                        android:textAlignment="center"
+                        android:textColor="@color/goldAccentColor"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                <!--
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/infoActivityCreditsThanksText"
+                                    android:text="@string/InfoActivity_CR_ThankYouHeaderText"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/goldAccentColor"
+                                    android:layout_marginTop="20dp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsStartText"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:id="@+id/infoActivityCreditsFirstSeparator"
+                                    android:background="@color/separatorColor"
+                                    android:layout_marginTop="15dp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThanksText"
+                                    />
+                -->
 
 
 
