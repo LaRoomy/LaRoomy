@@ -1211,8 +1211,12 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
 
     override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
 
-        // TODO!
-
+        this.fieldOneVisible = complexPropertyState.valueOne == 1
+        this.fieldTwoVisible = complexPropertyState.valueTwo == 1
+        this.fieldOneInputType = complexPropertyState.valueThree
+        this.fieldTwoInputType = complexPropertyState.valueFour
+        this.navigateBackOnButtonPress = complexPropertyState.valueFive == 1
+        this.fromComplexPropertyString(complexPropertyState.strValue)
     }
 
     override fun toComplexPropertyState(): ComplexPropertyState {
@@ -1237,15 +1241,113 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
             0
         }
 
-        //  TODO!
+        val oneParamElement = OneParamElement()
+        oneParamElement.parameterName = "B"
+        oneParamElement.parameterValue = this.buttonDescriptor.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
+
+        oneParamElement.parameterName = "F1"
+        oneParamElement.parameterValue = this.fieldOneDescriptor.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
+
+        oneParamElement.parameterName = "F2"
+        oneParamElement.parameterValue = this.fieldTwoDescriptor.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
+
+        oneParamElement.parameterName = "H1"
+        oneParamElement.parameterValue = this.fieldOneHint.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
+
+        oneParamElement.parameterName = "H2"
+        oneParamElement.parameterValue = this.fieldTwoHint.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
+
+        oneParamElement.parameterName = "C1"
+        oneParamElement.parameterValue = this.fieldOneContent.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
+
+        oneParamElement.parameterName = "C2"
+        oneParamElement.parameterValue = this.fieldTwoContent.ifEmpty {
+            "_"
+        }
+        cState.strValue += oneParamElement.toString()
 
         return cState
     }
 
     private fun fromComplexPropertyString(data: String){
+        val parameterList =
+            ComplexPropertyStateStringReader()
+                .readOneParameterDefinitions(data)
 
-        // TODO !
-
+        parameterList.forEach {
+            when(it.parameterName){
+                "B" -> {
+                    this.buttonDescriptor = if (it.parameterValue == "_") {
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                "F1" -> {
+                    this.fieldOneDescriptor = if(it.parameterValue == "_"){
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                "F2" -> {
+                    this.fieldTwoDescriptor = if(it.parameterValue == "_"){
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                "H1" -> {
+                    this.fieldOneHint = if(it.parameterValue == "_"){
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                "H2" -> {
+                    this.fieldTwoHint = if(it.parameterValue == "_"){
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                "C1" -> {
+                    this.fieldOneContent = if(it.parameterValue == "_"){
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                "C2" -> {
+                    this.fieldTwoContent = if(it.parameterValue == "_"){
+                        ""
+                    } else {
+                        it.parameterValue
+                    }
+                }
+                else -> {
+                    Log.e("StringInterrogator", "Unknown parameter name sequence")
+                }
+            }
+        }
     }
 
     override fun fromString(data: String): Boolean {
