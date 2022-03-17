@@ -36,15 +36,19 @@ class ComplexPropertyStateStringReader {
                                 if (data.length > (index + 2)) {
                                     if (data.elementAt(index + 1) == ';') {
                                         nextValidIndex = index + 2
-                                        singleStringList.add(singleDefinitionString)
-                                        singleDefinitionString = ""
+                                        if(singleDefinitionString.isNotEmpty()) {
+                                            singleStringList.add(singleDefinitionString)
+                                            singleDefinitionString = ""
+                                        }
                                     }
                                 }
                             }
                         }
                         '\r' -> {
-                            singleStringList.add(singleDefinitionString)
-                            singleDefinitionString = ""
+                            if(singleDefinitionString.isNotEmpty()) {
+                                singleStringList.add(singleDefinitionString)
+                                singleDefinitionString = ""
+                            }
                         }
                         else -> {
                             if(index >= nextValidIndex) {

@@ -231,6 +231,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             this.fieldOneDescriptor.visibility = if(stringInterrogatorState.fieldOneDescriptor.isEmpty()){
                 View.GONE
             } else {
+                this.fieldOneDescriptor.text = stringInterrogatorState.fieldOneDescriptor
                 View.VISIBLE
             }
             // if the hint is not empty set it
@@ -272,6 +273,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             this.fieldTwoDescriptor.visibility = if(stringInterrogatorState.fieldTwoDescriptor.isEmpty()){
                 View.GONE
             } else {
+                this.fieldTwoDescriptor.text = stringInterrogatorState.fieldTwoDescriptor
                 View.VISIBLE
             }
             // if the hint is not empty set it

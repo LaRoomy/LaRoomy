@@ -1344,7 +1344,7 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
                     }
                 }
                 else -> {
-                    Log.e("StringInterrogator", "Unknown parameter name sequence")
+                    Log.e("StringInterrogator", "Unknown parameter name sequence: ${it.parameterName}")
                 }
             }
         }
@@ -1385,7 +1385,7 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
             // data[12] is reserved for future use !
 
             // string definition data
-            val pureData = data.removeRange(0, 12)
+            val pureData = data.removeRange(0, 13)
             this.fromComplexPropertyString(pureData)
 
             true
@@ -1397,11 +1397,16 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
         // define data string
         var stringInterrogatorExecutionData = ""
 
-        if(this.fieldOneContent.isNotEmpty()){
-            stringInterrogatorExecutionData += "C1::${this.fieldOneContent};;"
+        stringInterrogatorExecutionData += if(this.fieldOneContent.isNotEmpty()){
+            "C1::${this.fieldOneContent};;"
+        } else {
+            "C1::_;;"
         }
-        if(this.fieldTwoContent.isNotEmpty()){
-            stringInterrogatorExecutionData += "C2::${this.fieldTwoContent}"
+
+        stringInterrogatorExecutionData += if(this.fieldTwoContent.isNotEmpty()){
+            "C2::${this.fieldTwoContent};;"
+        } else {
+            "C2::_;;"
         }
 
         // generate transmission header:
