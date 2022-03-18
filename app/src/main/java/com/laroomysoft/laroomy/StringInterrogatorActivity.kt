@@ -1,14 +1,16 @@
 package com.laroomysoft.laroomy
 
+import android.content.Context
 import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
@@ -99,7 +101,6 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             }
         }
 
-
         val stringInterrogatorState = StringInterrogatorState()
         stringInterrogatorState.fromComplexPropertyState(
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
@@ -128,6 +129,12 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onPause() {
         super.onPause()
+
+        // make sure to hide the soft keyboard
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(this.fieldTwoInputText.windowToken, 0)
+
         // if this is not called due to a back-navigation, the user must have left the app
         if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
             if(verboseLog) {
