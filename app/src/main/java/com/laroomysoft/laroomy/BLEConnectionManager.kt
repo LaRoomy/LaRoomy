@@ -836,6 +836,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             COMPLEX_PROPERTY_TYPE_ID_STRING_INTERROGATOR -> {
                 this.processStringInterrogatorData(propertyIndex, data)
             }
+            COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER -> {
+                this.processTextListPresenterData(propertyIndex, data)
+            }
         }
 
         // check if the loop is active and send the next request if necessary
@@ -1633,6 +1636,53 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 stringInterrogatorState.toComplexPropertyState()
 
             this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
+    }
+
+    private fun processTextListPresenterData(propertyIndex: Int, data: String){
+
+        // NOTE: this complex state is a bit different, in the "fromString(.." method data could be added
+        //          -> so the fromString method must be executed on the existing object
+
+        // first get the existing state object
+        val textListPresenterState = TextListPresenterState()
+
+        textListPresenterState.fromComplexPropertyState(
+            this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState
+        )
+
+        // extract the data
+        if(!textListPresenterState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from textListPresenter data transmission.")
+            return
+        } else {
+            val cState =
+                textListPresenterState.toComplexPropertyState()
+
+            // update internal array
+            this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
+
+            // update ui-array
+            this.uIAdapterList.forEach {
+                if((it.elementType == PROPERTY_ELEMENT)&&(it.internalElementIndex == propertyIndex)){
+                    it.complexPropertyState = cState
+                    return@forEach
+                }
+            }
+
+            // check if the respective property page is open
+            if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() == propertyIndex){
+                // the page is open, so add the new data over the data-pipe
+
+
+                // the internal stack and the data-set used for binding in the textListPresenter activity must be different sources, but both must be updated on transmission
+            }
+
+            // check if the activity is open and trigger event
+                // BUT! -> how to add a string direct to the list, how is this evaluated
+
+            // TODO!!!
         }
     }
 

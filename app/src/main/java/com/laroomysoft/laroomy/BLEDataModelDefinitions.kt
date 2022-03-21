@@ -1485,33 +1485,36 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
         } else {
             this.useBackgroundStack = data.elementAt(8) == '1'
 
-            when(data.elementAt(9)){
-                '1' -> {
-                    // add text to stack
-                    var textToAdd = ""
-                    textToAdd += when(data.elementAt(10)){
-                        '0' -> {
-                            "N"
+            // only read the successive data if it should be saved onto the stack
+            if(useBackgroundStack) {
+                when (data.elementAt(9)) {
+                    '1' -> {
+                        // add text to stack
+                        var textToAdd = ""
+                        textToAdd += when (data.elementAt(10)) {
+                            '0' -> {
+                                "N"
+                            }
+                            '1' -> {
+                                "I"
+                            }
+                            '2' -> {
+                                "W"
+                            }
+                            '3' -> {
+                                "E"
+                            }
+                            else -> {
+                                "N"
+                            }
                         }
-                        '1' -> {
-                            "I"
-                        }
-                        '2' -> {
-                            "W"
-                        }
-                        '3' -> {
-                            "E"
-                        }
-                        else -> {
-                            "N"
-                        }
+                        textToAdd += data.removeRange(0, 12)
+                        this.textListBackgroundStack.add(textToAdd)
                     }
-                    textToAdd += data.removeRange(0, 12)
-                    this.textListBackgroundStack.add(textToAdd)
-                }
-                '2' -> {
-                    // clear the stack
-                    this.textListBackgroundStack.clear()
+                    '2' -> {
+                        // clear the stack
+                        this.textListBackgroundStack.clear()
+                    }
                 }
             }
             true
