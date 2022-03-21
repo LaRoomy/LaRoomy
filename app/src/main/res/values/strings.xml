@@ -75,6 +75,8 @@
     <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Field 2</string>
     <string name="StringInterrogatorActivity_ButtonPlaceholderText">Submit</string>
 
+    <string name="TextListPresenter_HeaderText">Text List Presenter</string>
+
 
     <string name="UnlockCtrl_HeaderText">Unlock Control</string>
     <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
@@ -311,6 +313,7 @@
     <string name="AddDeviceListElementContentDescription" translatable="false">Adds the device to the known devices</string>
     <string name="GeneralBackButtonLabel" translatable="false">Goes back to previous activity</string>
     <string name="GeneralForwardButtonLabel" translatable="false">Navigates to the next activity</string>
+    <string name="GeneralClearButtonContentDescription" translatable="false">Clear the content</string>
     <string name="UnlockControlActivityChangePinButtonLabel" translatable="false">Change the pin of the remote device</string>
     <string name="UnlockControlActivityLockImageLabel" translatable="false">This image indicates the lock-status of the remote device. If unlocked, the remote device can be locked by tapping this image.</string>
     <string name="UnlockControlActivityShowHidePinButtonLabel" translatable="false">Show or hide the pin by pressing this image</string>
@@ -361,5 +364,6 @@
     <string name="UUIDDefaultFill" translatable="false">00000000-0000-1000-8000-00805f9b34fb</string>
     <string name="ConnectionLog_NoContent">Nothing to show..</string>
     <string name="TextResourceErrorState" translatable="false">Resource::Error</string>
+    <string name="TextListPresenterListElementPlaceholderText">List Element</string>
 
 </resources>

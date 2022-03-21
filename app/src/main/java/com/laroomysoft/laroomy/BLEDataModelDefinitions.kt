@@ -1425,6 +1425,104 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
     }
 }
 
+class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
+
+    var useBackgroundStack = false
+    val textListBackgroundStack = ArrayList<String>()
+
+    override fun isValid(): Boolean {
+        return true
+    }
+
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+
+        this.useBackgroundStack = complexPropertyState.valueOne == 1
+
+        var tStr = ""
+        var nextValidIndex = 0
+
+        complexPropertyState.strValue.forEachIndexed { index, c ->
+            if(c == ';'){
+                if(complexPropertyState.strValue.length > (index + 2)){
+                    if(complexPropertyState.strValue.elementAt(index + 1) == ';'){
+                        nextValidIndex = index + 2
+                        this.textListBackgroundStack.add(tStr)
+                        tStr = ""
+                    }
+                }
+            } else {
+                if(index >= nextValidIndex){
+                    tStr += c
+                }
+            }
+        }
+    }
+
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+
+        cState.valueOne = if(useBackgroundStack){
+            1
+        } else {
+            0
+        }
+        this.textListBackgroundStack.forEach {
+            cState.strValue += it
+            cState.strValue += ";;"
+        }
+        return cState
+    }
+
+    override fun fromString(data: String): Boolean {
+        return if (data.length < 12) {
+            if (verboseLog) {
+                Log.e(
+                    "TextListPresenter:fromString",
+                    "Error reading Data from TextListPreventer Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            this.useBackgroundStack = data.elementAt(8) == '1'
+
+            when(data.elementAt(9)){
+                '1' -> {
+                    // add text to stack
+                    var textToAdd = ""
+                    textToAdd += when(data.elementAt(10)){
+                        '0' -> {
+                            "N"
+                        }
+                        '1' -> {
+                            "I"
+                        }
+                        '2' -> {
+                            "W"
+                        }
+                        '3' -> {
+                            "E"
+                        }
+                        else -> {
+                            "N"
+                        }
+                    }
+                    textToAdd += data.removeRange(0, 12)
+                    this.textListBackgroundStack.add(textToAdd)
+                }
+                '2' -> {
+                    // clear the stack
+                    this.textListBackgroundStack.clear()
+                }
+            }
+            true
+        }
+    }
+
+    override fun toExecutionString(propertyIndex: Int): String {
+        return "not implemented"
+    }
+}
+
 class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 
     var unLocked = false

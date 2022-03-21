@@ -83,6 +83,7 @@
     <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Feld 2</string>
     <string name="StringInterrogatorActivity_ButtonPlaceholderText">Absenden</string>
 
+    <string name="TextListPresenter_HeaderText">Textliste</string>
 
 
     <string name="UnlockCtrl_HeaderText">Entsperren</string>
@@ -350,6 +351,8 @@
     <string name="binding_code_placeholder">h5G+s%gt</string>
     <string name="pinCodePlaceholder">*****</string>
     <string name="ConnectionLog_NoContent">Keine Daten vorhanden..</string>
+    <string name="TextListPresenterListElementPlaceholderText">Listen Element</string>
+
 
 
 </resources>

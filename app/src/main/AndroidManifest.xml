@@ -26,9 +26,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".StringInterrogatorActivity"
+            android:name=".TextListPresenter"
             android:screenOrientation="locked"
             android:exported="false" />
+        <activity
+            android:name=".StringInterrogatorActivity"
+            android:exported="false"
+            android:screenOrientation="locked" />
         <activity
             android:name=".LineGraphActivity"
             android:screenOrientation="locked" />
