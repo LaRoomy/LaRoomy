@@ -2,11 +2,8 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid
         android:color="@color/complexPropertyPanelBackgroundColor" />
-    <stroke
-        android:width="0dp"
-        android:color="@color/complexPropertyPanelBackgroundColor" />
     <corners
-        android:radius="10dp" />
+        android:radius="8dp" />
     <padding
         android:bottom="0dp"
         android:left="0dp"

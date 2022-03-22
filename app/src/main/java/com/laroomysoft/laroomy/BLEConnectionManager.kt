@@ -1643,6 +1643,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
         // NOTE: this complex state is a bit different, in the "fromString(.." method data could be added
         //          -> so the fromString method must be executed on the existing object
+        // the internal stack and the data-set used for binding in the textListPresenter activity must be different sources, but both must be updated on transmission
 
         // first get the existing state object
         val textListPresenterState = TextListPresenterState()
@@ -1657,6 +1658,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             applicationProperty.logControl("E: Error reading data from textListPresenter data transmission.")
             return
         } else {
+            var uiIndex = -1
             val cState =
                 textListPresenterState.toComplexPropertyState()
 
@@ -1664,25 +1666,30 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState = cState
 
             // update ui-array
-            this.uIAdapterList.forEach {
-                if((it.elementType == PROPERTY_ELEMENT)&&(it.internalElementIndex == propertyIndex)){
-                    it.complexPropertyState = cState
-                    return@forEach
+            this.uIAdapterList.forEachIndexed { index, dlc ->
+                if((dlc.elementType == PROPERTY_ELEMENT)&&(dlc.internalElementIndex == propertyIndex)){
+                    dlc.complexPropertyState = cState
+                    uiIndex = index
+                    return@forEachIndexed
                 }
             }
 
             // check if the respective property page is open
             if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() == propertyIndex){
-                // the page is open, so add the new data over the data-pipe
+                // the page is open, so add the new data over the complex property state update, but only put the new string in the object
+                // this is a temporary object to forward to the property callback
+                val eventObject = ComplexPropertyState()
 
+                if(textListPresenterState.textListBackgroundStack.isEmpty()){
+                    // the array is empty so this must have been a clear stack transmission
+                    eventObject.valueOne = 0
+                } else {
+                    eventObject.valueOne = 2
+                    eventObject.strValue = textListPresenterState.textListBackgroundStack.last()
+                }
 
-                // the internal stack and the data-set used for binding in the textListPresenter activity must be different sources, but both must be updated on transmission
+                this.propertyCallback.onComplexPropertyStateChanged(uiIndex, eventObject)
             }
-
-            // check if the activity is open and trigger event
-                // BUT! -> how to add a string direct to the list, how is this evaluated
-
-            // TODO!!!
         }
     }
 

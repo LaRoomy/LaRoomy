@@ -1483,6 +1483,8 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
             }
             false
         } else {
+            var deleteStack = this.useBackgroundStack
+
             this.useBackgroundStack = data.elementAt(8) == '1'
 
             // only read the successive data if it should be saved onto the stack
@@ -1510,11 +1512,19 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
                         }
                         textToAdd += data.removeRange(0, 12)
                         this.textListBackgroundStack.add(textToAdd)
+
+                        if(this.textListBackgroundStack.size > 200){
+                            this.textListBackgroundStack.removeAt(0)
+                        }
                     }
                     '2' -> {
                         // clear the stack
                         this.textListBackgroundStack.clear()
                     }
+                }
+            } else {
+                if(deleteStack){
+                    this.textListBackgroundStack.clear()
                 }
             }
             true

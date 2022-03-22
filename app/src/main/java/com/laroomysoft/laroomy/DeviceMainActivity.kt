@@ -800,6 +800,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 startActivity(intent)
                 overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
             }
+            COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER -> {
+                // prevent the normal "onPause" execution
+                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
+                // navigate to the text-list-presenter page
+                val intent = Intent(this@DeviceMainActivity, TextListPresenter::class.java)
+                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
+                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
+                intent.putExtra("isStandAlonePropertyMode", false)
+                startActivity(intent)
+                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+            }
             else -> {
                 // what to do here??
             }

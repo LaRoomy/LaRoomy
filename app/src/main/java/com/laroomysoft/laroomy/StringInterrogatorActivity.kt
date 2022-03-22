@@ -409,21 +409,44 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
     ) {
-        super.onComplexPropertyStateChanged(UIAdapterElementIndex, newState)
-
-        val element =
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
-
-        if(element.internalElementIndex == this.relatedElementID){
-            if(verboseLog) {
-                Log.d(
-                    "StringInterrogator",
-                    "Complex Property changed - Update the UI !"
+        if (UIAdapterElementIndex == this.relatedGlobalElementIndex) {
+            val element =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                    UIAdapterElementIndex
                 )
+
+            if (element.internalElementIndex == this.relatedElementID) {
+                if (verboseLog) {
+                    Log.d(
+                        "StringInterrogator",
+                        "Complex Property changed - Update the UI !"
+                    )
+                }
+                val stringInterrogatorState = StringInterrogatorState()
+                stringInterrogatorState.fromComplexPropertyState(element.complexPropertyState)
+                this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
             }
-            val stringInterrogatorState = StringInterrogatorState()
-            stringInterrogatorState.fromComplexPropertyState(element.complexPropertyState)
-            this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
         }
     }
+
+    override fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int) {
+        // mark the property as changed for the back-navigation-update
+        (this.applicationContext as ApplicationProperty).uiAdapterChanged = true
+        ApplicationProperty.bluetoothConnectionManager.uIAdapterList[UIAdapterElementIndex].hasChanged = true
+    }
+
+    override fun onPropertyInvalidated() {
+        if(!isStandAlonePropertyMode) {
+            (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = true
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+
+            finish()
+
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
+    }
+
 }
