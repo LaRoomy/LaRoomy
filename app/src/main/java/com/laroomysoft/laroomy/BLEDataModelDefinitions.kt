@@ -1443,7 +1443,7 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
 
         complexPropertyState.strValue.forEachIndexed { index, c ->
             if(c == ';'){
-                if(complexPropertyState.strValue.length > (index + 2)){
+                if(complexPropertyState.strValue.length > (index + 1)){
                     if(complexPropertyState.strValue.elementAt(index + 1) == ';'){
                         nextValidIndex = index + 2
                         this.textListBackgroundStack.add(tStr)
@@ -1510,7 +1510,7 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
                                 "N"
                             }
                         }
-                        textToAdd += data.removeRange(0, 12)
+                        textToAdd += data.removeRange(0, 11)
                         this.textListBackgroundStack.add(textToAdd)
 
                         if(this.textListBackgroundStack.size > 200){
