@@ -15,6 +15,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.Exception
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -81,9 +82,11 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
         // add clear list button onClick handler
         this.clearListButton.setOnClickListener {
-            // clear the list
-            this.textList.clear()
-            this.textPresenterListAdapter.notifyDataSetChanged()
+            // clear the list + notify
+            runOnUiThread {
+                this.textList.clear()
+                this.textPresenterListAdapter.notifyDataSetChanged()
+            }
 
             // delete the str member of the complexProperty state object in the internal and the ui array (internal content of the list)
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).complexPropertyState.strValue = ""
@@ -296,19 +299,30 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
     ) {
-        if(UIAdapterElementIndex == this.relatedGlobalElementIndex) {
-            when (newState.valueOne) {
-                0 -> {
-                    this.textList.clear()
-                    this.textPresenterListAdapter.notifyDataSetChanged()
-                }
-                2 -> {
-                    if(newState.strValue.isNotEmpty()){
-                        this.textList.add(newState.strValue)
-                        this.textPresenterListAdapter.notifyItemInserted(this.textList.size - 1)
+        try {
+            if (UIAdapterElementIndex == this.relatedGlobalElementIndex) {
+                when (newState.valueOne) {
+                    0 -> {
+                        // clear the list
+                        runOnUiThread {
+                            this.textList.clear()
+                            this.textPresenterListAdapter.notifyDataSetChanged()
+                        }
+                    }
+                    2 -> {
+                        // add a new item
+                        if (newState.strValue.isNotEmpty()) {
+                            runOnUiThread {
+                                this.textList.add(newState.strValue)
+                                this.textPresenterListAdapter.notifyItemInserted(this.textList.size - 1)
+                                this.textPresenterList.scrollToPosition(this.textList.size - 1)
+                            }
+                        }
                     }
                 }
             }
+        } catch (e: Exception){
+            Log.e("TextListPresenter", "Exception in onComplexPropertyStateChanged: $e")
         }
     }
 
