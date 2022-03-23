@@ -2,12 +2,17 @@
   <dictionary name="hans-">
     <words>
       <w>abcdefghijklmnopqrstuvw</w>
+      <w>appname</w>
       <w>bdata</w>
       <w>bmngr</w>
       <w>croller</w>
       <w>datasharing</w>
       <w>devid</w>
+      <w>dorg</w>
       <w>drfc</w>
+      <w>endlocal</w>
+      <w>errorlevel</w>
+      <w>ffff</w>
       <w>helpcircle</w>
       <w>huamao</w>
       <w>laroomydevicetype</w>
@@ -22,7 +27,9 @@
       <w>padd</w>
       <w>philipp</w>
       <w>pkerr</w>
+      <w>preventer</w>
       <w>ramotion</w>
+      <w>setlocal</w>
       <w>sharedpref</w>
       <w>spinkit</w>
       <w>textcolor</w>
@@ -35,6 +42,7 @@
       <w>uuids</w>
       <w>xpad</w>
       <w>xtest</w>
+      <w>ypad</w>
       <w>zabcdefghijklmnopqrstuvwxyz</w>
       <w>zimmermann</w>
     </words>

@@ -6,11 +6,11 @@ import android.util.Log
 import java.util.*
 import kotlin.collections.ArrayList
 
-const val ERROR_MESSAGE = 0
-const val WARNING_MESSAGE = 1
-const val INFO_MESSAGE = 2
+const val NOTIFICATION_TYPE_ERROR = 0
+const val NOTIFICATION_TYPE_WARNING = 1
+const val NOTIFICATION_TYPE_INFO = 2
 
-const val UNDEFINED_ELEMENT = 0
+//const val UNDEFINED_ELEMENT = -1
 const val PROPERTY_ELEMENT = 1
 const val GROUP_ELEMENT = 2
 

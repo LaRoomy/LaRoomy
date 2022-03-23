@@ -1,15 +1,13 @@
 package com.laroomysoft.laroomy
 
 import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
-import java.lang.Exception
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -429,9 +427,5 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         } catch (e: Exception){
             Log.e("BarGraphDataPipe", "Exception occurred: $e")
         }
-    }
-
-    fun onBarGraphActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
     }
 }

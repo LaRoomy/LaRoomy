@@ -647,7 +647,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     //var flagValue = -1
     private var barValues = ArrayList<Float>()
     private var barNames = ArrayList<String>()
-    var errorFlag = false
+    private var errorFlag = false
     var useValueAsBarDescriptor = false
     var useFixedMaximumValue = false
     var fixedMaximumValue = 0f
@@ -973,7 +973,7 @@ class LineGraphState: IComplexPropertySubTypeProtocolClass() {
     var drawGridLines = true
     var drawAxisValues = true
 
-    var errorFlag = false
+    private var errorFlag = false
 
     var xAxisMin = 0f
     var xAxisMax = 0f
@@ -1427,7 +1427,7 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
 
 class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
 
-    var useBackgroundStack = false
+    private var useBackgroundStack = false
     val textListBackgroundStack = ArrayList<String>()
 
     override fun isValid(): Boolean {
@@ -1483,7 +1483,7 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
             }
             false
         } else {
-            var deleteStack = this.useBackgroundStack
+            val deleteStack = this.useBackgroundStack
 
             this.useBackgroundStack = data.elementAt(8) == '1'
 
@@ -1631,8 +1631,8 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
 
 class DevicePropertyListContentInformation(val elementType: Int) {
     // NOTE: This is the data-model for the PropertyElement in the PropertyList on the DeviceMainActivity
-    var canNavigateForward = false
-    private set
+    private var canNavigateForward = false
+    //private set
 
     var isEnabled = true
     set(value) {
@@ -1961,6 +1961,7 @@ class LaRoomyDeviceProperty {
         return true
     }
 
+/*
     fun needNavigation(): Boolean {
         // if the property-type does not need navigation -> return false
         return when (this.propertyType) {
@@ -1973,6 +1974,7 @@ class LaRoomyDeviceProperty {
             else -> true
         }
     }
+*/
 
     fun fromString(string: String) {
         // generate member content from string:

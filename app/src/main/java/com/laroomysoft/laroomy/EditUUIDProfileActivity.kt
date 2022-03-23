@@ -8,7 +8,6 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
-import java.util.*
 
 class EditUUIDProfileActivity : AppCompatActivity() {
 

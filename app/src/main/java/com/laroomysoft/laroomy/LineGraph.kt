@@ -78,12 +78,12 @@ class LineGraph : View {
     var yAxisGridIntersectionUnits = INTERSECTION_NOT_SET
 
     // x + y axis-value colors
-    var xAxisValueTextColorID = R.color.lineGraphXAxisGridValueTextColor
+    private var xAxisValueTextColorID = R.color.lineGraphXAxisGridValueTextColor
     set(value) {
         this.xAxisGridValueTextPaint.color = context.getColor(value)
         field = value
     }
-    var yAxisValueTextColorID = R.color.lineGraphYAxisGridValueTextColor
+    private var yAxisValueTextColorID = R.color.lineGraphYAxisGridValueTextColor
         set(value) {
             this.yAxisGridValueTextPaint.color = context.getColor(value)
             field = value

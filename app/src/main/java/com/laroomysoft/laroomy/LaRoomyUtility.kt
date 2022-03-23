@@ -1,7 +1,6 @@
 package com.laroomysoft.laroomy
 
 import android.graphics.Color
-import kotlin.experimental.or
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -28,6 +27,7 @@ fun colorForPercentageLevel(level: Int): Int {
     else Color.GREEN
 }
 
+/*
 fun isNumber(char: Char): Boolean {
     return when (char) {
         '0' -> true
@@ -43,6 +43,7 @@ fun isNumber(char: Char): Boolean {
         else -> false
     }
 }
+*/
 
 fun colorForUserMessageType(type: Char) : Int {
     return when(type){
@@ -69,6 +70,7 @@ fun get8BitValueAsPercent(value: Int) : Int {
     return ret
 }
 
+/*
 fun get8BitValueAsPartOfOne(value: Int) : Float {
     val result = 0.01*get8BitValueAsPercent(value).toDouble()
     return when{
@@ -77,6 +79,7 @@ fun get8BitValueAsPartOfOne(value: Int) : Float {
         else -> result
     }.toFloat()
 }
+*/
 
 fun percentTo8Bit(percent: Int) : Int {
     val value = 255f*percent
@@ -84,6 +87,7 @@ fun percentTo8Bit(percent: Int) : Int {
     else (value/100f).roundToInt()
 }
 
+/*
 fun a8BitValueToString(value: Int) : String {
     var worker = value
     var hundred = 0
@@ -98,7 +102,9 @@ fun a8BitValueToString(value: Int) : String {
     // create the request string
     return "$hundred$tenth$single"
 }
+*/
 
+/*
 fun a8BitValueAsTwoCharString(value: Int) : String {
     var worker = value
     var tenth = 0
@@ -110,6 +116,7 @@ fun a8BitValueAsTwoCharString(value: Int) : String {
     // create the request string
     return "$tenth$single"
 }
+*/
 
 fun macAddressToEncryptString(macAddress: String): String {
     return if(macAddress.length < 16){
@@ -550,6 +557,7 @@ fun hexCharToNumber(c: Char) : Int {
     }
 }
 
+/*
 fun numberToHexChar(n: Int) : Char {
     return when(n){
         0 -> '0'
@@ -571,6 +579,7 @@ fun numberToHexChar(n: Int) : Char {
         else -> 'f'
     }
 }
+*/
 
 fun createRandomPasskey(keyLength: Int): String {
 

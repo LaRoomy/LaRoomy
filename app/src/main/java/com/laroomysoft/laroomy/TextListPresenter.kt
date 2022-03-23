@@ -1,17 +1,15 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -83,13 +81,13 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
         // add clear list button onClick handler
         this.clearListButton.setOnClickListener {
+            // clear the list
             this.textList.clear()
             this.textPresenterListAdapter.notifyDataSetChanged()
 
+            // delete the str member of the complexProperty state object in the internal and the ui array (internal content of the list)
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).complexPropertyState.strValue = ""
-
-            // TODO: delete the str member of the complexProperty state object in the internal and the ui array
-
+            ApplicationProperty.bluetoothConnectionManager.clearInternalPropertyStateStringValue(this.relatedElementID)
         }
 
         val textListPresenterState = TextListPresenterState()
@@ -225,7 +223,7 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
             )
         }
         if(state){
-            notifyUser(getString(R.string.GeneralMessage_reconnected), R.color.connectedTextColor)
+            notifyUser(NOTIFICATION_TYPE_INFO, getString(R.string.GeneralMessage_reconnected))
 
             if(this.propertyStateUpdateRequired){
                 this.propertyStateUpdateRequired = false
@@ -234,7 +232,7 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
                 }, TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT, TimeUnit.MILLISECONDS)
             }
         } else {
-            notifyUser(getString(R.string.GeneralMessage_connectionSuspended), R.color.disconnectedTextColor)
+            notifyUser(NOTIFICATION_TYPE_WARNING, getString(R.string.GeneralMessage_connectionSuspended))
 
             if(!expectedConnectionLoss){
                 // unexpected loss of connection
@@ -279,14 +277,21 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
     override fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData) {
         super.onRemoteUserMessage(deviceHeaderData)
-        // display here as notification
-        notifyUser(deviceHeaderData.message, R.color.InfoColor)
+        // display here as list element-notification
+        val type = when(deviceHeaderData.type){
+            '0' -> NOTIFICATION_TYPE_INFO
+            '1' -> NOTIFICATION_TYPE_WARNING
+            '2' -> NOTIFICATION_TYPE_ERROR
+            else -> NOTIFICATION_TYPE_INFO
+        }
+        notifyUser(type, deviceHeaderData.message)
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
         return this.relatedElementID
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onComplexPropertyStateChanged(
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
@@ -294,12 +299,14 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         if(UIAdapterElementIndex == this.relatedGlobalElementIndex) {
             when (newState.valueOne) {
                 0 -> {
-                    // TODO: clear the list !
-                    // TODO: notifyDataSetChanged!
+                    this.textList.clear()
+                    this.textPresenterListAdapter.notifyDataSetChanged()
                 }
                 2 -> {
-                    // TODO: add the string to list!
-                    // TODO: notifyItemInserted!
+                    if(newState.strValue.isNotEmpty()){
+                        this.textList.add(newState.strValue)
+                        this.textPresenterListAdapter.notifyItemInserted(this.textList.size - 1)
+                    }
                 }
             }
         }
@@ -325,22 +332,25 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         }
     }
 
-
-
-
     private fun notifyUser(notificationType: Int, message: String){
-
-        // TODO: in this activity the notification is not displayed in a separate textView, instead it is added as list-element !!!
-
+        // in this activity the notification is not displayed in a separate textView, instead it is added as list-element
+        val notiString =  when(notificationType){
+            NOTIFICATION_TYPE_INFO -> {
+                "I$message"
+            }
+            NOTIFICATION_TYPE_WARNING -> {
+                "W$message"
+            }
+            NOTIFICATION_TYPE_ERROR -> {
+                "E$message"
+            }
+            else -> {
+                "N$message"
+            }
+        }
+        this.textList.add(notiString)
+        this.textPresenterListAdapter.notifyItemInserted(this.textList.size - 1)
     }
-
-    private fun notifyUser(message: String, colorID: Int){
-        // TODO!
-    }
-
-
-
-
 
     class TextPresenterListAdapter(private val textPresenterList: ArrayList<String>)
         : RecyclerView.Adapter<TextPresenterListAdapter.ViewHolder>() {
@@ -348,10 +358,9 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         class ViewHolder(val linearLayout: LinearLayout) : RecyclerView.ViewHolder(linearLayout)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
             val view =
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.log_data_list_element, parent, false) as LinearLayout
+                    .inflate(R.layout.text_list_presenter_list_element, parent, false) as LinearLayout
 
             return ViewHolder(view)
         }
@@ -398,7 +407,6 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
                         setImageResource(R.drawable.ic_textlistpresenternone)
                     }
                 }
-
             }
         }
 

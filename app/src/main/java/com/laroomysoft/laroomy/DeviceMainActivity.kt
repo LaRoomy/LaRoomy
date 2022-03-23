@@ -1018,7 +1018,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
 
             val expandCollapseExtension = ExpandCollapseExtension()
-            expandCollapseExtension.expand(this.deviceHeaderNotificationContainer, 600)
+            expandCollapseExtension.expand(this.deviceHeaderNotificationContainer)//, 600)
         }
 
         // schedule the hide of the container (if requested)

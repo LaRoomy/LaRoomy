@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class InformationActivity : AppCompatActivity() {

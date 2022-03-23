@@ -33,7 +33,6 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/my_devices_list_element_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/property_list_group_header_element_background.xml" value="0.35555555555555557" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/single_property_list_element_background.xml" value="0.36203703703703705" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/text_list_presenter_list_element_background.xml" value="0.3745" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/drawable/unlock_activity_status_panel_background.xml" value="0.3592592592592593" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout-land/activity_unlock_control.xml" value="0.33" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_add_device.xml" value="0.33" />
@@ -54,11 +53,8 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_r_g_b_control.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_reset_app_data.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_simple_time_selector.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_string_interrogator.xml" value="0.3175213675213675" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_text_list_presenter.xml" value="0.3175213675213675" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_time_frame_selector.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_unlock_control.xml" value="0.37592592592592594" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/activity_view_log.xml" value="0.3175213675213675" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/add_device_list_element.xml" value="0.38055555555555554" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/add_new_device_list_element.xml" value="0.38055555555555554" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/available_device_list_item.xml" value="0.37407407407407406" />
@@ -69,7 +65,6 @@
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/main_activity_popup_flyout.xml" value="0.5" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/main_activity_popup_without_log_flyout.xml" value="0.3439814814814815" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/my_devices_list_element.xml" value="0.3592592592592593" />
-        <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/layout/text_list_presenter_list_element.xml" value="0.5" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_nolog.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/User/StudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_withlog.xml" value="0.37592592592592594" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable-v24/add_device_activity_bonding_hint_background.xml" value="0.25925925925925924" />
@@ -89,11 +84,18 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_117_rgb_point_circle_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_118_tool_circle_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_13_property_group_blue_white.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_16_dis_reload_turnright_white_vect.xml" value="0.178" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_16_reload_turnright_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_17_segmented_circle_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_32_settings_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_37_conjunction_blue_white_vect.xml" value="0.2215" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_40_dis_star_blue_vect.xml" value="0.178" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_40_star_blue_vect.xml" value="0.178" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_41_checkmark_blue_vect.xml" value="0.2355" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_42_dis_star_white_vect.xml" value="0.178" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_42_star_white_vect.xml" value="0.178" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_71_dis_home_blue_white_vect.xml" value="0.178" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_71_home_blue_white_vect.xml" value="0.178" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_98_arrows_right_left_blue_white_vect.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_add_white_36dp.xml" value="0.2215" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/drawable/ic_info_white_48dp.xml" value="0.2365" />
@@ -132,6 +134,7 @@
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/text_list_presenter_list_element.xml" value="0.33" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/layout/unlock_activity_change_pin_popup.xml" value="0.25" />
         <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/menu/main_activity_popup_menu_nolog.xml" value="0.20555555555555555" />
+        <entry key="..\:/Users/hans-/AndroidStudioProjects/LaRoomy/app/src/main/res/mipmap-anydpi-v26/deviceimage_general.xml" value="0.203" />
       </map>
     </option>
   </component>

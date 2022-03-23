@@ -29,6 +29,7 @@ class AddedDevices(private val appContext: Context) {
         }
     }
 
+/*
     fun clearAll(){
         val sharedPref =
             appContext.getSharedPreferences(
@@ -40,6 +41,7 @@ class AddedDevices(private val appContext: Context) {
             commit()
         }
     }
+*/
 
     fun removeAt(index: Int){
         val adr = devices.elementAt(index).macAddress
@@ -57,7 +59,6 @@ class AddedDevices(private val appContext: Context) {
         }
 
         if(indexToRemove > -1) {
-
             this.devices.removeAt(indexToRemove)
 
             val sharedPref =
@@ -75,18 +76,17 @@ class AddedDevices(private val appContext: Context) {
 
     private fun save(){
 
-        val sharedPref =
-            appContext.getSharedPreferences(
-                appContext.getString(R.string.FileKey_AddedDevices),
-                Context.MODE_PRIVATE
-            ).apply {
+        appContext.getSharedPreferences(
+            appContext.getString(R.string.FileKey_AddedDevices),
+            Context.MODE_PRIVATE
+        ).apply {
 
-                devices.forEachIndexed { index, knownDevices ->
-                    edit()
-                        .putString("device$index", "${knownDevices.macAddress}#${knownDevices.name}")
-                        .apply()
-                }
+            devices.forEachIndexed { index, knownDevices ->
+                edit()
+                    .putString("device$index", "${knownDevices.macAddress}#${knownDevices.name}")
+                    .apply()
             }
+        }
     }
 
     private fun load(){

@@ -1,21 +1,15 @@
 package com.laroomysoft.laroomy
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context.BLUETOOTH_SERVICE
-import android.content.Intent
-import android.app.Activity
 import android.bluetooth.*
-import android.content.pm.PackageManager
-import android.os.*
+import android.content.Context.BLUETOOTH_SERVICE
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import java.io.Serializable
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
 const val BINDING_RESPONSE_BINDING_NOT_SUPPORTED = 1
 const val BINDING_RESPONSE_BINDING_SUCCESS = 2
@@ -34,8 +28,6 @@ const val BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING = 4
 const val BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING = 5
 const val BLE_INIT_NO_PROPERTIES = 6
 const val BLE_BLUETOOTH_PERMISSION_MISSING = 7
-
-const val IS_OK = 0
 
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
@@ -108,7 +100,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     // device-property objects
     private var laRoomyDevicePropertyList = ArrayList<LaRoomyDeviceProperty>()
-    var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
+    private var laRoomyPropertyGroupList = ArrayList<LaRoomyDevicePropertyGroup>()
     var uIAdapterList = ArrayList<DevicePropertyListContentInformation>()
 
     var currentUsedServiceUUID = ""
@@ -146,10 +138,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return field
         }
 
+/*
     private val BluetoothAdapter.isDisabled: Boolean
         get() = !isEnabled
 
     private val requestEnableBT: Int = 13
+*/
 
     private var uIItemAddCounter = -1
 
@@ -1806,6 +1800,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // reset other params
         this.currentSimpleStateRetrievingIndex = -1
         this.currentComplexStateRetrievingIndex = -1
+    }
+
+    fun clearInternalPropertyStateStringValue(propertyIndex: Int){
+        // this function is only a workaround, not the best approach :/
+        if(propertyIndex < this.laRoomyDevicePropertyList.size){
+            this.laRoomyDevicePropertyList.elementAt(propertyIndex).complexPropertyState.strValue = ""
+        }
     }
 
     fun getLastConnectedDeviceAddress() : String {

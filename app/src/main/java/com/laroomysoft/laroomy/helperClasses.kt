@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ExpandCollapseExtension {
 
-    fun expand(view: View, duration: Long){
+    fun expand(view: View) { //, duration: Long){
 
         view.visibility = View.VISIBLE
 

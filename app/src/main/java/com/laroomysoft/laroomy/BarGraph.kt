@@ -56,11 +56,11 @@ class BarGraph : View {
     private val defaultBarDescriptionGapHeight = 22
 
     // attribute values
-    var barTextColor = R.color.normalTextColor
-    var barGraphOutlineColor = R.color.normalOutlineColor
-    var barTextHeight = defaultBarTextHeight
-    var barDescriptionGap = defaultBarDescriptionGapHeight
-    var scaleSectionWidth = defScaleSectionWidth
+    private var barTextColor = R.color.normalTextColor
+    private var barGraphOutlineColor = R.color.normalOutlineColor
+    private var barTextHeight = defaultBarTextHeight
+    private var barDescriptionGap = defaultBarDescriptionGapHeight
+    private var scaleSectionWidth = defScaleSectionWidth
     var fixedMaximumValue = -1
         set(value){
             field = if(value <= 0)
@@ -69,13 +69,13 @@ class BarGraph : View {
                 value
         }
 
-    val numberOfBars
+    private val numberOfBars
         get() = this.barDataList.size
 
     // control values
-    val isDataValid
+    private val isDataValid
         get() = ((this.numberOfBars == this.barDataList.size) && this.barDataList.size > 0)
-    val hasFixedMaximumValue
+    private val hasFixedMaximumValue
         get() = (this.fixedMaximumValue > 0)
 
     // bar graph data

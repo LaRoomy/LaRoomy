@@ -572,6 +572,5 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 }
             }
         }
-
     }
 }
