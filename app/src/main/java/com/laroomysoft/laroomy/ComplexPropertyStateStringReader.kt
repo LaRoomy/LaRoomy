@@ -72,19 +72,27 @@ class ComplexPropertyStateStringReader {
                     it.forEachIndexed { charIndex, c ->
                         when(c){
                             ':' -> {
-                                if(it.length > (charIndex + 2)){
-                                    if(it.elementAt(charIndex + 1) == ':'){
-                                        nextValidIndex = charIndex + 2
-                                        if(!isValue){
-                                            ope.parameterName = param
-                                            param = ""
-                                            isValue = true
-                                        }// else should not be happen!
+                                if(!isValue) {
+                                    if (it.length > (charIndex + 2)) {
+                                        if (it.elementAt(charIndex + 1) == ':') {
+                                            nextValidIndex = charIndex + 2
+                                            //if (!isValue) {
+                                                ope.parameterName = param
+                                                param = ""
+                                                isValue = true
+                                            //}// else should not be happen!
+                                        }
+                                    }
+                                } else {
+                                    if(charIndex >= nextValidIndex) {
+                                        param += c
                                     }
                                 }
                             }
                             else -> {
-                                param += c
+                                if(charIndex >= nextValidIndex) {
+                                    param += c
+                                }
                             }
                         }
                     }
