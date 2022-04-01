@@ -2660,7 +2660,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun insertPropertyElement(laRoomyDeviceProperty: LaRoomyDeviceProperty){
-        if(laRoomyDeviceProperty.propertyIndex >= this.laRoomyDevicePropertyList.size){
+        if(laRoomyDeviceProperty.propertyIndex > this.laRoomyDevicePropertyList.size){
             // error out of bounds
             Log.e("insertPropertyElement", "Error: invalid index for insert operation. Index was: ${laRoomyDeviceProperty.propertyIndex}. Property-Count is ${this.laRoomyDevicePropertyList.size}")
             applicationProperty.logControl("E: Invalid index for insert operation. Index was: ${laRoomyDeviceProperty.propertyIndex}. Property-Count is ${this.laRoomyDevicePropertyList.size}")
@@ -2680,8 +2680,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 else -> -1
             }
             val tailingElementGroupIndex = when{
+                    //
                 (laRoomyDeviceProperty.propertyIndex < 0) -> -1
-                this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).isGroupMember -> this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).groupIndex
+                    //
+                (laRoomyDeviceProperty.propertyIndex < this.laRoomyDevicePropertyList.size && this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).isGroupMember) -> this.laRoomyDevicePropertyList.elementAt(laRoomyDeviceProperty.propertyIndex).groupIndex
+                    //
                 else -> -1
             }
             if(precedingElementGroupIndex == tailingElementGroupIndex){
@@ -2713,12 +2716,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             // insert in internal property list
-            this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty.propertyIndex, laRoomyDeviceProperty)
+            if(this.laRoomyDevicePropertyList.size == laRoomyDeviceProperty.propertyIndex){
+                this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
+
+                // TODO: if the element is inserted at the end the property index cannot be found in the UIList, fix that!
+
+            } else {
+                this.laRoomyDevicePropertyList.add(
+                    laRoomyDeviceProperty.propertyIndex,
+                    laRoomyDeviceProperty
+                )
+            }
 
             // update the internal property-indexes
             this.laRoomyDevicePropertyList.forEachIndexed { index, p ->
                 p.propertyIndex = index
             }
+
+            // update device info (property-count)
+            this.bleDeviceData.propertyCount++
 
             // define element to insert in UI-List
             val uIElementContentInformation = DevicePropertyListContentInformation(PROPERTY_ELEMENT)
@@ -2824,6 +2840,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     laRoomyDeviceProperty.propertyIndex = index
                 }
 
+                // update device info (prop-count)
+                this.bleDeviceData.propertyCount--
+
                 // delete element in UI-List
                 var uIIndexToDelete = -1
                 var newPropertyIndex = 0
@@ -2915,6 +2934,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.laRoomyPropertyGroupList.forEachIndexed { index, laRoomyDevicePropertyGroup ->
                     laRoomyDevicePropertyGroup.groupIndex = index
                 }
+                // update device info (group-count)
+                this.bleDeviceData.groupCount--
 
                 // delete elements in UI-List
                 var uIIndexToDelete = -1
