@@ -788,7 +788,9 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                                 strValue += s[counter]
                                 counter++
                             }
-                            this.fixedMaximumValue = strValue.toFloat()
+                            if(strValue != "_") {
+                                this.fixedMaximumValue = strValue.toFloat()
+                            }
                         }
                     }
                 } else {

@@ -2716,16 +2716,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
 
             // insert in internal property list
-            if(this.laRoomyDevicePropertyList.size == laRoomyDeviceProperty.propertyIndex){
+            val insertAsLast = if(this.laRoomyDevicePropertyList.size == laRoomyDeviceProperty.propertyIndex){
                 this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
 
                 // TODO: if the element is inserted at the end the property index cannot be found in the UIList, fix that!
+
+                true
 
             } else {
                 this.laRoomyDevicePropertyList.add(
                     laRoomyDeviceProperty.propertyIndex,
                     laRoomyDeviceProperty
                 )
+                false
             }
 
             // update the internal property-indexes
@@ -2755,26 +2758,31 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // find the index to insert
             var uIIndexToInsert = -1
-            this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
-                if ((devicePropertyListContentInformation.internalElementIndex == laRoomyDeviceProperty.propertyIndex) && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)) {
-                    uIIndexToInsert =
-                        if ((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)) {
-                            // if the shifted item is inside group, insert it before the group-header, but only if the new item is NOT part of this group
-                            if (uIElementContentInformation.isGroupMember && devicePropertyListContentInformation.isGroupMember
-                                && (laRoomyDeviceProperty.groupIndex == this.laRoomyDevicePropertyList.elementAt(
-                                    devicePropertyListContentInformation.internalElementIndex
-                                ).groupIndex)
-                            ) {
-                                // insert inside the group as a member
-                                index
+            if(insertAsLast){
+                // if the element must be inserted on the end, it cannot be found by iterating through the array, so set it here
+                uIIndexToInsert = this.uIAdapterList.size
+            } else {
+                this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                    if ((devicePropertyListContentInformation.internalElementIndex == laRoomyDeviceProperty.propertyIndex) && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)) {
+                        uIIndexToInsert =
+                            if ((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)) {
+                                // if the shifted item is inside group, insert it before the group-header, but only if the new item is NOT part of this group
+                                if (uIElementContentInformation.isGroupMember && devicePropertyListContentInformation.isGroupMember
+                                    && (laRoomyDeviceProperty.groupIndex == this.laRoomyDevicePropertyList.elementAt(
+                                        devicePropertyListContentInformation.internalElementIndex
+                                    ).groupIndex)
+                                ) {
+                                    // insert inside the group as a member
+                                    index
+                                } else {
+                                    // insert before group header
+                                    index - 1
+                                }
                             } else {
-                                // insert before group header
-                                index - 1
+                                index
                             }
-                        } else {
-                            index
-                        }
-                    return@forEachIndexed
+                        return@forEachIndexed
+                    }
                 }
             }
 
@@ -2807,6 +2815,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                     // notify the insertion
                     this.propertyCallback.onUIAdaptableArrayItemInserted(uIIndexToInsert)
+                }
+                // if this was a complex property, send a state request
+                if(uIElementContentInformation.propertyType >= COMPLEX_PROPERTY_START_INDEX){
+                    this.sendComplexPropertyStateRequest(uIElementContentInformation.internalElementIndex)
                 }
             } else {
                 Log.e("insertPropertyElement", "Critical error: index to insert not found in UI-List!")
@@ -3111,6 +3123,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         //startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
 
                                         // TODO: reload, not start!!!!!!!!
+
+                                        reloadProperties()
 
                                     }
                                     LOOPTYPE_GROUP -> {
