@@ -62,6 +62,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var groupLoopActive = false
     private var isResumeConnectionAttempt = false
     private var invokeCallbackLoopAfterUIDataGeneration = false
+    private var reloadInitRequestPending = false
+    private var reloadAttemptCounter = 0
 
     private var suspendedDeviceAddress = ""
 
@@ -1036,30 +1038,35 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     bleDeviceData.hasCachingPermission = true
                 }
 
-                // check if binding is required
-                when {
-                    (data[13] == '1') -> {
-                        this.bleDeviceData.isBindingRequired = true
+                // check if binding is required (except this is a reload action!)
+                if(!this.reloadInitRequestPending) {
+                    when {
+                        (data[13] == '1') -> {
+                            this.bleDeviceData.isBindingRequired = true
 
-                        if(verboseLog){
-                            Log.d("onInitTransmission", "Binding is required. Searching the appropriate key for the mac address.")
+                            if (verboseLog) {
+                                Log.d(
+                                    "onInitTransmission",
+                                    "Binding is required. Searching the appropriate key for the mac address."
+                                )
+                            }
+                            applicationProperty.logControl("I: Binding is required. Searching the appropriate key for the mac address")
+
+                            // binding is required, so send the binding request on basis of the passkey setup
+                            val useCustomKeyForBinding =
+                                applicationProperty.loadBooleanData(
+                                    R.string.FileKey_AppSettings,
+                                    R.string.DataKey_UseCustomBindingKey
+                                )
+
+                            sendBindingRequest(useCustomKeyForBinding)
                         }
-                        applicationProperty.logControl("I: Binding is required. Searching the appropriate key for the mac address")
-
-                        // binding is required, so send the binding request on basis of the passkey setup
-                        val useCustomKeyForBinding =
-                            applicationProperty.loadBooleanData(
-                                R.string.FileKey_AppSettings,
-                                R.string.DataKey_UseCustomBindingKey
-                            )
-
-                        sendBindingRequest(useCustomKeyForBinding)
-                    }
-                    else -> {
-                        // no binding is required, so notify the subscriber of the callback
-                        saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
-                        bleDeviceData.authenticationSuccess = true
-                        callback.onInitializationSuccessful()
+                        else -> {
+                            // no binding is required, so notify the subscriber of the callback
+                            saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
+                            bleDeviceData.authenticationSuccess = true
+                            callback.onInitializationSuccessful()
+                        }
                     }
                 }
 
@@ -1069,6 +1076,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if(data[14] == '1'){
                         bleDeviceData.fragmentedTransmissionRequired = true
                     }
+                }
+
+                // check if this is a reload process
+                if(this.reloadInitRequestPending){
+                    // reset control params
+                    this.reloadInitRequestPending = false
+                    this.reloadAttemptCounter = 0
+
+                    // start the property loop
+                    this.invokeCallbackLoopAfterUIDataGeneration = true
+                    this.propertyLoopActive = true
+                    this.startLoopTimeoutWatcher(LOOPTYPE_PROPERTY)
+                    this.sendNextPropertyRequest(-1)
                 }
             }
         }
@@ -1289,10 +1309,35 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun startReloadProperties(){
-        this.invokeCallbackLoopAfterUIDataGeneration = true
-        this.propertyLoopActive = true
-        this.startLoopTimeoutWatcher(LOOPTYPE_PROPERTY)
-        this.sendNextPropertyRequest(-1)
+
+        this.reloadInitRequestPending = true
+        this.initDeviceTransmission()
+
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            // check if the init transmission was received
+            if(reloadInitRequestPending){
+                // try again (and count the attempts)
+                if(reloadAttemptCounter < 10) {
+                    // log:
+                    if(verboseLog){
+                        Log.d("startReloadProperties", "Remote device missed response to init request(s). Attempts: $reloadAttemptCounter")
+                    }
+                    applicationProperty.logControl("W: Remote device missed response to init request(s). Attempts: $reloadAttemptCounter")
+                    // increase counter and start again
+                    this.reloadAttemptCounter++
+                    this.initDeviceTransmission()
+                } else {
+                    // 5 sec and the remote device does not respond to init requests > stop process
+                    Log.e("startReloadProperties", "Timeout for the reload process. Remote device does not respond to init requests!")
+                    applicationProperty.logControl("E: Timeout for the reload process. Remote device does not respond to init requests!")
+                }
+            }
+        }, 500, TimeUnit.MILLISECONDS)
+
+//        this.invokeCallbackLoopAfterUIDataGeneration = true
+//        this.propertyLoopActive = true
+//        this.startLoopTimeoutWatcher(LOOPTYPE_PROPERTY)
+//        this.sendNextPropertyRequest(-1)
     }
 
     private fun sendNextPropertyRequest(currentIndex: Int){
@@ -1758,6 +1803,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.suspendedDeviceAddress = ""
 
         this.invokeCallbackLoopAfterUIDataGeneration = false
+        this.reloadAttemptCounter = 0
+        this.reloadInitRequestPending = false
 
         // loops
         this.propertyLoopActive = false
@@ -1789,6 +1836,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.simpleStateLoopActive = false
         this.complexStateLoopActive = false
         this.invokeCallbackLoopAfterUIDataGeneration = false
+        this.reloadInitRequestPending = false
 
         // clear arrays
         this.uIAdapterList.clear()
@@ -1800,6 +1848,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // reset other params
         this.currentSimpleStateRetrievingIndex = -1
         this.currentComplexStateRetrievingIndex = -1
+        this.reloadAttemptCounter = 0
+
     }
 
     fun clearInternalPropertyStateStringValue(propertyIndex: Int){
