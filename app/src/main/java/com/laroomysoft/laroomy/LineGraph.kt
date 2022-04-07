@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import java.lang.Exception
 
 const val LINEGRAPH_DEFAULT_X_AXIS_MIN_VALUE = 0f
 const val LINEGRAPH_DEFAULT_X_AXIS_MAX_VALUE = 10f
@@ -532,26 +534,30 @@ class LineGraph : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        canvas.apply {
-            if(isRangeDataValid) {
-                // this must be done anyway and must be done at first, to set the axis-base-values for further usage
-                onDrawAxes(canvas)
-                // draw others on request
-                onDrawGridLinesAndGridValues(canvas)
-                // draw the line data (if there is any)
-                onDrawLineData(canvas)
-            } else {
-                // range is invalid -> report error and do not draw!
-                if (canvas != null) {
-                    errorTextPaint.textSize = errorTextSize.toFloat()
-                    this?.drawText(
-                        "Invalid Data",
-                        width.div(2).toFloat(),
-                        height.div(2).toFloat(),
-                        errorTextPaint
-                    )
+        try {
+            canvas.apply {
+                if (isRangeDataValid) {
+                    // this must be done anyway and must be done at first, to set the axis-base-values for further usage
+                    onDrawAxes(canvas)
+                    // draw others on request
+                    onDrawGridLinesAndGridValues(canvas)
+                    // draw the line data (if there is any)
+                    onDrawLineData(canvas)
+                } else {
+                    // range is invalid -> report error and do not draw!
+                    if (canvas != null) {
+                        errorTextPaint.textSize = errorTextSize.toFloat()
+                        this?.drawText(
+                            "Invalid Data",
+                            width.div(2).toFloat(),
+                            height.div(2).toFloat(),
+                            errorTextPaint
+                        )
+                    }
                 }
             }
+        } catch (e: Exception){
+            Log.e("LineGraphSys:onDraw", "Exception occurred: $e")
         }
     }
 
