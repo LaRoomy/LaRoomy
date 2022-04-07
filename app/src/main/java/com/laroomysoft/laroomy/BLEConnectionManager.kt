@@ -1006,6 +1006,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun readInitTransmission(data: String, dataSize: Int) : Boolean {
+        // only accept init transmissions when loops not in progress
+        if(this.propertyLoopActive || this.groupLoopActive || this.complexStateLoopActive || this.simpleStateLoopActive){
+            // if this is a reload process, there is a possibility that a init request response was missed by
+            // the remote device, if another request is sent and the device does respond to the first request there are two requests pending
+            // when the first was processed, then the second will be treated normally like in the initial connection process
+            // this must be prohibited
+            return false
+        }
 
         // check if the length of the transmission is valid
         if(dataSize < 13){
@@ -1317,7 +1325,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // check if the init transmission was received
             if(reloadInitRequestPending){
                 // try again (and count the attempts)
-                if(reloadAttemptCounter < 10) {
+                if(reloadAttemptCounter < 5) {
                     // log:
                     if(verboseLog){
                         Log.d("startReloadProperties", "Remote device missed response to init request(s). Attempts: $reloadAttemptCounter")
@@ -1332,7 +1340,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     applicationProperty.logControl("E: Timeout for the reload process. Remote device does not respond to init requests!")
                 }
             }
-        }, 500, TimeUnit.MILLISECONDS)
+        }, 1000, TimeUnit.MILLISECONDS)
 
 //        this.invokeCallbackLoopAfterUIDataGeneration = true
 //        this.propertyLoopActive = true
