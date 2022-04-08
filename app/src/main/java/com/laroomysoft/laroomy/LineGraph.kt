@@ -534,7 +534,7 @@ class LineGraph : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        try {
+        //try {
             canvas.apply {
                 if (isRangeDataValid) {
                     // this must be done anyway and must be done at first, to set the axis-base-values for further usage
@@ -556,9 +556,9 @@ class LineGraph : View {
                     }
                 }
             }
-        } catch (e: Exception){
-            Log.e("LineGraphSys:onDraw", "Exception occurred: $e")
-        }
+        //} catch (e: Exception){
+        //    Log.e("LineGraphSys:onDraw", "Exception occurred: $e")
+        //}
     }
 
     private fun onDrawAxes(canvas: Canvas?){
@@ -773,38 +773,37 @@ class LineGraph : View {
     private fun onDrawLineData(canvas: Canvas?){
         // start point to end point!
         if(canvas != null) {
-            this.absoluteLineData.apply {
-                if (this.size > 1) {
-                    this.forEachIndexed { index, lData ->
-                        // end with the last but one, otherwise there would be an indexOutOfRange Exception
-                        if (index <= this.size - 2) {
-                            // only draw the line if the start-point is in the visible area
-                            if(((lData.xVal <= width)&&(lData.xVal >= 0))&&((lData.yVal >= 0)&&(lData.yVal <= height))) {
-                                // the start-point is visible -> draw the line
-                                canvas.drawLine(
-                                    lData.xVal,
-                                    lData.yVal,
-                                    this.elementAt(index + 1).xVal,
-                                    this.elementAt(index + 1).yVal,
-                                    graphLinePaint
-                                )
-                            } else {
-                                // the start-point is not visible, but maybe the endpoint
-                                if(index > 0){
-                                    // check if the endpoint is in the visible area
-                                    val sp =
-                                        this.elementAt(index + 1)
+            val absLineData = this.absoluteLineData
+            if (absLineData.size > 1) {
+                absLineData.forEachIndexed { index, lData ->
+                    // end with the last but one, otherwise there would be an indexOutOfRange Exception
+                    if (index <= absLineData.size - 2) {
+                        // only draw the line if the start-point is in the visible area
+                        if(((lData.xVal <= width)&&(lData.xVal >= 0))&&((lData.yVal >= 0)&&(lData.yVal <= height))) {
+                            // the start-point is visible -> draw the line
+                            canvas.drawLine(
+                                lData.xVal,
+                                lData.yVal,
+                                absLineData.elementAt(index + 1).xVal,
+                                absLineData.elementAt(index + 1).yVal,
+                                graphLinePaint
+                            )
+                        } else {
+                            // the start-point is not visible, but maybe the endpoint
+                            if(index > 0){
+                                // check if the endpoint is in the visible area
+                                val sp =
+                                    absLineData.elementAt(index + 1)
 
-                                    if (((sp.xVal <= width) && (sp.xVal >= 0)) && ((sp.yVal >= 0) && (sp.yVal <= height))) {
-                                        // the endpoint is visible, so the line must be partially visible, so draw the line
-                                        canvas.drawLine(
-                                            lData.xVal,
-                                            lData.yVal,
-                                            this.elementAt(index + 1).xVal,
-                                            this.elementAt(index + 1).yVal,
-                                            graphLinePaint
-                                        )
-                                    }
+                                if (((sp.xVal <= width) && (sp.xVal >= 0)) && ((sp.yVal >= 0) && (sp.yVal <= height))) {
+                                    // the endpoint is visible, so the line must be partially visible, so draw the line
+                                    canvas.drawLine(
+                                        lData.xVal,
+                                        lData.yVal,
+                                        absLineData.elementAt(index + 1).xVal,
+                                        absLineData.elementAt(index + 1).yVal,
+                                        graphLinePaint
+                                    )
                                 }
                             }
                         }
