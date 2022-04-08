@@ -450,9 +450,15 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
                     Log.e("LGA:FastDataPipe", "Error reading single value from String: $e")
                 }
             }
-            this.lineGraph.setRange(lRange)
-            this.lineGraph.lineGraphData = this.lineDataList
-            this.lineGraph.invalidate()
+            if(!this.lineGraph.drawProcessActive) {
+                this.lineGraph.setRange(lRange)
+                this.lineGraph.lineGraphData = this.lineDataList
+                this.lineGraph.invalidate()
+            } else {
+                Log.e("LineGraphFastDataSetter", "Operation was skipped. Too much data.")
+
+                // TODO: better log! user log!
+            }
 
         } catch (e: Exception){
             Log.e("LineGraphDataPipe", "Exception occurred: $e")

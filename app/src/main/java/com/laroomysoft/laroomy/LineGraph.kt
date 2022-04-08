@@ -79,6 +79,8 @@ class LineGraph : View {
     var xAxisGridIntersectionUnits = INTERSECTION_NOT_SET
     var yAxisGridIntersectionUnits = INTERSECTION_NOT_SET
 
+    var drawProcessActive = false
+
     // x + y axis-value colors
     private var xAxisValueTextColorID = R.color.lineGraphXAxisGridValueTextColor
     set(value) {
@@ -534,31 +536,42 @@ class LineGraph : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        //try {
-            canvas.apply {
-                if (isRangeDataValid) {
-                    // this must be done anyway and must be done at first, to set the axis-base-values for further usage
-                    onDrawAxes(canvas)
-                    // draw others on request
-                    onDrawGridLinesAndGridValues(canvas)
-                    // draw the line data (if there is any)
-                    onDrawLineData(canvas)
-                } else {
-                    // range is invalid -> report error and do not draw!
-                    if (canvas != null) {
-                        errorTextPaint.textSize = errorTextSize.toFloat()
-                        this?.drawText(
-                            "Invalid Data",
-                            width.div(2).toFloat(),
-                            height.div(2).toFloat(),
-                            errorTextPaint
-                        )
+        if(!this.drawProcessActive) {
+
+            this.drawProcessActive = true
+
+
+            try {
+
+                canvas.apply {
+                    if (isRangeDataValid) {
+                        // this must be done anyway and must be done at first, to set the axis-base-values for further usage
+                        onDrawAxes(canvas)
+                        // draw others on request
+                        onDrawGridLinesAndGridValues(canvas)
+                        // draw the line data (if there is any)
+                        onDrawLineData(canvas)
+                    } else {
+                        // range is invalid -> report error and do not draw!
+                        if (canvas != null) {
+                            errorTextPaint.textSize = errorTextSize.toFloat()
+                            this?.drawText(
+                                "Invalid Data",
+                                width.div(2).toFloat(),
+                                height.div(2).toFloat(),
+                                errorTextPaint
+                            )
+                        }
                     }
                 }
+
+                this.drawProcessActive = false
+
+            } catch (e: Exception){
+                this.drawProcessActive = false
+                Log.e("LineGraphSys:onDraw", "Exception occurred: $e")
             }
-        //} catch (e: Exception){
-        //    Log.e("LineGraphSys:onDraw", "Exception occurred: $e")
-        //}
+        }
     }
 
     private fun onDrawAxes(canvas: Canvas?){
