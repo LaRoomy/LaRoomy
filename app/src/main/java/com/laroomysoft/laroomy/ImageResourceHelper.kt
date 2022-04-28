@@ -127,6 +127,10 @@ fun resourceIdForImageId(imageID: Int): Int {
         121 -> R.drawable.ic_121_subtract_white_vect        // done
         122 -> R.drawable.ic_122_subtract_blue_vect         // done
         123 -> R.drawable.ic_123_brightness_white_vect      // done
+        124 -> R.drawable.ic_124_enumeration_point_white_vect// done
+        125 -> R.drawable.ic_125_enumeration_point_blue_vect // done
+        126 -> R.drawable.ic_126_sleep_white_vect           // done
+        127 -> R.drawable.ic_127_navigator_blue_white_vect  // done
 
         // TODO: implement all new image resources here...
 
@@ -261,6 +265,10 @@ fun resourceIdForDisabledImageId(imageID: Int): Int {
         121 -> R.drawable.ic_121_dis_subtract_white_vect
         122 -> R.drawable.ic_122_dis_subtract_blue_vect
         123 -> R.drawable.ic_123_dis_brightness_white_vect
+        124 -> R.drawable.ic_124_dis_enumeration_point_white_vect
+        125 -> R.drawable.ic_125_dis_enumeration_point_blue_vect
+        126 -> R.drawable.ic_126_dis_sleep_white_vect
+        127 -> R.drawable.ic_127_dis_navigator_blue_white_vect
 
         // TODO: implement all new disabled image resources here...
 
