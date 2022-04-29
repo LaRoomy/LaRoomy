@@ -144,6 +144,10 @@ fun resourceIdForImageId(imageID: Int): Int {
         138 -> R.drawable.ic_138_pressure_vect              // done
         139 -> R.drawable.ic_139_water_valve_vect           // done
         140 -> R.drawable.ic_140_valve_vect                 // done
+        141 -> R.drawable.ic_141_aircirculation_vect        // done
+        142 -> R.drawable.ic_142_plant_lighting_vect        // done
+        143 -> R.drawable.ic_143_plant_water_vect           // done
+        144 -> R.drawable.ic_144_plant_irrigation_vect      // done
 
         // TODO: implement all new image resources here...
 
@@ -295,6 +299,10 @@ fun resourceIdForDisabledImageId(imageID: Int): Int {
         138 -> R.drawable.ic_138_dis_pressure_vect
         139 -> R.drawable.ic_139_dis_water_valve_vect
         140 -> R.drawable.ic_140_dis_valve_vect
+        141 -> R.drawable.ic_141_dis_aircirculation_vect
+        142 -> R.drawable.ic_142_dis_plant_lighting_vect
+        143 -> R.drawable.ic_143_dis_plant_water_vect
+        144 -> R.drawable.ic_144_dis_plant_irrigation_vect
 
 
         // TODO: implement all new disabled image resources here...

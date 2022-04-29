@@ -451,6 +451,9 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
                 }
             }
             if(!this.lineGraph.drawProcessActive) {
+
+                // FIXME: this is useless. The draw routines are async, so the 'drawProcessActive' param will be set to false directly after the method call while the draw is in progress ?
+
                 this.lineGraph.setRange(lRange)
                 this.lineGraph.lineGraphData = this.lineDataList
                 this.lineGraph.invalidate()
