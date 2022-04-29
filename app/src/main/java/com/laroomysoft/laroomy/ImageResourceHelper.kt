@@ -131,6 +131,19 @@ fun resourceIdForImageId(imageID: Int): Int {
         125 -> R.drawable.ic_125_enumeration_point_blue_vect // done
         126 -> R.drawable.ic_126_sleep_white_vect           // done
         127 -> R.drawable.ic_127_navigator_blue_white_vect  // done
+        128 -> R.drawable.ic_128_notification_vect          // done
+        129 -> R.drawable.ic_129_notification_exclamation_vect// done
+        130 -> R.drawable.ic_130_notification_text_vect     // done
+        131 -> R.drawable.ic_131_microchip_vect             // done
+        132 -> R.drawable.ic_132_microchip_white_vect       // done
+        133 -> R.drawable.ic_133_circuit_white_vect         // done
+        134 -> R.drawable.ic_134_circuit_blue_vect          // done
+        135 -> R.drawable.ic_135_temperature_vect           // done
+        136 -> R.drawable.ic_136_fan_vect                   // done
+        137 -> R.drawable.ic_137_fan2_vect                  // done
+        138 -> R.drawable.ic_138_pressure_vect              // done
+        139 -> R.drawable.ic_139_water_valve_vect           // done
+        140 -> R.drawable.ic_140_valve_vect                 // done
 
         // TODO: implement all new image resources here...
 
@@ -269,6 +282,20 @@ fun resourceIdForDisabledImageId(imageID: Int): Int {
         125 -> R.drawable.ic_125_dis_enumeration_point_blue_vect
         126 -> R.drawable.ic_126_dis_sleep_white_vect
         127 -> R.drawable.ic_127_dis_navigator_blue_white_vect
+        128 -> R.drawable.ic_128_dis_notification_vect
+        129 -> R.drawable.ic_129_dis_notification_exclamation_vect
+        130 -> R.drawable.ic_130_dis_notification_text_vect
+        131 -> R.drawable.ic_131_dis_microchip_vect
+        132 -> R.drawable.ic_132_dis_microchip_white_vect
+        133 -> R.drawable.ic_133_dis_circuit_white_vect
+        134 -> R.drawable.ic_134_dis_circuit_blue_vect
+        135 -> R.drawable.ic_135_dis_temperature_vect
+        136 -> R.drawable.ic_136_dis_fan_vect
+        137 -> R.drawable.ic_137_dis_fan2_vect
+        138 -> R.drawable.ic_138_dis_pressure_vect
+        139 -> R.drawable.ic_139_dis_water_valve_vect
+        140 -> R.drawable.ic_140_dis_valve_vect
+
 
         // TODO: implement all new disabled image resources here...
 
