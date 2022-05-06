@@ -1019,9 +1019,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(dataSize < 13){
             //invalid data size
             if(verboseLog){
-                Log.e("readInitTransmission", "Invalid data size. Data-Size was: $dataSize > minimum is 7!")
+                Log.e("readInitTransmission", "Invalid data size. Data-Size was: $dataSize > minimum is 13!")
             }
-            applicationProperty.logControl("E: Invalid data size of init-transmission. Data-Size was: $dataSize > minimum is 7!")
+            applicationProperty.logControl("E: Invalid data size of init-transmission. Data-Size was: $dataSize > minimum is 13!")
             return false
         } else {
             // save device data:

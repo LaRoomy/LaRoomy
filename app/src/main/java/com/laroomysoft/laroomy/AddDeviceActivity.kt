@@ -5,11 +5,14 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -19,8 +22,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
 
+const val LIST_TYPE_BONDED_LIST = 1
+const val LIST_TYPE_SCAN_LIST = 2
+
 class AddDeviceActivity : AppCompatActivity(),
-    OnAddDeviceBondedListItemClickListener, OnAddDeviceScanResultListItemClickListener, BLEDiscoveryCallback {
+    OnAddDeviceActivityListItemClickListener, BLEDiscoveryCallback {
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if(verboseLog){
+                Log.d("MA:requestPermissionLauncher", "Permission-Request result is: $isGranted")
+            }
+            this.bluetoothPermissionGranted = isGranted
+            this.grantPermissionRequestDeclined = !isGranted    // prevent a request loop in onResume
+            // if the permission dialog is dismissed, the onResume method is invoked again, and bluetooth enabled state is checked
+            // when the permission request is reclined, the UI must go in missing-permission-state, and prevent the invocation
+            // of the permission request launcher in onResume, otherwise there will be an infinite loop between onResume and permission launcher
+        }
+
+    // TODO: refresh button !
+
 
     private var bondedDevices = ArrayList<LaRoomyDevicePresentationModel>()
         get() {
@@ -51,6 +74,9 @@ class AddDeviceActivity : AppCompatActivity(),
 
     private lateinit var bleDiscoveryManager: BLEDiscoveryManager
 
+    var bluetoothPermissionGranted = false
+    var grantPermissionRequestDeclined = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +106,7 @@ class AddDeviceActivity : AppCompatActivity(),
 
         // initialize the bonding-list recycler-view
         bondedDevicesListViewManager = LinearLayoutManager(this)
-        bondedDevicesListAdapter = AddDevicesListAdapter(this.bondedDevices, this, applicationContext)
+        bondedDevicesListAdapter = AddDevicesListAdapter(this.bondedDevices, this, LIST_TYPE_BONDED_LIST, applicationContext)
         bondedDevicesListView = findViewById<RecyclerView>(R.id.addDeviceActivityRecyclerView).apply{
             setHasFixedSize(true)
             layoutManager = bondedDevicesListViewManager
@@ -89,7 +115,7 @@ class AddDeviceActivity : AppCompatActivity(),
 
         // initialize the scanResultList recycler-view
         scanResultListViewManager = LinearLayoutManager(this)
-        scanResultListAdapter = AddDevicesListAdapter(this.scanResultListElements, this, applicationContext)
+        scanResultListAdapter = AddDevicesListAdapter(this.scanResultListElements, this, LIST_TYPE_SCAN_LIST, applicationContext)
         scanResultListView = findViewById<RecyclerView?>(R.id.addDeviceActivityScanResultRecyclerView).apply {
             setHasFixedSize(true)
             layoutManager = scanResultListViewManager
@@ -114,14 +140,37 @@ class AddDeviceActivity : AppCompatActivity(),
         //  if the activity was suspended - refresh the bondedList + clear the scanResultList
         if(this.listUpdateRequired){
             this.listUpdateRequired = false
-            this.bondedDevicesListView.adapter = AddDevicesListAdapter(this.bondedDevices, this, applicationContext)
+            this.bondedDevicesListView.adapter = AddDevicesListAdapter(this.bondedDevices, this, LIST_TYPE_BONDED_LIST, applicationContext)
 
             // delete all scan results
             this.scanResultListElements.clear()
         }
 
-        // start the scan
-        this.bleDiscoveryManager.startScan()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(!this.grantPermissionRequestDeclined) {
+                this.bluetoothPermissionGranted = if (ActivityCompat.checkSelfPermission(
+                        applicationContext,
+                        Manifest.permission.BLUETOOTH_SCAN
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // permission not granted - start the permission launcher
+                    if (verboseLog) {
+                        Log.d(
+                            "AddDevAc:onResume",
+                            "Permission is not granted. Execution permission request to user."
+                        )
+                    }
+                    this.requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN)
+                    false
+                } else {
+                    // start the scan
+                    this.bleDiscoveryManager.startScan()
+                    true
+                }
+            }
+        } else {
+            // TODO!
+        }
 
 
 //        if(this.imageRestoreRequired){
@@ -140,7 +189,8 @@ class AddDeviceActivity : AppCompatActivity(),
 
     class AddDevicesListAdapter(
         private val laRoomyDevListAdapter : ArrayList<LaRoomyDevicePresentationModel>,
-        private val deviceListItemClickListener: OnAddDeviceBondedListItemClickListener,
+        private val deviceListItemClickListener: OnAddDeviceActivityListItemClickListener,
+        private val type: Int,
         private val appContext: Context
     ) : RecyclerView.Adapter<AddDevicesListAdapter.DSLRViewHolder>() {
 
@@ -162,7 +212,7 @@ class AddDeviceActivity : AppCompatActivity(),
 
             // set the click listener for the add-button
             holder.constraintLayout.findViewById<AppCompatImageButton>(R.id.addDeviceListElementAddButton).setOnClickListener {
-                deviceListItemClickListener.onBondedItemClicked(position)
+                deviceListItemClickListener.onItemClicked(position, type)
             }
 
             if((this.appContext as ApplicationProperty).addedDevices.isAdded(laRoomyDevListAdapter[position].address)){
@@ -180,23 +230,26 @@ class AddDeviceActivity : AppCompatActivity(),
         }
     }
 
-    override fun onBondedItemClicked(index: Int) {
-
-        (applicationContext as ApplicationProperty).addedDevices.add(
-            bondedDevices.elementAt(index).address,
-            bondedDevices.elementAt(index).name
-        )
-        (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
-        finish()
-    }
-
-    override fun onScanResultListItemClicked(index: Int) {
-
-        (applicationContext as ApplicationProperty).addedDevices.add(
-            scanResultListElements.elementAt(index).address,
-            scanResultListElements.elementAt(index).name
-        )
-        (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
+    override fun onItemClicked(index: Int, type: Int) {
+        when (type) {
+            LIST_TYPE_BONDED_LIST -> {
+                (applicationContext as ApplicationProperty).addedDevices.add(
+                    bondedDevices.elementAt(index).address,
+                    bondedDevices.elementAt(index).name
+                )
+                (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
+            }
+            LIST_TYPE_SCAN_LIST -> {
+                (applicationContext as ApplicationProperty).addedDevices.add(
+                    scanResultListElements.elementAt(index).address,
+                    scanResultListElements.elementAt(index).name
+                )
+                (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
+            }
+            else -> {
+                return
+            }
+        }
         finish()
     }
 
@@ -220,15 +273,28 @@ class AddDeviceActivity : AppCompatActivity(),
         ) {
             this.permissionError()
         } else {
-            val element = LaRoomyDevicePresentationModel()
-            element.address = device.address
-            element.name = device.name
-            this.scanResultListElements.add(element)
+            if(!device.name.isNullOrEmpty() && !device.address.isNullOrEmpty()) {
+                var isNew = true
+
+                this.scanResultListElements.forEach {
+                    if(it.address == device.address){
+                        isNew = false
+                        return@forEach
+                    }
+                }
+
+                if(isNew) {
+                    val element = LaRoomyDevicePresentationModel()
+                    element.address = device.address
+                    element.name = device.name
+                    this.scanResultListElements.add(element)
+                    this.scanResultListAdapter.notifyItemInserted(this.scanResultListElements.size - 1)
+                }
+            }
         }
     }
 
     override fun permissionError() {
-        this.bleDiscoveryManager.stopScan()
 
         // TODO: do not finish if the BLUETOOTH_SCAN permission is not present - notify user instead and propose what he could do..
 

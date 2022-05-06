@@ -239,12 +239,8 @@ interface OnDeviceListItemClickListener {
     fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel)
 }
 
-interface OnAddDeviceBondedListItemClickListener {
-    fun onBondedItemClicked(index: Int)
-}
-
-interface OnAddDeviceScanResultListItemClickListener {
-    fun onScanResultListItemClicked(index: Int)
+interface OnAddDeviceActivityListItemClickListener {
+    fun onItemClicked(index: Int, type: Int)
 }
 
 interface OnUUIDProfileListItemClickListener {

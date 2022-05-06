@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="60dp"
+    android:layout_marginTop="4dp"
     android:background="@drawable/add_device_list_element_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -30,15 +31,17 @@
         />
 
     <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/addDeviceListElementAddButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/addDeviceListElementAddButton"
-        android:src="@drawable/ic_add_white_36dp"
-        android:layout_marginEnd="11dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/transparentColor"
         android:contentDescription="@string/AddDeviceListElementContentDescription"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:src="@drawable/ic_add_white_36dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
