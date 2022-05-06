@@ -74,7 +74,7 @@
     <color name="deviceMainActivityPopUpBackgroundColor">#FF505050</color>
 
 
-    <color name="addDeviceActivityBondingHintBackgroundColor">#FF202020</color>
+    <color name="addDeviceActivityContainerBackgroundColor">#FF202020</color>
 
 
 

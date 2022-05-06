@@ -1,11 +1,12 @@
 package com.laroomysoft.laroomy
 
+import android.Manifest
+import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +14,13 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.ybq.android.spinkit.SpinKitView
 
-class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener {
+class AddDeviceActivity : AppCompatActivity(),
+    OnAddDeviceBondedListItemClickListener, OnAddDeviceScanResultListItemClickListener, BLEDiscoveryCallback {
 
     private var bondedDevices = ArrayList<LaRoomyDevicePresentationModel>()
         get() {
@@ -25,15 +29,27 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
             return field
         }
 
+    private var scanResultListElements = ArrayList<LaRoomyDevicePresentationModel>()
+
     // UI Elements
     private lateinit var bottomSeparator: View
+
     private lateinit var bondedDevicesListView: RecyclerView
     private lateinit var bondedDevicesListViewManager: RecyclerView.LayoutManager
     private lateinit var bondedDevicesListAdapter: RecyclerView.Adapter<*>
+
     private lateinit var backButton: AppCompatImageButton
 
     private var listUpdateRequired = false
-    private var imageRestoreRequired = false
+//    private var imageRestoreRequired = false
+
+    private lateinit var scanResultListView: RecyclerView
+    private lateinit var scanResultListViewManager: RecyclerView.LayoutManager
+    private lateinit var scanResultListAdapter: RecyclerView.Adapter<*>
+
+    private lateinit var scanWorkingIndicator: SpinKitView
+
+    private lateinit var bleDiscoveryManager: BLEDiscoveryManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +65,12 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
             this.onBackPressed()
         }
 
+        // get the spin-kit
+        this.scanWorkingIndicator = findViewById(R.id.addDeviceActivityScanIndicationSpinKitView)
+
+        // init the discovery manager
+        this.bleDiscoveryManager = BLEDiscoveryManager(applicationContext, this)
+
 /*
         // hide the bonding-hint container if requested
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_DoNotShowBondingHint)){
@@ -56,13 +78,22 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         }
 */
 
-        // initialize the recycler-view
+        // initialize the bonding-list recycler-view
         bondedDevicesListViewManager = LinearLayoutManager(this)
-        bondedDevicesListAdapter = BondedDevicesListAdapter(this.bondedDevices, this, applicationContext)
+        bondedDevicesListAdapter = AddDevicesListAdapter(this.bondedDevices, this, applicationContext)
         bondedDevicesListView = findViewById<RecyclerView>(R.id.addDeviceActivityRecyclerView).apply{
             setHasFixedSize(true)
             layoutManager = bondedDevicesListViewManager
             adapter = bondedDevicesListAdapter
+        }
+
+        // initialize the scanResultList recycler-view
+        scanResultListViewManager = LinearLayoutManager(this)
+        scanResultListAdapter = AddDevicesListAdapter(this.scanResultListElements, this, applicationContext)
+        scanResultListView = findViewById<RecyclerView?>(R.id.addDeviceActivityScanResultRecyclerView).apply {
+            setHasFixedSize(true)
+            layoutManager = scanResultListViewManager
+            adapter = scanResultListAdapter
         }
     }
 
@@ -80,29 +111,38 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
             View.VISIBLE
         }
 
+        //  if the activity was suspended - refresh the bondedList + clear the scanResultList
         if(this.listUpdateRequired){
             this.listUpdateRequired = false
-            this.bondedDevicesListView.adapter = BondedDevicesListAdapter(this.bondedDevices, this, applicationContext)
+            this.bondedDevicesListView.adapter = AddDevicesListAdapter(this.bondedDevices, this, applicationContext)
+
+            // delete all scan results
+            this.scanResultListElements.clear()
         }
 
-        if(this.imageRestoreRequired){
-            findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_white_48dp)
-            findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.fullWhiteTextColor))
+        // start the scan
+        this.bleDiscoveryManager.startScan()
 
-            //findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_white_48dp)
-        }
+
+//        if(this.imageRestoreRequired){
+//            findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_white_48dp)
+//            findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.fullWhiteTextColor))
+//
+//            //findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_white_48dp)
+//        }
     }
 
     override fun onPause() {
         super.onPause()
         this.listUpdateRequired = true
+        this.bleDiscoveryManager.stopScan()
     }
 
-    class BondedDevicesListAdapter(
+    class AddDevicesListAdapter(
         private val laRoomyDevListAdapter : ArrayList<LaRoomyDevicePresentationModel>,
-        private val deviceListItemClickListener: OnAddDeviceListItemClickListener,
+        private val deviceListItemClickListener: OnAddDeviceBondedListItemClickListener,
         private val appContext: Context
-    ) : RecyclerView.Adapter<BondedDevicesListAdapter.DSLRViewHolder>() {
+    ) : RecyclerView.Adapter<AddDevicesListAdapter.DSLRViewHolder>() {
 
         class DSLRViewHolder(val constraintLayout: ConstraintLayout) :
             RecyclerView.ViewHolder(constraintLayout)
@@ -122,7 +162,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
 
             // set the click listener for the add-button
             holder.constraintLayout.findViewById<AppCompatImageButton>(R.id.addDeviceListElementAddButton).setOnClickListener {
-                deviceListItemClickListener.onItemClicked(position)
+                deviceListItemClickListener.onBondedItemClicked(position)
             }
 
             if((this.appContext as ApplicationProperty).addedDevices.isAdded(laRoomyDevListAdapter[position].address)){
@@ -140,7 +180,7 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         }
     }
 
-    override fun onItemClicked(index: Int) {
+    override fun onBondedItemClicked(index: Int) {
 
         (applicationContext as ApplicationProperty).addedDevices.add(
             bondedDevices.elementAt(index).address,
@@ -150,15 +190,60 @@ class AddDeviceActivity : AppCompatActivity(), OnAddDeviceListItemClickListener 
         finish()
     }
 
-    fun onAddDeviceActivityGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    override fun onScanResultListItemClicked(index: Int) {
 
-        findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_yellow_48dp)
-        findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.yellowAccentColor))
-        this.imageRestoreRequired = true
-
-        val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-        startActivity(intent)
+        (applicationContext as ApplicationProperty).addedDevices.add(
+            scanResultListElements.elementAt(index).address,
+            scanResultListElements.elementAt(index).name
+        )
+        (applicationContext as ApplicationProperty).mainActivityListElementWasAdded = true
+        finish()
     }
+
+    override fun scanStarted() {
+        this.scanWorkingIndicator.visibility = View.VISIBLE
+    }
+
+    override fun scanStopped() {
+        this.scanWorkingIndicator.visibility = View.INVISIBLE
+    }
+
+    override fun scanFail(errorCode: Int) {
+        super.scanFail(errorCode)
+    }
+
+    override fun deviceFound(device: BluetoothDevice) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            this.permissionError()
+        } else {
+            val element = LaRoomyDevicePresentationModel()
+            element.address = device.address
+            element.name = device.name
+            this.scanResultListElements.add(element)
+        }
+    }
+
+    override fun permissionError() {
+        this.bleDiscoveryManager.stopScan()
+
+        // TODO: do not finish if the BLUETOOTH_SCAN permission is not present - notify user instead and propose what he could do..
+
+        finish()
+    }
+
+//    fun onAddDeviceActivityGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
+//
+//        findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_yellow_48dp)
+//        findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.yellowAccentColor))
+//        this.imageRestoreRequired = true
+//
+//        val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+//        startActivity(intent)
+//    }
 
 
 /*

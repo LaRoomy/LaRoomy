@@ -289,6 +289,8 @@
     <string name="AddDeviceActivityBondingHintText">Devices must be paired to show up in the list. Go to Bluetooth settings to pair a device.</string>
     <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Settings</string>
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
+    <string name="AddDeviceActivityScanResultHeaderText">Available</string>
+    <string name="AddDeviceActivityPairedDevicesHeaderText">Paired</string>
 
     <!-- content descriptions and labels -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
