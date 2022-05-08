@@ -8,6 +8,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.ActivityCompat
 import java.io.Serializable
 import java.util.concurrent.Executors
@@ -29,61 +30,97 @@ class BLEDiscoveryManager(private val appContext: Context, private val discovery
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
             // report event
-            discoveryCallback.deviceFound(result.device)
+            discoveryCallback.onDeviceFound(result.device)
         }
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
             // report event
-            discoveryCallback.scanFail(errorCode)
+            discoveryCallback.onScanFail(errorCode)
         }
     }
 
-    fun startScan(){
-        if(!this.scanning) {
+    fun startScan() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(
                     appContext,
                     Manifest.permission.BLUETOOTH_SCAN
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 // report error
-                discoveryCallback.permissionError()
+                discoveryCallback.onPermissionError()
             } else {
+                if (!this.scanning) {
+                    // schedule the stop of scanning
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        // stop scan
+                        bluetoothLEScanner.stopScan(leScanCallback)
+                        scanning = false
+                        // report event
+                        discoveryCallback.onScanStopped()
+                    }, 10, TimeUnit.SECONDS)
+                    // start scan and set param
+                    this.bluetoothLEScanner.startScan(this.leScanCallback)
+                    this.scanning = true
+                    discoveryCallback.onScanStarted()
+                }
+            }
+
+        } else {
+            // TODO set UI to missing location permission error state
+
+            if (!this.scanning) {
                 // schedule the stop of scanning
                 Executors.newSingleThreadScheduledExecutor().schedule({
                     // stop scan
                     bluetoothLEScanner.stopScan(leScanCallback)
+                    scanning = false
                     // report event
-                    discoveryCallback.scanStopped()
+                    discoveryCallback.onScanStopped()
                 }, 10, TimeUnit.SECONDS)
                 // start scan and set param
                 this.bluetoothLEScanner.startScan(this.leScanCallback)
                 this.scanning = true
-                discoveryCallback.scanStarted()
+                discoveryCallback.onScanStarted()
             }
         }
     }
 
     fun stopScan(){
-        if (ActivityCompat.checkSelfPermission(
-                appContext,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // report error
-            discoveryCallback.permissionError()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.checkSelfPermission(
+                    appContext,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // report error
+                discoveryCallback.onPermissionError()
+            } else {
+                if(this.scanning) {
+                    // stop scan
+                    bluetoothLEScanner.stopScan(leScanCallback)
+                    this.scanning = false
+                    // report event
+                    discoveryCallback.onScanStopped()
+                }
+            }
         } else {
-            // stop scan
-            bluetoothLEScanner.stopScan(leScanCallback)
-            // report event
-            discoveryCallback.scanStopped()
+            // TODO: set UI to missing location permission error state (or is it done before at this point??)
+
+            if(this.scanning){
+                // stop scan
+                bluetoothLEScanner.stopScan(leScanCallback)
+                this.scanning = false
+                // report event
+                discoveryCallback.onScanStopped()
+            }
         }
     }
 }
 
 interface BLEDiscoveryCallback : Serializable {
-    fun scanStarted(){}
-    fun scanStopped(){}
-    fun deviceFound(device: BluetoothDevice){}
-    fun permissionError(){}
-    fun scanFail(errorCode: Int){}
+    fun onScanStarted(){}
+    fun onScanStopped(){}
+    fun onDeviceFound(device: BluetoothDevice){}
+    fun onPermissionError(){}
+    fun onScanFail(errorCode: Int){}
 }

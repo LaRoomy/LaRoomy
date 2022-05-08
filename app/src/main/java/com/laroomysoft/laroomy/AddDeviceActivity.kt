@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -28,12 +27,12 @@ const val LIST_TYPE_SCAN_LIST = 2
 class AddDeviceActivity : AppCompatActivity(),
     OnAddDeviceActivityListItemClickListener, BLEDiscoveryCallback {
 
-    private val requestPermissionLauncher =
+    private val requestAndroid12orHigherBluetoothScanPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if(verboseLog){
-                Log.d("MA:requestPermissionLauncher", "Permission-Request result is: $isGranted")
+                Log.d("AddDeviceActivity", "Android 12 or higher: BluetoothScan Permission-Request result is: $isGranted")
             }
             this.bluetoothPermissionGranted = isGranted
             this.grantPermissionRequestDeclined = !isGranted    // prevent a request loop in onResume
@@ -42,7 +41,26 @@ class AddDeviceActivity : AppCompatActivity(),
             // of the permission request launcher in onResume, otherwise there will be an infinite loop between onResume and permission launcher
         }
 
+    private val requestAndroid11orLowerLocationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if(verboseLog){
+                Log.d("AddDeviceActivity", "Android 11 or lower: LocationPermissionLauncherResult: Location Permission-Request result is: $isGranted")
+            }
+            this.bluetoothPermissionGranted = isGranted
+            this.bluetoothLocationPermissionGranted = isGranted
+            this.grantPermissionRequestDeclined = !isGranted    // prevent a request loop in onResume
+            // if the permission dialog is dismissed, the onResume method is invoked again, and bluetooth enabled state is checked
+            // when the permission request is reclined, the UI must go in missing-permission-state, and prevent the invocation
+            // of the permission request launcher in onResume, otherwise there will be an infinite loop between onResume and permission launcher
+        }
+
+
+
     // TODO: refresh button !
+
+
 
 
     private var bondedDevices = ArrayList<LaRoomyDevicePresentationModel>()
@@ -75,6 +93,7 @@ class AddDeviceActivity : AppCompatActivity(),
     private lateinit var bleDiscoveryManager: BLEDiscoveryManager
 
     var bluetoothPermissionGranted = false
+    var bluetoothLocationPermissionGranted = false
     var grantPermissionRequestDeclined = false
 
 
@@ -147,6 +166,9 @@ class AddDeviceActivity : AppCompatActivity(),
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(verboseLog){
+                Log.d("AddDeviceActivity", "onResume: This is Android 12 or higher - check for BLUETOOTH_SCAN permission")
+            }
             if(!this.grantPermissionRequestDeclined) {
                 this.bluetoothPermissionGranted = if (ActivityCompat.checkSelfPermission(
                         applicationContext,
@@ -160,7 +182,7 @@ class AddDeviceActivity : AppCompatActivity(),
                             "Permission is not granted. Execution permission request to user."
                         )
                     }
-                    this.requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN)
+                    this.requestAndroid12orHigherBluetoothScanPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN)
                     false
                 } else {
                     // start the scan
@@ -169,7 +191,33 @@ class AddDeviceActivity : AppCompatActivity(),
                 }
             }
         } else {
-            // TODO!
+            if (verboseLog) {
+                Log.d(
+                    "AddDeviceActivity",
+                    "onResume: This is Android 11 or lower - check for ACCESS_BACKGROUND_LOCATION permission"
+                )
+            }
+            if (!this.grantPermissionRequestDeclined) {
+                this.bluetoothLocationPermissionGranted = if (ActivityCompat.checkSelfPermission(
+                        applicationContext,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // permission not granted - start the permission launcher
+                    if (verboseLog) {
+                        Log.d(
+                            "AddDeviceActivity",
+                            "onResume: Background location permission is not granted, ask for it!"
+                        )
+                    }
+                    this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    false
+                } else {
+                    // start the scan
+                    this.bleDiscoveryManager.startScan()
+                    true
+                }
+            }
         }
 
 
@@ -253,37 +301,61 @@ class AddDeviceActivity : AppCompatActivity(),
         finish()
     }
 
-    override fun scanStarted() {
+    override fun onScanStarted() {
         this.scanWorkingIndicator.visibility = View.VISIBLE
     }
 
-    override fun scanStopped() {
+    override fun onScanStopped() {
         this.scanWorkingIndicator.visibility = View.INVISIBLE
     }
 
-    override fun scanFail(errorCode: Int) {
-        super.scanFail(errorCode)
+    override fun onScanFail(errorCode: Int) {
+        super.onScanFail(errorCode)
     }
 
-    override fun deviceFound(device: BluetoothDevice) {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            this.permissionError()
+    override fun onDeviceFound(device: BluetoothDevice) {
+        if(verboseLog){
+            Log.d("AddDeviceActivity", "onDeviceFound: DEVICE: Name<${device.name}> Mac<${device.address}>")
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                this.onPermissionError()
+            } else {
+                if (!device.name.isNullOrEmpty() && !device.address.isNullOrEmpty()) {
+                    var isNew = true
+
+                    this.scanResultListElements.forEach {
+                        if (it.address == device.address) {
+                            isNew = false
+                            return@forEach
+                        }
+                    }
+
+                    if (isNew) {
+                        val element = LaRoomyDevicePresentationModel()
+                        element.address = device.address
+                        element.name = device.name
+                        this.scanResultListElements.add(element)
+                        this.scanResultListAdapter.notifyItemInserted(this.scanResultListElements.size - 1)
+                    }
+                }
+            }
         } else {
-            if(!device.name.isNullOrEmpty() && !device.address.isNullOrEmpty()) {
+            if (!device.name.isNullOrEmpty() && !device.address.isNullOrEmpty()) {
                 var isNew = true
 
                 this.scanResultListElements.forEach {
-                    if(it.address == device.address){
+                    if (it.address == device.address) {
                         isNew = false
                         return@forEach
                     }
                 }
 
-                if(isNew) {
+                if (isNew) {
                     val element = LaRoomyDevicePresentationModel()
                     element.address = device.address
                     element.name = device.name
@@ -294,12 +366,13 @@ class AddDeviceActivity : AppCompatActivity(),
         }
     }
 
-    override fun permissionError() {
+    override fun onPermissionError() {
 
         // TODO: do not finish if the BLUETOOTH_SCAN permission is not present - notify user instead and propose what he could do..
 
         finish()
     }
+
 
 //    fun onAddDeviceActivityGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
 //
@@ -320,4 +393,5 @@ class AddDeviceActivity : AppCompatActivity(),
         findViewById<ConstraintLayout>(R.id.addDeviceActivityBondingHintContainer).visibility = View.GONE
     }
 */
+
 }
