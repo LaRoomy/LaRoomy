@@ -1,11 +1,14 @@
 package com.laroomysoft.laroomy
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context.BLUETOOTH_SERVICE
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import java.io.Serializable
 import java.util.*
 import java.util.concurrent.Executors
@@ -1977,6 +1980,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
 
                 this.gattCharacteristic.setValue(data)
+
+//                if (ActivityCompat.checkSelfPermission(
+//                        applicationProperty.applicationContext,
+//                        Manifest.permission.BLUETOOTH_CONNECT
+//                    ) != PackageManager.PERMISSION_GRANTED
+//                ) {
+//                    // TODO: Consider calling
+//                    //    ActivityCompat#requestPermissions
+//                    // here to request the missing permissions, and then overriding
+//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                    //                                          int[] grantResults)
+//                    // to handle the case where the user grants the permission. See the documentation
+//                    // for ActivityCompat#requestPermissions for more details.
+//                    return
+//                }
+//                this.bluetoothGatt?.writeCharacteristic()
 
                 if (this.bluetoothGatt == null) {
                     Log.e("M:sendData", "Member bluetoothGatt was null!")

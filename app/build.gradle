@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     kotlinOptions { jvmTarget = "1.8" }
 
     defaultConfig {
         applicationId "com.example.laroomy"
         minSdkVersion 29
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode 2
         versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -21,6 +21,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'com.laroomysoft.laroomy'
 }
 
 allprojects {
