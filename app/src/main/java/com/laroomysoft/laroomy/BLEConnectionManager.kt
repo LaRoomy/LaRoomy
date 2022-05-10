@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -1979,28 +1980,41 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     applicationProperty.logControl("I: Send Data: $data")
                 }
 
-                this.gattCharacteristic.setValue(data)
-
-//                if (ActivityCompat.checkSelfPermission(
-//                        applicationProperty.applicationContext,
-//                        Manifest.permission.BLUETOOTH_CONNECT
-//                    ) != PackageManager.PERMISSION_GRANTED
-//                ) {
-//                    // TODO: Consider calling
-//                    //    ActivityCompat#requestPermissions
-//                    // here to request the missing permissions, and then overriding
-//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                    //                                          int[] grantResults)
-//                    // to handle the case where the user grants the permission. See the documentation
-//                    // for ActivityCompat#requestPermissions for more details.
-//                    return
+                // TODO: the commented section is new for Android Tiramisu, keep it for later usage!
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                    if (ActivityCompat.checkSelfPermission(
+//                            applicationProperty.applicationContext,
+//                            Manifest.permission.BLUETOOTH_CONNECT
+//                        ) != PackageManager.PERMISSION_GRANTED
+//                    ) {
+//                        this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+//                        return
+//                    } else {
+//                        this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic, data.toByteArray(), writeType)
+//                    }
+//                } else {
+//                    this.gattCharacteristic.setValue(data)
+//
+//                    if (this.bluetoothGatt == null) {
+//                        Log.e("M:sendData", "Member bluetoothGatt was null!")
+//                    }
+//
+//                    try {
+//                        this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
+//                    } catch (e: SecurityException){
+//                        Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
+//                        this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+//                    }
 //                }
-//                this.bluetoothGatt?.writeCharacteristic()
+
+                // set the characteristic value
+                this.gattCharacteristic.setValue(data)
 
                 if (this.bluetoothGatt == null) {
                     Log.e("M:sendData", "Member bluetoothGatt was null!")
                 }
 
+                // write the characteristic
                 try {
                     this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
                 } catch (e: SecurityException){
