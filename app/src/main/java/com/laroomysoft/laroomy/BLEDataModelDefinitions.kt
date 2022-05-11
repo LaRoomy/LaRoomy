@@ -2010,6 +2010,8 @@ class LaRoomyDeviceProperty {
                 this.propertyDescriptor = string.removeRange(0, 18)
                 this.propertyDescriptor = this.propertyDescriptor.removeSuffix("\r")
 
+                // TODO: decode descriptor (unicode!)
+
                 // decode hex values
                 this.propertyIndex = Integer.decode(propIndex)
                 this.propertyType = Integer.decode(propType)
@@ -2119,6 +2121,8 @@ class LaRoomyDevicePropertyGroup {
                 // get the descriptor
                 this.groupName = groupString.removeRange(0, 12)
                 this.groupName = this.groupName.removeSuffix("\r")
+
+                // TODO: decode groupName (unicode!) do it also on all visible strings!
 
                 if (verboseLog) {
                     Log.d("M:PropGroup:fromString", "Data Recorded - Results:")

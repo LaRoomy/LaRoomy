@@ -14,6 +14,8 @@ import java.io.Serializable
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.text.Regex.Companion.escape
+
 
 const val BINDING_RESPONSE_BINDING_NOT_SUPPORTED = 1
 const val BINDING_RESPONSE_BINDING_SUCCESS = 2
