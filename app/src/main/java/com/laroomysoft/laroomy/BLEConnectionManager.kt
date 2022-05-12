@@ -643,7 +643,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             deviceInfoHeaderData.imageID = Integer.decode(hexString)
             deviceInfoHeaderData.type = data[9]
             deviceInfoHeaderData.displayTime = data[10].toString().toLong()
-            deviceInfoHeaderData.message = data.removeRange(0, 11)
+            deviceInfoHeaderData.message = unescapeUTF8String(data.removeRange(0, 11))
 
             this.propertyCallback.onRemoteUserMessage(deviceInfoHeaderData)
         } else {
@@ -961,6 +961,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // decode property string to class
             val laRoomyDeviceProperty = LaRoomyDeviceProperty()
             laRoomyDeviceProperty.fromString(data)
+            
+            // TODO: what if the sub-type of the transmission is not correct, e.g. is request, not response ????
 
             // add property and request next property if the loop is active
             if(this.propertyLoopActive){

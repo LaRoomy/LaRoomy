@@ -177,6 +177,46 @@ fun decryptString(inputString: String):String {
     }
 }
 
+fun unescapeUTF8String(string: String) : String {
+    var formattedString = ""
+    var nextValidIndex = 0
+
+    string.forEachIndexed { index, c ->
+        if(index >= nextValidIndex){
+            // check for escape entry
+            if(c == '\\'){
+                // save check for \u
+                if(string.length < (index + 1)){
+                    formattedString += c
+                } else {
+                    // check for \u
+                    if(string.elementAt(index + 1) == 'u'){
+                        // save check for \u0000
+                        if(string.length < index + 5){
+                            formattedString += c
+                        } else {
+                            // make sure to ignore the escape sequence in recording
+                            nextValidIndex = index + 6
+                            // convert the value
+                            formattedString += a4CharHexValueToChar(
+                                string.elementAt(index + 2),
+                                string.elementAt(index + 3),
+                                string.elementAt(index + 4),
+                                string.elementAt(index + 5)
+                            )
+                        }
+                    } else {
+                        formattedString += c
+                    }
+                }
+            } else {
+                formattedString += c
+            }
+        }
+    }
+    return formattedString
+}
+
 fun swapChar(c: Char) : Char {
     return when(c){
         '0' -> 'N'
@@ -517,17 +557,21 @@ fun a2CharHexValueToIntValue(c_left: Char, c_right: Char) : Int {
 }
 
 fun a4CharHexValueToSignedIntValue(hl: Char, hr: Char, ll: Char, lr: Char) : Short {
-
     val highLeft = hexCharToNumber(hl)
     val highRight = hexCharToNumber(hr)
     val lowLeft = hexCharToNumber(ll)
     val lowRight = hexCharToNumber(lr)
-
     return  (highLeft.shl(12).or(highRight.shl(8)).or(lowLeft.shl(4).or(lowRight))).toShort()
-
-    //val valueStr = "0x$hl$hr$ll$lr"
-    //return Integer.decode(valueStr)
 }
+
+fun a4CharHexValueToChar(hl: Char, hr: Char, ll: Char, lr: Char) : Char {
+    val highLeft = hexCharToNumber(hl)
+    val highRight = hexCharToNumber(hr)
+    val lowLeft = hexCharToNumber(ll)
+    val lowRight = hexCharToNumber(lr)
+    return  (highLeft.shl(12).or(highRight.shl(8)).or(lowLeft.shl(4).or(lowRight))).toChar()
+}
+
 
 fun hexCharToNumber(c: Char) : Int {
     return when(c){
