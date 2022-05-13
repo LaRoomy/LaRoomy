@@ -962,19 +962,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             val laRoomyDeviceProperty = LaRoomyDeviceProperty()
             laRoomyDeviceProperty.fromString(data)
             
-            // TODO: what if the sub-type of the transmission is not correct, e.g. is request, not response ????
+            // TODO: what if the sub-type of the transmission is not correct, e.g. this is a request, not a response ????
 
             // add property and request next property if the loop is active
             if(this.propertyLoopActive){
-
-                // TODO: question: when the property-index member of the decoded object does not equals the index which must be follow in the collection, is this an error?
-
-                this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
-                this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
+                if(data[1] == '2') {
+    
+                    // TODO: question: when the property-index member of the decoded object does not equal the index which must be follow in the collection, is this an error?
+    
+                    this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
+                    this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
+                } else {
+                    // wrong transmission sub-type (response was expected)
+                    if(verboseLog){
+                        Log.e("readPropertyString", "Invalid transmission sub-type. Type was: ${data[1]} | 2 was expected (response)")
+                    }
+                    applicationProperty.logControl("W: Invalid transmission sub-type. Type was: ${data[1]} | 2 was expected (response)")
+                }
             } else {
 
 
-                // TODO: this could be a update or insert transmission. So update or insert data and launch event respectively
+                // TODO: this could be an update or insert transmission. So update or insert data and launch event respectively
 
                 when(data[1]) {
                     '4' -> {
@@ -1006,6 +1014,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                         // the loop is not active and the sub-type is insert, so insert at the specified index
                         this.insertPropertyElement(laRoomyDeviceProperty)
+                    }
+                    else -> {
+                        // invalid transmission sub-type (at this point)
+                        if(verboseLog){
+                            Log.e("readPropertyString", "Invalid transmission sub-type. Type was: ${data[1]}")
+                        }
+                        applicationProperty.logControl("W: Invalid transmission sub-type. Type was: ${data[1]}")
                     }
                 }
             }
