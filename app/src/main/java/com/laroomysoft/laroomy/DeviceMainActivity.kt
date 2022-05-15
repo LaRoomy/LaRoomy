@@ -52,7 +52,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var popUpWindow: PopupWindow
     private lateinit var deviceMenuPopUpWindow: PopupWindow
 
-
     private var activityWasSuspended = false
     //private var buttonRecoveryRequired = false
     private var restoreIndex = -1
@@ -292,10 +291,19 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     // CREATION OR RESUME ACTION
                     // ********************************************************************
 
-                    // make sure to set the right Name and image for the device
+                    // make sure to set the right name for the device
                     try {
+                        // try to get the device name from the bluetooth device object (could be empty)
                         this.deviceTypeHeaderTextView.text =
                             ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+                        // check if there is a name
+                        if(this.deviceTypeHeaderTextView.text.isEmpty()){
+                            // there is no name provided, so lookup in the friendly device list for a name
+                            this.deviceTypeHeaderTextView.text =
+                                (applicationContext as ApplicationProperty)
+                                    .addedDevices
+                                    .lookupForDeviceNameWithAddress(ApplicationProperty.bluetoothConnectionManager.currentDevice?.address ?: "")
+                        }
                     } catch (e: SecurityException) {
                         Log.e("DMA:onResume", "Exception while trying to access the current device: $e")
                         (applicationContext as ApplicationProperty).logControl("E: onResume: Exception while trying to access the current device: $e")

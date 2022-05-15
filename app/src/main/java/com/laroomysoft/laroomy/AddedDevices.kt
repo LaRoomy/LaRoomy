@@ -137,4 +137,13 @@ class AddedDevices(private val appContext: Context) {
         }
         return false
     }
+    
+    fun lookupForDeviceNameWithAddress(address: String) : String {
+        this.devices.forEach {
+            if(it.macAddress == address){
+                return it.name
+            }
+        }
+        return ""
+    }
 }
