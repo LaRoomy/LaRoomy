@@ -977,7 +977,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun readPropertyString(data: String, dataSize: Int) : Boolean {
 
         // check if the length of the transmission is valid
-        if(dataSize < 18){
+        if(dataSize < 10){
             //invalid data size
             if(verboseLog){
                 Log.e("readPropertyString", "Invalid data size. Data-Size was: $dataSize > minimum is 18!")
