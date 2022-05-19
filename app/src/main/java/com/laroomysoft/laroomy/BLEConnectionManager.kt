@@ -1,20 +1,15 @@
 package com.laroomysoft.laroomy
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context.BLUETOOTH_SERVICE
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import java.io.Serializable
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.text.Regex.Companion.escape
 
 
 const val BINDING_RESPONSE_BINDING_NOT_SUPPORTED = 1
@@ -380,15 +375,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return false
         } else {
             // first read data size
-            var strDataSize = "0x"
-            strDataSize += data[4]
-            strDataSize += data[5]
+            var strPayLoadDataSize = "0x"
+            strPayLoadDataSize += data[4]
+            strPayLoadDataSize += data[5]
 
             // convert to integer
-            var dataSize =
-                Integer.decode(strDataSize)
+            val payLoadDataSize =
+                Integer.decode(strPayLoadDataSize)
+
             // add the header length
-            dataSize += 8
+            //payLoadDataSize += 8
 
             // check error flag
             if(data[6] != '0'){
@@ -421,7 +417,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                         else -> {
                             // must be response, update or insert transmission
-                            dataProcessed = readPropertyString(data, dataSize)
+                            dataProcessed = readPropertyString(data, payLoadDataSize)
                         }
                     }
                 }
@@ -436,32 +432,32 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         )
                     } else {
                         // must be a response, update or insert transmission
-                        dataProcessed = readGroupString(data, dataSize)
+                        dataProcessed = readGroupString(data, payLoadDataSize)
                     }
                 }
                 '3' -> {
                     // property state data
-                    dataProcessed = dispatchPropertyStateTransmission(data, dataSize)
+                    dataProcessed = dispatchPropertyStateTransmission(data, payLoadDataSize)
                 }
                 '4' -> {
                     // property execution command (only response)
-                    dataProcessed = readPropertyExecutionResponse(data, dataSize)
+                    dataProcessed = readPropertyExecutionResponse(data, payLoadDataSize)
                 }
                 '5' -> {
                     // device to app notification
-                    dataProcessed = readDeviceNotification(data, dataSize)
+                    dataProcessed = readDeviceNotification(data, payLoadDataSize)
                 }
                 '6' -> {
                     // binding response
-                    dataProcessed = readBindingResponse(data, dataSize)
+                    dataProcessed = readBindingResponse(data, payLoadDataSize)
                 }
                 '7' -> {
                     // init transmission string
-                    dataProcessed = readInitTransmission(data, dataSize)
+                    dataProcessed = readInitTransmission(data, payLoadDataSize)
                 }
                 '8' -> {
                     // fast data setter
-                    dataProcessed = readFastDataSetterTransmission(data, dataSize)
+                    dataProcessed = readFastDataSetterTransmission(data, payLoadDataSize)
                 }
                 '9' -> {
                     // fragmented fast data setter
@@ -602,14 +598,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun readDeviceNotification(data: String, dataSize: Int) : Boolean {
+    private fun readDeviceNotification(data: String, payLoadDataSize: Int) : Boolean {
 
-        if(dataSize < 9){
+        if((payLoadDataSize < 2)||(data.length < 10)){
             //invalid transmission length
             if(verboseLog){
-                Log.e("readDevNotification", "Invalid transmission length. Transmission-length was: ${data.length} > minimum transmission-length is 9!")
+                Log.e("readDevNotification", "Invalid transmission length. PayLoadData-size was: $payLoadDataSize > minimum is 2!\n" +
+                        "String-length was ${data.length}")
             }
-            applicationProperty.logControl("E: Invalid transmission length. Transmission-length was: ${data.length} > minimum transmission-length is 9!")
+            applicationProperty.logControl("E: Invalid transmission length of device-notification transmission. Transmission-length was: $payLoadDataSize > minimum transmission-length is 2! String-lenth was ${data.length}")
             return false
         } else {
             // get ID
@@ -623,7 +620,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             when(data[8]){
                 '1' -> {
                     // user-message notification
-                    this.handleUserMessage(data, dataSize)
+                    this.handleUserMessage(data, payLoadDataSize)
                 }
                 '2' -> {
                     // time request notification from device
@@ -656,10 +653,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun handleUserMessage(data: String, dataSize: Int){
+    private fun handleUserMessage(data: String, payLoadDataSize: Int){
 
         // check transmission length
-        if(dataSize > 9) {
+        if(payLoadDataSize > 1) {
             val deviceInfoHeaderData = DeviceInfoHeaderData()
 
             // get image id (transferred in the id fields)
@@ -676,9 +673,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             // no notification data
             if(verboseLog){
-                Log.w("handleUserMessage", "User-Message transmission contains no data.")
+                Log.w("handleUserMessage", "User-Message transmission payLoadData size invalid")
             }
-            applicationProperty.logControl("W: User-Message contains no data")
+            applicationProperty.logControl("W: User-Message transmission payLoadData size invalid")
         }
     }
 
@@ -704,7 +701,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         sendData(languageRequestResponse)
     }
 
-    private fun readPropertyExecutionResponse(data: String, dataSize: Int) : Boolean {
+    private fun readPropertyExecutionResponse(data: String, payLoadDataSize: Int) : Boolean {
         // FIXME: what to do here?
         // if a property was executed and no response is received, send a state-update to verify the user-interface??
         return true
@@ -736,13 +733,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun readSimpleStateData(propertyIndex: Int, data: String, dataSize: Int){
-        if(dataSize < 10){
+    private fun readSimpleStateData(propertyIndex: Int, data: String, payLoadDataSize: Int){
+        if((payLoadDataSize < 2)||(data.length < 10)){
             // invalid data size
             if(verboseLog){
-                Log.e("readSimpleStateData", "Invalid transmission size. Data-size was: $dataSize. Minimum is: 10")
+                Log.e("readSimpleStateData", "Invalid payLoadData-size. Data-size was: $payLoadDataSize. Minimum is: 2\n" +
+                        "String-length was: ${data.length}")
             }
-            applicationProperty.logControl("E: Invalid simple-state transmission size. Data-size was: $dataSize. Minimum is: 10")
+            applicationProperty.logControl("E: Invalid simple-state payLoadData-size. Data-size was: $payLoadDataSize. Minimum is: 2 / String-length was: ${data.length}")
         } else {
             var uiChangeIndex = -1// the index for the callback, the callback needs the UI-Adapter-Index
 
@@ -917,14 +915,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun readGroupString(data: String, dataSize: Int) : Boolean {
-
         // check if the length of the transmission is valid
-        if(dataSize < 12){
+        if((dataSize < 5)||(data.length < 13)){
             // invalid data size
             if(verboseLog){
-                Log.e("readGroupString", "Invalid data size. Data-size was: $dataSize - minimum is 12!")
+                Log.e("readGroupString", "Invalid payLoadData size. Data-size was: $dataSize - minimum is 5!\n" +
+                        "String-length was ${data.length}")
             }
-            applicationProperty.logControl("E: Invalid data size. Data-size was: $dataSize - minimum is 12!")
+            applicationProperty.logControl("E: Invalid payLoadData size. Data-size was: $dataSize - minimum is 5! String-length was ${data.length}")
             return false
         } else {
             // decode group string to class
@@ -933,14 +931,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // add group and request next group if the loop is active
             if(this.groupLoopActive){
-                this.laRoomyPropertyGroupList.add(laRoomyDevicePropertyGroup)
-                this.sendNextGroupRequest(laRoomyDevicePropertyGroup.groupIndex)
+                // check transmission sub-type (only response is valid)
+                if(data[1] == '2') {
+                    this.laRoomyPropertyGroupList.add(laRoomyDevicePropertyGroup)
+                    this.sendNextGroupRequest(laRoomyDevicePropertyGroup.groupIndex)
+                } else {
+                    // wrong transmission sub-type (response was expected)
+                    if(verboseLog){
+                        Log.e("readGroupString", "Invalid transmission sub-type. Type was: ${data[1]} | 2 was expected (response)")
+                    }
+                    applicationProperty.logControl("W: Invalid transmission sub-type on group transmission. Type was: ${data[1]} | 2 was expected (response)")
+                }
             } else {
 
                 // TODO: this could be a update, insert or remove transmission. So update, insert or remove data and launch event respectively
 
                     when(data[1]) {
-                        '4' -> {
+                        '4' -> {    // update
                             if (verboseLog) {
                                 Log.d(
                                     "readGroupString",
@@ -957,7 +964,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             // update UI
                             this.updateGroupElementInUIList(laRoomyDevicePropertyGroup)
                         }
-                        '5' -> {
+                        '5' -> {    // insert
                             if (verboseLog) {
                                 Log.d(
                                     "readGroupString",
@@ -965,8 +972,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 )
                             }
                             applicationProperty.logControl("I: Group-Transmission received. Loop not active. INSERT element with index: ${laRoomyDevicePropertyGroup.groupIndex}")
-
-
+                        }
+                        else -> {
+                            // invalid transmission sub-type (at this point)
+                            if(verboseLog){
+                                Log.e("readGroupString", "Invalid transmission sub-type on group transmission. Type was: ${data[1]}")
+                            }
+                            applicationProperty.logControl("W: Invalid transmission sub-type on group transmission. Type was: ${data[1]}")
                         }
                     }
             }
@@ -976,13 +988,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun readPropertyString(data: String, dataSize: Int) : Boolean {
 
-        // check if the length of the transmission is valid
-        if(dataSize < 10){
+        // validate the string length and payLoadDataSize
+        if((dataSize < 10)||(data.length < 18)){
             //invalid data size
             if(verboseLog){
-                Log.e("readPropertyString", "Invalid data size. Data-Size was: $dataSize > minimum is 18!")
+                Log.e("readPropertyString", "Invalid data size. PayLoadData-Size was: $dataSize > minimum is 10!\n" +
+                        "String-length was ${data.length} > minimum is 18")
             }
-            applicationProperty.logControl("E: Invalid data size of property transmission. Data-Size was: $dataSize > minimum is 18!")
+            applicationProperty.logControl("E: Invalid payLoadData size of property transmission. Data-Size was: $dataSize > minimum is 10! String-length was ${data.length}")
             return false
         } else {
             // decode property string to class
@@ -993,6 +1006,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // add property and request next property if the loop is active
             if(this.propertyLoopActive){
+                // check transmission sub-type (only response is valid)
                 if(data[1] == '2') {
     
                     // TODO: question: when the property-index member of the decoded object does not equal the index which must be follow in the collection, is this an error?
@@ -1004,7 +1018,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if(verboseLog){
                         Log.e("readPropertyString", "Invalid transmission sub-type. Type was: ${data[1]} | 2 was expected (response)")
                     }
-                    applicationProperty.logControl("W: Invalid transmission sub-type. Type was: ${data[1]} | 2 was expected (response)")
+                    applicationProperty.logControl("W: Invalid transmission sub-type on property-transmission. Type was: ${data[1]} | 2 was expected (response)")
                 }
             } else {
 
@@ -1012,7 +1026,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // TODO: this could be an update or insert transmission. So update or insert data and launch event respectively
 
                 when(data[1]) {
-                    '4' -> {
+                    '4' -> {    // update
                         if (verboseLog) {
                             Log.d(
                                 "readPropertyString",
@@ -1030,7 +1044,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             this.updatePropertyElementInUIList(laRoomyDeviceProperty)
                         }
                     }
-                    '5' -> {
+                    '5' -> {    // insert
                         if (verboseLog) {
                             Log.d(
                                 "readPropertyString",
@@ -1047,7 +1061,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         if(verboseLog){
                             Log.e("readPropertyString", "Invalid transmission sub-type. Type was: ${data[1]}")
                         }
-                        applicationProperty.logControl("W: Invalid transmission sub-type. Type was: ${data[1]}")
+                        applicationProperty.logControl("W: Invalid transmission sub-type on property transmission. Type was: ${data[1]}")
                     }
                 }
             }
@@ -1055,7 +1069,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun readInitTransmission(data: String, dataSize: Int) : Boolean {
+    private fun readInitTransmission(data: String, payLoadDataSize: Int) : Boolean {
         // only accept init transmissions when loops not in progress
         if(this.propertyLoopActive || this.groupLoopActive || this.complexStateLoopActive || this.simpleStateLoopActive){
             // if this is a reload process, there is a possibility that a init request response was missed by
@@ -1065,13 +1079,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return false
         }
 
-        // check if the length of the transmission is valid
-        if(dataSize < 13){
+        // check if the length of the transmission is valid (the payload size for the init response is 7 bytes)
+        if((payLoadDataSize < 7)||(data.length < 13)){
             //invalid data size
             if(verboseLog){
-                Log.e("readInitTransmission", "Invalid data size. Data-Size was: $dataSize > minimum is 13!")
+                Log.e("readInitTransmission", "Invalid payLoadData size. Data-Size was: $payLoadDataSize > minimum is 7!\n" +
+                        "String-length was: ${data.length}")
             }
-            applicationProperty.logControl("E: Invalid data size of init-transmission. Data-Size was: $dataSize > minimum is 13!")
+            applicationProperty.logControl("E: Invalid payLoadData size of init-transmission. Data-Size was: $payLoadDataSize > minimum is 7! String-length was: ${data.length}")
             return false
         } else {
             // save device data:
@@ -1153,13 +1168,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         return true
     }
 
-    private fun readBindingResponse(data: String, dataSize: Int) : Boolean {
+    private fun readBindingResponse(data: String, payLoadDataSize: Int) : Boolean {
 
-        if(dataSize < 10){
+        if((payLoadDataSize < 1)||(data.length < 9)){
             if(verboseLog){
-                Log.e("BindingResponse", "Invalid data size. Data size was $dataSize - Required: 9")
+                Log.e("BindingResponse", "Invalid data size of binding response. PayLoadData size was $payLoadDataSize - min is 1")
             }
-            applicationProperty.logControl("Invalid data size. Data size was $dataSize - Required: 9")
+            applicationProperty.logControl("W: Invalid payLoadData size of binding transmission. Data size was $payLoadDataSize - min is 1")
             return false
         } else {
             when {
@@ -1290,10 +1305,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
 
-    private fun readFastDataSetterTransmission(data: String, dataSize: Int) : Boolean {
-        return if(dataSize < 8){
+    private fun readFastDataSetterTransmission(data: String, payLoadDataSize: Int) : Boolean {
+        return if((payLoadDataSize < 1)||(data.length < 9)){
             if(verboseLog){
-                Log.e("readFastDataSetter", "DataSize too short. DataSize was $dataSize. Minimum is 8!")
+                Log.e("readFastDataSetter", "DataSize too short. DataSize was $payLoadDataSize. String-length was: ${data.length}")
             }
             false
         } else {

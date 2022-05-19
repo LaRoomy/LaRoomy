@@ -120,6 +120,9 @@ class ApplicationProperty : Application() {
 
     fun logControl(message: String){
         if(eventLogEnabled){
+            if(this.connectionLog.size > 300){
+                this.connectionLog.removeAt(0)
+            }
             this.connectionLog.add(message)
         }
     }
