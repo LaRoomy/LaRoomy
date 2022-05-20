@@ -203,9 +203,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         gatt?.writeDescriptor(descriptor)
 
                         // notify the remote device
-                        Handler(Looper.getMainLooper()).postDelayed({
+    
+                        Executors.newSingleThreadScheduledExecutor().schedule({
                             sendData(deviceReconnectedNotification)
-                        }, 500)
+                        }, 800, TimeUnit.MILLISECONDS)
+                        
+                        
+//                        Handler(Looper.getMainLooper()).postDelayed({
+//                            sendData(deviceReconnectedNotification)
+//                        }, 500)
                     }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
