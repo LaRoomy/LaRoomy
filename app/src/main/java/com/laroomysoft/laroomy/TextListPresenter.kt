@@ -248,7 +248,16 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
             }
         }
     }
-
+    
+    override fun onConnectionEvent(eventID: Int) {
+        if (eventID == BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED) {
+            notifyUser(
+                NOTIFICATION_TYPE_WARNING,
+                getString(R.string.GeneralMessage_resumingConnection)
+            )
+        }
+    }
+    
     override fun onConnectionError(errorID: Int) {
         super.onConnectionError(errorID)
         // if there is a connection failure -> navigate back

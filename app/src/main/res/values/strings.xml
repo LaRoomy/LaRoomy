@@ -95,6 +95,7 @@
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
+    <string name="GeneralMessage_resumingConnection">Resuming connection - please wait</string>
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Cancel</string>

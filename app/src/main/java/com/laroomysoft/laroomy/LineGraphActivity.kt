@@ -245,7 +245,16 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
             }
         }
     }
-
+    
+    override fun onConnectionEvent(eventID: Int) {
+        if (eventID == BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED) {
+            notifyUser(
+                getString(R.string.GeneralMessage_resumingConnection),
+                R.color.connectingTextColor
+            )
+        }
+    }
+    
     override fun onConnectionError(errorID: Int) {
         super.onConnectionError(errorID)
         // if there is a connection failure -> navigate back

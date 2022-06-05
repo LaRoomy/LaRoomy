@@ -1145,6 +1145,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             }
         }
     }
+    
+    override fun onConnectionEvent(eventID: Int) {
+        when(eventID){
+            BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED -> {
+                this.setUIConnectionStatus(STATUS_CONNECTING)
+            }
+            else -> {
+                Log.d("DeviceMainActivity", "Invalid Connection Event!")
+            }
+        }
+    }
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)

@@ -30,6 +30,8 @@ const val BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING = 5
 const val BLE_INIT_NO_PROPERTIES = 6
 const val BLE_BLUETOOTH_PERMISSION_MISSING = 7
 
+const val BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED = 101
+
 class BLEConnectionManager(private val applicationProperty: ApplicationProperty) {
 
     private val clientCharacteristicConfig = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
@@ -2172,6 +2174,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             applicationProperty.logControl("I: Connection was suspended: trying to resume connection")
 
             try {
+                // trigger event
+                this.callback.onConnectionEvent(BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED)
+    
+                // start connection process
                 this.bluetoothGatt?.connect()
 
                 // set up a handler to check if the connection works
@@ -3387,6 +3393,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onConnectionStateChanged(state: Boolean){}
         fun onDataReceived(data: String?){}
         fun onConnectionError(errorID: Int){}
+        fun onConnectionEvent(eventID: Int){}
         fun onInitializationSuccessful(){}
         fun onBindingPasskeyRejected(){}
         fun onDeviceReadyForCommunication(){}

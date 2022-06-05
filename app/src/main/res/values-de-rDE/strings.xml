@@ -105,6 +105,7 @@
 
     <string name="GeneralMessage_reconnected">Verbindung wiederhergestellt</string>
     <string name="GeneralMessage_connectionSuspended">Verbindung unterbrochen</string>
+    <string name="GeneralMessage_resumingConnection">Verbindung wird wiederhergestellt..</string>
     <string name="GeneralMessage_connectingFailed">Verbindung fehlgeschlagen:</string>
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Abbrechen</string>
