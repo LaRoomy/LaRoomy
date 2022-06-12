@@ -143,6 +143,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
                 (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(pos)//viewHolder.position)
                 (applicationContext as ApplicationProperty).addedDevices.removeAt(pos)//viewHolder.position)
+                
+                // TODO: UPDATE THE POSITIONS, WHEN THE REMOVED ELEMENT WAS NOT THE LAST IN THE LIST, ALL SUCCESSIVE ELEMENTS HAVE AN INVALID POSITION VALUE!!!!!!!!!!!!
+                
+                // TODO: PROBLEM SOLVED BY USING BINDING ADAPTER POSITION IN RECYCLER VIEW ADAPTER -> BUT MUST BE TESTED!
 
                 if((applicationContext as ApplicationProperty).addedDevices.devices.isEmpty()){
                     availableDevicesRecyclerView.visibility = View.GONE
@@ -320,6 +324,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
+        if(verboseLog){
+            Log.d("MainActivity", "List Element Clicked at index: $index with name: ${data.name} and address: ${data.address}")
+        }
         if(!preventListSelection) {
             setItemColors(
                 index,
@@ -464,11 +471,19 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         class DSLRViewHolder(val constraintLayout: ConstraintLayout) :
             RecyclerView.ViewHolder(constraintLayout){
 
-            fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener, position: Int){
+//            fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener, position: Int){
+//                itemView.setOnClickListener{
+//                    deviceListItemClick.onItemClicked(position, data)
+//                }
+//            }
+    
+            fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener){
                 itemView.setOnClickListener{
-                    deviceListItemClick.onItemClicked(position, data)
+                    deviceListItemClick.onItemClicked(bindingAdapterPosition, data)
                 }
             }
+    
+    
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DSLRViewHolder {
@@ -486,7 +501,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             // set the appropriate image for the device type
             holder.constraintLayout.findViewById<ImageView>(R.id.myDevicesListElementImageView).setImageResource(laRoomyDevListAdapter[position].image)
 
-            holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener, position)
+            //holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener, position)
+    
+            holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener)
         }
 
         override fun getItemCount(): Int {
