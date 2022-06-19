@@ -64,6 +64,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
     private var scrollToTop = false
+    
+    private val slideUpdateData = SimpleUpdateStorage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -669,12 +671,35 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).progress = newValue
             }
 
-            ApplicationProperty.bluetoothConnectionManager.sendData(
-                makeSimplePropertyExecutionString(
-                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
-                    bitValue
-                )
-            )
+            // old: no delay of successive transmissions
+//                ApplicationProperty.bluetoothConnectionManager.sendData(
+//                    makeSimplePropertyExecutionString(
+//                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
+//                        bitValue
+//                    )
+//                )
+
+            if(!this.slideUpdateData.isHandled){
+                // only save the value, because there is a transmission pending
+                this.slideUpdateData.value = bitValue
+            } else {
+                // if there is no transmission pending, send the data delayed
+                this.slideUpdateData.value = bitValue
+                this.slideUpdateData.isHandled = false
+                this.slideUpdateData.eIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex
+                
+                Executors.newSingleThreadScheduledExecutor().schedule(
+                    {
+                        ApplicationProperty.bluetoothConnectionManager.sendData(
+                            makeSimplePropertyExecutionString(
+                                slideUpdateData.eIndex,
+                                slideUpdateData.value
+                            )
+                        )
+                        slideUpdateData.isHandled = true
+                        
+                    }, 150, TimeUnit.MILLISECONDS)
+            }
         }
     }
 

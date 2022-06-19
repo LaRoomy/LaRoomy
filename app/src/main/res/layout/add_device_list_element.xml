@@ -18,16 +18,18 @@
         />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/addDeviceListElementDeviceNameTextView"
         android:text="@string/UniversalPlaceholderName"
         android:textSize="18sp"
         android:layout_marginStart="10dp"
         android:textColor="@color/fullWhiteTextColor"
+        android:textAlignment="viewStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/addDeviceListElementImageView"
+        app:layout_constraintEnd_toStartOf="@id/addDeviceListElementAddButton"
         />
 
     <androidx.appcompat.widget.AppCompatImageButton

@@ -25,6 +25,9 @@ class BLEDiscoveryManager(private val appContext: Context, private val discovery
 
     private val bluetoothLEScanner = this.bleAdapter.bluetoothLeScanner
     private var scanning = false
+    
+    val isScanning
+    get() = scanning
 
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {

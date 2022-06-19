@@ -89,12 +89,13 @@ class AddDeviceActivity : AppCompatActivity(),
     private lateinit var scanResultListAdapter: RecyclerView.Adapter<*>
 
     private lateinit var scanWorkingIndicator: SpinKitView
+    private lateinit var reloadButton: AppCompatImageButton
 
     private lateinit var bleDiscoveryManager: BLEDiscoveryManager
 
-    var bluetoothPermissionGranted = false
-    var bluetoothLocationPermissionGranted = false
-    var grantPermissionRequestDeclined = false
+    private var bluetoothPermissionGranted = false
+    private var bluetoothLocationPermissionGranted = false
+    private var grantPermissionRequestDeclined = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,6 +113,14 @@ class AddDeviceActivity : AppCompatActivity(),
 
         // get the spin-kit
         this.scanWorkingIndicator = findViewById(R.id.addDeviceActivityScanIndicationSpinKitView)
+        
+        // get the reload-button and add onClick handler
+        this.reloadButton = findViewById(R.id.addDeviceActivityRescanButton)
+        this.reloadButton.apply {
+            setOnClickListener {
+                rescan()
+            }
+        }
 
         // init the discovery manager
         this.bleDiscoveryManager = BLEDiscoveryManager(applicationContext, this)
@@ -219,20 +228,32 @@ class AddDeviceActivity : AppCompatActivity(),
                 }
             }
         }
-
-
-//        if(this.imageRestoreRequired){
-//            findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_white_48dp)
-//            findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.fullWhiteTextColor))
-//
-//            //findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_white_48dp)
-//        }
     }
 
     override fun onPause() {
         super.onPause()
         this.listUpdateRequired = true
         this.bleDiscoveryManager.stopScan()
+    }
+    
+    private fun rescan(){
+        if(!this.bleDiscoveryManager.isScanning) {
+            //  refresh the bondedList + clear the scanResultList
+            this.bondedDevicesListView.adapter = AddDevicesListAdapter(
+                this.bondedDevices,
+                this,
+                LIST_TYPE_BONDED_LIST,
+                applicationContext
+            )
+            // delete all scan results
+            this.scanResultListElements.clear()
+            // start scan
+            this.bleDiscoveryManager.startScan()
+        } else {
+            if(verboseLog){
+                Log.d("AddDeviceActivity", "UNEXPECTED! Rescan not possible, because the discovery manager reported: already started!")
+            }
+        }
     }
 
     class AddDevicesListAdapter(
@@ -303,14 +324,22 @@ class AddDeviceActivity : AppCompatActivity(),
 
     override fun onScanStarted() {
         this.scanWorkingIndicator.visibility = View.VISIBLE
+        this.reloadButton.visibility = View.GONE
     }
 
     override fun onScanStopped() {
-        this.scanWorkingIndicator.visibility = View.INVISIBLE
+        runOnUiThread {
+            this.scanWorkingIndicator.visibility = View.INVISIBLE
+            this.reloadButton.visibility = View.VISIBLE
+        }
     }
 
     override fun onScanFail(errorCode: Int) {
         super.onScanFail(errorCode)
+        runOnUiThread {
+            this.scanWorkingIndicator.visibility = View.INVISIBLE
+            this.reloadButton.visibility = View.VISIBLE
+        }
     }
 
     override fun onDeviceFound(device: BluetoothDevice) {

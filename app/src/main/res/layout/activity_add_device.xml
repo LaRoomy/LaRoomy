@@ -104,6 +104,20 @@
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addDeviceActivityRescanButton"
+                android:src="@drawable/reload_properties_white_48dp"
+                android:background="@color/transparentColor"
+                android:contentDescription="@string/GeneralReloadButtonContentDescription"
+                android:layout_margin="2dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView

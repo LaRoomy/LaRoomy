@@ -2171,3 +2171,9 @@ class DualDescriptor {
     var actionText = ""
     var isDual = false
 }
+
+class SimpleUpdateStorage {
+    var value = 0
+    var isHandled = true
+    var eIndex = -1
+}
