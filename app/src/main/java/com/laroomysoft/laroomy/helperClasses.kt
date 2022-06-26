@@ -6,6 +6,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 
 
@@ -65,4 +66,22 @@ class DeviceMainPropertyRecyclerView : RecyclerView {
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle)
 
     override fun scrollTo(x: Int, y: Int) {}
+}
+
+class DevicePropertyListItemAnimator : DefaultItemAnimator() {
+    
+    override fun animateChange(
+        oldHolder: RecyclerView.ViewHolder,
+        newHolder: RecyclerView.ViewHolder,
+        preInfo: ItemHolderInfo,
+        postInfo: ItemHolderInfo
+    ): Boolean {
+        if(oldHolder == newHolder){
+            dispatchChangeFinished(oldHolder, true)
+        } else {
+            dispatchChangeFinished(oldHolder, true)
+            dispatchChangeFinished(newHolder, false)
+        }
+        return false
+    }
 }

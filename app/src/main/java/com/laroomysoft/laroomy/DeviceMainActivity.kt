@@ -130,7 +130,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     //setHasFixedSize(true)
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
-                    //itemAnimator = null
+                    itemAnimator = DevicePropertyListItemAnimator()
                 }
     }
 
