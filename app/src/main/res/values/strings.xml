@@ -29,6 +29,7 @@
     <string name="CA_ErrorDeviceAddressAccessException">Critical error. Index out of bounds.</string>
     <string name="CA_InitTimeoutOccurred">Timeout: Remote device not responding</string>
     <string name="CA_TransmissionTimeoutOccurred">Transmission timeout: Remote device not responding</string>
+    <string name="CA_FirstTimeoutSecondTryout">Cannot connect to device. Trying again..</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">disconnected - trying to reconnect</string>

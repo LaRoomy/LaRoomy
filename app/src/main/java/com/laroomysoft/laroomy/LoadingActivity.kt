@@ -243,9 +243,26 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                             if (!timeOutHandlerStarted) {
                                 // make sure this will only be executed once:
                                 timeOutHandlerStarted = true
-                                Handler(Looper.getMainLooper()).postDelayed({
+                                
+                                // log:
+                                if(verboseLog) {
+                                    Log.d(
+                                        "LoadingActivity",
+                                        "Unexpected disconnected-event. Device may be not reachable. Trying again.."
+                                    )
+                                }
+                                (applicationContext as ApplicationProperty).logControl("W: Unexpected disconnected-event. Device may be not reachable. Trying again..")
+                                
+                                // notify user:
+                                setMessageText(
+                                    R.color.WarningColor,
+                                    getString(R.string.CA_FirstTimeoutSecondTryout)
+                                )
+                                
+                                // schedule to set the timeout flag
+                                Executors.newSingleThreadScheduledExecutor().schedule({
                                     timeOut = true
-                                }, 5000) // timeout 5 seconds!
+                                }, 5000, TimeUnit.MILLISECONDS)// set after 5 seconds!
                             }
                         } else {
                             // must be a timeout, the system says disconnected, but the device was not previously connected

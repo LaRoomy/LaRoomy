@@ -614,7 +614,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 Log.e("readDevNotification", "Invalid transmission length. PayLoadData-size was: $payLoadDataSize > minimum is 2!\n" +
                         "String-length was ${data.length}")
             }
-            applicationProperty.logControl("E: Invalid transmission length of device-notification transmission. Transmission-length was: $payLoadDataSize > minimum transmission-length is 2! String-lenth was ${data.length}")
+            applicationProperty.logControl("E: Invalid transmission length of device-notification transmission. Transmission-length was: $payLoadDataSize > minimum transmission-length is 2! String-length was ${data.length}")
             return false
         } else {
             // get ID
@@ -834,7 +834,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                 } else {
                     if(verboseLog){
-                        Log.w("readSimpleStateData", "Simple property state loop is active, but the received index is not the requested one.")
+                        Log.w("readSimpleStateData", "Inconsistent data: Simple property state loop is active, but the received index is not the requested one.")
                     }
                 }
             }
@@ -2536,6 +2536,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.sendPropertyStateRequest(
                 this.simpleStatePropertyIndexes.elementAt(currentSimpleStateRetrievingIndex)
             )
+        } else {
+            // there are no properties with simple-state, so start the complex loop here
+            this.startComplexStateDataLoop()
         }
     }
 
