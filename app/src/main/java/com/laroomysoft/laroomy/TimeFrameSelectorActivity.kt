@@ -20,6 +20,11 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    
+    private var nextTimeChangeApplicable = true
+    private var timeUpdateNecessary = false
+    
+    private var updateDelayStarted = false
 
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
@@ -171,7 +176,15 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
                         "New Time is: $hourOfDay : $minute"
             )
         }
-        collectDataSendCommandAndUpdateState()
+        
+        // update with a little delay to avoid too much transmissions
+        if(!updateDelayStarted){
+            updateDelayStarted = true
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                updateDelayStarted = false
+                collectDataSendCommandAndUpdateState()
+            }, 800, TimeUnit.MILLISECONDS)
+        }
     }
 
     private fun collectDataSendCommandAndUpdateState(){
