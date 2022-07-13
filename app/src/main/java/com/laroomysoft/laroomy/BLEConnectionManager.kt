@@ -1301,6 +1301,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                     return true
                 }
+                (data[8] == '3') -> {
+                    // the param is unused -> must be a general not-implemented response
+                    if (verboseLog) {
+                        Log.d("BindingResponse", "Binding Response: FAILED. Binding not supported!")
+                    }
+                    applicationProperty.logControl("W: Binding-Failed response from the device. -Binding not supported")
+    
+                    this.propertyCallback.onBindingResponse(
+                        BINDING_RESPONSE_BINDING_NOT_SUPPORTED
+                    )
+                    return true
+                }
                 else -> {
                     // invalid data
                     if(verboseLog){

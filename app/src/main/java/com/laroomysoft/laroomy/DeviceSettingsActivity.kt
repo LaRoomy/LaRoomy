@@ -252,7 +252,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             } else {
                 notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
             }
-        }, 4000)
+        }, 8000)
     }
 
     private fun setUIElementsEnabledState(state: Boolean){
@@ -406,77 +406,80 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     override fun onBindingResponse(responseID: Int) {
         super.onBindingResponse(responseID)
-        // response received, reset timeout param
-        this.pendingBindingTransmission = DB_NONE
-
-        // look for a rejected/error/success setting notification
-        when (responseID) {
-            BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {
-                // update the hint for the user
-                bindingHintTextView.text =
-                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
-
-                // hide the share-button
-                shareBindingContainer.visibility = View.GONE
-
-                // reset the switch
-                bindingSwitch.isChecked = false
-
-                // notify user
-                notifyUserWithDelayedReset(
-                    getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification),
-                    R.color.WarningColor
-                )
-            }
-            BINDING_RESPONSE_BINDING_SUCCESS -> {
-                //notify user
-                notifyUserWithDelayedReset(
-                    getString(R.string.DeviceSettingsActivity_BindingSuccessNotification),
-                    R.color.successLightColor
-                )
-            }
-            BINDING_RESPONSE_BINDING_ERROR -> {
-                // update the hint for the user
-                bindingHintTextView.text =
-                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
-                // reset the switch
-                bindingSwitch.isChecked = false
-                //notify user
-                notifyUserWithDelayedReset(
-                    getString(R.string.DeviceSettingsActivity_BindingErrorNotification),
-                    R.color.errorLightColor
-                )
-            }
-            BINDING_RESPONSE_RELEASE_BINDING_SUCCESS -> {
-                // notify user
-                notifyUserWithDelayedReset(
-                    getString(R.string.DeviceSettingsActivity_ReleaseBindingSuccessText),
-                    R.color.successLightColor
-                )
-            }
-            BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
-                // update the hint for the user
-                bindingHintTextView.text =
-                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
-                // reset the switch
-                bindingSwitch.isChecked = true
-                // notify user
-                notifyUserWithDelayedReset(
-                    getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText),
-                    R.color.errorLightColor
-                )
-            }
-            BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR -> {
-                // update the hint for the user
-                bindingHintTextView.text =
-                    getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
-                // reset the switch
-                bindingSwitch.isChecked = true
-                // notify user
-                notifyUserWithDelayedReset(
-                    getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText),
-                    R.color.errorLightColor
-                )
+        
+        runOnUiThread {
+            // response received, reset timeout param
+            this.pendingBindingTransmission = DB_NONE
+    
+            // look for a rejected/error/success setting notification
+            when (responseID) {
+                BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {
+                    // update the hint for the user
+                    bindingHintTextView.text =
+                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+            
+                    // hide the share-button
+                    shareBindingContainer.visibility = View.GONE
+            
+                    // reset the switch
+                    bindingSwitch.isChecked = false
+            
+                    // notify user
+                    notifyUserWithDelayedReset(
+                        getString(R.string.DeviceSettingsActivity_BindingNotSupportedNotification),
+                        R.color.WarningColor
+                    )
+                }
+                BINDING_RESPONSE_BINDING_SUCCESS -> {
+                    //notify user
+                    notifyUserWithDelayedReset(
+                        getString(R.string.DeviceSettingsActivity_BindingSuccessNotification),
+                        R.color.successLightColor
+                    )
+                }
+                BINDING_RESPONSE_BINDING_ERROR -> {
+                    // update the hint for the user
+                    bindingHintTextView.text =
+                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                    // reset the switch
+                    bindingSwitch.isChecked = false
+                    //notify user
+                    notifyUserWithDelayedReset(
+                        getString(R.string.DeviceSettingsActivity_BindingErrorNotification),
+                        R.color.errorLightColor
+                    )
+                }
+                BINDING_RESPONSE_RELEASE_BINDING_SUCCESS -> {
+                    // notify user
+                    notifyUserWithDelayedReset(
+                        getString(R.string.DeviceSettingsActivity_ReleaseBindingSuccessText),
+                        R.color.successLightColor
+                    )
+                }
+                BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
+                    // update the hint for the user
+                    bindingHintTextView.text =
+                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
+                    // reset the switch
+                    bindingSwitch.isChecked = true
+                    // notify user
+                    notifyUserWithDelayedReset(
+                        getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText),
+                        R.color.errorLightColor
+                    )
+                }
+                BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR -> {
+                    // update the hint for the user
+                    bindingHintTextView.text =
+                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
+                    // reset the switch
+                    bindingSwitch.isChecked = true
+                    // notify user
+                    notifyUserWithDelayedReset(
+                        getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText),
+                        R.color.errorLightColor
+                    )
+                }
             }
         }
     }
