@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.content.Context
+import android.util.Log
 import java.io.File
 import java.io.FileNotFoundException
 import java.lang.Exception
@@ -19,20 +20,24 @@ const val UUID_File_UserProfiles = "uuidUserProfiles"
 
 class UUIDProfile{
     var profileName = ""
+    var useSingleCharacteristic = false
     var serviceUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
-    var characteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
+    var rxCharacteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
+    var txCharacteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
 }
 
 class UUIDManager(private var appContext: Context) {
 
     private val rn4870TransparentUartServiceUUID: UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455")
-    private val rn4870CharacteristicUUID1: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
+    private val rxRN4870CharacteristicUUID: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
+    private val txRN4870CharacteristicUUID: UUID = UUID.fromString("49535343-8841-43f4-a8d4-EcbE34729bb3")
 
     private val hmModulesServiceUUID: UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB")
     private val hmModulesCharacteristicUUID: UUID = UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB")
 
     private val commonAppAccessServiceUUID: UUID = UUID.fromString("b47f725f-5fca-45b9-998f-f828388d044f")
-    private val commonAppAccessCharacteristicUUID: UUID = UUID.fromString("124c0402-da98-4d2b-8492-e712f8036997")
+    private val rxCommonAppAccessCharacteristicUUID: UUID = UUID.fromString("124c0402-da98-4d2b-8492-e712f8036997")
+    private val txCommonAppAccessCharacteristicUUID: UUID = UUID.fromString("124c0402-da99-4d2b-8492-e712f8036997")
 
     //val rn4870_service_one = "00001800-0000-1000-8000-00805f9b34fb"
     //val rn4870_service_two = "00001801-0000-1000-8000-00805f9b34fb"
@@ -49,15 +54,20 @@ class UUIDManager(private var appContext: Context) {
         val hmXXProfile = UUIDProfile()
         hmXXProfile.profileName = "HMxx - Modules"
         hmXXProfile.serviceUUID = hmModulesServiceUUID
-        hmXXProfile.characteristicUUID = hmModulesCharacteristicUUID
+        hmXXProfile.useSingleCharacteristic = true
+        hmXXProfile.rxCharacteristicUUID = hmModulesCharacteristicUUID
+        
         val rn48xxProfile = UUIDProfile()
         rn48xxProfile.profileName = "RN48xx Modules (Microchip)"
         rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
-        rn48xxProfile.characteristicUUID = rn4870CharacteristicUUID1
+        rn48xxProfile.rxCharacteristicUUID = rxRN4870CharacteristicUUID
+        rn48xxProfile.txCharacteristicUUID = txRN4870CharacteristicUUID
+        
         val commonAccessProfile = UUIDProfile()
         commonAccessProfile.profileName = "Common Access Profile"
         commonAccessProfile.serviceUUID = commonAppAccessServiceUUID
-        commonAccessProfile.characteristicUUID = commonAppAccessCharacteristicUUID
+        commonAccessProfile.rxCharacteristicUUID = rxCommonAppAccessCharacteristicUUID
+        commonAccessProfile.txCharacteristicUUID = txCommonAppAccessCharacteristicUUID
 
         this.add(commonAccessProfile)
         this.add(rn48xxProfile)
@@ -90,18 +100,24 @@ class UUIDManager(private var appContext: Context) {
 
             // re-add the common profiles
             this.uUIDProfileList.apply {
+                
                 val hmXXProfile = UUIDProfile()
-                hmXXProfile.profileName = "Huamao HMxx - Modules"
+                hmXXProfile.profileName = "HMxx - Modules"
                 hmXXProfile.serviceUUID = hmModulesServiceUUID
-                hmXXProfile.characteristicUUID = hmModulesCharacteristicUUID
+                hmXXProfile.useSingleCharacteristic = true
+                hmXXProfile.rxCharacteristicUUID = hmModulesCharacteristicUUID
+                
                 val rn48xxProfile = UUIDProfile()
-                rn48xxProfile.profileName = "Microchip RN48xx Modules"
+                rn48xxProfile.profileName = "RN48xx Modules (Microchip)"
                 rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
-                rn48xxProfile.characteristicUUID = rn4870CharacteristicUUID1
+                rn48xxProfile.rxCharacteristicUUID = rxRN4870CharacteristicUUID
+                rn48xxProfile.txCharacteristicUUID = txRN4870CharacteristicUUID
+                
                 val commonAccessProfile = UUIDProfile()
                 commonAccessProfile.profileName = "Common Access Profile"
                 commonAccessProfile.serviceUUID = commonAppAccessServiceUUID
-                commonAccessProfile.characteristicUUID = commonAppAccessCharacteristicUUID
+                commonAccessProfile.rxCharacteristicUUID = rxCommonAppAccessCharacteristicUUID
+                commonAccessProfile.txCharacteristicUUID = txCommonAppAccessCharacteristicUUID
 
                 this.add(commonAccessProfile)
                 this.add(rn48xxProfile)
@@ -114,16 +130,20 @@ class UUIDManager(private var appContext: Context) {
         }
     }
 
-    fun changeExistingProfile(index: Int, profileName: String, serviceUUID: String, characteristicUUID: String) : Int {
+    fun changeExistingProfile(index: Int, profile: UUIDProfile) : Int {
 
         return if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
             INVALID_INDEX
         } else {
-            if((checkUUIDFormat(serviceUUID) && checkUUIDFormat(characteristicUUID))){
+            if(checkUUIDFormat(profile.serviceUUID.toString())
+                && checkUUIDFormat(profile.rxCharacteristicUUID.toString())
+                && checkUUIDFormat(profile.txCharacteristicUUID.toString())){
 
-                this.uUIDProfileList[index].profileName = profileName
-                this.uUIDProfileList[index].serviceUUID = UUID.fromString(serviceUUID)
-                this.uUIDProfileList[index].characteristicUUID = UUID.fromString(characteristicUUID)
+                this.uUIDProfileList[index].profileName = profile.profileName
+                this.uUIDProfileList[index].useSingleCharacteristic = profile.useSingleCharacteristic
+                this.uUIDProfileList[index].serviceUUID = profile.serviceUUID
+                this.uUIDProfileList[index].rxCharacteristicUUID = profile.rxCharacteristicUUID
+                this.uUIDProfileList[index].txCharacteristicUUID = profile.txCharacteristicUUID
 
                 this.saveUserProfiles()
                 CHANGE_SUCCESS
@@ -154,32 +174,27 @@ class UUIDManager(private var appContext: Context) {
         }
     }
 
-    fun addNewProfile(profileName: String, serviceUUID: String, characteristicUUID: String) : Int {
+    fun addNewProfile(profile: UUIDProfile) : Int {
         try {
             // first check if the name already exists
             for (uuidProfile in this.uUIDProfileList) {
-                if (uuidProfile.profileName == profileName) {
+                if (uuidProfile.profileName == profile.profileName) {
                     return PROFILE_NAME_ALREADY_EXIST
                 }
             }
             // then check the uuid-format
-            if (!checkUUIDFormat(serviceUUID) || !checkUUIDFormat(characteristicUUID)) {
+            if (!checkUUIDFormat(profile.serviceUUID.toString())
+                || !checkUUIDFormat(profile.rxCharacteristicUUID.toString())
+                || !checkUUIDFormat(profile.txCharacteristicUUID.toString())) {
                 return UUID_FORMAT_INVALID
             }
 
 
             //TODO: format the hyphen!!!
 
-
-
-
-
+            
             // everything is ok, so add the profile
-            val p = UUIDProfile()
-            p.profileName = profileName
-            p.serviceUUID = UUID.fromString(serviceUUID)
-            p.characteristicUUID = UUID.fromString(characteristicUUID)
-            this.uUIDProfileList.add(p)
+            this.uUIDProfileList.add(profile)
             // write the new profile-list to file
             this.saveUserProfiles()
 
@@ -272,7 +287,7 @@ class UUIDManager(private var appContext: Context) {
         var profileBuffer = ""
 
         for (profile in profiles) {
-            profileBuffer += "N[${profile.profileName}\nS[${profile.serviceUUID}\nC[${profile.characteristicUUID}\n"
+            profileBuffer += "N[${profile.profileName}\nS[${profile.serviceUUID}\nC[${profile.rxCharacteristicUUID}\nD[${profile.txCharacteristicUUID}\nU[${profile.useSingleCharacteristic}\n"
         }
         return profileBuffer
     }
@@ -282,6 +297,7 @@ class UUIDManager(private var appContext: Context) {
         val profileList = ArrayList<UUIDProfile>()
         var nameRead = false
         var serviceUUIDRead = false
+        var useSingleCharValueRead = false
         var characteristicUUIDRead = false
 
         val profile = UUIDProfile()
@@ -317,23 +333,47 @@ class UUIDManager(private var appContext: Context) {
                                 line += c
                             }
                         }
-                        profile.characteristicUUID = UUID.fromString(line)
+                        profile.rxCharacteristicUUID = UUID.fromString(line)
                         characteristicUUIDRead = true
 
+                    }
+                    'D' -> {
+                        it.forEachIndexed { index, c ->
+                            if (index > 1) {
+                                line += c
+                            }
+                        }
+                        profile.txCharacteristicUUID = UUID.fromString(line)
+                        characteristicUUIDRead = true
+        
+                    }
+                    'U' -> {
+                        it.forEachIndexed { index, c ->
+                            if (index > 1) {
+                                line += c
+                            }
+                        }
+                        profile.useSingleCharacteristic = when(line){
+                            "false" -> false
+                            else -> true
+                        }
+                        useSingleCharValueRead = true
+        
                     }
                     else -> {
                         // must be the end !
                     }
                 }
-                if (nameRead && serviceUUIDRead && characteristicUUIDRead) {
+                if (nameRead && serviceUUIDRead && characteristicUUIDRead && useSingleCharValueRead) {
                     profileList.add(profile)
                     nameRead = false
                     serviceUUIDRead = false
+                    useSingleCharValueRead = false
                     characteristicUUIDRead = false
                 }
             }
         } catch (e: Exception){
-            // ...
+            Log.e("UUIDManage", "Error while converting buffer to profiles")
         }
         return profileList
     }

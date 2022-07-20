@@ -78,7 +78,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
 
                     profileNameEditText.setText(profile.profileName)
                     serviceUUIDEditText.setText(profile.serviceUUID.toString())
-                    characteristicUUIDEditText.setText(profile.characteristicUUID.toString())
+                    characteristicUUIDEditText.setText(profile.rxCharacteristicUUID.toString())
 
                 } else {
                     headerTextView.text = getString(R.string.EditUUIDProfileActivityModeError)

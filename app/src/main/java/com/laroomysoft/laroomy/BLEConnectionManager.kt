@@ -3,8 +3,6 @@ package com.laroomysoft.laroomy
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context.BLUETOOTH_SERVICE
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import java.io.Serializable
 import java.util.*
@@ -279,7 +277,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                     // set the characteristic notification for the desired characteristic in the service
                                     if (it.uuid == applicationProperty.uuidManager.uUIDProfileList.elementAt(
                                             profileIndex
-                                        ).characteristicUUID
+                                        ).rxCharacteristicUUID
                                     ) {
                             
                                         if (verboseLog) {
