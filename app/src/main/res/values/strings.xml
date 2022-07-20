@@ -276,7 +276,11 @@
     <string name="EditUUIDProfileActivityHeaderNewModeText">New UUID Profile</string>
     <string name="EditUUIDProfileActivityModeError">Invocation Error</string>
     <string name="EditUUIDProfileActivityServiceUUIDDescriptorText">Service UUID:</string>
-    <string name="EditUUIDProfileActivityCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+
+    <string name="EditUUIDProfileActivitySingleCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="EditUUIDProfileActivityRXCharacteristicUUIDDescriptorText">RX Characteristic UUID:</string>
+    <string name="EditUUIDProfileActivityTXCharacteristicUUIDDescriptorText">TX Characteristic UUID:</string>
+
     <string name="EditUUIDProfileActivityProfileNameDefaultValue">My Profile 1</string>
     <string name="EditUUIDProfileActivityProfileNameDescriptorText">Profile Name:</string>
     <string name="EditUUIDProfileActivityHelpText">The entered UUID can only contain numbers 0 to 9, lowercase letters a to f and the hyphen. Watch out for the appropriate format. For Example: 0000f5ff&#8211;0000&#8211;1000&#8211;8000&#8211;00805f9b34fb To generate a Bluetooth default UUID: tap the text above the box.</string>
@@ -286,6 +290,7 @@
     <string name="EditUUIDProfileActivityIsStaticProfileNotification">This is a static profile. Changes will take no effect. Add a new profile to define your own UUIDs.</string>
     <string name="EditUUIDProfileActivityInvalidUUIDNotification">Invalid UUID-Format.</string>
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profile-Name already exist.</string>
+    <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Use distinct characteristics for RX and TX</string>
 
     <string name="AddDeviceActivityHeaderText">Add new Device</string>
     <string name="AddDeviceActivityBondingHintText">Devices must be paired to show up in the list. Go to Bluetooth settings to pair a device.</string>

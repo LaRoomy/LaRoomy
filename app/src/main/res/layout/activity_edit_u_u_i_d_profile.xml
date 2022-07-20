@@ -151,7 +151,7 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/editUUIDActivityCharacteristicUUIDContainer"
+            android:id="@+id/editUUIDActivityRXCharacteristicUUIDContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -160,19 +160,19 @@
             app:layout_constraintTop_toBottomOf="@id/editUUIDActivityServiceUUIDContainer">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/editUUIDActivityCharacteristicUUIDDescriptorTextView"
+                android:id="@+id/editUUIDActivityRXCharacteristicUUIDDescriptorTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:onClick="onEditUUIDActivityCharacteristicUUIDDescriptorClick"
-                android:text="@string/EditUUIDProfileActivityCharacteristicUUIDDescriptorText"
+                android:text="@string/EditUUIDProfileActivityRXCharacteristicUUIDDescriptorText"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/editUUIDActivityCharacteristicUUIDEditText"
+                android:id="@+id/editUUIDActivityRXCharacteristicUUIDEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -185,7 +185,75 @@
                 android:typeface="monospace"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/editUUIDActivityCharacteristicUUIDDescriptorTextView" />
+                app:layout_constraintTop_toBottomOf="@id/editUUIDActivityRXCharacteristicUUIDDescriptorTextView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- -->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/editUUIDActivityTXCharacteristicUUIDContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/editUUIDActivityRXCharacteristicUUIDContainer">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/editUUIDActivityTXCharacteristicUUIDDescriptorTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:onClick="onEditUUIDActivityCharacteristicUUIDDescriptorClick"
+                android:text="@string/EditUUIDProfileActivityTXCharacteristicUUIDDescriptorText"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/editUUIDActivityTXCharacteristicUUIDEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:hint="@string/UUIDFormatHint"
+                android:minHeight="48dp"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:typeface="monospace"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/editUUIDActivityTXCharacteristicUUIDDescriptorTextView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- -->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editUUIDActivityUseDistinctCharUUIDsContainer"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/editUUIDActivityTXCharacteristicUUIDContainer"
+            >
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="10dp"
+                android:checked="true"
+                android:id="@+id/editUUIDActivityUseDistinctCharUUIDsCheckBox"
+                android:text="@string/EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -196,7 +264,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            app:layout_constraintTop_toBottomOf="@id/editUUIDActivityCharacteristicUUIDContainer"
+            app:layout_constraintTop_toBottomOf="@id/editUUIDActivityUseDistinctCharUUIDsContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             >

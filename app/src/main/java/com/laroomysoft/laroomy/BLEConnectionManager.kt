@@ -90,7 +90,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     // bluetooth system objects
     var currentDevice: BluetoothDevice? = null
     private var bluetoothGatt: BluetoothGatt? = null
-    lateinit var gattCharacteristic: BluetoothGattCharacteristic
+    lateinit var rxGattCharacteristic: BluetoothGattCharacteristic
+    lateinit var txGattCharacteristic: BluetoothGattCharacteristic
     // --
 //    val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
 //        this.bleAdapter?.bondedDevices
@@ -111,8 +112,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // used to cache the current service uuid
         private set
 
-    val currentUsedCharacteristicUUID: String
-        get() = this.gattCharacteristic.uuid.toString()
+    val currentUsedRXCharacteristicUUID: String
+        get() = this.rxGattCharacteristic.uuid.toString()
+    
+    val currentUsedTXCharacteristicUUID: String
+    get() {
+        return if(this.txGattCharacteristic.toString() == this.rxGattCharacteristic.toString()){
+            ""
+        } else {
+            this.txGattCharacteristic.toString()
+        }
+    }
 
     val isLastAddressValid: Boolean
         get() = (this.getLastConnectedDeviceAddress().isNotEmpty())
@@ -196,7 +206,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         applicationProperty.logControl("I: Connection restored")
 
                         // re-init the descriptor to establish a stream!
-                        val descriptor = gattCharacteristic.getDescriptor(clientCharacteristicConfig)
+                        val descriptor = rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
                             .apply {
                                 value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                             }
@@ -262,6 +272,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     
                                 // cache the service uuid
                                 currentUsedServiceUUID = bluetoothGattService.uuid.toString()
+                                
+                                // local param
+                                var firstCharacteristicAdded = false
                     
                                 // iterate through the characteristics in the service
                                 bluetoothGattService.characteristics.forEach {
@@ -273,43 +286,85 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         )
                                     }
                                     applicationProperty.logControl("I: Characteristic in Service found. UUID: ${it.uuid}")
-                        
+    
                                     // set the characteristic notification for the desired characteristic in the service
-                                    if (it.uuid == applicationProperty.uuidManager.uUIDProfileList.elementAt(
-                                            profileIndex
-                                        ).rxCharacteristicUUID
-                                    ) {
-                            
-                                        if (verboseLog) {
-                                            Log.d(
-                                                "M:CB:onServicesDisc",
-                                                "Correct characteristic found - enable notifications"
-                                            )
-                                        }
-                                        applicationProperty.logControl("I: Characteristic match: enable notifications")
-                            
-                                        // save characteristic
-                                        gattCharacteristic = it
-                                        //gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_SIGNED//WRITE_TYPE_NO_RESPONSE
-                                        // enable notification on the device
-                                        gatt.setCharacteristicNotification(gattCharacteristic, true)
-                            
-                                        if (verboseLog) {
-                                            Log.d("M:CB:onServicesDisc", "Set Descriptor")
-                                        }
-                            
-                                        // set the correct descriptor for this characteristic
-                                        val descriptor = gattCharacteristic.getDescriptor(
-                                            clientCharacteristicConfig
-                                        )
-                                            .apply {
-                                                value =
-                                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                    // and set tx if permitted
+                                    when(it.uuid) {
+    
+                                        applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).rxCharacteristicUUID -> {
+        
+                                            if (verboseLog) {
+                                                Log.d(
+                                                    "M:CB:onServicesDisc",
+                                                    "Correct characteristic found (rx) - enable notifications"
+                                                )
                                             }
-                                        gatt.writeDescriptor(descriptor)
-                            
-                                        // report object ready
-                                        callback.onDeviceReadyForCommunication()
+                                            applicationProperty.logControl("I: RX Characteristic match: enable notifications")
+        
+                                            // save characteristic
+                                            rxGattCharacteristic = it
+                                            
+                                            // if the usage of only one characteristic is desired, copy the reference (so that both characteristics equals each other)
+                                            if(applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).useSingleCharacteristic) {
+                                                txGattCharacteristic = rxGattCharacteristic
+                                                
+                                                // make sure the callback is triggered in any case
+                                                firstCharacteristicAdded = true
+                                            }
+                                            
+                                            // enable notification on the device
+                                            gatt.setCharacteristicNotification(
+                                                rxGattCharacteristic,
+                                                true
+                                            )
+        
+                                            if (verboseLog) {
+                                                Log.d("M:CB:onServicesDisc", "Set Descriptor")
+                                            }
+        
+                                            // set the correct descriptor for this characteristic
+                                            val descriptor = rxGattCharacteristic.getDescriptor(
+                                                clientCharacteristicConfig
+                                            )
+                                                .apply {
+                                                    value =
+                                                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                                }
+                                            gatt.writeDescriptor(descriptor)
+        
+                                            if(firstCharacteristicAdded) {
+                                                // report ready for communication
+                                                callback.onDeviceReadyForCommunication()
+                                            } else {
+                                                // flag it
+                                                firstCharacteristicAdded = true
+                                            }
+                                        }
+                                        applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).txCharacteristicUUID -> {
+                                            
+                                            // only save the tx characteristic if the usage is permitted
+                                            if(!applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).useSingleCharacteristic) {
+    
+                                                if (verboseLog) {
+                                                    Log.d(
+                                                        "M:CB:onServicesDisc",
+                                                        "Correct characteristic found (tx)"
+                                                    )
+                                                }
+                                                applicationProperty.logControl("I: TX Characteristic match!")
+    
+                                                // save characteristic
+                                                txGattCharacteristic = it
+                                                
+                                                if(firstCharacteristicAdded){
+                                                    // report ready to communicate
+                                                    callback.onDeviceReadyForCommunication()
+                                                } else {
+                                                    // flag it
+                                                    firstCharacteristicAdded = true
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2094,23 +2149,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // save the data for echo prevention
                 //this.echoPreventerDataHolder = data
                 // set the characteristic value
-                this.gattCharacteristic.setValue(data)
-                
-                
-
+                //this.rxGattCharacteristic.setValue(data)
+                this.txGattCharacteristic.setValue(data)
+    
+    
+    
                 if (this.bluetoothGatt == null) {
                     Log.e("M:sendData", "Member bluetoothGatt was null!")
                 }
-
+    
                 // write the characteristic
                 try {
-                    this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
-                } catch (e: SecurityException){
+                    this.bluetoothGatt?.writeCharacteristic(this.txGattCharacteristic)
+                } catch (e: SecurityException) {
                     Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
                     this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
                 }
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Log.e("BLEManager:sendData", "Unexpected Error: $e")
         }
     }

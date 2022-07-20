@@ -290,7 +290,12 @@
     <string name="EditUUIDProfileActivityHeaderNewModeText">Neues UUID Profil anlegen</string>
     <string name="EditUUIDProfileActivityModeError">Modus-Fehler</string>
     <string name="EditUUIDProfileActivityServiceUUIDDescriptorText">Service UUID:</string>
-    <string name="EditUUIDProfileActivityCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+
+    <string name="EditUUIDProfileActivitySingleCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="EditUUIDProfileActivityRXCharacteristicUUIDDescriptorText">RX Characteristic UUID:</string>
+    <string name="EditUUIDProfileActivityTXCharacteristicUUIDDescriptorText">TX Characteristic UUID:</string>
+
+
     <string name="EditUUIDProfileActivityProfileNameDefaultValue">Eigenes Profil 1</string>
     <string name="EditUUIDProfileActivityProfileNameDescriptorText">Profil-Name:</string>
     <string name="EditUUIDProfileActivityHelpText">Die eingegebene UUID darf nur die Nummern 0 bis 9, die Buchstaben a bis f und den Bindestrich enthalten. Das UUID-Format muss beachtet werden. Zum Beispiel: 0000f5ff&#8211;0000&#8211;1000&#8211;8000&#8211;00805f9b34fb\nDurch tippen auf den entsprechenden Descriptor über der Box kann eine standard-UUID generiert werden.</string>
@@ -300,6 +305,8 @@
     <string name="EditUUIDProfileActivityIsStaticProfileNotification">Dies ist ein statisches Profil. Änderungen haben keine Auswirkungen. Erstellen Sie ein neues Profil um eigene UUIDs zu definieren.</string>
     <string name="EditUUIDProfileActivityInvalidUUIDNotification">Ungültiges UUID-Format.</string>
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profil-Name existiert bereits.</string>
+    <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Separate Characteristic für RX und TX verwenden</string>
+
 
     <string name="AddDeviceActivityHeaderText">Neues Gerät hinzufügen</string>
     <string name="AddDeviceActivityBondingHintText">Nur gekoppelte Geräte werden in der Liste angezeigt. Geräte können über die Bluetooth Einstellungen gekoppelt werden.</string>

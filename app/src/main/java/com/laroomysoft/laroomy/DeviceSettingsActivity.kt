@@ -77,7 +77,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
         deviceAddressTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
         deviceServiceUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedServiceUUID
-        deviceCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedCharacteristicUUID
+        deviceCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedRXCharacteristicUUID
 
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired
