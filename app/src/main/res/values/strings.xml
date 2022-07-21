@@ -338,6 +338,8 @@
     <string name="Error_UnexpectedBindingKeyMissing">Unexpected error: Internal binding key is missing.</string>
     <string name="Error_UnknownError">Unknown error occurred.</string>
     <string name="Error_InitFailed_NoProperties">Initialization failed. Property count is zero.</string>
+    <string name="Error_NoMatchingServicesFound">No service matching the defined UUIDs was found. May take a look at the UUID-Profiles to solve the problem.</string>
+    <string name="Error_NoMatchingCharacteristicsFound">No characteristic(s) matching the defined UUIDs were found. May take a look at the UUID-Profiles to solve the problem.</string>
 
 
     <!-- FileKeys: -->

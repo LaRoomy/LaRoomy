@@ -27,6 +27,8 @@ const val BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING = 4
 const val BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING = 5
 const val BLE_INIT_NO_PROPERTIES = 6
 const val BLE_BLUETOOTH_PERMISSION_MISSING = 7
+const val BLE_NO_MATCHING_SERVICES = 8
+const val BLE_NO_MATCHING_CHARACTERISTICS = 9
 
 const val BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED = 101
 
@@ -44,6 +46,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     // data holder objects
     private val bleDeviceData = BLEDeviceData()
     private val timeoutWatcherData = LoopTimeoutWatcherData()
+    private val discoveryWatcherData = ServCharDiscoveryWatcherData()
 
     // timer
     private lateinit var timeoutTimer: Timer
@@ -190,7 +193,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
                         }
                         applicationProperty.logControl("I: Starting to discover Services")
-
+                        
+                        // set indication param
+                        discoveryWatcherData.isServiceDiscovery = true
+                        
                         // start to discover the services of the device
                         gatt?.discoverServices()
                     } else {
@@ -213,15 +219,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         gatt?.writeDescriptor(descriptor)
 
                         // notify the remote device
-    
                         Executors.newSingleThreadScheduledExecutor().schedule({
                             sendData(deviceReconnectedNotification)
                         }, 800, TimeUnit.MILLISECONDS)
-                        
-                        
-//                        Handler(Looper.getMainLooper()).postDelayed({
-//                            sendData(deviceReconnectedNotification)
-//                        }, 500)
                     }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
@@ -261,6 +261,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 )
                 
                             if (profileIndex != -1) {
+                                // log
                                 if (verboseLog) {
                                     Log.d(
                                         "M:CB:onServicesDisc",
@@ -269,12 +270,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 }
                                 applicationProperty.logControl("I: This service is found in UUID Profile")
                                 applicationProperty.logControl("I: Perform lookup for Characteristic UUID")
+                                
+                                // set/reset indication params
+                                discoveryWatcherData.serviceDiscovered = true
+                                discoveryWatcherData.isServiceDiscovery = false
                     
                                 // cache the service uuid
                                 currentUsedServiceUUID = bluetoothGattService.uuid.toString()
                                 
                                 // local param
                                 var firstCharacteristicAdded = false
+                                
+                                // setup an indicator if characteristics were found
+                                discoveryWatcherData.isCharDiscovery = true
                     
                                 // iterate through the characteristics in the service
                                 bluetoothGattService.characteristics.forEach {
@@ -335,6 +343,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                             if(firstCharacteristicAdded) {
                                                 // report ready for communication
                                                 callback.onDeviceReadyForCommunication()
+                                                discoveryWatcherData.characteristicDiscovered = true
+                                                return@forEach
                                             } else {
                                                 // flag it
                                                 firstCharacteristicAdded = true
@@ -359,6 +369,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                                 if(firstCharacteristicAdded){
                                                     // report ready to communicate
                                                     callback.onDeviceReadyForCommunication()
+                                                    discoveryWatcherData.characteristicDiscovered = true
+                                                    return@forEach
                                                 } else {
                                                     // flag it
                                                     firstCharacteristicAdded = true
@@ -367,7 +379,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         }
                                     }
                                 }
+                                if(discoveryWatcherData.isCharDiscovery && !discoveryWatcherData.characteristicDiscovered){
+                                    // no matching characteristic(s) were found, report error
+                                    callback.onConnectionError(BLE_NO_MATCHING_CHARACTERISTICS)
+                                }
                             }
+                        }
+                        if(discoveryWatcherData.isServiceDiscovery && !discoveryWatcherData.serviceDiscovered){
+                            // no matching service was found, report error
+                            callback.onConnectionError(BLE_NO_MATCHING_SERVICES)
                         }
                     }
                     else -> {
@@ -1972,6 +1992,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // data holder
         this.bleDeviceData.clear()
         this.timeoutWatcherData.clear()
+        this.discoveryWatcherData.clear()
     }
 
     private fun clearPropertyRelatedParameterAndStopAllLoops(){

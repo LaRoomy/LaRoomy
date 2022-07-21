@@ -179,7 +179,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
 
     private fun setErrorText(text: String){
-        setMessageText(R.color.ErrorColor, text)
+        setMessageText(R.color.errorLightColor, text)
     }
 
     private fun setMessageText(colorID: Int, text: String){
@@ -223,7 +223,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         super.onConnectionStateChanged(state)
         if(verboseLog) {
             Log.d(
-                "M:CB:ConStateChange",
+                "LoadingActivity",
                 "Connection State changed in Loading Activity: new State: $state"
             )
         }
@@ -409,6 +409,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             }
             BLE_INIT_NO_PROPERTIES -> {
                 getString(R.string.Error_InitFailed_NoProperties)
+            }
+            BLE_NO_MATCHING_SERVICES -> {
+                getString(R.string.Error_NoMatchingServicesFound)
+            }
+            BLE_NO_MATCHING_CHARACTERISTICS -> {
+                getString(R.string.Error_NoMatchingCharacteristicsFound)
             }
             else -> {
                 getString(R.string.Error_UnknownError)

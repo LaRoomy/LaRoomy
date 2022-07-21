@@ -2177,3 +2177,17 @@ class SimpleUpdateStorage {
     var isHandled = true
     var eIndex = -1
 }
+
+class ServCharDiscoveryWatcherData {
+    var isCharDiscovery = false
+    var isServiceDiscovery = false
+    var serviceDiscovered = false
+    var characteristicDiscovered = false
+    
+    fun clear(){
+        this.isCharDiscovery = false
+        this.isServiceDiscovery = false
+        this.serviceDiscovered = false
+        this.characteristicDiscovered = false
+    }
+}

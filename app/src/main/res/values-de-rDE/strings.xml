@@ -339,6 +339,8 @@
     <string name="Error_UnexpectedBindingKeyMissing">Unerwarteter Fehler: Interner Bindungsschlüssel fehlt.</string>
     <string name="Error_UnknownError">Unbekannter Fehler aufgetreten.</string>
     <string name="Error_InitFailed_NoProperties">Initialisierung fehlgeschlagen. Anzahl der Geräte-Eigenschaften: 0.</string>
+    <string name="Error_NoMatchingServicesFound">Es wurde kein mit den definierten UUIDs übereinstimmender Service gefunden. Sie können die UUID-Profile anpassen um das Problem zu lösen.</string>
+    <string name="Error_NoMatchingCharacteristicsFound">Es wurden keine mit den definierten UUIDs übereinstimmenden Characteristiken gefunden. Sie können die UUID-Profile anpassen um das Problem zu lösen.</string>
 
 
 
