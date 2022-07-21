@@ -201,18 +201,32 @@ class EditUUIDProfileActivity : AppCompatActivity() {
             
             //  this must be a new-action
             
-            val result = (applicationContext as ApplicationProperty).uuidManager.addNewProfile(
-                profileNameEditText.text.toString(), serviceUUIDEditText.text.toString(), rxCharacteristicUUIDEditText.text.toString()
-            )
-            when(result){
+            val profile = UUIDProfile()
+            profile.useSingleCharacteristic = !useDistCharCheckBox.isChecked
+            profile.profileName = this.profileNameEditText.text.toString()
+            profile.serviceUUID = UUID.fromString(this.serviceUUIDEditText.text.toString())
+            profile.rxCharacteristicUUID = UUID.fromString(this.rxCharacteristicUUIDEditText.text.toString())
+            profile.txCharacteristicUUID = if(profile.useSingleCharacteristic){
+                profile.rxCharacteristicUUID
+            } else {
+                UUID.fromString(this.txCharacteristicUUIDEditText.text.toString())
+            }
+    
+            when ((applicationContext as ApplicationProperty).uuidManager.addNewProfile(profile)) {
                 ADD_SUCCESS -> finish()
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.ErrorColor)
+                    notifyUser(
+                        getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification),
+                        R.color.ErrorColor
+                    )
                 }
                 PROFILE_NAME_ALREADY_EXIST -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityProfileNameAlreadyExistNotification), R.color.ErrorColor)
+                    notifyUser(
+                        getString(R.string.EditUUIDProfileActivityProfileNameAlreadyExistNotification),
+                        R.color.ErrorColor
+                    )
                 }
             }
         }
@@ -221,7 +235,12 @@ class EditUUIDProfileActivity : AppCompatActivity() {
     fun onEditUUIDActivityServiceUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
         this.serviceUUIDEditText.setText(getString(R.string.UUIDDefaultFill))
     }
-    fun onEditUUIDActivityCharacteristicUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
+    
+    fun onEditUUIDActivityRXCharacteristicUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
         this.rxCharacteristicUUIDEditText.setText(getString(R.string.UUIDDefaultFill))
+    }
+    
+    fun onEditUUIDActivityTXCharacteristicUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        this.txCharacteristicUUIDEditText.setText(getString(R.string.UUIDDefaultFill))
     }
 }

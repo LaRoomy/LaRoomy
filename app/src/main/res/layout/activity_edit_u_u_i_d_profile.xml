@@ -164,7 +164,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:onClick="onEditUUIDActivityCharacteristicUUIDDescriptorClick"
+                android:onClick="onEditUUIDActivityRXCharacteristicUUIDDescriptorClick"
                 android:text="@string/EditUUIDProfileActivityRXCharacteristicUUIDDescriptorText"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -189,8 +189,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- -->
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/editUUIDActivityTXCharacteristicUUIDContainer"
             android:layout_width="match_parent"
@@ -205,7 +203,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:onClick="onEditUUIDActivityCharacteristicUUIDDescriptorClick"
+                android:onClick="onEditUUIDActivityTXCharacteristicUUIDDescriptorClick"
                 android:text="@string/EditUUIDProfileActivityTXCharacteristicUUIDDescriptorText"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -229,8 +227,6 @@
                 app:layout_constraintTop_toBottomOf="@id/editUUIDActivityTXCharacteristicUUIDDescriptorTextView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- -->
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
