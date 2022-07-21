@@ -276,14 +276,12 @@
     <string name="EditUUIDProfileActivityHeaderNewModeText">New UUID Profile</string>
     <string name="EditUUIDProfileActivityModeError">Invocation Error</string>
     <string name="EditUUIDProfileActivityServiceUUIDDescriptorText">Service UUID:</string>
-
     <string name="EditUUIDProfileActivitySingleCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
     <string name="EditUUIDProfileActivityRXCharacteristicUUIDDescriptorText">RX Characteristic UUID:</string>
     <string name="EditUUIDProfileActivityTXCharacteristicUUIDDescriptorText">TX Characteristic UUID:</string>
-
     <string name="EditUUIDProfileActivityProfileNameDefaultValue">My Profile 1</string>
     <string name="EditUUIDProfileActivityProfileNameDescriptorText">Profile Name:</string>
-    <string name="EditUUIDProfileActivityHelpText">The entered UUID can only contain numbers 0 to 9, lowercase letters a to f and the hyphen. Watch out for the appropriate format. For Example: 0000f5ff&#8211;0000&#8211;1000&#8211;8000&#8211;00805f9b34fb To generate a Bluetooth default UUID: tap the text above the box.</string>
+    <string name="EditUUIDProfileActivityHelpText">The entered UUID can only contain numbers 0 to 9, lowercase letters a to f and the hyphen. Watch out for the appropriate format. For Example: 0000f5ff&#8211;0000&#8211;1000&#8211;8000&#8211;00805f9b34fb To generate a Bluetooth default UUID: tap the text above the box. If distinct characteristics for RX and TX are used, be aware that the receiver(rx) here corresponds to the transmitter(tx) on the remote device and vice versa.</string>
     <string name="EditUUIDProfileActivitySaveButtonText">Save</string>
     <string name="EditUUIDProfileActivityDeleteButtonText">Delete</string>
     <string name="EditUUIDProfileActivityButtonTextDiscard">Discard</string>
