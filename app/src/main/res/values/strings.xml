@@ -92,6 +92,8 @@
     <string name="UnlockCtrl_PopupCancelButtonText">Cancel</string>
     <string name="UnlockCtrl_PopupPositiveButtonText">Change</string>
     <string name="UnlockCtrl_LockHintMessageText">Tap image to lock</string>
+    <string name="UnlockCtrl_PinChangeFailedWrongPin">Pin change failed - wrong pin.</string>
+    <string name="UnlockCtrl_PinChangeSuccess">Pin changed successful.</string>
 
 
     <string name="GeneralMessage_reconnected">Device reconnected</string>

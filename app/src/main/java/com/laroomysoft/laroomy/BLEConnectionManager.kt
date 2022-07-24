@@ -723,6 +723,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // refresh all property states notification
                     this.updatePropertyStates()
                 }
+                '7' -> {
+                    // handle the remote back navigation request
+                    this.handleForcedBackNavigation()
+                }
                 else -> {
                     if(verboseLog){
                         Log.e("readDeviceNotification", "Unknown device notification type")
@@ -1735,10 +1739,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             applicationProperty.logControl("E: Error reading data from UnLockControlState data transmission.")
             return
         } else {
-            val cState =
-                unlockControlState.toComplexPropertyState()
-
-            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+            // check error flags
+            if(unlockControlState.flags != 0){
+                // this must be an error transmission, so notify user if the appropriate activity is open (and do not update internal state)
+                if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() == propertyIndex) {
+                    // search for UIAdapter-Element-Index
+                    this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
+                        if((devicePropertyListContentInformation.internalElementIndex == propertyIndex)&&(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
+                            this.propertyCallback.onComplexPropertyStateChanged(index, unlockControlState.toComplexPropertyState())
+                            return@forEachIndexed
+                        }
+                    }
+                }
+            } else {
+                // this is a normal transmission so update internal state
+                val cState =
+                    unlockControlState.toComplexPropertyState()
+    
+                this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+            }
         }
     }
 
@@ -3477,6 +3496,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private fun isOtherThanDeviceMainActivity() : Boolean {
         return (this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1)
     }
+    
+    private fun handleForcedBackNavigation(){
+        if(this.isOtherThanDeviceMainActivity()){
+            this.propertyCallback.onRemoteBackNavigationRequested()
+        }
+    }
 
     // the callback definition for the event handling in the calling class
     interface BleEventCallback : Serializable{
@@ -3496,6 +3521,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onUIAdaptableArrayItemInserted(index: Int){}
         fun onUIAdaptableArrayItemRemoved(index: Int){}
         fun onPropertyInvalidated(){}
+        fun onRemoteBackNavigationRequested(){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}

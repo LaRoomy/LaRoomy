@@ -1557,6 +1557,7 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
         } else {
             UC_NORMAL_MODE
         }
+        this.flags = complexPropertyState.valueThree
         this.pin = complexPropertyState.strValue
     }
 
@@ -1573,6 +1574,7 @@ class UnlockControlState: IComplexPropertySubTypeProtocolClass(){
         } else {
             1
         }
+        cState.valueThree = this.flags
         cState.strValue = this.pin
 
         return cState

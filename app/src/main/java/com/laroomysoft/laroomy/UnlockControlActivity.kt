@@ -177,18 +177,28 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private fun setCurrentViewStateFromComplexPropertyState(unlockControlState: UnlockControlState) {
 
         if(unlockControlState.isValid()) {
-            if(unlockControlState.unLocked){
-                this.lockState = UC_STATE_UNLOCKED
-                this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_unlocked_sq128_vect)
-                this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
-                this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Unlocked)
-                this.notifyUser(getString(R.string.UnlockCtrl_LockHintMessageText), R.color.successLightColor)
+            if(unlockControlState.mode == UC_PIN_CHANGE_MODE){
+                // if this is a pin-change mode update, this indicates a pin-change success!
+                this.notifyUser(getString(R.string.UnlockCtrl_PinChangeSuccess), R.color.successLightColor)
             } else {
-                this.lockState = UC_STATE_LOCKED
-                this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_locked_sq128_vect)
-                this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
-                this.lockStatusTextView.text = getString(R.string.UnlockCtrl_ConditionText_Locked)
-                this.notifyUser("", R.color.normalTextColor)
+                if (unlockControlState.unLocked) {
+                    this.lockState = UC_STATE_UNLOCKED
+                    this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_unlocked_sq128_vect)
+                    this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
+                    this.lockStatusTextView.text =
+                        getString(R.string.UnlockCtrl_ConditionText_Unlocked)
+                    this.notifyUser(
+                        getString(R.string.UnlockCtrl_LockHintMessageText),
+                        R.color.successLightColor
+                    )
+                } else {
+                    this.lockState = UC_STATE_LOCKED
+                    this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_locked_sq128_vect)
+                    this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
+                    this.lockStatusTextView.text =
+                        getString(R.string.UnlockCtrl_ConditionText_Locked)
+                    this.notifyUser("", R.color.normalTextColor)
+                }
             }
         }
     }
@@ -365,6 +375,13 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             var goAhead = true
 
             when {
+                currentPin.length > 10 -> {
+                    curPinInput.background = AppCompatResources.getDrawable(
+                        this,
+                        R.drawable.unlock_control_popup_edittext_error_background
+                    )
+                    goAhead = false
+                }
                 currentPin.isEmpty() -> {
                     curPinInput.background = AppCompatResources.getDrawable(
                         this,
@@ -565,23 +582,43 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
     ) {
-        super.onComplexPropertyStateChanged(UIAdapterElementIndex, newState)
-
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
         if(element.internalElementIndex == this.relatedElementID){
             if(verboseLog) {
                 Log.d(
-                    "M:CB:UCA:ComplexPCg",
-                    "Unlock Control Activity - Complex Property changed - Update the UI"
+                    "UnlockControlActivity",
+                    "Complex Property state changed - Update the UI"
                 )
             }
             val unlockControlState = UnlockControlState()
             unlockControlState.fromComplexPropertyState(newState)
-
-            runOnUiThread {
-                this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
+            
+            // when the flag value is nonzero, this indicates an error response
+            if(unlockControlState.flags != 0){
+                // flags are set, so prevent the normal UI-Update and display error message
+                when {
+                    ((unlockControlState.flags and 0x01) != 0) -> {
+                        // unlock failed - pin rejected message
+        
+                        val animation =
+                            AnimationUtils.loadAnimation(this, R.anim.image_view_shake_animation)
+                        runOnUiThread {
+                            this.lockUnlockImageView.startAnimation(animation)
+                        }
+                        
+                        
+                    }
+                    ((unlockControlState.flags and 0x02) != 0) -> {
+                        // pin change failed - wrong pin
+                        notifyUser(getString(R.string.UnlockCtrl_PinChangeFailedWrongPin), R.color.errorLightColor)
+                    }
+                }
+            } else {
+                runOnUiThread {
+                    this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
+                }
             }
         }
     }
@@ -604,6 +641,21 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 R.anim.finish_activity_slide_animation_in,
                 R.anim.finish_activity_slide_animation_out
             )
+        }
+    }
+    
+    override fun onRemoteBackNavigationRequested() {
+        if (!isStandAlonePropertyMode) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                
+                finish()
+                
+                overridePendingTransition(
+                    R.anim.finish_activity_slide_animation_in,
+                    R.anim.finish_activity_slide_animation_out
+                )
+            }, 500, TimeUnit.MILLISECONDS)
         }
     }
 }

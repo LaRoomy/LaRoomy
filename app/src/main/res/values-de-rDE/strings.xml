@@ -101,6 +101,8 @@
     <string name="UnlockCtrl_PopupCancelButtonText">Abbrechen</string>
     <string name="UnlockCtrl_PopupPositiveButtonText">Ändern</string>
     <string name="UnlockCtrl_LockHintMessageText">Zum Verriegeln Symbol berühren</string>
+    <string name="UnlockCtrl_PinChangeFailedWrongPin">Pin-Änderung verweigert - Pin nicht korrekt.</string>
+    <string name="UnlockCtrl_PinChangeSuccess">Pin erfolgreich geändert.</string>
 
 
 
