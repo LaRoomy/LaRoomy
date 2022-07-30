@@ -2381,7 +2381,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             currentGroup = -1
                             expectedGroupIndex++
                             // the last element must have been the last in group
-                            this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
+                            if(addInALoop){
+                                tempList.elementAt(globalIndex - 1).apply {
+                                    isLastInGroup = true
+                                    update(applicationProperty.applicationContext)
+                                }
+                            } else {
+                                this.uIAdapterList.elementAt(globalIndex - 1).apply {
+                                    isLastInGroup = true
+                                    update(applicationProperty.applicationContext)
+                                }
+//                                this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
+//                                this.uIAdapterList.elementAt(globalIndex - 1)
+//                                    .update(applicationProperty.applicationContext)
+                            }
                         }
 
                         // add the group element
