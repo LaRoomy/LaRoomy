@@ -435,6 +435,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             }
         } catch (e: Exception){
             Log.e("BarGraphDataPipe", "Exception occurred: $e")
+            (applicationContext as ApplicationProperty).logControl("E: BarGraphDataPipe exception: $e.")
         }
     }
 }
