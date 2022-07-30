@@ -1455,6 +1455,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             // get regarding element
             val elementToRender = devicePropertyAdapter.elementAt(position)
+            
+            if(!elementToRender.isAccessible){
+                if(verboseLog){
+                    Log.e("DeviceMainActivity", "> onBindViewHolder was invoked on an inaccessible element")
+                }
+            }
 
             // enable the listener for the regarding property type
             holder.activateListenerFromType(elementToRender.propertyType)
