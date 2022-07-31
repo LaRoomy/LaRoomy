@@ -644,7 +644,6 @@ class NavigatorState : IComplexPropertySubTypeProtocolClass() {
 class BarGraphState : IComplexPropertySubTypeProtocolClass() {
 
     var numBars = -1
-    //var flagValue = -1
     private var barValues = ArrayList<Float>()
     private var barNames = ArrayList<String>()
     private var errorFlag = false
@@ -661,7 +660,9 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
         this.useValueAsBarDescriptor = (complexPropertyState.valueTwo and 0x01) != 0
         this.useFixedMaximumValue = (complexPropertyState.valueTwo and 0x02) != 0
         this.fixedMaximumValue = complexPropertyState.floatValue
-        this.errorFlag = this.fromComplexPropertyString(complexPropertyState.strValue, false)
+        this.errorFlag = !this.fromComplexPropertyString(complexPropertyState.strValue, false)
+        // NOTE: fromComplexPropertyString returns true is successful, but the setting the error-flag to true means
+        //       there is a problem, so the method result must be inverted
     }
 
     fun updateFromString(data: String) : Boolean {
@@ -680,8 +681,11 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
             this.useFixedMaximumValue = (flags and 0x02) != 0
 
             // get the number of bars
-            this.numBars = data[9].toString().toInt()
-
+            val nBars = data[9].toString().toInt()
+            // check if this conforms to the existing state (since this is an update transmission)
+            if(nBars != this.numBars){
+                return false
+            }
             val pureData = data.removeRange(0, 11)
             this.fromComplexPropertyString(pureData, true)
         }
@@ -709,14 +713,7 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
     }
 
     private fun fromComplexPropertyString(data: String, isUpdateMode: Boolean): Boolean {
-
-        // the transmission data entry must be removed on transmission reception
-
-        // "32IDxx00" + "t" (type) + "barIndex::barName::initialBarValue;;"
-        // numBars ?? where?
-        // single name transmission ??? not necessary, could be done trough a complex property state update
-        // pipe: [x]bar-index + [...barValue ... ?
-
+        
         // the bar-graph-data can be changed by a state-update but this is not efficient
         // for dynamic data setting the pipe function could be used, this is fast!
 
@@ -812,16 +809,19 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                         // missing delimiter
                         return false
                     } else {
+                        var dataIndex = 3
+                        
                         if (data[3] == '_') {
                             // undefined placeholder char
                             if (!isUpdateMode) {
                                 // initial mode
                                 this.barNames.add("_")
+                                nextValidIndex = 6
                             }
                         } else {
                             // record the data
                             nextValidIndex = -1
-                            var dataIndex = 3
+                            
                             var barNameString = ""
 
                             // record the bar-name
@@ -841,51 +841,46 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                                 }
                                 dataIndex++
                             }
+                        }
 
-                            if (nextValidIndex < s.length) {
+                        if (nextValidIndex < s.length) {
 
-                                dataIndex = nextValidIndex
+                            dataIndex = nextValidIndex
 
-                                if (s[dataIndex] == '_') {
+                            if (s[dataIndex] == '_') {
+                                // placeholder char, add value 0f
+                                this.barValues.add(0f)
+                            } else {
+                                var barValueString = ""
 
-                                    // undefined placeholder char -> add value zero in initial mode, in update mode let the ???
-                                    //if (!isUpdateMode) {
-                                        // initial mode
-                                        this.barValues.add(0f)
-                                    //}
-
-                                } else {
-                                    var barValueString = ""
-
-                                    // record the bar-value
-                                    while (dataIndex < s.length) {
-                                        if (s[dataIndex] == '\r') {
-                                            break
-                                        }
-                                        barValueString += s[dataIndex]
-                                        dataIndex++
+                                // record the bar-value
+                                while (dataIndex < s.length) {
+                                    if (s[dataIndex] == '\r') {
+                                        break
                                     }
-                                    if (!isUpdateMode) {
-                                        // initial mode
-                                        if (barValueString.isNotEmpty()) {
-                                            this.barValues.add(
-                                                barValueString.toFloat()
-                                            )
-                                        } else {
-                                            this.barValues.add(0f)
-                                            return false
-                                        }
+                                    barValueString += s[dataIndex]
+                                    dataIndex++
+                                }
+                                if (!isUpdateMode) {
+                                    // initial mode
+                                    if (barValueString.isNotEmpty()) {
+                                        this.barValues.add(
+                                            barValueString.toFloat()
+                                        )
                                     } else {
-                                        // must be update mode
-                                        if (barValueString.isNotEmpty()) {
-                                            this.barValues[barIndex] = barValueString.toFloat()
-                                        }
+                                        this.barValues.add(0f)
+                                        return false
+                                    }
+                                } else {
+                                    // must be update mode
+                                    if (barValueString.isNotEmpty()) {
+                                        this.barValues[barIndex] = barValueString.toFloat()
                                     }
                                 }
-                            } else {
-                                // error
-                                return false
                             }
+                        } else {
+                            // error
+                            return false
                         }
                     }
                 }

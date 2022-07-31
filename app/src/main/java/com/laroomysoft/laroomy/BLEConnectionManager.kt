@@ -1793,15 +1793,36 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         // validate the existing state and apply the appropriate method
-        val res = if(barGraphState.isValid()){
-            barGraphState.updateFromString(data)
+        var res: Boolean
+        if(barGraphState.isValid()){
+            // if the old state is valid, try to update the data in it
+            res = barGraphState.updateFromString(data)
+            if(!res){
+                // the state does not conform to the update regularities (the bar to update is outside of range, or something)
+                // so try to reset the whole state
+                res = barGraphState.fromString(data)
+            }
         } else {
-            barGraphState.fromString(data)
+            res = barGraphState.fromString(data)
         }
+        
+        // TODO: remove !
+//        val res = if(barGraphState.isValid()){
+//            if(!barGraphState.updateFromString(data)){
+//                barGraphState.fromString(data)
+//            } else {
+//                true
+//            }
+//        } else {
+//            barGraphState.fromString(data)
+//        }
 
         // check the result and update the data (or handle error)
         if(!res){
-            // handle error
+            // handle error (log + return)
+            if(verboseLog){
+                Log.e("BLEConnectionManager", "processBarGraphData: Error reading data from BarGraphState data transmission.")
+            }
             applicationProperty.logControl("E: Error reading data from BarGraphState data transmission.")
             return
         } else {
