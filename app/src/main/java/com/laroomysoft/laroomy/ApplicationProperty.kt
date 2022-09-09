@@ -75,6 +75,7 @@ class ApplicationProperty : Application() {
 
     // navigation control parameter:
     var navigatedFromPropertySubPage = false
+    var delayedNavigationNotificationRequired = false
     var noConnectionKillOnPauseExecution = false
     var uiAdapterChanged = false
     var uiAdapterInvalidatedOnPropertySubPage = false
@@ -84,9 +85,6 @@ class ApplicationProperty : Application() {
     var mainActivityListElementWasAdded = false
     var complexUpdateIndex = -1
     var propertyInvalidatedOnSubPage = false
-
-
-    //var userNavigatedFromCommActivity = false
 
     lateinit var uuidManager: UUIDManager
     lateinit var addedDevices: AddedDevices

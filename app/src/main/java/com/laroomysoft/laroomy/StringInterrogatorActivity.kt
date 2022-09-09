@@ -97,6 +97,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             this.collectDataAndSendCommand()
 
             if(navigateBackOnButtonPress){
+                (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired = true
                 this.onBackPressed()
             }
         }

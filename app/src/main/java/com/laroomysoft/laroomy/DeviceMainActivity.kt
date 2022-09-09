@@ -226,7 +226,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
                         // notify the remote device that the user navigated back to the device main page
-                        ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
+                        if((applicationContext as ApplicationProperty).delayedNavigationNotificationRequired) {
+                            (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired = false
+                            // use a delay, because the activity navigated from requested this (normally it sends data to the device before closing)
+                            Executors.newSingleThreadScheduledExecutor().schedule({
+                                ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
+                            }, 300, TimeUnit.MILLISECONDS)
+                        } else {
+                            ApplicationProperty.bluetoothConnectionManager.notifyBackNavigationToDeviceMainPage()
+                        }
 
                         // set property-item to normal background
                         resetSelectedItemBackground()
