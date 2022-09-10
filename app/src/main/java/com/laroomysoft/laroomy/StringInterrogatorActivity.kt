@@ -434,7 +434,9 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 }
                 val stringInterrogatorState = StringInterrogatorState()
                 stringInterrogatorState.fromComplexPropertyState(element.complexPropertyState)
-                this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
+                runOnUiThread {
+                    this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
+                }
             }
         }
     }

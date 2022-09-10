@@ -623,6 +623,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         if(indexToRemove != -1){
+            if(verboseLog){
+                Log.d("readFragmentTransMsn", "Fragment processed. Removing open fragmented transmission with index: $indexToRemove")
+            }
             this.openFragmentedTransmissionData.removeAt(indexToRemove)
         }
 
@@ -2033,6 +2036,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bleDeviceData.clear()
         this.timeoutWatcherData.clear()
         this.discoveryWatcherData.clear()
+        this.openFragmentedTransmissionData.clear()
     }
 
     private fun clearPropertyRelatedParameterAndStopAllLoops(){
@@ -2057,6 +2061,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.currentComplexStateRetrievingIndex = -1
         this.reloadAttemptCounter = 0
 
+        // this should be empty at this point, but clear it anyway
+        this.openFragmentedTransmissionData.clear()
     }
 
     fun clearInternalPropertyStateStringValue(propertyIndex: Int){
