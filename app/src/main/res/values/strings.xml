@@ -298,6 +298,14 @@
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
     <string name="AddDeviceActivityScanResultHeaderText">Available</string>
     <string name="AddDeviceActivityPairedDevicesHeaderText">Paired</string>
+    <string name="AddDeviceActivityPermissionRationaleText">To scan for Bluetooth-Devices the location permission is required. This is an Android system requirement. Actually this app is not using the location in any case. Grant permission?</string>
+    <string name="AddDeviceActivityPermissionRationaleTitleText">Permission required</string>
+    <string name="AddDeviceActivityDeclineButton">No thanks</string>
+    <string name="AddDeviceActivityMissingPermissionMessageHeaderText">Device-Scan failed. The required permission was not granted.</string>
+    <string name="AddDeviceActivityMissingPermissionMessageT2Text">What you now can do:</string>
+    <string name="AddDeviceActivityMissingPermissionResolutionText1">1. Go to settings and enable the missing permission for this app.</string>
+    <string name="AddDeviceActivityMissingPermissionResolutionText2">2. If your device could be paired, go to settings and pair it. It will then appear in the list below.</string>
+
 
     <!-- content descriptions and labels -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>

@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
@@ -13,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,6 +22,8 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ybq.android.spinkit.SpinKitView
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 const val LIST_TYPE_BONDED_LIST = 1
 const val LIST_TYPE_SCAN_LIST = 2
@@ -54,14 +58,8 @@ class AddDeviceActivity : AppCompatActivity(),
             // if the permission dialog is dismissed, the onResume method is invoked again, and bluetooth enabled state is checked
             // when the permission request is reclined, the UI must go in missing-permission-state, and prevent the invocation
             // of the permission request launcher in onResume, otherwise there will be an infinite loop between onResume and permission launcher
+            this.permissionRationalePending = false
         }
-
-
-
-    // TODO: refresh button !
-
-
-
 
     private var bondedDevices = ArrayList<LaRoomyDevicePresentationModel>()
         get() {
@@ -96,6 +94,8 @@ class AddDeviceActivity : AppCompatActivity(),
     private var bluetoothPermissionGranted = false
     private var bluetoothLocationPermissionGranted = false
     private var grantPermissionRequestDeclined = false
+    
+    private var permissionRationalePending = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -207,26 +207,66 @@ class AddDeviceActivity : AppCompatActivity(),
                 )
             }
             if (!this.grantPermissionRequestDeclined) {
-                this.bluetoothLocationPermissionGranted = if (ActivityCompat.checkSelfPermission(
-                        applicationContext,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    // permission not granted - start the permission launcher
-                    if (verboseLog) {
-                        Log.d(
-                            "AddDeviceActivity",
-                            "onResume: Background location permission is not granted, ask for it!"
-                        )
+                if (!permissionRationalePending) {
+                    this.bluetoothLocationPermissionGranted = when {
+                        ActivityCompat.checkSelfPermission(
+                            applicationContext,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED -> {
+                            if (verboseLog) {
+                                Log.d(
+                                    "AddDeviceActivity",
+                                    "onResume: Location permission granted > start discovery scan."
+                                )
+                            }
+                            this.setUIToMissingPermissionState(false)
+                            this.bleDiscoveryManager.startScan()
+                            true
+                        }
+                        shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                            if (verboseLog) {
+                                Log.d(
+                                    "AddDeviceActivity",
+                                    "onResume: Location permission NOT granted > show request permission rationale."
+                                )
+                            }
+                            permissionRationalePending = true
+                            showPermissionRationaleDialog()
+                            false
+                        }
+                        else -> {
+                            this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            false
+                        }
                     }
-                    this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    false
-                } else {
-                    // start the scan
-                    this.bleDiscoveryManager.startScan()
-                    true
                 }
+            } else {
+                this.setUIToMissingPermissionState(true)
             }
+    
+            // old!
+//            if (!this.grantPermissionRequestDeclined) {
+//                this.bluetoothLocationPermissionGranted = if (ActivityCompat.checkSelfPermission(
+//                        applicationContext,
+//                        Manifest.permission.ACCESS_FINE_LOCATION
+//                    ) != PackageManager.PERMISSION_GRANTED
+//                ) {
+//                    // permission not granted - start the permission launcher
+//                    if (verboseLog) {
+//                        Log.d(
+//                            "AddDeviceActivity",
+//                            "onResume: Background location permission is not granted, ask for it!"
+//                        )
+//                    }
+//                    this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+//                    false
+//                } else {
+//                    // start the scan
+//                    this.bleDiscoveryManager.startScan()
+//                    true
+//                }
+//            }
+    
         }
     }
 
@@ -251,7 +291,59 @@ class AddDeviceActivity : AppCompatActivity(),
             this.bleDiscoveryManager.startScan()
         } else {
             if(verboseLog){
-                Log.d("AddDeviceActivity", "UNEXPECTED! Rescan not possible, because the discovery manager reported: already started!")
+                Log.w("AddDeviceActivity", "UNEXPECTED! Rescan not possible, because the discovery manager reported: already started!")
+            }
+        }
+    }
+    
+    private fun showPermissionRationaleDialog(){
+        runOnUiThread {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setMessage(R.string.AddDeviceActivityPermissionRationaleText)
+            dialog.setTitle(R.string.AddDeviceActivityPermissionRationaleTitleText)
+            dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                if(verboseLog){
+                    Log.d("AddDeviceActivity", "locationPermissionRationaleDialog: User confirmed the location request, so show it.")
+                }
+                this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                dialogInterface.dismiss()
+            }
+            dialog.setNegativeButton(R.string.AddDeviceActivityDeclineButton) { dialogInterface: DialogInterface, _: Int ->
+                if(verboseLog){
+                    Log.d("AddDeviceActivity", "locationPermissionRationaleDialog: User declined the location usage.")
+                }
+                // reset params
+                this.permissionRationalePending = false
+                // prevent all further requests
+                this.grantPermissionRequestDeclined = true
+                // set UI to missing-permission-state
+                this.setUIToMissingPermissionState(true)
+                dialogInterface.dismiss()
+            }
+            dialog.create()
+            dialog.show()
+        }
+    }
+    
+    private fun setUIToMissingPermissionState(permissionMissing: Boolean){
+        runOnUiThread {
+            when (permissionMissing) {
+                true -> {
+                    findViewById<RecyclerView>(R.id.addDeviceActivityScanResultRecyclerView).apply {
+                        visibility = View.GONE
+                    }
+                    findViewById<ConstraintLayout>(R.id.addDeviceActivityMissingPermissionInfoContainer).apply {
+                        visibility = View.VISIBLE
+                    }
+                }
+                else -> {
+                    findViewById<RecyclerView>(R.id.addDeviceActivityScanResultRecyclerView).apply {
+                        visibility = View.VISIBLE
+                    }
+                    findViewById<ConstraintLayout>(R.id.addDeviceActivityMissingPermissionInfoContainer).apply {
+                        visibility = View.GONE
+                    }
+                }
             }
         }
     }

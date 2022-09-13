@@ -313,6 +313,13 @@
     <string name="AddDeviceActivityDoNotShowAgainButtonText">Nicht mehr anzeigen</string>
     <string name="AddDeviceActivityScanResultHeaderText">Verfügbar</string>
     <string name="AddDeviceActivityPairedDevicesHeaderText">Gekoppelt</string>
+    <string name="AddDeviceActivityPermissionRationaleText">Um einen Bluetooth-Scan durchzuführen ist die Standort Berechtigung erforderlich. Diese Bedingung ist vom System vorgegeben. Der Standort wird weder abgerufen noch verwendet. Berechtigung gewähren?</string>
+    <string name="AddDeviceActivityPermissionRationaleTitleText">Berechtigung erforderlich</string>
+    <string name="AddDeviceActivityDeclineButton">Nein danke</string>
+    <string name="AddDeviceActivityMissingPermissionMessageHeaderText">Bluetooth-Scan fehlgeschlagen. Die erforderlichen Berechtigungen wurden nicht gewährt.</string>
+    <string name="AddDeviceActivityMissingPermissionMessageT2Text">Wie kann das Problem behoben werden?</string>
+    <string name="AddDeviceActivityMissingPermissionResolutionText1">1. Über die Einstellungen kann die entsprechende Berechtigung gewährt werden.</string>
+    <string name="AddDeviceActivityMissingPermissionResolutionText2">2. Wenn das Gerät gekoppelt werden kann, dann kann die Kopplung über die Bluetooth-Einstellungen hergestellt werden. Das Gerät erscheint dann unten in der Liste.</string>
 
 
 
