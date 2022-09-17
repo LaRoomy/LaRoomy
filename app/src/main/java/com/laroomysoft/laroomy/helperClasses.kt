@@ -32,12 +32,12 @@ class ExpandCollapseExtension {
 
         mAnimator.addListener(object : Animator.AnimatorListener {
 
-            override fun onAnimationStart(p0: Animator?) {}
-            override fun onAnimationEnd(p0: Animator?) {
+            override fun onAnimationStart(p0: Animator) {}
+            override fun onAnimationEnd(p0: Animator) {
                 view.visibility = View.GONE
             }
-            override fun onAnimationCancel(p0: Animator?) {}
-            override fun onAnimationRepeat(p0: Animator?) {}
+            override fun onAnimationCancel(p0: Animator) {}
+            override fun onAnimationRepeat(p0: Animator) {}
         })
         mAnimator.duration = duration
         mAnimator.start()

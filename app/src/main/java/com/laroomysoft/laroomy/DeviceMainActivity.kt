@@ -66,6 +66,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var scrollToTop = false
     
     private val slideUpdateData = SimpleUpdateStorage()
+    private val optionSelectUpdateData = SimpleUpdateStorage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -599,10 +600,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
 
                 setOnValueChangedListener { _, _, newVal ->
-                    // send execution command
-                    ApplicationProperty.bluetoothConnectionManager.sendData(
-                        makeSimplePropertyExecutionString(devicePropertyListContentInformation.internalElementIndex, newVal)
-                    )
+    
                     // update list element
                     ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
                         .apply {
@@ -610,6 +608,40 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             this.update(applicationContext)
                         }
                     devicePropertyListViewAdapter.notifyItemChanged(index)
+                    
+                    // control successive transmissions
+                    if(!optionSelectUpdateData.isHandled){
+                        // only save the value, because there is a transmission pending
+                        optionSelectUpdateData.value = newVal
+                    } else {
+                        // if there is no transmission pending, send the data delayed
+                        optionSelectUpdateData.value = newVal
+                        optionSelectUpdateData.isHandled = false
+                        optionSelectUpdateData.eIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex
+    
+                        Executors.newSingleThreadScheduledExecutor().schedule(
+                            {
+                                ApplicationProperty.bluetoothConnectionManager.sendData(
+                                    makeSimplePropertyExecutionString(
+                                        optionSelectUpdateData.eIndex,
+                                        optionSelectUpdateData.value
+                                    )
+                                )
+                                optionSelectUpdateData.isHandled = true
+            
+                            }, 150, TimeUnit.MILLISECONDS)
+    
+    
+    
+                        // send execution command
+//                        ApplicationProperty.bluetoothConnectionManager.sendData(
+//                            makeSimplePropertyExecutionString(
+//                                devicePropertyListContentInformation.internalElementIndex,
+//                                newVal
+//                            )
+//                        )
+                        
+                    }
                 }
             }
     }
