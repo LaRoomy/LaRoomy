@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.PopupWindow
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.*
@@ -53,6 +54,13 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+        
+        // register back event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // get UI-Views
         this.notificationTextView = findViewById(R.id.ucNotificationTextView)
@@ -67,7 +75,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         // add back button functionality
         this.backButton = findViewById(R.id.unlockControlBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         // add show/hide pin button functionality
@@ -99,9 +107,8 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         // set the UI State
         this.setCurrentViewStateFromComplexPropertyState(lockState)
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true

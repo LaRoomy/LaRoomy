@@ -107,8 +107,6 @@ class BLEDiscoveryManager(private val appContext: Context, private val discovery
                 }
             }
         } else {
-            // TODO: set UI to missing location permission error state (or is it done before at this point??)
-
             if(this.scanning){
                 // stop scan
                 bluetoothLEScanner.stopScan(leScanCallback)

@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageButton
@@ -101,14 +102,21 @@ class AddDeviceActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_device)
-
+        
+        // register on-back-pressed event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
+        
         // get UI Elements
         this.bottomSeparator = findViewById(R.id.addDeviceActivityBottomSeparator)
         this.backButton = findViewById(R.id.addDeviceActivityBackButton)
 
         // add back button functionality
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         // get the spin-kit
@@ -150,12 +158,7 @@ class AddDeviceActivity : AppCompatActivity(),
             adapter = scanResultListAdapter
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
-
+    
     override fun onResume() {
         super.onResume()
         // if this is the landscape mode, hide the bottom separator
@@ -243,30 +246,6 @@ class AddDeviceActivity : AppCompatActivity(),
             } else {
                 this.setUIToMissingPermissionState(true)
             }
-    
-            // old!
-//            if (!this.grantPermissionRequestDeclined) {
-//                this.bluetoothLocationPermissionGranted = if (ActivityCompat.checkSelfPermission(
-//                        applicationContext,
-//                        Manifest.permission.ACCESS_FINE_LOCATION
-//                    ) != PackageManager.PERMISSION_GRANTED
-//                ) {
-//                    // permission not granted - start the permission launcher
-//                    if (verboseLog) {
-//                        Log.d(
-//                            "AddDeviceActivity",
-//                            "onResume: Background location permission is not granted, ask for it!"
-//                        )
-//                    }
-//                    this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-//                    false
-//                } else {
-//                    // start the scan
-//                    this.bleDiscoveryManager.startScan()
-//                    true
-//                }
-//            }
-    
         }
     }
 
@@ -274,6 +253,11 @@ class AddDeviceActivity : AppCompatActivity(),
         super.onPause()
         this.listUpdateRequired = true
         this.bleDiscoveryManager.stopScan()
+    }
+    
+    private fun handleBackEvent(){
+        this.bleDiscoveryManager.stopScan()
+        finish()
     }
     
     private fun rescan(){

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -52,6 +53,13 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
+        // register back event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
+        
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
@@ -70,7 +78,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // add back button functionality
         this.backButton = findViewById(R.id.stringInterrogatorBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         // bind the callbacks of the bluetooth-manager to this activity
@@ -98,7 +106,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
             if(navigateBackOnButtonPress){
                 (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired = true
-                this.onBackPressed()
+                handleBackEvent()
             }
         }
 
@@ -109,14 +117,13 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
         (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-
+    
         // close activity
         finish()
         if(!isStandAlonePropertyMode) {

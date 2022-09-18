@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import java.util.*
@@ -31,6 +32,13 @@ class EditUUIDProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_u_u_i_d_profile)
+        
+        // register onBackEvent handler
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         profileNameEditText = findViewById(R.id.editUUIDActivityProfileNameEditText)
         serviceUUIDEditText = findViewById(R.id.editUUIDActivityServiceUUIDEditText)
@@ -48,10 +56,9 @@ class EditUUIDProfileActivity : AppCompatActivity() {
 
         // add back button functionality
         backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
         
-
         mode = this.intent.getStringExtra("activity-mode") ?: "err"
 
         this.headerTextView = findViewById(R.id.editUUIDActivityHeaderTextView)
@@ -135,9 +142,8 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         }
     
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         finish()
     }
 

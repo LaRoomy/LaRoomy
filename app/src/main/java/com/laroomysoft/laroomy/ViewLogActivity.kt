@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +19,7 @@ class ViewLogActivity : AppCompatActivity() {
     private lateinit var logDataListView: RecyclerView
     private lateinit var logDataListAdapter: RecyclerView.Adapter<*>
     private lateinit var logDataListLayoutManager: RecyclerView.LayoutManager
+    private lateinit var backButton: AppCompatImageButton
 
     private var wasInvokedFromSettingsActivity = false
 
@@ -24,6 +27,19 @@ class ViewLogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_log)
 
+        // register back event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
+        
+        // add back button functionality
+        backButton = findViewById(R.id.viewLogActivityBackButton)
+        backButton.setOnClickListener{
+            handleBackEvent()
+        }
+        
         this.wasInvokedFromSettingsActivity = intent.getBooleanExtra("wasInvokedFromSettingsActivity", false)
 
         this.notificationTextView = findViewById(R.id.viewLogActivityNotificationTextView)
@@ -56,9 +72,8 @@ class ViewLogActivity : AppCompatActivity() {
             )
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         finish()
         if(wasInvokedFromSettingsActivity) {
             overridePendingTransition(
@@ -108,9 +123,5 @@ class ViewLogActivity : AppCompatActivity() {
         override fun getItemCount(): Int {
             return logDataList.size
         }
-    }
-
-    fun onViewLogActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
     }
 }

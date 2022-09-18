@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.PopupWindow
 import android.widget.SeekBar
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -71,6 +72,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_main)
+        
+        // register onBackPressed event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // keep screen active if requested
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
@@ -159,14 +167,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = false
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        // the loading activity is terminated, so the start(main)-Activity will be invoked
-        ApplicationProperty.bluetoothConnectionManager.clear()
-        finish()
-    }
-
+    
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
@@ -345,6 +346,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
             }
         }
+    }
+    
+    private fun handleBackEvent(){
+        // the loading activity is terminated, so the start(main)-Activity will be invoked
+        ApplicationProperty.bluetoothConnectionManager.clear()
+        finish()
     }
 
     private fun setPropertyToSelectedState(index: Int){

@@ -2,6 +2,18 @@
 
 buildscript {
     ext.kotlin_version = '1.7.10'
+
+    ext {
+        // Sdk and tools
+        minSdkVersion = 29
+        compileSdkPreview = "Tiramisu"
+        targetSdkPreview = "Tiramisu"
+
+        // App dependencies
+        appCompatVersion = '1.6.0-alpha03' // Built original with changes
+    }
+
+
     repositories {
         google()
         //jcenter()

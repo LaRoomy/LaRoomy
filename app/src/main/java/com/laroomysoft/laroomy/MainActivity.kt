@@ -553,7 +553,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
         try {
             this.popUpWindow.dismiss()
-        } catch(e: Exception){}
+        } catch(e: Exception){
+            Log.e("MainActivity", "M: onMainActivityPopUpButtonClick -> exception occurred: $e")
+        }
     }
 
     fun onMainActivityNoContentContainerClick(@Suppress("UNUSED_PARAMETER")view: View) {

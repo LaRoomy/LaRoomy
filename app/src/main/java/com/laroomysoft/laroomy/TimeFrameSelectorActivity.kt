@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.TimePicker
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
@@ -21,8 +22,8 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
     
-    private var nextTimeChangeApplicable = true
-    private var timeUpdateNecessary = false
+    //private var nextTimeChangeApplicable = true
+    //private var timeUpdateNecessary = false
     
     private var updateDelayStarted = false
 
@@ -40,6 +41,13 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+        
+        // register back event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -51,7 +59,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         // add back button functionality
         this.backButton = findViewById(R.id.tfsBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         // set the header-text to the property Name
@@ -90,9 +98,8 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         this.fromTimePicker.setOnTimeChangedListener(this)
         this.toTimePicker.setOnTimeChangedListener(this)
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true

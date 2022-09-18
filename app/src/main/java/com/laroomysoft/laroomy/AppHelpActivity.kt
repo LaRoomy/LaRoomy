@@ -64,12 +64,7 @@ class AppHelpActivity : AppCompatActivity() {
         this.appResetContentContainer = findViewById(R.id.appHelpActivityAppResetContentContainer)
         this.appResetImageView = findViewById(R.id.appHelpActivityAppResetImageView)
     }
-
-//    fun onGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER")view: View){
-//        val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-//        startActivity(intent)
-//    }
-
+    
     fun onTopicClick(view: View){
 
         when(view.id){

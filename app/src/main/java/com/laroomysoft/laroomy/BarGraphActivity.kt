@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
@@ -34,6 +35,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bar_graph)
+        
+        // register onBackPressed event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // keep screen active if requested
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
@@ -58,7 +66,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // add back button functionality
         this.backButton = findViewById(R.id.barGraphActivityBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         // bind the callbacks of the bluetooth-manager to this activity
@@ -83,23 +91,23 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         )
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-
-        // close activity
-        finish()
-        if(!isStandAlonePropertyMode) {
-            // only set slide transition if the activity was invoked from the deviceMainActivity
-            overridePendingTransition(
-                R.anim.finish_activity_slide_animation_in,
-                R.anim.finish_activity_slide_animation_out
-            )
-        }
-    }
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
+//        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+//        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+//        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
+//
+//        // close activity
+//        finish()
+//        if(!isStandAlonePropertyMode) {
+//            // only set slide transition if the activity was invoked from the deviceMainActivity
+//            overridePendingTransition(
+//                R.anim.finish_activity_slide_animation_in,
+//                R.anim.finish_activity_slide_animation_out
+//            )
+//        }
+//    }
 
     override fun onPause() {
         super.onPause()
@@ -155,6 +163,23 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                     )
                 }
             }
+        }
+    }
+    
+    private fun handleBackEvent(){
+        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
+        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
+    
+        // close activity
+        finish()
+        if(!isStandAlonePropertyMode) {
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
         }
     }
 

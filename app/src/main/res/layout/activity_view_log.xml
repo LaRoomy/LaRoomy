@@ -26,7 +26,6 @@
             android:background="@color/transparentColor"
             android:contentDescription="@string/GeneralBackButtonLabel"
             android:src="@drawable/ic_arrow_back_white_24dp"
-            android:onClick="onViewLogActivityBackButtonClick"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

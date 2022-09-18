@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.CompoundButton
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.AppCompatImageButton
@@ -30,11 +31,18 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reset_app_data)
+        
+        // register back event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackPressed()
+            }
+        })
 
         // add back button functionality
         this.backButton = findViewById(R.id.resetAppActivityBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackPressed()
         }
 
         (applicationContext as ApplicationProperty).appSettingsResetDone = false
@@ -101,9 +109,8 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
             }
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackPressed(){
         finish()
         overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
     }

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
@@ -35,6 +36,13 @@ class AppSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_settings)
+        
+        // register onBackPressed event
+        this.onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // get the views
         this.passwordBox = findViewById(R.id.setupActivityBindingCodeBox)
@@ -44,7 +52,7 @@ class AppSettingsActivity : AppCompatActivity() {
             findViewById(R.id.setupActivityBindingKeyNotificationTextView)
         this.backButton = findViewById(R.id.setupActivityBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         this.autoConnectSwitch =
@@ -254,12 +262,7 @@ class AppSettingsActivity : AppCompatActivity() {
             )
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
-
+    
     override fun onResume() {
         super.onResume()
 
@@ -298,6 +301,10 @@ class AppSettingsActivity : AppCompatActivity() {
 
             (applicationContext as ApplicationProperty).appSettingsResetDone = false
         }
+    }
+    
+    private fun handleBackEvent(){
+        finish()
     }
 
     private val passwordViewModeVisible: Int = 1

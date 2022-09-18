@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
@@ -49,6 +50,13 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+        
+        // register back event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -68,7 +76,7 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         // add back button functionality
         this.backButton = findViewById(R.id.textListPresenterBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         // bind the callbacks of the bluetooth-manager to this activity
@@ -109,14 +117,13 @@ class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCall
         }
 
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
         (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-
+    
         // close activity
         finish()
         if(!isStandAlonePropertyMode) {

@@ -36,7 +36,7 @@ class InformationActivity : AppCompatActivity() {
         // add back button functionality
         this.backButton = findViewById(R.id.infoActivityBackButton)
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            finish()
         }
 
 //        val pInfo =

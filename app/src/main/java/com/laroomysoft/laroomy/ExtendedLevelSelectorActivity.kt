@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
@@ -16,12 +17,12 @@ import com.ramotion.fluidslider.FluidSlider
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-const val TM_NONE = 0
-const val TM_START = 1
-const val TM_END = 2
-
 class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
-
+    
+    private val tmNONE = 0
+    private val tmSTART = 1
+    private val tmEND = 2
+    
     private var mustReconnect = false
     private var relatedElementID = -1
     private var relatedGlobalElementIndex = -1
@@ -62,6 +63,13 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+        
+        // register onBackPressed event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // get the element ID + UI-Adapter Index
         relatedElementID = intent.getIntExtra("elementID", -1)
@@ -128,7 +136,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
 
         this.backButton.setOnClickListener {
-            this.onBackPressed()
+            handleBackEvent()
         }
 
         this.fluidLevelSlider.apply {
@@ -164,18 +172,17 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                 Executors.newSingleThreadScheduledExecutor().schedule({
                     val realPos = sliderPositionToLevelValue(fluidLevelSlider.position)
                     currentLevel = realPos
-                    collectDataSendCommandAndUpdateState(TM_END, true)
+                    collectDataSendCommandAndUpdateState(tmEND, true)
                 }, 200, TimeUnit.MILLISECONDS)
             }
             // set begin tracking listener
             this.beginTrackingListener = {
-                collectDataSendCommandAndUpdateState(TM_START, false)
+                collectDataSendCommandAndUpdateState(tmSTART, false)
             }
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
@@ -405,7 +412,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     private fun onOffSwitchClicked(){
         this.onOffState = this.onOffSwitch.isChecked
-        this.collectDataSendCommandAndUpdateState(TM_NONE, true)
+        this.collectDataSendCommandAndUpdateState(tmNONE, true)
     }
 
     private fun onSliderPositionChanged(value: Int){
@@ -417,7 +424,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
         // save the new value
         this.currentLevel = value
-        this.collectDataSendCommandAndUpdateState(TM_NONE, true)
+        this.collectDataSendCommandAndUpdateState(tmNONE, true)
     }
 
     private fun collectDataSendCommandAndUpdateState(transmissionType: Int, updateState: Boolean){
@@ -429,8 +436,8 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         exLevelState.showOnOffSwitch = this.showOnOffSwitch
 
         when {
-            (transmissionType == TM_START) -> exLevelState.isStart = true
-            (transmissionType == TM_END) -> exLevelState.isEnd = true
+            (transmissionType == tmSTART) -> exLevelState.isStart = true
+            (transmissionType == tmEND) -> exLevelState.isEnd = true
         }
 
         ApplicationProperty.bluetoothConnectionManager.sendData(

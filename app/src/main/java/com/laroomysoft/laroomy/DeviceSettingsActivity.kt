@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
@@ -19,12 +20,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-const val DB_NONE = 0
-const val DB_ENABLE = 1
-const val DB_RELEASE = 2
-
 class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
-
+    
+    private val dbNONE = 0
+    private val dbENABLE = 1
+    private val dbRELEASE = 2
+    
     private var mustReconnect = false
     private lateinit var userNotificationTextView: AppCompatTextView
     private lateinit var bindingSwitch: SwitchCompat
@@ -35,11 +36,13 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private lateinit var deviceAddressTextView: AppCompatTextView
     private lateinit var deviceServiceUUIDTextView: AppCompatTextView
     private lateinit var deviceCharacteristicUUIDTextView: AppCompatTextView
+    private lateinit var backButton: AppCompatImageButton
+    private lateinit var deviceInfoButton: AppCompatButton
 
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
 
-    private var pendingBindingTransmission = DB_NONE
+    private var pendingBindingTransmission = dbNONE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,13 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_KeepScreenActive)){
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+        
+        // register onBackPressed event
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
 
         // align context and event objects
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
@@ -57,14 +67,31 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         // get the necessary views
         userNotificationTextView = findViewById(R.id.deviceSettingsActivityUserNotificationTextView)
         bindingSwitch = findViewById(R.id.deviceSettingsActivityBindingSwitch)
-        factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
         bindingHintTextView = findViewById(R.id.deviceSettingsActivityBindingHintTextView)
         shareBindingContainer = findViewById(R.id.deviceSettingsActivityShareBindingContainer)
         deviceNameTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoNameTextView)
         deviceAddressTextView = findViewById(R.id.deviceSettingsActivityDeviceMACAddressNameTextView)
         deviceServiceUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoServiceUUIDTextView)
         deviceCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoCharacteristicUUIDTextView)
-
+        
+        // get backButton and add onClick handler
+        backButton = findViewById(R.id.deviceSettingsActivityBackButton)
+        backButton.setOnClickListener{
+            handleBackEvent()
+        }
+        
+        // get device-info button and add onClick listener
+        deviceInfoButton = findViewById(R.id.deviceSettingsActivityShowDeviceInfoButton)
+        deviceInfoButton.setOnClickListener {
+            onDeviceSettingsActivityShowDevInfoButtonClick()
+        }
+        
+        // get factory reset button and add onClick listener
+        factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
+        factoryResetButton.setOnClickListener {
+            onFactoryResetButtonClick()
+        }
+    
         // set device info
         try {
             deviceNameTextView.text =
@@ -141,10 +168,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     shareBindingContainer.visibility = View.VISIBLE
 
                     // schedule a timeout control for the response
-                    this.pendingBindingTransmission = DB_ENABLE
+                    this.pendingBindingTransmission = dbENABLE
                     Executors.newSingleThreadScheduledExecutor().schedule({
-                        if(pendingBindingTransmission == DB_ENABLE){
-                            pendingBindingTransmission = DB_NONE
+                        if(pendingBindingTransmission == dbENABLE){
+                            pendingBindingTransmission = dbNONE
 
                             if(verboseLog){
                                 Log.d("EnableDeviceBinding", "Unexpected Timeout for enable response.")
@@ -169,10 +196,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     shareBindingContainer.visibility = View.GONE
 
                     // schedule a timeout control for the response
-                    this.pendingBindingTransmission = DB_RELEASE
+                    this.pendingBindingTransmission = dbRELEASE
                     Executors.newSingleThreadScheduledExecutor().schedule({
-                        if(pendingBindingTransmission == DB_RELEASE){
-                            pendingBindingTransmission = DB_NONE
+                        if(pendingBindingTransmission == dbRELEASE){
+                            pendingBindingTransmission = dbNONE
 
                             if(verboseLog){
                                 Log.d("ReleaseDeviceBinding", "Unexpected Timeout for release response.")
@@ -189,15 +216,14 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             }
         }
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
+    
+    private fun handleBackEvent(){
         // handle the back-navigation like a property-sub-page, because the device should remain connected during this procedure
         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
         // close
         finish()
     }
-
+    
     override fun onPause() {
         super.onPause()
         // if this is not called due to a back-navigation, the user must have left the app
@@ -292,15 +318,15 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
     }
 
-    fun onFactoryResetButtonClick(@Suppress("UNUSED_PARAMETER") view: View){
+    private fun onFactoryResetButtonClick(){
         val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
-        view.startAnimation(buttonAnimation)
+        this.factoryResetButton.startAnimation(buttonAnimation)
         factoryResetAlertDialog()
     }
 
-    fun onDeviceSettingsActivityShowDevInfoButtonClick(view: View) {
+    private fun onDeviceSettingsActivityShowDevInfoButtonClick() {
         // hide the button and show the device info..
-        view.visibility = View.GONE
+        this.deviceInfoButton.visibility = View.GONE
         findViewById<ConstraintLayout>(R.id.deviceSettingsActivityDeviceInfoParentContainer).visibility = View.VISIBLE
 
     }
@@ -409,7 +435,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         
         runOnUiThread {
             // response received, reset timeout param
-            this.pendingBindingTransmission = DB_NONE
+            this.pendingBindingTransmission = dbNONE
     
             // look for a rejected/error/success setting notification
             when (responseID) {
@@ -549,9 +575,5 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             R.anim.finish_activity_slide_animation_in,
             R.anim.finish_activity_slide_animation_out
         )
-    }
-
-    fun onDeviceSettingsActivityBackButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        this.onBackPressed()
     }
 }
