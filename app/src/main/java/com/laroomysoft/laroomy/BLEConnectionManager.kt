@@ -38,9 +38,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     // static notifications
     private val propertyLoadingCompleteNotification = "5000030010\r"         // sent when the retrieving of the properties is complete (raw loading - not from cache)
-    private val deviceReconnectedNotification = "500002007\r"                // sent when the connection was suspended (user has left the app) and the user re-invoked the app
-    private val userNavigatedBackToDeviceMainNotification = "500002004\r"    // sent when the user has opened a complex property page and navigated back to device-main-page
     private val propertyLoadedFromCacheCompleteNotification = "5000030011\r" // sent when the properties and groups are loaded from cache and the operation is complete
+    private val deviceReconnectedNotificationEntry = "500002007"           // sent when the connection was suspended (user has left the app) and the user re-invoked the app (the current opened property ID must be appended to this notification)
+    private val userNavigatedBackToDeviceMainNotification = "500002004\r"    // sent when the user has opened a complex property page and navigated back to device-main-page
     private val factoryResetCommand = "500002006\r"                          // sent when the user executes the factory reset on the device-settings page
 
     // data holder objects
@@ -220,7 +220,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
                         // notify the remote device
                         Executors.newSingleThreadScheduledExecutor().schedule({
-                            sendData(deviceReconnectedNotification)
+                            sendDeviceReconnectedNotification()
                         }, 800, TimeUnit.MILLISECONDS)
                     }
                 }
@@ -3541,6 +3541,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(this.isOtherThanDeviceMainActivity()){
             this.propertyCallback.onRemoteBackNavigationRequested()
         }
+    }
+    
+    private fun sendDeviceReconnectedNotification(){
+        val currentPageIndex = this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+        val dataToSend = "${this.deviceReconnectedNotificationEntry}${a8bitValueTo2CharHexValue(currentPageIndex)}\r"
+        this.sendData(dataToSend)
     }
 
     // the callback definition for the event handling in the calling class
