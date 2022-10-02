@@ -1,5 +1,6 @@
 package com.laroomysoft.laroomy
 
+import android.content.Context
 import android.graphics.Color
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -25,6 +26,10 @@ fun colorForPercentageLevel(level: Int): Int {
     return if((level < 35)&&(level > 12)) Color.YELLOW
     else if(level <= 12) Color.RED
     else Color.GREEN
+}
+
+fun dpToPixel(context: Context, dp: Int) : Float {
+    return dp * context.resources.displayMetrics.density
 }
 
 /*

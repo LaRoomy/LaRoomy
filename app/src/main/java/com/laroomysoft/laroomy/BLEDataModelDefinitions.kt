@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
@@ -1638,6 +1639,12 @@ class DevicePropertyListContentInformation(val elementType: Int) {
         this.isAccessible = false
         field = value
     }
+    
+    var hasSubColorDefinition = false
+    private set
+    
+    var hasNavImageColorDefinition = false
+    private set
 
     var hasChanged = false
 
@@ -1698,7 +1705,11 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     // resources for the visual state of the item
     lateinit var backgroundDrawable : Drawable //= R.drawable.single_property_list_element_background
     private set
+    var navigationImageBackground = GradientDrawable()
+    private set
     var textColorResource = 0
+    private set
+    var subTextColorResource = 0
     private set
     var switchVisibility = View.GONE
     private set
@@ -1721,6 +1732,12 @@ class DevicePropertyListContentInformation(val elementType: Int) {
         }
         // set the text color in relation to the enabled param
         this.textColorResource = if(this.isEnabled){
+            context.getColor(R.color.normalTextColor)
+        } else {
+            context.getColor(R.color.disabledTextColor)
+        }
+        // set the sub-text color in relation to the enabled param (this could later be revoked by some property-color morphs)
+        this.subTextColorResource = if(this.isEnabled){
             context.getColor(R.color.normalTextColor)
         } else {
             context.getColor(R.color.disabledTextColor)
@@ -1819,22 +1836,74 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                         this.switchVisibility = View.GONE
 
                         this.canNavigateForward = false
+                        
+                        val dd = checkForDualDescriptor(this.elementDescriptorText)
+                        if(dd.isDual){
+                            // retrieve the color value and set it
+                            this.elementText = dd.elementText
+    
+                            // only try to change the color if the property is enabled
+                            if(this.isEnabled) {
+                                try {
+                                    val col = Color.parseColor(dd.actionText)
+                                    this.subTextColorResource = col
+                                    this.hasSubColorDefinition = true
+                                } catch (e: Exception) {
+                                    Log.e(
+                                        "DLCI:Update",
+                                        "DevicePropertyListContentInformation::Update failed by LevelIndicator-Type"
+                                    )
+                                }
+                            }
+                        } else {
+                            // set the element text
+                            this.elementText = this.elementDescriptorText
+                        }
 
-                        // set the element text
-                        this.elementText = this.elementDescriptorText
                         // convert the state to the string for the level-textView
                         this.elementSubText = PercentageLevelPropertyGenerator(this.simplePropertyState).percentageString ?: ""
                     }
-                    PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY ->{
+                    PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
                         this.navigationImageVisibility = View.GONE
                         this.levelIndicationTextViewVisibility = View.GONE
                         this.buttonVisibility = View.GONE
                         this.switchVisibility = View.GONE
 
                         this.canNavigateForward = false
-
-                        // set the element text
-                        this.elementText = this.elementDescriptorText
+                        
+                        // the dual descriptor in this property is a color definition
+                        val dd = checkForDualDescriptor(this.elementDescriptorText)
+                        if(dd.isDual){
+                            
+                            // set the element text
+                            this.elementText = dd.elementText
+                            
+                            // create resources and set params
+                            try {
+                                val col = if(this.isEnabled) {
+                                    Color.parseColor(dd.actionText)
+                                } else {
+                                    context.getColor(R.color.propertyListElementNavImageDisabledBackground)
+                                }
+                                
+                                this.navigationImageBackground.shape = GradientDrawable.RECTANGLE
+                                this.navigationImageBackground.setColor(col)
+                                this.navigationImageBackground.cornerRadius = dpToPixel(context, 11)
+                                
+                                this.hasNavImageColorDefinition = true
+                                this.navigationImageVisibility = View.VISIBLE
+    
+                            } catch (e: Exception){
+                                Log.e(
+                                    "DLCI:Update",
+                                    "DevicePropertyListContentInformation::Update failed by TextListPresenter-Type"
+                                )
+                            }
+                            
+                        } else {
+                            // set the element text
+                            this.elementText = this.elementDescriptorText
+                        }
                         this.elementSubText = ""
                     }
                     PROPERTY_TYPE_OPTION_SELECTOR -> {

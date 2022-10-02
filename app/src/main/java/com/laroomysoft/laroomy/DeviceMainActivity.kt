@@ -1563,6 +1563,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     this.visibility = elementToRender.levelIndicationTextViewVisibility
                     if(elementToRender.levelIndicationTextViewVisibility == View.VISIBLE){
                         this.text = elementToRender.elementSubText
+                        if(elementToRender.hasSubColorDefinition){
+                            this.setTextColor(elementToRender.subTextColorResource)
+                        }
                     } else {
                         this.text = ""
                     }
@@ -1571,10 +1574,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // navigation image properties
             holder.linearLayout.findViewById<AppCompatImageView>(R.id.forwardImage).apply {
                 visibility = elementToRender.navigationImageVisibility
-                if(elementToRender.isEnabled){
-                    setImageResource(R.drawable.ic_complex_property_navigation_arrow)
+                if(elementToRender.hasNavImageColorDefinition){
+                    background = elementToRender.navigationImageBackground
+                    setImageResource(R.drawable.ic_complex_property_navigation_arrow_invisible)
                 } else {
-                    setImageResource(R.drawable.ic_complex_property_disabled_navigation_arrow)
+                    if (elementToRender.isEnabled) {
+                        setImageResource(R.drawable.ic_complex_property_navigation_arrow)
+                    } else {
+                        setImageResource(R.drawable.ic_complex_property_disabled_navigation_arrow)
+                    }
                 }
             }
         }
