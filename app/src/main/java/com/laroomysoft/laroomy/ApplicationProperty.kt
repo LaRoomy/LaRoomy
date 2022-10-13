@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.app.Application
 import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import java.util.*
 import kotlin.collections.ArrayList
@@ -95,12 +96,10 @@ class ApplicationProperty : Application() {
     override fun onCreate() {
         super.onCreate()
         bluetoothConnectionManager = BLEConnectionManager(this)
-
-
-        //systemLanguage = Locale.getDefault().displayLanguage
-
-
-        systemLanguage = Locale.getDefault().language
+        
+        //systemLanguage = Locale.getDefault().displayLanguage - returns 'Deutsch' for example
+        //systemLanguage = Locale.getDefault().language - returns the system language in iso 639-1 format 'de' for example
+        systemLanguage = resources.configuration.locales.get(0).language // returns the app language in iso 639-1 format
 
         eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
 
