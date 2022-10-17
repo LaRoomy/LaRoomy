@@ -212,6 +212,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         if(verboseLog){
             Log.d("MA:onResume", "onResume executed in MainActivity")
         }
+        // update the global app params
+        (applicationContext as ApplicationProperty).onResume()
 
         // control bottom separator in alignment to the screen orientation
         bottomSeparator.visibility = when (this.resources.configuration.orientation) {

@@ -106,6 +106,10 @@ class ApplicationProperty : Application() {
         // add the initial placeholder value
         //this.connectionLog.add(getString(R.string.ConnectionLog_NoContent))
     }
+    
+    fun onResume(){
+        systemLanguage = resources.configuration.locales.get(0).language // returns the app language in iso 639-1 format
+    }
 
     fun resetControlParameter(){
         this.noConnectionKillOnPauseExecution = false
