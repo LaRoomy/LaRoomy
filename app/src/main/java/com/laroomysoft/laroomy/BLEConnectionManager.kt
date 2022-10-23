@@ -120,10 +120,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     
     val currentUsedTXCharacteristicUUID: String
     get() {
-        return if(this.txGattCharacteristic.toString() == this.rxGattCharacteristic.toString()){
+        return if(this.txGattCharacteristic.uuid.toString() == this.rxGattCharacteristic.uuid.toString()){
             ""
         } else {
-            this.txGattCharacteristic.toString()
+            this.txGattCharacteristic.uuid.toString()
         }
     }
 

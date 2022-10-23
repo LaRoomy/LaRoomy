@@ -66,8 +66,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var propertyStateUpdateRequired = false
     private var scrollToTop = false
     
-    private val slideUpdateData = SimpleUpdateStorage()
-    private val optionSelectUpdateData = SimpleUpdateStorage()
+    private val slideUpdateData = SuccessiveSimpleUpdateStorage()
+    private val optionSelectUpdateData = SuccessiveSimpleUpdateStorage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

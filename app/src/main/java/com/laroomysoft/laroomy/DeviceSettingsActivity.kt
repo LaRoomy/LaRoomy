@@ -35,7 +35,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private lateinit var deviceNameTextView: AppCompatTextView
     private lateinit var deviceAddressTextView: AppCompatTextView
     private lateinit var deviceServiceUUIDTextView: AppCompatTextView
-    private lateinit var deviceCharacteristicUUIDTextView: AppCompatTextView
+    private lateinit var deviceRxCharacteristicUUIDTextView: AppCompatTextView
+    private lateinit var deviceTxCharacteristicUUIDTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
     private lateinit var deviceInfoButton: AppCompatButton
 
@@ -72,24 +73,28 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         deviceNameTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoNameTextView)
         deviceAddressTextView = findViewById(R.id.deviceSettingsActivityDeviceMACAddressNameTextView)
         deviceServiceUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoServiceUUIDTextView)
-        deviceCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoCharacteristicUUIDTextView)
+        deviceTxCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoTxCharacteristicUUIDTextView)
+        deviceRxCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoRxCharacteristicUUIDTextView)
         
         // get backButton and add onClick handler
-        backButton = findViewById(R.id.deviceSettingsActivityBackButton)
-        backButton.setOnClickListener{
-            handleBackEvent()
+        backButton = findViewById<AppCompatImageButton?>(R.id.deviceSettingsActivityBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
         }
         
         // get device-info button and add onClick listener
-        deviceInfoButton = findViewById(R.id.deviceSettingsActivityShowDeviceInfoButton)
-        deviceInfoButton.setOnClickListener {
-            onDeviceSettingsActivityShowDevInfoButtonClick()
+        deviceInfoButton = findViewById<AppCompatButton?>(R.id.deviceSettingsActivityShowDeviceInfoButton).apply {
+            setOnClickListener {
+                onDeviceSettingsActivityShowDevInfoButtonClick()
+            }
         }
         
         // get factory reset button and add onClick listener
-        factoryResetButton = findViewById(R.id.deviceSettingsActivityFactoryResetButton)
-        factoryResetButton.setOnClickListener {
-            onFactoryResetButtonClick()
+        factoryResetButton = findViewById<AppCompatButton?>(R.id.deviceSettingsActivityFactoryResetButton).apply {
+            setOnClickListener {
+                onFactoryResetButtonClick()
+            }
         }
     
         // set device info
@@ -98,13 +103,14 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
         } catch (e: SecurityException){
             // further execution makes no sense, so navigate back
-                // (DeviceMainActivity::onResume) will check the permission again and will go navigate back to main to request the permission
+                // (DeviceMainActivity::onResume) will check the permission again and will navigate back to main to request the permission
             deviceNameTextView.text = getString(R.string.TextResourceErrorState)
             finish()
         }
         deviceAddressTextView.text = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
         deviceServiceUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedServiceUUID
-        deviceCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedRXCharacteristicUUID
+        deviceRxCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedRXCharacteristicUUID
+        deviceTxCharacteristicUUIDTextView.text = ApplicationProperty.bluetoothConnectionManager.currentUsedTXCharacteristicUUID
 
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired

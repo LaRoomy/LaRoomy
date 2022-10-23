@@ -1,0 +1,69 @@
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="48dp"
+            android:height="48dp"
+            android:viewportWidth="48"
+            android:viewportHeight="48">
+
+            <group android:name="dot"
+                android:translateX="24"
+                android:translateY="24">
+                <path
+                    android:name="dot_path"
+                    android:pathData="M 0,0 m -20,0 a 10,10 0 1,0 40,0 a 10,10 0 1,0 -40,0"
+                    android:fillColor="#00aaaaaa"
+                    />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="dot_path">
+    <aapt:attr name="android:animation">
+        <set>
+            <objectAnimator
+                android:propertyName="fillColor"
+                android:duration="200"
+                android:valueFrom="#00000000"
+                android:valueTo="#aaaaaaaa"
+                android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </set>
+    </aapt:attr>
+    </target>
+    <target android:name="dot">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="scaleX"
+                    android:duration="500"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+                <objectAnimator
+                    android:propertyName="scaleY"
+                    android:duration="500"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="dot_path">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="fillAlpha"
+                    android:startOffset="400"
+                    android:duration="400"
+                    android:valueFrom="1"
+                    android:valueTo="0"
+                    android:valueType="floatType"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

@@ -1,12 +1,14 @@
 package com.laroomysoft.laroomy
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +22,13 @@ class ViewLogActivity : AppCompatActivity() {
     private lateinit var logDataListAdapter: RecyclerView.Adapter<*>
     private lateinit var logDataListLayoutManager: RecyclerView.LayoutManager
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var scrollUpButton: ImageButton
+    private lateinit var scrollDownButton: ImageButton
+    private lateinit var exportButton: ImageButton
+    
+    private lateinit var exportButtonAnimation: AnimatedVectorDrawable
+    private lateinit var scrollUpButtonAnimation: AnimatedVectorDrawable
+    private lateinit var scrollDownButtonAnimation: AnimatedVectorDrawable
 
     private var wasInvokedFromSettingsActivity = false
 
@@ -35,9 +44,68 @@ class ViewLogActivity : AppCompatActivity() {
         })
         
         // add back button functionality
-        backButton = findViewById(R.id.viewLogActivityBackButton)
-        backButton.setOnClickListener{
-            handleBackEvent()
+        backButton = findViewById<AppCompatImageButton?>(R.id.viewLogActivityBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
+        }
+        
+        val noContent = (applicationContext as ApplicationProperty).connectionLog.size == 0
+        
+        // add tool button functionalities
+        scrollUpButton = findViewById<ImageButton?>(R.id.viewLogActivityScrollUpImageButton).apply {
+            
+            scrollUpButtonAnimation = background as AnimatedVectorDrawable
+            
+            if(noContent){
+                isEnabled = false
+            }
+            
+            setOnClickListener {
+                scrollUpButtonAnimation.start()
+                logDataListView.scrollToPosition(0)
+            }
+        }
+        scrollDownButton = findViewById<ImageButton?>(R.id.viewLogActivityScrollDownImageButton).apply {
+            
+            scrollDownButtonAnimation = background as AnimatedVectorDrawable
+            
+            if(noContent){
+                isEnabled = false
+            }
+            
+            setOnClickListener {
+                scrollDownButtonAnimation.start()
+                logDataListView.scrollToPosition(logDataListAdapter.itemCount - 1)
+            }
+        }
+        exportButton = findViewById<ImageButton?>(R.id.viewLogActivityExportImageButton).apply {
+            
+            exportButtonAnimation = background as AnimatedVectorDrawable
+            
+            if(noContent){
+                isEnabled = false
+            }
+            
+            setOnClickListener {
+                exportButtonAnimation.start()
+                
+                var textBuffer = ""
+    
+                (applicationContext as ApplicationProperty).connectionLog.forEach {
+                    textBuffer += it
+                    textBuffer += "\r\n"
+                }
+    
+                // share
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, textBuffer)
+                    type = "text/plain"
+                }
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                startActivity(shareIntent)
+            }
         }
         
         this.wasInvokedFromSettingsActivity = intent.getBooleanExtra("wasInvokedFromSettingsActivity", false)

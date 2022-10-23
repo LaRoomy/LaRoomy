@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -28,7 +30,11 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     private lateinit var userNotificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
-
+    
+    private val updateList = ArrayList<String>()
+    private var queueInProgress = false
+    private lateinit var queueTimer: Timer
+    
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -212,9 +218,38 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
             true -> NAV_TOUCH_TYPE_DOWN
             else -> NAV_TOUCH_TYPE_RELEASE
         }
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            navigatorState.toExecutionString(this.relatedElementID)
-        )
+    
+        this.handleTransmissionQueue(navigatorState.toExecutionString(this.relatedElementID))
+    }
+    
+    private fun handleTransmissionQueue(data: String){
+        this.updateList.add(data)
+        
+        if(!this.queueInProgress){
+            
+            this.queueTimer = Timer()
+            this.queueInProgress = true
+            this.queueTimer.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    
+                    var kill = false
+                    
+                    if(updateList.size > 0){
+                        ApplicationProperty.bluetoothConnectionManager.sendData(updateList.first())
+                        updateList.removeAt(0)
+                        if(updateList.size == 0){
+                            kill = true
+                        }
+                    } else {
+                        kill = true
+                    }
+                    if(kill){
+                        queueInProgress = false
+                        this.cancel()
+                    }
+                }
+            }, (150).toLong(), (150).toLong())
+        }
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(navigatorState: NavigatorState) {

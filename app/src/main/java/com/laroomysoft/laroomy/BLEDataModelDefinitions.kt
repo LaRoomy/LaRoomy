@@ -2238,7 +2238,7 @@ class DualDescriptor {
     var isDual = false
 }
 
-class SimpleUpdateStorage {
+class SuccessiveSimpleUpdateStorage {
     var value = 0
     var isHandled = true
     var eIndex = -1

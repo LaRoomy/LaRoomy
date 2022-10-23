@@ -401,19 +401,19 @@
                 app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivityDeviceInfoServiceUUIDDescriptorTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/deviceSettingsActivityDeviceInfoCharacteristicUUIDDescriptorTextView"
+                android:id="@+id/deviceSettingsActivityDeviceInfoRxCharacteristicUUIDDescriptorTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
-                android:text="@string/DeviceSettingsActivity_DeviceCharacteristicUUIDDescriptorText"
+                android:text="@string/DeviceSettingsActivity_DeviceRxCharacteristicUUIDDescriptorText"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivityDeviceInfoServiceUUIDTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/deviceSettingsActivityDeviceInfoCharacteristicUUIDTextView"
+                android:id="@+id/deviceSettingsActivityDeviceInfoRxCharacteristicUUIDTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
@@ -424,7 +424,34 @@
                 android:typeface="monospace"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivityDeviceInfoCharacteristicUUIDDescriptorTextView" />
+                app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivityDeviceInfoRxCharacteristicUUIDDescriptorTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/deviceSettingsActivityDeviceInfoTxCharacteristicUUIDDescriptorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/DeviceSettingsActivity_DeviceTxCharacteristicUUIDDescriptorText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivityDeviceInfoRxCharacteristicUUIDTextView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/deviceSettingsActivityDeviceInfoTxCharacteristicUUIDTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="20dp"
+                android:textColor="@color/pureWhite"
+                android:textSize="12sp"
+                android:typeface="monospace"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivityDeviceInfoTxCharacteristicUUIDDescriptorTextView" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

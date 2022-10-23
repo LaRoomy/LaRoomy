@@ -230,7 +230,8 @@
     <string name="DeviceSettingsActivity_DeviceInfoNameDescriptorText">Name:</string>
     <string name="DeviceSettingsActivity_DeviceMACAddressDescriptorText">MAC:</string>
     <string name="DeviceSettingsActivity_DeviceServiceUUIDDescriptorText">Service UUID:</string>
-    <string name="DeviceSettingsActivity_DeviceCharacteristicUUIDDescriptorText">Characteristic UUID:</string>
+    <string name="DeviceSettingsActivity_DeviceRxCharacteristicUUIDDescriptorText">RX Characteristic UUID:</string>
+    <string name="DeviceSettingsActivity_DeviceTxCharacteristicUUIDDescriptorText">TX Characteristic UUID:</string>
     <string name="DeviceSettingsActivity_ReleaseBindingSuccessText">Gerätebindung erfolgreich gelöst.</string>
     <string name="DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText">Fehler beim Lösen der Geräte-Bindung: Falscher Schlüssel.</string>
     <string name="DeviceSettingsActivity_ReleaseBindingFailedUnknownErrorText">Fehler beim Lösen der Geräte-Bindung: Unbekannter Fehler.</string>
