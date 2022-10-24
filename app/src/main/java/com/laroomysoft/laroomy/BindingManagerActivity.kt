@@ -79,7 +79,7 @@ class BindingManagerActivity : AppCompatActivity() {
             
             }
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementBindingTypeTextView).apply {
-                
+            
             }
         }
         
