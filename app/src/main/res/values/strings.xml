@@ -172,6 +172,12 @@
     <string name="SetupActivity_ResetDataButtonText">Reset App Data</string>
     <string name="SetupActivity_KeepScreenActiveElementText">Keep screen active</string>
     <string name="SetupActivity_KeepScreenActiveHint">Prevents the device from falling in sleep-mode when the remote device is connected.</string>
+    <string name="SetupActivity_BindingManagerButtonText">Binding-Data Manager</string>
+
+    <string name="BindingManagerActivity_HeaderText">Manage Binding-Data</string>
+    <string name="BindingManagerActivity_ListElementDeviceName">Device-Name:</string>
+    <string name="BindingManagerActivity_ListElementMacAddress">Mac-Address:</string>
+    <string name="BindingManagerActivity_ListElementBindingType">Binding-Type:</string>
 
     <string name="ResetAppActivity_HeaderText">Reset Data</string>
     <string name="ResetAppActivity_SelectDataActionText">Select the data you want to reset:</string>
@@ -364,7 +370,6 @@
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>
-    <string name="DataKey_UseCustomBindingKey" translatable="false">useDeviceBindingValue</string>
     <string name="DataKey_AutoConnect" translatable="false">autoConnectValue</string>
     <string name="DataKey_DefaultRandomBindingPasskey" translatable="false">bindingPasskey</string>
     <string name="DataKey_CustomBindingPasskey" translatable="false">customBindingPasskey</string>

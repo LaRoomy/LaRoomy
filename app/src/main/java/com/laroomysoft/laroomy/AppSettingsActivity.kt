@@ -1,35 +1,28 @@
 package com.laroomysoft.laroomy
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.View
-import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.widget.addTextChangedListener
 
 class AppSettingsActivity : AppCompatActivity() {
 
-    private lateinit var passwordBox: EditText
-    private lateinit var passwordViewModeButton: AppCompatImageButton
-    private lateinit var useCustomBindingKeySwitch: SwitchCompat
     private lateinit var autoConnectSwitch: SwitchCompat
     private lateinit var savePropertiesSwitch: SwitchCompat
-    private lateinit var passwordContainer: ConstraintLayout
     private lateinit var enableLogSwitch: SwitchCompat
-    private lateinit var passKeyInputNotificationTextView: AppCompatTextView
     private lateinit var keepScreenActiveSwitchCompat: SwitchCompat
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var manageUUIDProfileButton: ConstraintLayout
+    private lateinit var showLogButton: ConstraintLayout
+    private lateinit var resetAppButton: ConstraintLayout
+    private lateinit var bindingManagerButton: ConstraintLayout
 
     private var buttonNormalizationRequired = false
 
@@ -44,15 +37,39 @@ class AppSettingsActivity : AppCompatActivity() {
             }
         })
 
-        // get the views
-        this.passwordBox = findViewById(R.id.setupActivityBindingCodeBox)
-        this.passwordViewModeButton = findViewById(R.id.setupActivityBindingCodeVisibilityButton)
-        this.passwordContainer = findViewById(R.id.setupActivityBindingCodeContainer)
-        this.passKeyInputNotificationTextView =
-            findViewById(R.id.setupActivityBindingKeyNotificationTextView)
-        this.backButton = findViewById(R.id.setupActivityBackButton)
-        this.backButton.setOnClickListener {
-            handleBackEvent()
+        // get backButton and add functionality
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.setupActivityBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
+        }
+        
+        // get manage UUID Button (ConstraintLayout) and register onClick event
+        this.manageUUIDProfileButton = findViewById<ConstraintLayout?>(R.id.setupActivityUUIDManagerButton).apply {
+            setOnClickListener {
+                onManageUUIDProfilesButtonClick(it)
+            }
+        }
+        
+        // get show-log Button (ConstraintLayout) and register onClick event
+        this.showLogButton = findViewById<ConstraintLayout?>(R.id.setupActivityShowLogButton).apply {
+            setOnClickListener {
+                onShowLogButtonClick(it)
+            }
+        }
+        
+        // get binding-manager Button (ConstraintLayout) and register onClick event
+        this.bindingManagerButton = findViewById<ConstraintLayout?>(R.id.setupActivityBindingManagerButton).apply {
+            setOnClickListener {
+                onBindingManagerButtonClick(it)
+            }
+        }
+        
+        // get reset-app Button (ConstraintLayout) and register onClick event
+        this.resetAppButton = findViewById<ConstraintLayout?>(R.id.setupActivityResetDataButton).apply {
+            setOnClickListener {
+                onResetDataButtonClick(it)
+            }
         }
 
         this.autoConnectSwitch =
@@ -63,19 +80,14 @@ class AppSettingsActivity : AppCompatActivity() {
                         R.string.DataKey_AutoConnect
                     )
                 this.isChecked = state
-            }
-        this.useCustomBindingKeySwitch =
-            findViewById<SwitchCompat>(R.id.setupActivityCustomBindingCodeSwitch).apply {
-                val state =
-                    (applicationContext as ApplicationProperty).loadBooleanData(
+    
+                setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+        
+                    (applicationContext as ApplicationProperty).saveBooleanData(
+                        b,
                         R.string.FileKey_AppSettings,
-                        R.string.DataKey_UseCustomBindingKey
+                        R.string.DataKey_AutoConnect
                     )
-                this.isChecked = state
-
-                // if the device binding is active, show the password-edit container and set the password to the edit-box
-                if (state) {
-                    passwordContainer.visibility = View.VISIBLE
                 }
             }
 
@@ -88,6 +100,15 @@ class AppSettingsActivity : AppCompatActivity() {
                         true
                     )
                 this.isChecked = state
+    
+                setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+        
+                    (applicationContext as ApplicationProperty).saveBooleanData(
+                        b,
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_SaveProperties
+                    )
+                }
             }
 
         this.enableLogSwitch =
@@ -98,15 +119,29 @@ class AppSettingsActivity : AppCompatActivity() {
                         R.string.DataKey_EnableLog
                     )
                 this.isChecked = state
-
-                // if logging is activated, show the nav-button
-                //setShowLogButtonVisibility(state)
-
-                // FIXME: not the best approach???? Why does setting the margins of the separator view in onCreate not work???
-                Handler(Looper.getMainLooper()).postDelayed({
-                    setShowLogButtonVisibility(state)
-                }, 200)
+    
+                // set the visual state of the log nav button regarding to the state value
+                setShowLogButtonState(state)
+    
+                setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+        
+                    (applicationContext as ApplicationProperty).saveBooleanData(
+                        b,
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_EnableLog
+                    )
+                    setShowLogButtonState(b)
+        
+                    (applicationContext as ApplicationProperty).eventLogEnabled = b
+        
+                    // delete log data if the switch is set to off state
+                    if(!b) {
+                        (applicationContext as ApplicationProperty).logRecordingTime = ""
+                        (applicationContext as ApplicationProperty).connectionLog.clear()
+                    }
+                }
             }
+        
         this.keepScreenActiveSwitchCompat =
             findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
                 val state =
@@ -115,152 +150,16 @@ class AppSettingsActivity : AppCompatActivity() {
                         R.string.DataKey_KeepScreenActive
                     )
                 this.isChecked = state
-            }
-
-        // set the saved password (if there is one, actually there should always be one)
-        val pw = (this.applicationContext as ApplicationProperty).loadSavedStringData(
-            R.string.FileKey_AppSettings,
-            R.string.DataKey_CustomBindingPasskey
-        )
-        if (pw != ERROR_NOTFOUND) {
-            this.passwordBox.setText(pw)
-        }
-
-        // add on change listener to the password-box
-        this.passwordBox.addTextChangedListener {
-            // check if the box is empty, if so: save the entered passkey. Otherwise restore a default value -> the passkey cannot be empty
-            val passKey =
-                passwordBox.text.toString()
-            // the passKey will only be saved if the length is correct (0 > length < 11)
-            if (passKey.isNotEmpty()) {
-                if (passKey.length > 10) {
-                    // passKey too long
-                    // notify User
-                    setPassKeyInputNotification(
-                        getString(R.string.SetupActivity_PassKeyMaxIs10Character),
-                        R.color.WarningColor
+    
+                setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+        
+                    (applicationContext as ApplicationProperty).saveBooleanData(
+                        b,
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_KeepScreenActive
                     )
-                } else {
-                    // check for invalid character
-                    if (!validatePassKey(passKey)) {
-                        // invalid character in passKey string
-                        // notify user
-                        setPassKeyInputNotification(
-                            getString(R.string.SetupActivity_PassKeyContainsInvalidCharacter),
-                            R.color.ErrorColor
-                        )
-                    } else {
-                        // everything ok - hide notification (if there is one)
-                        if (passKeyInputNotificationTextView.visibility == View.VISIBLE) {
-                            setPassKeyInputNotification("", 0)
-                        }
-                        // save the passKey
-                        (applicationContext as ApplicationProperty).saveStringData(
-                            passKey,
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_CustomBindingPasskey
-                        )
-
-                    }
                 }
-            } else {
-                val randomKey = createRandomPasskey(10)
-                (applicationContext as ApplicationProperty).saveStringData(
-                    randomKey,
-                    R.string.FileKey_AppSettings,
-                    R.string.DataKey_CustomBindingPasskey
-                )
-
-                setPassKeyInputNotification(
-                    getString(R.string.SetupActivity_PassKeyMustNotBeEmpty),
-                    R.color.ErrorColor
-                )
             }
-        }
-
-        // add the listener for the switches
-        this.autoConnectSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-
-            (this.applicationContext as ApplicationProperty).saveBooleanData(
-                b,
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_AutoConnect
-            )
-        }
-        this.useCustomBindingKeySwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-
-            (this.applicationContext as ApplicationProperty).saveBooleanData(
-                b,
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_UseCustomBindingKey
-            )
-
-            when (b) {
-                true -> {
-                    // show the password-box
-                    passwordContainer.visibility = View.VISIBLE
-
-                    // if this is the first time a custom binding key is set, a random value must be set to prevent that the key is empty
-                    if ((applicationContext as ApplicationProperty).loadSavedStringData(
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_CustomBindingPasskey
-                        ) == ERROR_NOTFOUND
-                    ) {
-                        val randomKey = createRandomPasskey(10)
-                        (applicationContext as ApplicationProperty).saveStringData(
-                            randomKey,
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_CustomBindingPasskey
-                        )
-                        passwordBox.setText(randomKey)
-                    } else {
-                        // display the default key
-                        passwordBox.setText(
-                            (applicationContext as ApplicationProperty).loadSavedStringData(
-                                R.string.FileKey_AppSettings,
-                                R.string.DataKey_CustomBindingPasskey
-                            )
-                        )
-                    }
-                }
-                else -> passwordContainer.visibility = View.GONE
-            }
-        }
-
-        this.savePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-
-            (this.applicationContext as ApplicationProperty).saveBooleanData(
-                b,
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_SaveProperties
-            )
-        }
-
-        this.enableLogSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-
-            (this.applicationContext as ApplicationProperty).saveBooleanData(
-                b,
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_EnableLog
-            )
-            setShowLogButtonVisibility(b)
-
-            (this.applicationContext as ApplicationProperty).eventLogEnabled = b
-
-            // delete log data if the switch is set to off state
-            if(!b) {
-                (applicationContext as ApplicationProperty).logRecordingTime = ""
-                (applicationContext as ApplicationProperty).connectionLog.clear()
-            }
-        }
-        this.keepScreenActiveSwitchCompat.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-
-            (this.applicationContext as ApplicationProperty).saveBooleanData(
-                b,
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_KeepScreenActive
-            )
-        }
     }
     
     override fun onResume() {
@@ -268,19 +167,25 @@ class AppSettingsActivity : AppCompatActivity() {
 
         if (this.buttonNormalizationRequired) {
             // normalize uuidManager-Button
-            findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton).apply {
+            manageUUIDProfileButton.apply {
                 setBackgroundColor(
                     getColor(R.color.setupActivityButtonNormalBackground)
                 )
             }
             // normalize showLog-Button
-            findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
+            showLogButton.apply {
+                setBackgroundColor(
+                    getColor(R.color.setupActivityButtonNormalBackground)
+                )
+            }
+            // normalize binding-manager-Button
+            bindingManagerButton.apply {
                 setBackgroundColor(
                     getColor(R.color.setupActivityButtonNormalBackground)
                 )
             }
             // normalize resetData-Button
-            findViewById<ConstraintLayout>(R.id.setupActivityResetDataButton).apply {
+            resetAppButton.apply {
                 setBackgroundColor(
                     getColor(R.color.setupActivityButtonNormalBackground)
                 )
@@ -292,11 +197,8 @@ class AppSettingsActivity : AppCompatActivity() {
             // app setting were reset by reset-activity -> apply changes to UI:
             // this are the default values:
             this.autoConnectSwitch.isChecked = false
-            this.useCustomBindingKeySwitch.isChecked = false
-            passwordContainer.visibility = View.GONE
-            //this.listAllDevicesSwitch.isChecked = false
             this.enableLogSwitch.isChecked = false
-            this.setShowLogButtonVisibility(false)
+            this.setShowLogButtonState(false)
             this.keepScreenActiveSwitchCompat.isChecked = false
 
             (applicationContext as ApplicationProperty).appSettingsResetDone = false
@@ -306,62 +208,42 @@ class AppSettingsActivity : AppCompatActivity() {
     private fun handleBackEvent(){
         finish()
     }
-
-    private val passwordViewModeVisible: Int = 1
-    private val passwordViewModeHidden: Int = 2
-    private var currentPasswordViewMode = passwordViewModeHidden
-
-    fun onPasswordViewModeButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        when (currentPasswordViewMode) {
-            // the password is hidden -> show it
-            passwordViewModeHidden -> {
-                // set the crossed eye image
-                passwordViewModeButton.setImageResource(R.drawable.ic_visibility_off_gray)
-                // show the password
-                passwordBox.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                // save the state-var
-                currentPasswordViewMode = passwordViewModeVisible
-            }
-            // the password is visible -> hide it
-            passwordViewModeVisible -> {
-                // set the normal eye image
-                passwordViewModeButton.setImageResource(R.drawable.ic_visibility_gray)
-                // hide the password
-                passwordBox.transformationMethod = PasswordTransformationMethod.getInstance()
-                // save the state-var
-                currentPasswordViewMode = passwordViewModeHidden
-            }
-        }
-    }
-
-    private fun setShowLogButtonVisibility(visible: Boolean) {
+    
+    private fun setShowLogButtonState(logActive: Boolean) {
         findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
-            visibility = when (visible) {
-                true -> View.VISIBLE
-                else -> View.GONE
+            when(logActive){
+                true -> {
+                    setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+                }
+                else -> {
+                    setBackgroundColor(getColor(R.color.setupActivityButtonDisabledBackground))
+                }
             }
         }
-        findViewById<View>(R.id.setupActivitySixthSeparatorView).apply {
-            visibility = when (visible) {
-                true -> View.VISIBLE
-                else -> View.GONE
+        findViewById<AppCompatTextView>(R.id.setupActivityShowLogButtonDescriptor).apply {
+            when(logActive){
+                true -> {
+                    setTextColor(getColor(R.color.normalTextColor))
+                }
+                else -> {
+                    setTextColor(getColor(R.color.disabledTextColor))
+                }
             }
         }
-        findViewById<View>(R.id.setupActivityFifthSeparatorView).apply {
-
-            if (visible) {
-                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(0, 10, 0, 0)
-            } else {
-                (layoutParams as ViewGroup.MarginLayoutParams).setMargins(10, 10, 10, 0)
+        findViewById<AppCompatImageView>(R.id.setupActivityShowLogButtonImage).apply {
+            when(logActive){
+                true -> {
+                    setBackgroundResource(R.drawable.ic_complex_property_navigation_arrow)
+                }
+                else -> {
+                    setBackgroundResource(R.drawable.ic_complex_property_disabled_navigation_arrow)
+                }
             }
-//            requestLayout()
-//            invalidate()
         }
     }
 
-    fun onManageUUIDProfilesButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-
-        findViewById<ConstraintLayout>(R.id.setupActivityUUIDManagerButton).apply {
+    private fun onManageUUIDProfilesButtonClick(view: View) {
+        (view as ConstraintLayout).apply {
             setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
         }
         this.buttonNormalizationRequired = true
@@ -371,34 +253,39 @@ class AppSettingsActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
 
     }
-
-    fun onShowLogButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
+    
+    private fun onShowLogButtonClick(view: View) {
+        if (this.enableLogSwitch.isChecked) {
+            (view as ConstraintLayout).apply {
+                setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
+            }
+            this.buttonNormalizationRequired = true
+            
+            val intent = Intent(this@AppSettingsActivity, ViewLogActivity::class.java)
+            intent.putExtra("wasInvokedFromSettingsActivity", true)
+            startActivity(intent)
+            overridePendingTransition(
+                R.anim.start_activity_slide_animation_in,
+                R.anim.start_activity_slide_animation_out
+            )
+        }
+    }
+    
+    private fun onBindingManagerButtonClick(view: View){
+        (view as ConstraintLayout).apply {
             setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
         }
         this.buttonNormalizationRequired = true
-
-        val intent = Intent(this@AppSettingsActivity, ViewLogActivity::class.java)
-        intent.putExtra("wasInvokedFromSettingsActivity", true)
+        
+        val intent = Intent(this@AppSettingsActivity, BindingManagerActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
     }
 
-    private fun setPassKeyInputNotification(message: String, colorID: Int) {
-        if (message.isEmpty()) {
-            this.passKeyInputNotificationTextView.setTextColor(getColor(R.color.normalTextColor))
-            this.passKeyInputNotificationTextView.visibility = View.GONE
-        } else {
-            this.passKeyInputNotificationTextView.visibility = View.VISIBLE
-            this.passKeyInputNotificationTextView.setTextColor(getColor(colorID))
-            this.passKeyInputNotificationTextView.text = message
+    private fun onResetDataButtonClick(view: View) {
+        (view as ConstraintLayout).apply {
+            setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
         }
-    }
-
-    fun onResetDataButtonClick(view: View) {
-        (view as ConstraintLayout).setBackgroundColor(
-            getColor(R.color.setupActivityButtonPressedBackground)
-        )
         this.buttonNormalizationRequired = true
 
         val intent = Intent(this@AppSettingsActivity, ResetAppDataActivity::class.java)

@@ -1,35 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Requirements for Android 11 and lower -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Requirements for Android 11 and lower -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
-
-
-<!--
+    <!--
     <uses-permission
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         android:maxSdkVersion="30" />
--->
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+    -->
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
         android:maxSdkVersion="30" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:maxSdkVersion="30" />
-
-    <!-- Android 12 and up -->
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="30" /> <!-- Android 12 and up -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
-
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -40,17 +33,24 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules_descriptor"
         android:enableOnBackInvokedCallback="true"
-        android:localeConfig="@xml/locales_config"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".BindingManagerActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".TextListPresenter"
-            android:screenOrientation="locked"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="locked" />
         <activity
             android:name=".StringInterrogatorActivity"
             android:exported="false"
@@ -94,9 +94,7 @@
         <activity android:name=".ManageUUIDProfilesActivity" />
         <activity android:name=".AppSettingsActivity" />
         <activity android:name=".InformationActivity" />
-        <activity android:name=".AppHelpActivity" />
-
-        <!-- Activities in connected state: -->
+        <activity android:name=".AppHelpActivity" /> <!-- Activities in connected state: -->
         <activity
             android:name=".UnlockControlActivity"
             android:screenOrientation="locked" />

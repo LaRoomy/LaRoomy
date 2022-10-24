@@ -165,7 +165,6 @@
 
 
 
-
     <string name="SetupActivity_Header">Einstellungen</string>
     <string name="SetupActivity_AutoConnectElementText">Automatisch verbinden</string>
     <string name="SetupActivity_AutoConnectHint">Wenn diese Einstellung aktiviert ist, dann wird die App versuchen eine Verbindung zum letzten erfolgreich verbundenen Gerät herzustellen. Wenn nur ein Gerät verfügbar ist, dann wird dieses automatisch verbunden.</string>
@@ -184,6 +183,13 @@
     <string name="SetupActivity_ResetDataButtonText">App zurücksetzen</string>
     <string name="SetupActivity_KeepScreenActiveElementText">Bildschirm aktiv halten</string>
     <string name="SetupActivity_KeepScreenActiveHint">Verhindert den Stromsparmodus wenn das Gerät verbunden ist.</string>
+    <string name="SetupActivity_BindingManagerButtonText">Bindungsdaten verwalten</string>
+
+    <string name="BindingManagerActivity_HeaderText">Bindungsdaten verwalten</string>
+    <string name="BindingManagerActivity_ListElementDeviceName">Gerätename:</string>
+    <string name="BindingManagerActivity_ListElementMacAddress">Mac Adresse:</string>
+    <string name="BindingManagerActivity_ListElementBindingType">Bindungstyp:</string>
+
 
 
     <string name="ResetAppActivity_HeaderText">App-Daten zurücksetzen</string>

@@ -2,10 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.app.Application
 import android.content.Context
-import android.content.res.Resources
 import android.util.Log
-import java.util.*
-import kotlin.collections.ArrayList
 
 const val NOTIFICATION_TYPE_ERROR = 0
 const val NOTIFICATION_TYPE_WARNING = 1
@@ -127,23 +124,12 @@ class ApplicationProperty : Application() {
             this.connectionLog.add(message)
         }
     }
-
-    fun getCurrentUsedPasskey() : String {
-
-        val useCustomKey =
-            this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)
-
-        return if(useCustomKey){
-            this.loadSavedStringData(
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_CustomBindingPasskey
-            )
-        } else {
-            this.loadSavedStringData(
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_DefaultRandomBindingPasskey
-            )
-        }
+    
+    fun getCurrentUsedPasskey(): String {
+        return this.loadSavedStringData(
+            R.string.FileKey_AppSettings,
+            R.string.DataKey_DefaultRandomBindingPasskey
+        )
     }
 
     fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int) : String {
