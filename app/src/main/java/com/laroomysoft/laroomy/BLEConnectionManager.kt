@@ -1,9 +1,12 @@
 package com.laroomysoft.laroomy
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context.BLUETOOTH_SERVICE
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import java.io.Serializable
 import java.util.*
 import java.util.concurrent.Executors
@@ -1213,14 +1216,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             }
                             applicationProperty.logControl("I: Binding is required. Searching the appropriate key for the mac address")
 
-                            // binding is required, so send the binding request on basis of the passkey setup
-                            val useCustomKeyForBinding =
-                                applicationProperty.loadBooleanData(
-                                    R.string.FileKey_AppSettings,
-                                    R.string.DataKey_UseCustomBindingKey
-                                )
-
-                            sendBindingRequest(useCustomKeyForBinding)
+                            // binding is required, so send the binding request
+                            sendBindingRequest()
                         }
                         else -> {
                             // no binding is required, so notify the subscriber of the callback
@@ -1230,13 +1227,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-
-                // TODO: remove the length iteration and change it at the beginning of the method (only made to remain compatible with the FSC device - temporary!)
-                if(data.length >= 13){
-                    // check if the remote device needs fragmented transmission
-                    if(data[14] == '1'){
-                        bleDeviceData.fragmentedTransmissionRequired = true
-                    }
+                // check if the remote device needs fragmented transmission
+                if(data[14] == '1'){
+                    bleDeviceData.fragmentedTransmissionRequired = true
                 }
 
                 // check if this is a reload process
@@ -1296,6 +1289,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             Log.d("Binding Response", "Binding Authentication successful!")
                         }
                         applicationProperty.logControl("I: Binding Authentication successful!")
+                        
+                        if(bleDeviceData.passKeyTypeUsed == PASSKEY_TYPE_SHARED){
+                            // try to update a missing device name
+                            val bManager = BindingDataManager(applicationProperty.applicationContext)
+                            val bData = bManager.lookUpForBindingData(currentDevice?.address ?: "")
+                            
+                            if(bData.macAddress.isNotEmpty()){
+                                if (ActivityCompat.checkSelfPermission(
+                                        applicationProperty.applicationContext,
+                                        Manifest.permission.BLUETOOTH_CONNECT
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    bData.deviceName = currentDevice?.name ?: ""
+                                    bManager.updateElement(bData)
+                                }
+                            }
+                        }
 
                         saveLastSuccessfulConnectedDeviceAddress(currentDevice?.address ?: "")
                         bleDeviceData.authenticationSuccess = true
@@ -2755,37 +2765,31 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData(requestString)
     }
 
-    private fun sendBindingRequest(useCustomKey: Boolean){
+    private fun sendBindingRequest(){
 
         val passKey: String
 
         // at first look for a shared key for the device
-        val bindingPairManager = BindingPairManager(applicationProperty.applicationContext)
-        val sharedKey = bindingPairManager.lookUpForPassKeyWithMacAddress(this.currentDevice?.address ?: "")
+        val bindingPairManager = BindingDataManager(applicationProperty.applicationContext)
+        val bindingData = bindingPairManager.lookUpForBindingData(this.currentDevice?.address ?: "")
 
         // if a shared binding key for the mac address exists, the key is preferred,
         // because a key from a sharing link will only be saved if it defers from the main key
 
-        passKey = if (sharedKey.isNotEmpty() && (sharedKey != ERROR_NOTFOUND)) {
+        passKey = if (bindingData.passKey.isNotEmpty() && (bindingData.passKey != ERROR_NOTFOUND)) {
 
-            // TODO: if the address is invalid, the shared key is not empty (it is ERROR_NOT_FOUND), but there is no shared key used. so this must be handled
-
-            bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_SHARED
-            sharedKey
-        } else {
-            if (useCustomKey) {
-                bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_CUSTOM
-                (applicationProperty.loadSavedStringData(
-                    R.string.FileKey_AppSettings,
-                    R.string.DataKey_CustomBindingPasskey
-                ))
+            bleDeviceData.passKeyTypeUsed = if(bindingData.generatedAsOriginator){
+                PASSKEY_TYPE_NORM
             } else {
-                bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_NORM
-                (applicationProperty.loadSavedStringData(
-                    R.string.FileKey_AppSettings,
-                    R.string.DataKey_DefaultRandomBindingPasskey
-                ))
+                PASSKEY_TYPE_SHARED
             }
+            bindingData.passKey
+        } else {
+            bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_NORM
+            (applicationProperty.loadSavedStringData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_DefaultRandomBindingPasskey
+            ))
         }
         if(passKey == ERROR_NOTFOUND){
             // critical error (should not happen)

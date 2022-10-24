@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
@@ -20,7 +19,7 @@ class BindingManagerActivity : AppCompatActivity() {
     
     private lateinit var backButton: AppCompatImageButton
     
-    private val bindingPairManager = BindingPairManager(applicationContext)
+    private lateinit var bindingDataManager: BindingDataManager
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +31,9 @@ class BindingManagerActivity : AppCompatActivity() {
                 handleBackEvent()
             }
         })
+        
+        // init binding data manager
+        bindingDataManager = BindingDataManager(applicationContext)
     
         // get backButton and add functionality
         backButton = findViewById<AppCompatImageButton?>(R.id.bindingManagerActivityBackButton).apply {
@@ -41,7 +43,7 @@ class BindingManagerActivity : AppCompatActivity() {
         }
         
         // initialize recycler view
-        bindingDataElementListAdapter = BindingDataElementListAdapter(this.bindingPairManager.bindingPairs)
+        bindingDataElementListAdapter = BindingDataElementListAdapter(this.bindingDataManager.bindingDataList)
         bindingDataElementListLayoutManager = LinearLayoutManager(this)
         bindingDataElementListView = findViewById<RecyclerView?>(R.id.bindingManagerActivityBindingDataListView).apply {
             setHasFixedSize(true)
@@ -57,7 +59,7 @@ class BindingManagerActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
     }
     
-    class BindingDataElementListAdapter(private val bindingDataElementList: ArrayList<BindingPair>)
+    class BindingDataElementListAdapter(private val bindingDataElementList: ArrayList<BindingData>)
         : RecyclerView.Adapter<BindingDataElementListAdapter.ViewHolder>() {
         
         class ViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
@@ -72,14 +74,27 @@ class BindingManagerActivity : AppCompatActivity() {
         }
         
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementDeviceNameTextView).apply {
+            val element = bindingDataElementList.elementAt(position)
             
+            holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementDeviceNameTextView).apply {
+                text = element.deviceName
             }
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementMacAddressTextView).apply {
-            
+                text = element.macAddress
             }
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementBindingTypeTextView).apply {
-            
+                text = when(element.generatedAsOriginator){
+                    true -> {
+                        if((holder.constraintLayout.context.applicationContext as ApplicationProperty).getCurrentUsedPasskey() == element.passKey){
+                            holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeAsOriginator)
+                        } else {
+                            holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeDeprecatedOriginator)
+                        }
+                    }
+                    else -> {
+                        holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeAsSharingReceiver)
+                    }
+                }
             }
         }
         

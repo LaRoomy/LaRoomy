@@ -164,7 +164,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         }
         if(this.resetBindingDataCheckBox.isChecked){
             // if there are another future binding-data, clear it here!
-            val bindingPairManager = BindingPairManager(this.applicationContext)
+            val bindingPairManager = BindingDataManager(this.applicationContext)
             bindingPairManager.clearAll()
         }
         if(this.resetUUIDProfilesCheckBox.isChecked){

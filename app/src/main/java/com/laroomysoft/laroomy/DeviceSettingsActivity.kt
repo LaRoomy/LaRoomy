@@ -1,7 +1,9 @@
 package com.laroomysoft.laroomy
 
+import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -17,6 +19,7 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -144,23 +147,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         bindingSwitch.setOnCheckedChangeListener { _, isChecked ->
 
             // create/release device binding
-
+    
             val passkey =
-                // select default or custom key in relation to the appropriate setting
-                when((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)) {
-                    true -> {
-                        (applicationContext as ApplicationProperty).loadSavedStringData(
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_CustomBindingPasskey
-                        )
-                    }
-                    false -> {
-                        (applicationContext as ApplicationProperty).loadSavedStringData(
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_DefaultRandomBindingPasskey
-                        )
-                    }
-                }
+                (applicationContext as ApplicationProperty).loadSavedStringData(
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_DefaultRandomBindingPasskey
+                )
 
             when(isChecked){
                 true -> {
@@ -175,6 +167,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
                     // schedule a timeout control for the response
                     this.pendingBindingTransmission = dbENABLE
+                    
                     Executors.newSingleThreadScheduledExecutor().schedule({
                         if(pendingBindingTransmission == dbENABLE){
                             pendingBindingTransmission = dbNONE
@@ -468,6 +461,25 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                         getString(R.string.DeviceSettingsActivity_BindingSuccessNotification),
                         R.color.successLightColor
                     )
+                    // save binding info
+                    val bData = BindingData()
+                    val bManager = BindingDataManager(applicationContext)
+    
+                    ApplicationProperty.bluetoothConnectionManager.currentDevice?.apply {
+                        if (ActivityCompat.checkSelfPermission(
+                                this@DeviceSettingsActivity,
+                                Manifest.permission.BLUETOOTH_CONNECT
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            bData.deviceName = this.name
+                            bData.macAddress = this.address
+                            bData.passKey = (applicationContext as ApplicationProperty).getCurrentUsedPasskey()
+                            bData.generatedAsOriginator = true
+                            bManager.addOrUpdate(bData)
+                        }
+                    }
+                    
+                    //bData.deviceName = dev.name ?: ""
                 }
                 BINDING_RESPONSE_BINDING_ERROR -> {
                     // update the hint for the user
@@ -487,6 +499,21 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                         getString(R.string.DeviceSettingsActivity_ReleaseBindingSuccessText),
                         R.color.successLightColor
                     )
+                    // remove binding data
+                    val bData = BindingData()
+                    val bManager = BindingDataManager(applicationContext)
+    
+                    ApplicationProperty.bluetoothConnectionManager.currentDevice?.apply {
+                        if (ActivityCompat.checkSelfPermission(
+                                this@DeviceSettingsActivity,
+                                Manifest.permission.BLUETOOTH_CONNECT
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            // here only the mac address is necessary
+                            bData.macAddress = this.address
+                            bManager.removeElement(bData)
+                        }
+                    }
                 }
                 BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
                     // update the hint for the user
@@ -526,20 +553,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
             // get passKey
             val passKey =
-                when((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_UseCustomBindingKey)){
-                    true -> {
-                        (applicationContext as ApplicationProperty).loadSavedStringData(
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_CustomBindingPasskey
-                        )
-                    }
-                    else -> {
-                        (applicationContext as ApplicationProperty).loadSavedStringData(
-                            R.string.FileKey_AppSettings,
-                            R.string.DataKey_DefaultRandomBindingPasskey
-                        )
-                    }
-                }
+                (applicationContext as ApplicationProperty).loadSavedStringData(
+                    R.string.FileKey_AppSettings,
+                    R.string.DataKey_DefaultRandomBindingPasskey
+                )
 
             // get mac-address
             val mac = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address

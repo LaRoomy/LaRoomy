@@ -3,7 +3,7 @@ package com.laroomysoft.laroomy
 import android.content.Context
 import android.util.Log
 
-class BindingPair {
+class BindingData {
     var macAddress = ""
     var passKey = ""
     var generatedAsOriginator = false
@@ -53,6 +53,7 @@ class BindingPair {
                         Log.e("BindingPairClass", "BindingPairClass::FromString: error invalid record index!")
                     }
                 }
+                recordString = ""
                 recordIndex++
             } else {
                 recordString += it
@@ -61,30 +62,63 @@ class BindingPair {
     }
 }
 
-class BindingPairManager(private val appContext: Context) {
+class BindingDataManager(private val appContext: Context) {
     
-    var bindingPairs = ArrayList<BindingPair>()
+    var bindingDataList = ArrayList<BindingData>()
     private set
 
     init {
         this.load()
     }
 
-    fun add(pair: BindingPair){
-        this.bindingPairs.add(pair)
+    fun add(data: BindingData){
+        this.bindingDataList.add(data)
         this.save()
     }
     
-    fun updatePair(pair: BindingPair){
-        this.bindingPairs.forEach {
-            if(it.macAddress == pair.macAddress){
-                it.passKey = pair.passKey
-                it.deviceName = pair.deviceName
-                it.generatedAsOriginator = pair.generatedAsOriginator
+    fun updateElement(data: BindingData){
+        this.bindingDataList.forEach {
+            if(it.macAddress == data.macAddress){
+                it.passKey = data.passKey
+                it.deviceName = data.deviceName
+                it.generatedAsOriginator = data.generatedAsOriginator
                 return@forEach
             }
         }
         this.save()
+    }
+    
+    fun addOrUpdate(data: BindingData){
+        var found = false
+        this.bindingDataList.forEach {
+            if(it.macAddress == data.macAddress){
+                found = true
+                it.passKey = data.passKey
+                it.deviceName = data.deviceName
+                it.generatedAsOriginator = data.generatedAsOriginator
+                return@forEach
+            }
+        }
+        if(!found){
+            this.add(data)
+        }
+        this.save()
+    }
+    
+    fun removeElement(data: BindingData){
+        //this.clearAll()
+        var indexToRemove = -1
+        this.bindingDataList.forEachIndexed { index, bindingData ->
+            if(bindingData.macAddress == data.macAddress){
+                indexToRemove = index
+                return@forEachIndexed
+            }
+        }
+        if(indexToRemove != -1){
+            this.clearAll()
+            this.bindingDataList.removeAt(indexToRemove)
+            this.save()
+        }
     }
     
     fun clearAll() {
@@ -100,33 +134,44 @@ class BindingPairManager(private val appContext: Context) {
     }
 
     fun lookUpForPassKeyWithMacAddress(mac: String) : String {
-        this.bindingPairs.forEach{
+        this.bindingDataList.forEach{
             if(it.macAddress == mac){
                 return it.passKey
             }
         }
         return ERROR_NOTFOUND
     }
+    
+    fun lookUpForBindingData(mac: String) : BindingData {
+        this.bindingDataList.forEach {
+            if(it.macAddress == mac){
+                return it;
+            }
+        }
+        return BindingData()
+    }
 
     private fun save() {
-
-        val dataKeyStarter = appContext.getString(R.string.DataKey_BindingPairStartKey)
-
-        val sharedPref =
-            appContext.getSharedPreferences(
-                appContext.getString(R.string.FileKey_BindingPairs),
-                Context.MODE_PRIVATE
-            )
-
-        this.bindingPairs.forEachIndexed { index, bindingPair ->
-
-            val dataToSave = bindingPair.toString()
-            val dataKey = "$dataKeyStarter$index"
-
-            sharedPref
-                .edit()
-                .putString(dataKey, dataToSave)
-                .apply()
+        if(this.bindingDataList.isNotEmpty()) {
+    
+            val dataKeyStarter = appContext.getString(R.string.DataKey_BindingPairStartKey)
+    
+            val sharedPref =
+                appContext.getSharedPreferences(
+                    appContext.getString(R.string.FileKey_BindingPairs),
+                    Context.MODE_PRIVATE
+                )
+    
+            this.bindingDataList.forEachIndexed { index, bindingPair ->
+        
+                val dataToSave = bindingPair.toString()
+                val dataKey = "$dataKeyStarter$index"
+        
+                sharedPref
+                    .edit()
+                    .putString(dataKey, dataToSave)
+                    .apply()
+            }
         }
     }
 
@@ -148,7 +193,7 @@ class BindingPairManager(private val appContext: Context) {
             if(data == ERROR_NOTFOUND){
                 return
             } else {
-                val loadedPair = BindingPair()
+                val loadedPair = BindingData()
                 loadedPair.fromString(data ?: "")
                 this.add(loadedPair)
             }

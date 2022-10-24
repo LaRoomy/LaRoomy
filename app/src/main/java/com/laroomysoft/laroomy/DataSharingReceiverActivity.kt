@@ -47,15 +47,16 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                 notifyUser(getString(R.string.DataSharingActivity_Message_YouAreOriginator), R.color.normalTextColor)
             } else {
 
-                // TODO: look if the mac-address is saved before, check if the key changed and notify the user respectively! (key updated / key already saved!)
-
                 if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
                     // data valid: save the data
-                    val pair = BindingPair()
-                    pair.macAddress = macReformatted
-                    pair.passKey = passKeyDecrypted
-                    val bindingPairManager = BindingPairManager(applicationContext)
-                    bindingPairManager.add(pair)
+                    val bindingData = BindingData()
+                    bindingData.macAddress = macReformatted
+                    bindingData.passKey = passKeyDecrypted
+                    bindingData.generatedAsOriginator = false
+                    
+                    val bindingPairManager = BindingDataManager(applicationContext)
+                    bindingPairManager.addOrUpdate(bindingData)
+                    
                     // notify user
                     notifyUser(
                         getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),

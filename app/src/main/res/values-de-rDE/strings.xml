@@ -186,6 +186,9 @@
     <string name="SetupActivity_BindingManagerButtonText">Bindungsdaten verwalten</string>
 
     <string name="BindingManagerActivity_HeaderText">Bindungsdaten verwalten</string>
+    <string name="BindingManagerActivity_BindingTypeAsOriginator">Urheber</string>
+    <string name="BindingManagerActivity_BindingTypeDeprecatedOriginator">Urheber (Schlüssel veraltet)</string>
+    <string name="BindingManagerActivity_BindingTypeAsSharingReceiver">Geteilter Schlüssel</string>
     <string name="BindingManagerActivity_ListElementDeviceName">Gerätename:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac Adresse:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Bindungstyp:</string>

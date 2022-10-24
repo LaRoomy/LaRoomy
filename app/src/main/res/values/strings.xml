@@ -175,6 +175,9 @@
     <string name="SetupActivity_BindingManagerButtonText">Binding-Data Manager</string>
 
     <string name="BindingManagerActivity_HeaderText">Manage Binding-Data</string>
+    <string name="BindingManagerActivity_BindingTypeAsOriginator">Origin</string>
+    <string name="BindingManagerActivity_BindingTypeDeprecatedOriginator">Origin (Key deprecated)</string>
+    <string name="BindingManagerActivity_BindingTypeAsSharingReceiver">Shared Key</string>
     <string name="BindingManagerActivity_ListElementDeviceName">Device-Name:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac-Address:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Binding-Type:</string>
