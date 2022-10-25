@@ -133,14 +133,14 @@ class BindingDataManager(private val appContext: Context) {
         }
     }
 
-    fun lookUpForPassKeyWithMacAddress(mac: String) : String {
-        this.bindingDataList.forEach{
-            if(it.macAddress == mac){
-                return it.passKey
-            }
-        }
-        return ERROR_NOTFOUND
-    }
+//    fun lookUpForPassKeyWithMacAddress(mac: String) : String {
+//        this.bindingDataList.forEach{
+//            if(it.macAddress == mac){
+//                return it.passKey
+//            }
+//        }
+//        return ERROR_NOTFOUND
+//    }
     
     fun lookUpForBindingData(mac: String) : BindingData {
         this.bindingDataList.forEach {

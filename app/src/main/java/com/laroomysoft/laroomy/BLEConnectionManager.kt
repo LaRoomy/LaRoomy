@@ -97,8 +97,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     // bluetooth system objects
     var currentDevice: BluetoothDevice? = null
     private var bluetoothGatt: BluetoothGatt? = null
-    lateinit var rxGattCharacteristic: BluetoothGattCharacteristic
-    lateinit var txGattCharacteristic: BluetoothGattCharacteristic
+    private lateinit var rxGattCharacteristic: BluetoothGattCharacteristic
+    private lateinit var txGattCharacteristic: BluetoothGattCharacteristic
     // --
 //    val bondedList: Set<BluetoothDevice>? by lazy(LazyThreadSafetyMode.NONE){
 //        this.bleAdapter?.bondedDevices
@@ -169,210 +169,276 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var uIItemAddCounter = -1
 
 
-    // callback implementation for BluetoothGatt
+    // NEW callback implementation for BluetoothGatt for API LEVEL 33+
     private val gattCallback = object : BluetoothGattCallback() {
         @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
-
-            when(newState){
-                BluetoothProfile.STATE_CONNECTED -> {
-
-                    // if successful connected reset the device-data??
-                    //bleDeviceData.clear()
-
-                    isConnected = true
-
-                    if(verboseLog) {
-                        Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
-                    }
-                    callback.onConnectionStateChanged(true)
-
-                    if(!isResumeConnectionAttempt) {
-                        if(verboseLog) {
-                            Log.d(
-                                "M:CB:ConStateChanged",
-                                "This is no resume action, so discover services"
-                            )
-                            Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
-                        }
-                        applicationProperty.logControl("I: Starting to discover Services")
-                        
-                        // set indication param
-                        discoveryWatcherData.isServiceDiscovery = true
-                        
-                        // start to discover the services of the device
-                        gatt?.discoverServices()
-                    } else {
-                        isResumeConnectionAttempt = false
-                        suspendedDeviceAddress = ""
-
-                        if(verboseLog) {
-                            Log.d(
-                                "M:CB:ConStateChanged",
-                                "This is a resume action -> DO NOT DISCOVER SERVICES!"
-                            )
-                        }
-                        applicationProperty.logControl("I: Connection restored")
-
-                        // re-init the descriptor to establish a stream!
-    
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            val descriptor =
-                                rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
-                            gatt?.writeDescriptor(
-                                descriptor,
-                                BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                            )
-                        } else {
-    
-                            // deprecated:
-                            val descriptor = rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
-                                .apply {
-                                    @Suppress("DEPRECATION")
-                                    value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                }
-                            @Suppress("DEPRECATION")
-                            gatt?.writeDescriptor(descriptor)
-                        }
-
-                        // notify the remote device
-                        Executors.newSingleThreadScheduledExecutor().schedule({
-                            sendDeviceReconnectedNotification()
-                        }, 800, TimeUnit.MILLISECONDS)
-                    }
-                }
-                BluetoothProfile.STATE_DISCONNECTED -> {
-
-                    isConnected = false
-
-                    if(verboseLog) {
-                        Log.d("M:CB:ConStateChanged", "Connection-state changed to: DISCONNECTED")
-                    }
-                    callback.onConnectionStateChanged(false)
-                }
-            }
+            processOnConnectionStateChange(gatt, newState)
         }
 
         @SuppressLint("MissingPermission")
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
-
-            try {
-                when (status) {
-                    BluetoothGatt.GATT_SUCCESS -> {
-                        // iterate throughout the services and display it in the debug-log
-                        gatt?.services?.forEachIndexed { index, bluetoothGattService ->
+            processOnServicesDiscovered(gatt, status)
+        }
+    
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic, value)
+            val dataAsString: String = value.decodeToString()
+            processOnCharacteristicChanged(dataAsString)
+        }
+    }
+    
+    // callback implementation for BluetoothGatt for older versions (API LEVEL LOW THAN 33)
+    private val oldGattCallback = object : BluetoothGattCallback() {
+        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+            super.onConnectionStateChange(gatt, status, newState)
+            processOnConnectionStateChange(gatt, newState)
+        }
+        
+        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            super.onServicesDiscovered(gatt, status)
+            processOnServicesDiscovered(gatt, status)
+        }
+        
+        @Deprecated("Deprecated in Java")
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
+            @Suppress("DEPRECATION")
+            super.onCharacteristicChanged(gatt, characteristic)
+            
+            @Suppress("DEPRECATION") val dataAsString = characteristic?.getStringValue(0)
+            processOnCharacteristicChanged(dataAsString ?: "")
+        }
+    }
+    
+    @SuppressLint("MissingPermission")
+    private fun processOnConnectionStateChange(gatt: BluetoothGatt?, newState: Int){
+        when(newState){
+            BluetoothProfile.STATE_CONNECTED -> {
+            
+                // if successful connected reset the device-data??
+                //bleDeviceData.clear()
+            
+                isConnected = true
+            
+                if(verboseLog) {
+                    Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
+                }
+                callback.onConnectionStateChanged(true)
+            
+                if(!isResumeConnectionAttempt) {
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CB:ConStateChanged",
+                            "This is no resume action, so discover services"
+                        )
+                        Log.d("M:CB:ConStateChanged", "Invoking discoverServices()")
+                    }
+                    applicationProperty.logControl("I: Starting to discover Services")
                 
+                    // set indication param
+                    discoveryWatcherData.isServiceDiscovery = true
+                
+                    // start to discover the services of the device
+                    gatt?.discoverServices()
+                } else {
+                    isResumeConnectionAttempt = false
+                    suspendedDeviceAddress = ""
+                
+                    if(verboseLog) {
+                        Log.d(
+                            "M:CB:ConStateChanged",
+                            "This is a resume action -> DO NOT DISCOVER SERVICES!"
+                        )
+                    }
+                    applicationProperty.logControl("I: Connection restored")
+                
+                    // re-init the descriptor to establish a stream!
+                
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val descriptor =
+                            rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
+                        gatt?.writeDescriptor(
+                            descriptor,
+                            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        )
+                    } else {
+                    
+                        // deprecated:
+                        val descriptor = rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
+                            .apply {
+                                @Suppress("DEPRECATION")
+                                value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            }
+                        @Suppress("DEPRECATION")
+                        gatt?.writeDescriptor(descriptor)
+                    }
+                
+                    // notify the remote device
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        sendDeviceReconnectedNotification()
+                    }, 800, TimeUnit.MILLISECONDS)
+                }
+            }
+            BluetoothProfile.STATE_DISCONNECTED -> {
+            
+                isConnected = false
+            
+                if(verboseLog) {
+                    Log.d("M:CB:ConStateChanged", "Connection-state changed to: DISCONNECTED")
+                }
+                callback.onConnectionStateChanged(false)
+            }
+        }
+    }
+    
+    @SuppressLint("MissingPermission")
+    private fun processOnServicesDiscovered(gatt: BluetoothGatt?, status: Int){
+        try {
+            when (status) {
+                BluetoothGatt.GATT_SUCCESS -> {
+                    // iterate throughout the services and display it in the debug-log
+                    gatt?.services?.forEachIndexed { index, bluetoothGattService ->
+                    
+                        if (verboseLog) {
+                            Log.d(
+                                "M:CB:onServicesDisc",
+                                "Service discovered. Index: $index ServiceUUID: ${bluetoothGattService.uuid} Type: ${bluetoothGattService.type}"
+                            )
+                        }
+                        applicationProperty.logControl("I: Service discovered. UUID: ${bluetoothGattService.uuid}")
+                    
+                        // look if the service matches an uuid profile
+                        val profileIndex =
+                            applicationProperty.uuidManager.profileIndexFromServiceUUID(
+                                bluetoothGattService.uuid
+                            )
+                    
+                        if (profileIndex != -1) {
+                            // log
                             if (verboseLog) {
                                 Log.d(
                                     "M:CB:onServicesDisc",
-                                    "Service discovered. Index: $index ServiceUUID: ${bluetoothGattService.uuid} Type: ${bluetoothGattService.type}"
+                                    "Correct service found - retrieving characteristics for the service"
                                 )
                             }
-                            applicationProperty.logControl("I: Service discovered. UUID: ${bluetoothGattService.uuid}")
-                
-                            // look if the service matches an uuid profile
-                            val profileIndex =
-                                applicationProperty.uuidManager.profileIndexFromServiceUUID(
-                                    bluetoothGattService.uuid
-                                )
-                
-                            if (profileIndex != -1) {
-                                // log
+                            applicationProperty.logControl("I: This service is found in UUID Profile")
+                            applicationProperty.logControl("I: Perform lookup for Characteristic UUID")
+                        
+                            // set/reset indication params
+                            discoveryWatcherData.serviceDiscovered = true
+                            discoveryWatcherData.isServiceDiscovery = false
+                        
+                            // cache the service uuid
+                            currentUsedServiceUUID = bluetoothGattService.uuid.toString()
+                        
+                            // local param
+                            var firstCharacteristicAdded = false
+                        
+                            // setup an indicator if characteristics were found
+                            discoveryWatcherData.isCharDiscovery = true
+                        
+                            // iterate through the characteristics in the service
+                            bluetoothGattService.characteristics.forEach {
+                            
                                 if (verboseLog) {
                                     Log.d(
                                         "M:CB:onServicesDisc",
-                                        "Correct service found - retrieving characteristics for the service"
+                                        "Characteristic found: UUID: ${it.uuid}  InstanceID: ${it.instanceId}"
                                     )
                                 }
-                                applicationProperty.logControl("I: This service is found in UUID Profile")
-                                applicationProperty.logControl("I: Perform lookup for Characteristic UUID")
+                                applicationProperty.logControl("I: Characteristic in Service found. UUID: ${it.uuid}")
+                            
+                                // set the characteristic notification for the desired characteristic in the service
+                                // and set tx if permitted
+                                when(it.uuid) {
                                 
-                                // set/reset indication params
-                                discoveryWatcherData.serviceDiscovered = true
-                                discoveryWatcherData.isServiceDiscovery = false
-                    
-                                // cache the service uuid
-                                currentUsedServiceUUID = bluetoothGattService.uuid.toString()
-                                
-                                // local param
-                                var firstCharacteristicAdded = false
-                                
-                                // setup an indicator if characteristics were found
-                                discoveryWatcherData.isCharDiscovery = true
-                    
-                                // iterate through the characteristics in the service
-                                bluetoothGattService.characteristics.forEach {
-                        
-                                    if (verboseLog) {
-                                        Log.d(
-                                            "M:CB:onServicesDisc",
-                                            "Characteristic found: UUID: ${it.uuid}  InstanceID: ${it.instanceId}"
+                                    applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).rxCharacteristicUUID -> {
+                                    
+                                        if (verboseLog) {
+                                            Log.d(
+                                                "M:CB:onServicesDisc",
+                                                "Correct characteristic found (rx) - enable notifications"
+                                            )
+                                        }
+                                        applicationProperty.logControl("I: RX Characteristic match: enable notifications")
+                                    
+                                        // save characteristic
+                                        rxGattCharacteristic = it
+                                    
+                                        // if the usage of only one characteristic is desired, copy the reference (so that both characteristics equals each other)
+                                        if(applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).useSingleCharacteristic) {
+                                            txGattCharacteristic = rxGattCharacteristic
+                                        
+                                            // make sure the callback is triggered in any case
+                                            firstCharacteristicAdded = true
+                                        }
+                                    
+                                        // enable notification on the device
+                                        gatt.setCharacteristicNotification(
+                                            rxGattCharacteristic,
+                                            true
                                         )
+                                    
+                                        if (verboseLog) {
+                                            Log.d("M:CB:onServicesDisc", "Set Descriptor")
+                                        }
+                                    
+                                        // set the correct descriptor for this characteristic
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                            val descriptor = rxGattCharacteristic.getDescriptor(
+                                                clientCharacteristicConfig
+                                            )
+                                            gatt.writeDescriptor(
+                                                descriptor,
+                                                BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                            )
+                                        } else {
+                                            // deprecated since API-Level 33
+                                            val descriptor = rxGattCharacteristic.getDescriptor(clientCharacteristicConfig).apply {
+                                                @Suppress("DEPRECATION")
+                                                value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                            }
+                                            @Suppress("DEPRECATION")
+                                            gatt.writeDescriptor(descriptor)
+                                        }
+                                    
+                                        if(firstCharacteristicAdded) {
+                                            // report ready for communication
+                                            callback.onDeviceReadyForCommunication()
+                                            discoveryWatcherData.characteristicDiscovered = true
+                                            return@forEach
+                                        } else {
+                                            // flag it
+                                            firstCharacteristicAdded = true
+                                        }
                                     }
-                                    applicationProperty.logControl("I: Characteristic in Service found. UUID: ${it.uuid}")
-    
-                                    // set the characteristic notification for the desired characteristic in the service
-                                    // and set tx if permitted
-                                    when(it.uuid) {
-    
-                                        applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).rxCharacteristicUUID -> {
-        
+                                    applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).txCharacteristicUUID -> {
+                                    
+                                        // only save the tx characteristic if the usage is permitted
+                                        if(!applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).useSingleCharacteristic) {
+                                        
                                             if (verboseLog) {
                                                 Log.d(
                                                     "M:CB:onServicesDisc",
-                                                    "Correct characteristic found (rx) - enable notifications"
+                                                    "Correct characteristic found (tx)"
                                                 )
                                             }
-                                            applicationProperty.logControl("I: RX Characteristic match: enable notifications")
-        
+                                            applicationProperty.logControl("I: TX Characteristic match!")
+                                        
                                             // save characteristic
-                                            rxGattCharacteristic = it
-                                            
-                                            // if the usage of only one characteristic is desired, copy the reference (so that both characteristics equals each other)
-                                            if(applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).useSingleCharacteristic) {
-                                                txGattCharacteristic = rxGattCharacteristic
-                                                
-                                                // make sure the callback is triggered in any case
-                                                firstCharacteristicAdded = true
-                                            }
-                                            
-                                            // enable notification on the device
-                                            gatt.setCharacteristicNotification(
-                                                rxGattCharacteristic,
-                                                true
-                                            )
-        
-                                            if (verboseLog) {
-                                                Log.d("M:CB:onServicesDisc", "Set Descriptor")
-                                            }
-        
-                                            // set the correct descriptor for this characteristic
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                                val descriptor = rxGattCharacteristic.getDescriptor(
-                                                    clientCharacteristicConfig
-                                                )
-                                                gatt.writeDescriptor(
-                                                    descriptor,
-                                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                                )
-                                            } else {
-                                                // deprecated since API-Level 33
-                                                val descriptor = rxGattCharacteristic.getDescriptor(
-                                                    clientCharacteristicConfig
-                                                )
-                                                    .apply {
-                                                        @Suppress("DEPRECATION")
-                                                        value =
-                                                            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                                    }
-                                                @Suppress("DEPRECATION")
-                                                gatt.writeDescriptor(descriptor)
-                                            }
-        
-                                            if(firstCharacteristicAdded) {
-                                                // report ready for communication
+                                            txGattCharacteristic = it
+                                        
+                                            if(firstCharacteristicAdded){
+                                                // report ready to communicate
                                                 callback.onDeviceReadyForCommunication()
                                                 discoveryWatcherData.characteristicDiscovered = true
                                                 return@forEach
@@ -381,104 +447,67 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                                 firstCharacteristicAdded = true
                                             }
                                         }
-                                        applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).txCharacteristicUUID -> {
-                                            
-                                            // only save the tx characteristic if the usage is permitted
-                                            if(!applicationProperty.uuidManager.uUIDProfileList.elementAt(profileIndex).useSingleCharacteristic) {
-    
-                                                if (verboseLog) {
-                                                    Log.d(
-                                                        "M:CB:onServicesDisc",
-                                                        "Correct characteristic found (tx)"
-                                                    )
-                                                }
-                                                applicationProperty.logControl("I: TX Characteristic match!")
-    
-                                                // save characteristic
-                                                txGattCharacteristic = it
-                                                
-                                                if(firstCharacteristicAdded){
-                                                    // report ready to communicate
-                                                    callback.onDeviceReadyForCommunication()
-                                                    discoveryWatcherData.characteristicDiscovered = true
-                                                    return@forEach
-                                                } else {
-                                                    // flag it
-                                                    firstCharacteristicAdded = true
-                                                }
-                                            }
-                                        }
                                     }
                                 }
-                                if(discoveryWatcherData.isCharDiscovery && !discoveryWatcherData.characteristicDiscovered){
-                                    // no matching characteristic(s) were found, report error
-                                    callback.onConnectionError(BLE_NO_MATCHING_CHARACTERISTICS)
-                                }
+                            }
+                            if(discoveryWatcherData.isCharDiscovery && !discoveryWatcherData.characteristicDiscovered){
+                                // no matching characteristic(s) were found, report error
+                                callback.onConnectionError(BLE_NO_MATCHING_CHARACTERISTICS)
                             }
                         }
-                        if(discoveryWatcherData.isServiceDiscovery && !discoveryWatcherData.serviceDiscovered){
-                            // no matching service was found, report error
-                            callback.onConnectionError(BLE_NO_MATCHING_SERVICES)
-                        }
                     }
-                    else -> {
-                        Log.e("M:CB:onServicesDisc", "Gatt-Status: $status")
-                        applicationProperty.logControl("E: Unexpected Gatt-Status: $status")
+                    if(discoveryWatcherData.isServiceDiscovery && !discoveryWatcherData.serviceDiscovered){
+                        // no matching service was found, report error
+                        callback.onConnectionError(BLE_NO_MATCHING_SERVICES)
                     }
                 }
-            } catch(e: Exception){
-                Log.e("M:CB:onServicesDisc", "Exception occurred while discovering services: $e")
-                applicationProperty.logControl("E: $e")
-            }
-        }
-
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            value: ByteArray
-        ) {
-            super.onCharacteristicChanged(gatt, characteristic, value)
-            
-            // get data
-            val dataAsString = value.toString()
-                
-                //characteristic?.getStringValue(0)
-    
-            // check if this was an unexpected echo notification
-            if (dataAsString == echoPreventerDataHolder) {
-                // clear holder at first !
-                echoPreventerDataHolder = ""
-                // this was an echo
-                if(verboseLog) {
-                    Log.e("M:CB:onCharacteristicChanged", "This was an echo. Why does this happen?!")// TODO: change to Log.w (is not an error at all)
-                }
-            } else {
-                // clear holder at first !
-                echoPreventerDataHolder = ""
-                // log (string)
-                if (verboseLog) {
-                    Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $dataAsString")
-                }
-                applicationProperty.logControl("I: Characteristic changed: $dataAsString")
-        
-                try {
-                    if (!dispatchTransmission(dataAsString)) {
-                        callback.onDataReceived(dataAsString)
-                    }
-                } catch (e: Exception) {
-                    if (verboseLog) {
-                        Log.e(
-                            "onCharacteristicChanged",
-                            "Exception while dispatching the incoming transmission. Exception: $e Transmission-Data: $dataAsString"
-                        )
-                    }
-                    applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
+                else -> {
+                    Log.e("M:CB:onServicesDisc", "Gatt-Status: $status")
+                    applicationProperty.logControl("E: Unexpected Gatt-Status: $status")
                 }
             }
+        } catch(e: Exception){
+            Log.e("M:CB:onServicesDisc", "Exception occurred while discovering services: $e")
+            applicationProperty.logControl("E: $e")
         }
     }
+    
+    private fun processOnCharacteristicChanged(data: String){
+        // check if this was an unexpected echo notification
+        if (data == echoPreventerDataHolder) {
+            // clear holder at first !
+            echoPreventerDataHolder = ""
+            // this was an echo
+            if(verboseLog) {
+                Log.e("M:CB:onCharacteristicChanged", "This was an echo. Why does this happen?!")// TODO: change to Log.w (is not an error at all)
+            }
+        } else {
+            // clear holder at first !
+            echoPreventerDataHolder = ""
+            // log (string)
+            if (verboseLog) {
+                Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $data")
+            }
+            applicationProperty.logControl("I: Characteristic changed: $data")
+        
+            try {
+                if (!dispatchTransmission(data)) {
+                    callback.onDataReceived(data)
+                }
+            } catch (e: Exception) {
+                if (verboseLog) {
+                    Log.e(
+                        "onCharacteristicChanged",
+                        "Exception while dispatching the incoming transmission. Exception: $e Transmission-Data: $data"
+                    )
+                }
+                applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
+            }
+        }
+    
+    }
 
-    fun dispatchTransmission(data: String): Boolean {
+    private fun dispatchTransmission(data: String): Boolean {
         // validate transmission length
         if(data.length < 8){
             //invalid transmission length
@@ -2146,11 +2175,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             // old:
             //BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
-            this.bluetoothGatt = this.currentDevice?.connectGatt(
-                applicationProperty.applicationContext,
-                false,
-                this.gattCallback
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                this.bluetoothGatt = this.currentDevice?.connectGatt(
+                    applicationProperty.applicationContext,
+                    false,
+                    this.gattCallback
+                )
+            } else {
+                this.bluetoothGatt = this.currentDevice?.connectGatt(
+                    applicationProperty.applicationContext,
+                    false,
+                    this.oldGattCallback
+                )
+            }
         } catch (e: SecurityException){
             Log.e("connectToRemoteDevice", "Security Exception occurred while trying to connect to remote device: ${e.message}")
             this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
@@ -2175,12 +2212,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         macAddress
                     )
             }
-
-            this.bluetoothGatt = this.currentDevice?.connectGatt(
-                applicationProperty.applicationContext,
-                false,
-                this.gattCallback
-            )
+    
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                this.bluetoothGatt = this.currentDevice?.connectGatt(
+                    applicationProperty.applicationContext,
+                    false,
+                    this.gattCallback
+                )
+            } else {
+                this.bluetoothGatt = this.currentDevice?.connectGatt(
+                    applicationProperty.applicationContext,
+                    false,
+                    this.oldGattCallback
+                )
+            }
         } catch (e: SecurityException){
             Log.e("conToBondedDevWithMacAddress", "Security Exception occurred while trying to connect to bonded device with mac-address: ${e.message}")
             this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)

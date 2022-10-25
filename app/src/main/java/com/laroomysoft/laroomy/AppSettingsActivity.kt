@@ -223,7 +223,7 @@ class AppSettingsActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.setupActivityShowLogButtonDescriptor).apply {
             when(logActive){
                 true -> {
-                    setTextColor(getColor(R.color.normalTextColor))
+                    setTextColor(getColor(R.color.colorTextPrimary))
                 }
                 else -> {
                     setTextColor(getColor(R.color.disabledTextColor))

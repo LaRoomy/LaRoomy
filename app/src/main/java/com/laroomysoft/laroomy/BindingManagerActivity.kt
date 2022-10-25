@@ -44,7 +44,10 @@ class BindingManagerActivity : AppCompatActivity() {
         }
         
         // initialize recycler view
-        bindingDataElementListAdapter = BindingDataElementListAdapter(this.bindingDataManager.bindingDataList)
+        bindingDataElementListAdapter = BindingDataElementListAdapter(this.bindingDataManager)
+    
+        //bindingDataElementListAdapter = BindingDataElementListAdapter(this.bindingDataManager.bindingDataList)
+        
         bindingDataElementListLayoutManager = LinearLayoutManager(this)
         bindingDataElementListView = findViewById<RecyclerView?>(R.id.bindingManagerActivityBindingDataListView).apply {
             setHasFixedSize(true)
@@ -56,9 +59,7 @@ class BindingManagerActivity : AppCompatActivity() {
         val swipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val pos = viewHolder.absoluteAdapterPosition
-                val element = (bindingDataElementListAdapter as BindingDataElementListAdapter).elementAt(pos)
                 (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(pos)
-                bindingDataManager.removeElement(element)
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
@@ -71,7 +72,7 @@ class BindingManagerActivity : AppCompatActivity() {
         overridePendingTransition(R.anim.finish_activity_slide_animation_in, R.anim.finish_activity_slide_animation_out)
     }
     
-    class BindingDataElementListAdapter(private val bindingDataElementList: ArrayList<BindingData>)
+    class BindingDataElementListAdapter(private val bindingDataManager: BindingDataManager)
         : RecyclerView.Adapter<BindingDataElementListAdapter.ViewHolder>() {
         
         class ViewHolder(val constraintLayout: ConstraintLayout) : RecyclerView.ViewHolder(constraintLayout)
@@ -86,7 +87,7 @@ class BindingManagerActivity : AppCompatActivity() {
         }
         
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val element = bindingDataElementList.elementAt(position)
+            val element = bindingDataManager.bindingDataList.elementAt(position)
             
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementDeviceNameTextView).apply {
                 text = element.deviceName
@@ -111,20 +112,14 @@ class BindingManagerActivity : AppCompatActivity() {
         }
         
         override fun getItemCount(): Int {
-            return bindingDataElementList.size
+            return bindingDataManager.bindingDataList.size
         }
         
         fun removeAt(position: Int){
-            bindingDataElementList.removeAt(position)
+            //bindingDataElementList.removeAt(position)
+            val element = bindingDataManager.bindingDataList.elementAt(position)
+            bindingDataManager.removeElement(element)
             notifyItemRemoved(position)
-        }
-        
-        fun elementAt(position: Int) : BindingData {
-            return if(position < bindingDataElementList.size) {
-                bindingDataElementList[position]
-            } else {
-                BindingData()
-            }
         }
     }
 }
