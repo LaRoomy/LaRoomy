@@ -79,6 +79,7 @@
 
 
     <color name="addDeviceActivityContainerBackgroundColor">#FF202020</color>
+    <color name="manageBindingDataActivityContainerBackgroundColor">#DD202020</color>
 
 
 

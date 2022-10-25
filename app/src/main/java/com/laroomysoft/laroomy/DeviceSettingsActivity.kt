@@ -357,7 +357,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
         if(state){
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Connected), R.color.connectedTextColor)
-            setUIElementsEnabledState(state)
+            setUIElementsEnabledState(true)
 
             if(this.propertyStateUpdateRequired){
                 this.propertyStateUpdateRequired = false
@@ -367,7 +367,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             }
         } else {
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
-            setUIElementsEnabledState(state)
+            setUIElementsEnabledState(false)
 
             if(!this.expectedConnectionLoss) {
                 // unexpected loss of connection

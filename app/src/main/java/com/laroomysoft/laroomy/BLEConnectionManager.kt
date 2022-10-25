@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import java.io.Serializable
@@ -215,11 +216,25 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         applicationProperty.logControl("I: Connection restored")
 
                         // re-init the descriptor to establish a stream!
-                        val descriptor = rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
-                            .apply {
-                                value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                            }
-                        gatt?.writeDescriptor(descriptor)
+    
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            val descriptor =
+                                rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
+                            gatt?.writeDescriptor(
+                                descriptor,
+                                BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                            )
+                        } else {
+    
+                            // deprecated:
+                            val descriptor = rxGattCharacteristic.getDescriptor(clientCharacteristicConfig)
+                                .apply {
+                                    @Suppress("DEPRECATION")
+                                    value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                }
+                            @Suppress("DEPRECATION")
+                            gatt?.writeDescriptor(descriptor)
+                        }
 
                         // notify the remote device
                         Executors.newSingleThreadScheduledExecutor().schedule({
@@ -334,14 +349,27 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                             }
         
                                             // set the correct descriptor for this characteristic
-                                            val descriptor = rxGattCharacteristic.getDescriptor(
-                                                clientCharacteristicConfig
-                                            )
-                                                .apply {
-                                                    value =
-                                                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                                }
-                                            gatt.writeDescriptor(descriptor)
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                val descriptor = rxGattCharacteristic.getDescriptor(
+                                                    clientCharacteristicConfig
+                                                )
+                                                gatt.writeDescriptor(
+                                                    descriptor,
+                                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                                )
+                                            } else {
+                                                // deprecated since API-Level 33
+                                                val descriptor = rxGattCharacteristic.getDescriptor(
+                                                    clientCharacteristicConfig
+                                                )
+                                                    .apply {
+                                                        @Suppress("DEPRECATION")
+                                                        value =
+                                                            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                                    }
+                                                @Suppress("DEPRECATION")
+                                                gatt.writeDescriptor(descriptor)
+                                            }
         
                                             if(firstCharacteristicAdded) {
                                                 // report ready for communication
@@ -405,14 +433,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         override fun onCharacteristicChanged(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
         ) {
-            super.onCharacteristicChanged(gatt, characteristic)
+            super.onCharacteristicChanged(gatt, characteristic, value)
             
             // get data
-            val dataAsString =
-                characteristic?.getStringValue(0)
+            val dataAsString = value.toString()
+                
+                //characteristic?.getStringValue(0)
     
             // check if this was an unexpected echo notification
             if (dataAsString == echoPreventerDataHolder) {
@@ -432,8 +462,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 applicationProperty.logControl("I: Characteristic changed: $dataAsString")
         
                 try {
-                    if (!dispatchTransmission(dataAsString ?: "")) {
-                        callback.onDataReceived(dataAsString ?: "")
+                    if (!dispatchTransmission(dataAsString)) {
+                        callback.onDataReceived(dataAsString)
                     }
                 } catch (e: Exception) {
                     if (verboseLog) {
@@ -793,6 +823,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun readPropertyExecutionResponse(data: String, payLoadDataSize: Int) : Boolean {
+        if(verboseLog){
+            Log.d("BLEConnectionManager", "readPropertyExecutionResponse: exec:data: $data / exec:payLoadDataSize: $payLoadDataSize")
+        }
         // FIXME: what to do here?
         // if a property was executed and no response is received, send a state-update to verify the user-interface??
         return true
@@ -2196,52 +2229,55 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     applicationProperty.logControl("I: Send Data: $data")
                 }
 
-                // TODO: the commented section is new for Android Tiramisu, keep it for later usage!
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//                    if (ActivityCompat.checkSelfPermission(
-//                            applicationProperty.applicationContext,
-//                            Manifest.permission.BLUETOOTH_CONNECT
-//                        ) != PackageManager.PERMISSION_GRANTED
-//                    ) {
-//                        this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
-//                        return
-//                    } else {
-//                        this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic, data.toByteArray(), writeType)
-//                    }
-//                } else {
-//                    this.gattCharacteristic.setValue(data)
-//
-//                    if (this.bluetoothGatt == null) {
-//                        Log.e("M:sendData", "Member bluetoothGatt was null!")
-//                    }
-//
-//                    try {
-//                        this.bluetoothGatt?.writeCharacteristic(this.gattCharacteristic)
-//                    } catch (e: SecurityException){
-//                        Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
-//                        this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
-//                    }
-//                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ActivityCompat.checkSelfPermission(
+                            applicationProperty.applicationContext,
+                            Manifest.permission.BLUETOOTH_CONNECT
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        this.bluetoothGatt?.writeCharacteristic(
+                            this.txGattCharacteristic,
+                            data.toByteArray(),
+                            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                        )
+                    }
+                } else {
+                    // deprecated since api level 33
+                    @Suppress("DEPRECATION")
+                    this.txGattCharacteristic.setValue(data)
+    
+                    if (this.bluetoothGatt == null) {
+                        Log.e("M:sendData", "Member bluetoothGatt was null!")
+                    }
+
+                    try {
+                        @Suppress("DEPRECATION")
+                        this.bluetoothGatt?.writeCharacteristic(this.txGattCharacteristic)
+                    } catch (e: SecurityException){
+                        Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
+                        this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+                    }
+                }
     
                 // save the data for echo prevention
                 //this.echoPreventerDataHolder = data
                 // set the characteristic value
                 //this.rxGattCharacteristic.setValue(data)
-                this.txGattCharacteristic.setValue(data)
-    
-    
-    
-                if (this.bluetoothGatt == null) {
-                    Log.e("M:sendData", "Member bluetoothGatt was null!")
-                }
-    
-                // write the characteristic
-                try {
-                    this.bluetoothGatt?.writeCharacteristic(this.txGattCharacteristic)
-                } catch (e: SecurityException) {
-                    Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
-                    this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
-                }
+//                this.txGattCharacteristic.setValue(data)
+//
+//
+//
+//                if (this.bluetoothGatt == null) {
+//                    Log.e("M:sendData", "Member bluetoothGatt was null!")
+//                }
+//
+//                // write the characteristic
+//                try {
+//                    this.bluetoothGatt?.writeCharacteristic(this.txGattCharacteristic)
+//                } catch (e: SecurityException) {
+//                    Log.e("BLEManager:sendData", "Security Exception: ${e.message}")
+//                    this.callback.onConnectionError(BLE_BLUETOOTH_PERMISSION_MISSING)
+//                }
             }
         } catch (e: Exception) {
             Log.e("BLEManager:sendData", "Unexpected Error: $e")

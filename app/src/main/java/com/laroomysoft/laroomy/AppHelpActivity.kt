@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
@@ -36,13 +37,20 @@ class AppHelpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_help)
-
+    
+        // register onBackPressed event
+        this.onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                handleBackEvent()
+            }
+        })
+    
         // add back button functionality
-        this.backButton = findViewById(R.id.appHelpActivityBackButton)
-        this.backButton.setOnClickListener {
-            this.onBackPressed()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.appHelpActivityBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
         }
-
 
         // connect device topic elements
 
@@ -63,6 +71,10 @@ class AppHelpActivity : AppCompatActivity() {
 
         this.appResetContentContainer = findViewById(R.id.appHelpActivityAppResetContentContainer)
         this.appResetImageView = findViewById(R.id.appHelpActivityAppResetImageView)
+    }
+    
+    private fun handleBackEvent(){
+        finish()
     }
     
     fun onTopicClick(view: View){

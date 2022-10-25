@@ -15,21 +15,22 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
     private val intrinsicWidth = deleteIcon?.intrinsicWidth
     private val intrinsicHeight = deleteIcon?.intrinsicHeight
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
-
-
-    override fun getMovementFlags(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ): Int {
-        /**
-         * To disable "swipe" for specific item return 0 here.
-         * For example:
-         * if (viewHolder?.itemViewType == YourAdapter.SOME_TYPE) return 0
-         * if (viewHolder?.adapterPosition == 0) return 0
-         */
-        if (viewHolder.absoluteAdapterPosition == 10) return 0
-        return super.getMovementFlags(recyclerView, viewHolder)
-    }
+    
+//    override fun getMovementFlags(
+//        recyclerView: RecyclerView,
+//        viewHolder: RecyclerView.ViewHolder
+//    ): Int {
+//        /**
+//         * To disable "swipe" for specific item return 0 here.
+//         * For example:
+//         * if (viewHolder?.itemViewType == YourAdapter.SOME_TYPE) return 0
+//         * if (viewHolder?.adapterPosition == 0) return 0
+//         */
+//
+//        //if (viewHolder.absoluteAdapterPosition == 10) return 0
+//
+//        return super.getMovementFlags(recyclerView, viewHolder)
+//    }
 
     override fun onMove(
         recyclerView: RecyclerView,
@@ -55,7 +56,7 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
 
         if (isCanceled) {
             clearCanvas(c, itemView.right + dX, itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, false)
             return
         }
 

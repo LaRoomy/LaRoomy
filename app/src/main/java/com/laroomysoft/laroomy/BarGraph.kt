@@ -33,18 +33,18 @@ class BarGraph : View {
         val a = context.obtainStyledAttributes(
             attrs, R.styleable.BarGraph, defStyle, 0
         )
-            try {
-                barTextColor = a.getInteger(R.styleable.BarGraph_barTextColor, R.color.normalTextColor)
-                barGraphOutlineColor = a.getInteger(R.styleable.BarGraph_barGraphOutlineColor, R.color.normalOutlineColor)
-                barDescriptionGap = a.getDimensionPixelSize(R.styleable.BarGraph_barDescriptionGap, defaultBarDescriptionGapHeight)
-                barTextHeight = a.getDimensionPixelSize(R.styleable.BarGraph_barTextSize, defaultBarTextHeight)
-                scaleTextSize = a.getDimensionPixelSize(R.styleable.BarGraph_scaleTextSize, 25)
-                scaleSectionWidth = a.getDimensionPixelSize(R.styleable.BarGraph_scaleSectionWidth, defScaleSectionWidth)
-                extraTopPadding = a.getDimensionPixelSize(R.styleable.BarGraph_extraTopPadding, 0)
-                fixedMaximumValue = a.getInteger(R.styleable.BarGraph_fixedMaximumValue, -1)
-            } finally {
-                a.recycle()
-            }
+        try {
+            barTextColor = a.getInteger(R.styleable.BarGraph_barTextColor, R.color.normalTextColor)
+            barGraphOutlineColor = a.getInteger(R.styleable.BarGraph_barGraphOutlineColor, R.color.normalOutlineColor)
+            barDescriptionGap = a.getDimensionPixelSize(R.styleable.BarGraph_barDescriptionGap, defaultBarDescriptionGapHeight)
+            barTextHeight = a.getDimensionPixelSize(R.styleable.BarGraph_barTextSize, defaultBarTextHeight)
+            scaleTextSize = a.getDimensionPixelSize(R.styleable.BarGraph_scaleTextSize, 25)
+            scaleSectionWidth = a.getDimensionPixelSize(R.styleable.BarGraph_scaleSectionWidth, defScaleSectionWidth)
+            extraTopPadding = a.getDimensionPixelSize(R.styleable.BarGraph_extraTopPadding, 0)
+            fixedMaximumValue = a.getInteger(R.styleable.BarGraph_fixedMaximumValue, -1)
+        } finally {
+            a.recycle()
+        }
     }
 
     // colors

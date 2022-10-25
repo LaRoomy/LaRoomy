@@ -192,6 +192,7 @@
     <string name="BindingManagerActivity_ListElementDeviceName">Gerätename:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac Adresse:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Bindungstyp:</string>
+    <string name="BindingManagerActivity_UserHint">Nach links wischen löscht einen Datensatz. Aber Vorsicht: Wenn die Bindung für das Gerät aktiviert ist, ist die Verbindung eventuell nicht mehr möglich. Die Bindung sollte gelöst werden bevor ein Datensatz gelöscht wird.</string>
 
 
 

@@ -10,7 +10,6 @@ import androidx.appcompat.content.res.AppCompatResources
 
 const val PASSKEY_TYPE_NONE = 0
 const val PASSKEY_TYPE_SHARED = 1
-const val PASSKEY_TYPE_CUSTOM = 2
 const val PASSKEY_TYPE_NORM = 3
 
 const val NAV_TOUCH_TYPE_INVALID = '0'

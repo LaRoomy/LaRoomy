@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -51,6 +52,17 @@ class BindingManagerActivity : AppCompatActivity() {
             layoutManager = bindingDataElementListLayoutManager
         }
         
+        // add swipe to delete callback
+        val swipeHandler = object : SwipeToDeleteCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.absoluteAdapterPosition
+                val element = (bindingDataElementListAdapter as BindingDataElementListAdapter).elementAt(pos)
+                (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(pos)
+                bindingDataManager.removeElement(element)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(bindingDataElementListView)
     }
     
     private fun handleBackEvent(){
@@ -101,6 +113,18 @@ class BindingManagerActivity : AppCompatActivity() {
         override fun getItemCount(): Int {
             return bindingDataElementList.size
         }
+        
+        fun removeAt(position: Int){
+            bindingDataElementList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+        
+        fun elementAt(position: Int) : BindingData {
+            return if(position < bindingDataElementList.size) {
+                bindingDataElementList[position]
+            } else {
+                BindingData()
+            }
+        }
     }
-    
 }

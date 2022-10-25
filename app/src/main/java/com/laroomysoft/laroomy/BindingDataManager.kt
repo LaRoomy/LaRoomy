@@ -145,7 +145,7 @@ class BindingDataManager(private val appContext: Context) {
     fun lookUpForBindingData(mac: String) : BindingData {
         this.bindingDataList.forEach {
             if(it.macAddress == mac){
-                return it;
+                return it
             }
         }
         return BindingData()

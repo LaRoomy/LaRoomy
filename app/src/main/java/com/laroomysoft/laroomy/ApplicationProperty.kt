@@ -185,7 +185,6 @@ class ApplicationProperty : Application() {
     fun loadBooleanData(fileKeyID: Int, dataKeyID: Int): Boolean{
         return when(this.loadSavedStringData(fileKeyID, dataKeyID)){
             "true" -> true
-            "false" -> false
             else -> false
         }
     }

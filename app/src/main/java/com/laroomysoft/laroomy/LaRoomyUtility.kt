@@ -68,8 +68,7 @@ fun get8BitValueAsPercent(value: Int) : Int {
                 val floatVar = value.toFloat()
                 ((floatVar*100f)/255f).roundToInt()
             }
-            value == 0 -> 0
-            else -> ret -1
+            else -> 0
         }
     }
     return ret
@@ -547,7 +546,6 @@ fun aSigned16bitValueTo4CharHexValue(bVal: Short): String {
     val hexString =
         Integer.toHexString(a.toInt())
     return when (hexString.length) {
-        0 -> "eeee"
         1 -> "000$hexString"
         2 -> "00$hexString"
         3 -> "0$hexString"
