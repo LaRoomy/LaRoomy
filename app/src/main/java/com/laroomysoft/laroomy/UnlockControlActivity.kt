@@ -182,29 +182,33 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(unlockControlState: UnlockControlState) {
-
-        if(unlockControlState.isValid()) {
-            if(unlockControlState.mode == UC_PIN_CHANGE_MODE){
-                // if this is a pin-change mode update, this indicates a pin-change success!
-                this.notifyUser(getString(R.string.UnlockCtrl_PinChangeSuccess), R.color.successLightColor)
-            } else {
-                if (unlockControlState.unLocked) {
-                    this.lockState = UC_STATE_UNLOCKED
-                    this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_unlocked_sq128_vect)
-                    this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
-                    this.lockStatusTextView.text =
-                        getString(R.string.UnlockCtrl_ConditionText_Unlocked)
+        runOnUiThread {
+            if (unlockControlState.isValid()) {
+                if (unlockControlState.mode == UC_PIN_CHANGE_MODE) {
+                    // if this is a pin-change mode update, this indicates a pin-change success!
                     this.notifyUser(
-                        getString(R.string.UnlockCtrl_LockHintMessageText),
+                        getString(R.string.UnlockCtrl_PinChangeSuccess),
                         R.color.successLightColor
                     )
                 } else {
-                    this.lockState = UC_STATE_LOCKED
-                    this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_locked_sq128_vect)
-                    this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
-                    this.lockStatusTextView.text =
-                        getString(R.string.UnlockCtrl_ConditionText_Locked)
-                    this.notifyUser("", R.color.normalTextColor)
+                    if (unlockControlState.unLocked) {
+                        this.lockState = UC_STATE_UNLOCKED
+                        this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_unlocked_sq128_vect)
+                        this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
+                        this.lockStatusTextView.text =
+                            getString(R.string.UnlockCtrl_ConditionText_Unlocked)
+                        this.notifyUser(
+                            getString(R.string.UnlockCtrl_LockHintMessageText),
+                            R.color.successLightColor
+                        )
+                    } else {
+                        this.lockState = UC_STATE_LOCKED
+                        this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_locked_sq128_vect)
+                        this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
+                        this.lockStatusTextView.text =
+                            getString(R.string.UnlockCtrl_ConditionText_Locked)
+                        this.notifyUser("", R.color.normalTextColor)
+                    }
                 }
             }
         }
@@ -623,9 +627,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                     }
                 }
             } else {
-                runOnUiThread {
-                    this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
-                }
+                this.setCurrentViewStateFromComplexPropertyState(unlockControlState)
             }
         }
     }

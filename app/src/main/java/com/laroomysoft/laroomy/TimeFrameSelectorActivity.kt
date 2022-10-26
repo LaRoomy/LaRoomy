@@ -245,10 +245,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(timeFrameSelectorState: TimeFrameSelectorState){
-        this.fromTimePicker.hour = timeFrameSelectorState.onTimeHour
-        this.fromTimePicker.minute = timeFrameSelectorState.onTimeMinute
-        this.toTimePicker.hour = timeFrameSelectorState.offTimeHour
-        this.toTimePicker.minute = timeFrameSelectorState.offTimeMinute
+        runOnUiThread {
+            this.fromTimePicker.hour = timeFrameSelectorState.onTimeHour
+            this.fromTimePicker.minute = timeFrameSelectorState.onTimeMinute
+            this.toTimePicker.hour = timeFrameSelectorState.offTimeHour
+            this.toTimePicker.minute = timeFrameSelectorState.offTimeMinute
+        }
     }
 
     private fun notifyUser(message: String, colorID: Int){

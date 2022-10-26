@@ -267,9 +267,9 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.maxValue = extendedLevelSelectorState.maxValue
         this.showOnOffSwitch = extendedLevelSelectorState.showOnOffSwitch
         this.transmitOnlyStartEndIndication = extendedLevelSelectorState.transmitOnlyStartEndOfTracking
-
-        // set the switch visibility
+        
         runOnUiThread {
+            // set the switch visibility
             this.switchContainer.visibility = if (this.showOnOffSwitch) {
                 // set switch state
                 this.onOffSwitch.isChecked = extendedLevelSelectorState.onOffState

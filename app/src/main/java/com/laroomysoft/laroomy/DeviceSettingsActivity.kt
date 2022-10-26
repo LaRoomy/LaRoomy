@@ -120,7 +120,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
         // change the UI if the binding-switch is on
         if(ApplicationProperty.bluetoothConnectionManager.isBindingRequired){
-            bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
             shareBindingContainer.visibility = View.VISIBLE
 
             if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey){
@@ -159,9 +158,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     // enable the device binding
                     ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding(passkey)
 
-                    // update the hint for the user
-                    bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
-
                     // show the share-button
                     shareBindingContainer.visibility = View.VISIBLE
 
@@ -189,7 +185,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding(passkey)
 
                     // update the hint for the user
-                    bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                    //bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHint)
 
                     // hide the share-button
                     shareBindingContainer.visibility = View.GONE
@@ -440,8 +436,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             when (responseID) {
                 BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {
                     // update the hint for the user
-                    bindingHintTextView.text =
-                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                    //bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
             
                     // hide the share-button
                     shareBindingContainer.visibility = View.GONE
@@ -483,8 +478,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 }
                 BINDING_RESPONSE_BINDING_ERROR -> {
                     // update the hint for the user
-                    bindingHintTextView.text =
-                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
+                    //bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
                     // reset the switch
                     bindingSwitch.isChecked = false
                     //notify user
@@ -516,9 +510,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     }
                 }
                 BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
-                    // update the hint for the user
-                    bindingHintTextView.text =
-                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
                     // reset the switch
                     bindingSwitch.isChecked = true
                     // notify user
@@ -528,9 +519,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     )
                 }
                 BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR -> {
-                    // update the hint for the user
-                    bindingHintTextView.text =
-                        getString(R.string.DeviceSettingsActivity_BindingPurposeHintForDisable)
                     // reset the switch
                     bindingSwitch.isChecked = true
                     // notify user

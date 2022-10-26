@@ -231,97 +231,100 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(stringInterrogatorState: StringInterrogatorState){
-
-        // save action type on button press
-        this.navigateBackOnButtonPress = stringInterrogatorState.navigateBackOnButtonPress
-
-        // set button text (if there is one)
-        if(stringInterrogatorState.buttonDescriptor.isNotEmpty()){
-            this.confirmButton.text = stringInterrogatorState.buttonDescriptor
-        }
-
-        // set field 1 container visibility and sub element properties
-        this.fieldOneContainer.visibility = if(stringInterrogatorState.fieldOneVisible){
-            // if the field descriptor is empty, hide it
-            this.fieldOneDescriptor.visibility = if(stringInterrogatorState.fieldOneDescriptor.isEmpty()){
-                View.GONE
-            } else {
-                this.fieldOneDescriptor.text = stringInterrogatorState.fieldOneDescriptor
-                View.VISIBLE
+        runOnUiThread {
+            // save action type on button press
+            this.navigateBackOnButtonPress = stringInterrogatorState.navigateBackOnButtonPress
+    
+            // set button text (if there is one)
+            if (stringInterrogatorState.buttonDescriptor.isNotEmpty()) {
+                this.confirmButton.text = stringInterrogatorState.buttonDescriptor
             }
-            // if the hint is not empty set it
-            if(stringInterrogatorState.fieldOneHint.isNotEmpty()){
-                this.fieldOneInputText.hint = stringInterrogatorState.fieldOneHint
-            }
-            // if the content is not empty set it
-            if(stringInterrogatorState.fieldOneContent.isNotEmpty()){
-                this.fieldOneInputText.setText(stringInterrogatorState.fieldOneContent)
-            }
-            // set the input type of the field 1 editText
-            this.fieldOneInputText.inputType =
-                when(stringInterrogatorState.fieldOneInputType){
-                    SI_INPUT_TYPE_TEXT -> {
-                        InputType.TYPE_CLASS_TEXT
+    
+            // set field 1 container visibility and sub element properties
+            this.fieldOneContainer.visibility = if (stringInterrogatorState.fieldOneVisible) {
+                // if the field descriptor is empty, hide it
+                this.fieldOneDescriptor.visibility =
+                    if (stringInterrogatorState.fieldOneDescriptor.isEmpty()) {
+                        View.GONE
+                    } else {
+                        this.fieldOneDescriptor.text = stringInterrogatorState.fieldOneDescriptor
+                        View.VISIBLE
                     }
-                    SI_INPUT_TYPE_TEXT_PASSWORD -> {
-                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                    }
-                    SI_INPUT_TYPE_NUMBER -> {
-                        InputType.TYPE_CLASS_NUMBER
-                    }
-                    SI_INPUT_TYPE_NUMBER_PASSWORD -> {
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-                    }
-                    else -> {
-                        InputType.TYPE_CLASS_TEXT
-                    }
+                // if the hint is not empty set it
+                if (stringInterrogatorState.fieldOneHint.isNotEmpty()) {
+                    this.fieldOneInputText.hint = stringInterrogatorState.fieldOneHint
                 }
-
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-
-        // set field 2 container visibility and sub element properties
-        this.fieldTwoContainer.visibility = if(stringInterrogatorState.fieldTwoVisible){
-            // if the field descriptor is empty, hide it
-            this.fieldTwoDescriptor.visibility = if(stringInterrogatorState.fieldTwoDescriptor.isEmpty()){
-                View.GONE
-            } else {
-                this.fieldTwoDescriptor.text = stringInterrogatorState.fieldTwoDescriptor
-                View.VISIBLE
-            }
-            // if the hint is not empty set it
-            if(stringInterrogatorState.fieldTwoHint.isNotEmpty()){
-                this.fieldTwoInputText.hint = stringInterrogatorState.fieldTwoHint
-            }
-            // if the content is not empty set it
-            if(stringInterrogatorState.fieldTwoContent.isNotEmpty()){
-                this.fieldTwoInputText.setText(stringInterrogatorState.fieldTwoContent)
-            }
-            // set the input type of the field 2 editText
-            this.fieldTwoInputText.inputType =
-                when(stringInterrogatorState.fieldTwoInputType){
-                    SI_INPUT_TYPE_TEXT -> {
-                        InputType.TYPE_CLASS_TEXT
-                    }
-                    SI_INPUT_TYPE_TEXT_PASSWORD -> {
-                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                    }
-                    SI_INPUT_TYPE_NUMBER -> {
-                        InputType.TYPE_CLASS_NUMBER
-                    }
-                    SI_INPUT_TYPE_NUMBER_PASSWORD -> {
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-                    }
-                    else -> {
-                        InputType.TYPE_CLASS_TEXT
-                    }
+                // if the content is not empty set it
+                if (stringInterrogatorState.fieldOneContent.isNotEmpty()) {
+                    this.fieldOneInputText.setText(stringInterrogatorState.fieldOneContent)
                 }
-
-            View.VISIBLE
-        } else {
-            View.GONE
+                // set the input type of the field 1 editText
+                this.fieldOneInputText.inputType =
+                    when (stringInterrogatorState.fieldOneInputType) {
+                        SI_INPUT_TYPE_TEXT -> {
+                            InputType.TYPE_CLASS_TEXT
+                        }
+                        SI_INPUT_TYPE_TEXT_PASSWORD -> {
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        }
+                        SI_INPUT_TYPE_NUMBER -> {
+                            InputType.TYPE_CLASS_NUMBER
+                        }
+                        SI_INPUT_TYPE_NUMBER_PASSWORD -> {
+                            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                        }
+                        else -> {
+                            InputType.TYPE_CLASS_TEXT
+                        }
+                    }
+        
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+    
+            // set field 2 container visibility and sub element properties
+            this.fieldTwoContainer.visibility = if (stringInterrogatorState.fieldTwoVisible) {
+                // if the field descriptor is empty, hide it
+                this.fieldTwoDescriptor.visibility =
+                    if (stringInterrogatorState.fieldTwoDescriptor.isEmpty()) {
+                        View.GONE
+                    } else {
+                        this.fieldTwoDescriptor.text = stringInterrogatorState.fieldTwoDescriptor
+                        View.VISIBLE
+                    }
+                // if the hint is not empty set it
+                if (stringInterrogatorState.fieldTwoHint.isNotEmpty()) {
+                    this.fieldTwoInputText.hint = stringInterrogatorState.fieldTwoHint
+                }
+                // if the content is not empty set it
+                if (stringInterrogatorState.fieldTwoContent.isNotEmpty()) {
+                    this.fieldTwoInputText.setText(stringInterrogatorState.fieldTwoContent)
+                }
+                // set the input type of the field 2 editText
+                this.fieldTwoInputText.inputType =
+                    when (stringInterrogatorState.fieldTwoInputType) {
+                        SI_INPUT_TYPE_TEXT -> {
+                            InputType.TYPE_CLASS_TEXT
+                        }
+                        SI_INPUT_TYPE_TEXT_PASSWORD -> {
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        }
+                        SI_INPUT_TYPE_NUMBER -> {
+                            InputType.TYPE_CLASS_NUMBER
+                        }
+                        SI_INPUT_TYPE_NUMBER_PASSWORD -> {
+                            InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                        }
+                        else -> {
+                            InputType.TYPE_CLASS_TEXT
+                        }
+                    }
+        
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         }
     }
 
@@ -441,9 +444,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 }
                 val stringInterrogatorState = StringInterrogatorState()
                 stringInterrogatorState.fromComplexPropertyState(element.complexPropertyState)
-                runOnUiThread {
-                    this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
-                }
+                this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
             }
         }
     }

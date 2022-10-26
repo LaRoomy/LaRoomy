@@ -253,21 +253,27 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(navigatorState: NavigatorState) {
-
-        if(!navigatorState.upperButton){
-            findViewById<ConstraintLayout>(R.id.navConUpperButtonContainer).visibility = View.GONE
-        }
-        if(!navigatorState.rightButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility = View.INVISIBLE
-        }
-        if(!navigatorState.downButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).visibility = View.GONE
-        }
-        if(!navigatorState.leftButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility = View.INVISIBLE
-        }
-        if(!navigatorState.midButton){
-            findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility = View.INVISIBLE
+        runOnUiThread {
+            if (!navigatorState.upperButton) {
+                findViewById<ConstraintLayout>(R.id.navConUpperButtonContainer).visibility =
+                    View.GONE
+            }
+            if (!navigatorState.rightButton) {
+                findViewById<AppCompatImageButton>(R.id.navConNavigateRightButton).visibility =
+                    View.INVISIBLE
+            }
+            if (!navigatorState.downButton) {
+                findViewById<AppCompatImageButton>(R.id.navConNavigateDownButton).visibility =
+                    View.GONE
+            }
+            if (!navigatorState.leftButton) {
+                findViewById<AppCompatImageButton>(R.id.navConNavigateLeftButton).visibility =
+                    View.INVISIBLE
+            }
+            if (!navigatorState.midButton) {
+                findViewById<AppCompatImageButton>(R.id.navConNavigateMiddleButton).visibility =
+                    View.INVISIBLE
+            }
         }
     }
 

@@ -115,7 +115,7 @@
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:text="@string/DeviceSettingsActivity_BindingPurposeHintForEnable"
+            android:text="@string/DeviceSettingsActivity_BindingPurposeHint"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -181,14 +181,12 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     private fun setCurrentViewStateFromComplexPropertyState(timeSelectorState: TimeSelectorState){
         // NOTE: do not use this method before the view is retrieved in onCreate
-
-        // TODO: check if this works (send property-changed notification from device)
-
-        this.currentHour = timeSelectorState.hour
-        this.currentMinute = timeSelectorState.minute
-
-        this.simpleTimePicker.hour = timeSelectorState.hour
-        this.simpleTimePicker.minute = timeSelectorState.minute
+        runOnUiThread {
+            this.currentHour = timeSelectorState.hour
+            this.currentMinute = timeSelectorState.minute
+            this.simpleTimePicker.hour = timeSelectorState.hour
+            this.simpleTimePicker.minute = timeSelectorState.minute
+        }
     }
 
     private fun notifyUser(message: String, colorID: Int){
