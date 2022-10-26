@@ -168,7 +168,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private var uIItemAddCounter = -1
 
-
+    /*
+     TODO: the following double implementation of the gatt callback is necessary, because on systems
+           with api level 33 or higher the callback method 'onCharacteristicChanged(gatt, characteristic)
+           is deprecated. So the replacement 'onCharacteristicChanged(gatt, characteristic, value)' should
+           be used. But on systems running api level lower than 33 the new method is not called. To guarantee
+           functionality on all system both are implemented.
+           In the future the min-sdk version of the app could be changed to api level 33 and the old
+           implementation can be removed!
+    */
     // NEW callback implementation for BluetoothGatt for API LEVEL 33+
     private val gattCallback = object : BluetoothGattCallback() {
         @SuppressLint("MissingPermission")
@@ -221,6 +229,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     
     @SuppressLint("MissingPermission")
     private fun processOnConnectionStateChange(gatt: BluetoothGatt?, newState: Int){
+        // NOTE: Suppressing the missing permission warning here is absolutely ok, because the warning is a paradox:
+        //       when the permission is not granted, the bluetooth connection cannot be established - Thus the
+        //       callback cannot be invoked.
         when(newState){
             BluetoothProfile.STATE_CONNECTED -> {
             
@@ -302,6 +313,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     
     @SuppressLint("MissingPermission")
     private fun processOnServicesDiscovered(gatt: BluetoothGatt?, status: Int){
+        // NOTE: Suppressing the missing permission warning here is absolutely ok, because the warning is a paradox:
+        //       when the permission is not granted, the bluetooth connection cannot be established - Thus the
+        //       callback cannot be invoked.
         try {
             when (status) {
                 BluetoothGatt.GATT_SUCCESS -> {
@@ -479,7 +493,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             echoPreventerDataHolder = ""
             // this was an echo
             if(verboseLog) {
-                Log.e("M:CB:onCharacteristicChanged", "This was an echo. Why does this happen?!")// TODO: change to Log.w (is not an error at all)
+                Log.e("M:CB:onCharacteristicChanged", "This was an echo. Why does this happen?!")
             }
         } else {
             // clear holder at first !
@@ -2935,6 +2949,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // send it
         this.sendData(bindingString)
         this.bleDeviceData.isBindingRequired = false
+    }
+    
+    fun updateInternalSimplePropertyState(internalIndex: Int, state: Int){
+        if(internalIndex < this.laRoomyDevicePropertyList.size && internalIndex >= 0){
+            this.laRoomyDevicePropertyList[internalIndex].propertyState = state
+        }
     }
 
     private fun propertyTypeFromIndex(propertyIndex: Int) : Int {

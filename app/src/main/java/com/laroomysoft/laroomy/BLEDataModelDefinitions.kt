@@ -2243,6 +2243,14 @@ class SuccessiveSimpleUpdateStorage {
     var eIndex = -1
 }
 
+class SuccessiveComplexUpdateStorage {
+    var data = ""
+    var isHandled = true
+    var isStarted = false
+    var keep = false
+    //var eIndex = -1
+}
+
 class ServCharDiscoveryWatcherData {
     var isCharDiscovery = false
     var isServiceDiscovery = false

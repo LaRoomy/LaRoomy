@@ -48,7 +48,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".TextListPresenter"
+            android:name=".TextListPresenterActivity"
             android:exported="false"
             android:screenOrientation="locked" />
         <activity

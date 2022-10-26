@@ -454,13 +454,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             true -> 1
             else -> 0
         }
+        // send state change
         ApplicationProperty.bluetoothConnectionManager.sendData(
             makeSimplePropertyExecutionString(devicePropertyListContentInformation.internalElementIndex, c)
         )
+        // update UI List
         ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).apply {
             this.simplePropertyState = c
             //this.update() - not necessary on a switch
         }
+        // update internal property state
+        ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(devicePropertyListContentInformation.internalElementIndex, c)
     }
 
     @SuppressLint("InflateParams")
@@ -616,6 +620,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                     devicePropertyListViewAdapter.notifyItemChanged(index)
                     
+                    // update internal simple state
+                    ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(
+                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
+                        newVal
+                    )
+                    
                     // control successive transmissions
                     if(!optionSelectUpdateData.isHandled){
                         // only save the value, because there is a transmission pending
@@ -637,17 +647,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                                 optionSelectUpdateData.isHandled = true
             
                             }, 150, TimeUnit.MILLISECONDS)
-    
-    
-    
-                        // send execution command
-//                        ApplicationProperty.bluetoothConnectionManager.sendData(
-//                            makeSimplePropertyExecutionString(
-//                                devicePropertyListContentInformation.internalElementIndex,
-//                                newVal
-//                            )
-//                        )
-                        
                     }
                 }
             }
@@ -710,6 +709,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     this.update(applicationContext)
                 }
             this.devicePropertyListViewAdapter.notifyItemChanged(index)
+            
+            // update internal simple state
+            ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
+                bitValue
+            )
 
             if(levelSelectorPopUpOpen){
                 val seekBarText =  "$newValue%"
@@ -717,15 +722,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text = seekBarText
                 this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).progress = newValue
             }
-
-            // old: no delay of successive transmissions
-//                ApplicationProperty.bluetoothConnectionManager.sendData(
-//                    makeSimplePropertyExecutionString(
-//                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
-//                        bitValue
-//                    )
-//                )
-
+            
+            // handle successive transmission
             if(!this.slideUpdateData.isHandled){
                 // only save the value, because there is a transmission pending
                 this.slideUpdateData.value = bitValue
@@ -884,7 +882,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 // prevent the normal "onPause" execution
                 (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
                 // navigate to the text-list-presenter page
-                val intent = Intent(this@DeviceMainActivity, TextListPresenter::class.java)
+                val intent = Intent(this@DeviceMainActivity, TextListPresenterActivity::class.java)
                 intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
                 intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
                 intent.putExtra("isStandAlonePropertyMode", false)

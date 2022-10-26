@@ -20,7 +20,7 @@ import java.lang.Exception
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class TextListPresenter : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var mustReconnect = false
     private var relatedElementID = -1

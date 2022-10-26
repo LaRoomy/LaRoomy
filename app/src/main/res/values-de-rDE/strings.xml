@@ -223,7 +223,7 @@
     <string name="DeviceSettingsActivity_UserInfo_Connected">Gerät verbunden</string>
     <string name="DeviceSettingsActivity_UserInfo_Disconnected">Gerät getrennt</string>
     <string name="DeviceSettingsActivity_BindingSwitchDescriptor">Gerätebindung aktiv</string>
-    <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">Beim Aktivieren wird eine Anforderung zum Herstellen einer Bindung an das Gerät gesendet. Wenn das Gerät diese Funktion unterstützt, wird der Bindungs-Schlüssel an das Gerät übermittelt und ist für alle nachfolgenden Verbindungen mit dem Gerät erforderlich.</string>
+    <string name="DeviceSettingsActivity_BindingPurposeHintForEnable">Wenn die Geräte-Bindung aktiviert ist, wird das Gerät mit dieser App verknüpft und akzeptiert keine anderen Verbindungen. Sollen weitere Nutzer Zugang zum Gerät erhalten kann die Bindung geteilt werden.</string>
     <string name="DeviceSettingsActivity_BindingPurposeHintForDisable">Beim Deaktivieren wird eine Anforderung zum Löschen der Bindung an das Gerät gesendet. Es wird kein Bindungs-Schlüssel mehr benötigt um eine Verbindung herzustellen.</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonDescriptorText">Werkseinstellungen</string>
     <string name="DeviceSettingsActivity_FactoryResetButtonText">Reset</string>

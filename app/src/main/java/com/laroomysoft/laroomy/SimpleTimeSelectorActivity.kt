@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -28,6 +29,9 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
+    
+    private val successiveComplexUpdateStorage = SuccessiveComplexUpdateStorage()
+    private lateinit var setupTimer: Timer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,15 +202,47 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         val timeSelectorState = TimeSelectorState()
         timeSelectorState.hour = this.currentHour
         timeSelectorState.minute = this.currentMinute
-
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            timeSelectorState.toExecutionString(this.relatedElementID)
-        )
+        
+//          old update, no transmission control
+//        ApplicationProperty.bluetoothConnectionManager.sendData(
+//            timeSelectorState.toExecutionString(this.relatedElementID)
+//        )
 
         ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
             timeSelectorState.toComplexPropertyState(),
             this.relatedElementID
         )
+
+        // control the output transmissions in a sensible manner
+        if(!this.successiveComplexUpdateStorage.isStarted){
+            // set initial update data
+            this.successiveComplexUpdateStorage.keep = true
+            this.successiveComplexUpdateStorage.data = timeSelectorState.toExecutionString(this.relatedElementID)
+            this.successiveComplexUpdateStorage.isStarted = true
+            
+            // start timer
+            this.setupTimer = Timer()
+            this.setupTimer.scheduleAtFixedRate(
+                object : TimerTask() {
+                    override fun run() {
+                        if(successiveComplexUpdateStorage.keep){
+                            successiveComplexUpdateStorage.keep = false
+                        } else {
+                            // this is the second run while no action was executed by the user, send update transmission (delay = 120*2 = 240 millis)
+                            ApplicationProperty.bluetoothConnectionManager.sendData(
+                                successiveComplexUpdateStorage.data
+                            )
+                            // stop timer
+                            this.cancel()
+                            successiveComplexUpdateStorage.isStarted = false
+                        }
+                    }
+                }, (120).toLong(), (120).toLong())
+        } else {
+            // timer is running, set keep to true to mark the time-setup-process as pending and save the data, not more!
+            this.successiveComplexUpdateStorage.keep = true
+            this.successiveComplexUpdateStorage.data = timeSelectorState.toExecutionString(this.relatedElementID)
+        }
     }
 
     private fun connectionLossAlertDialog(){
