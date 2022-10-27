@@ -75,6 +75,7 @@
     <string name="StringInterrogatorActivity_FieldOneDescriptorPlaceholder">Field 1</string>
     <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Field 2</string>
     <string name="StringInterrogatorActivity_ButtonPlaceholderText">Submit</string>
+    <string name="StringInterrogatorActivity_InvalidInputMessage">The entered text is invalid. It must not contain a double semicolon (;;) and must not contain only of an underscore (_).</string>
 
     <string name="TextListPresenter_HeaderText">Text List Presenter</string>
 
@@ -348,6 +349,7 @@
     <string name="ViewLogActivityScrollUpButtonLabel" translatable="false">Scroll to the top</string>
     <string name="ViewLogActivityScrollDownButtonLabel" translatable="false">Scroll to the bottom</string>
     <string name="ViewLogActivityExportButtonLabel" translatable="false">Export the log</string>
+    <string name="TextListPresenterExportButtonLabel" translatable="false">Export the text list</string>
 
     <!-- Activity Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
@@ -380,6 +382,7 @@
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
     <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>
     <string name="DataKey_KeepScreenActive" translatable="false">keepScreenActiveKey</string>
+    <string name="DataKey_A11orLowerLocationPermissionRequestFirstRequest" translatable="false">a11orLowerLocationFirstRequest</string>
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

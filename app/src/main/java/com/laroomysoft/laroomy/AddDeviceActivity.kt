@@ -204,7 +204,7 @@ class AddDeviceActivity : AppCompatActivity(),
             if (verboseLog) {
                 Log.d(
                     "AddDeviceActivity",
-                    "onResume: This is Android 11 or lower - check for ACCESS_BACKGROUND_LOCATION permission"
+                    "onResume: This is Android 11 or lower - check for ACCESS_FINE_LOCATION permission"
                 )
             }
             if (!this.grantPermissionRequestDeclined) {
@@ -236,7 +236,15 @@ class AddDeviceActivity : AppCompatActivity(),
                             false
                         }
                         else -> {
-                            this.requestAndroid11orLowerLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_A11orLowerLocationPermissionRequestFirstRequest, true)){
+                                (applicationContext as ApplicationProperty).saveBooleanData(false, R.string.FileKey_AppSettings, R.string.DataKey_A11orLowerLocationPermissionRequestFirstRequest)
+                                // TODO: test it !
+                                showPermissionRationaleDialog()
+                            } else {
+                                this.requestAndroid11orLowerLocationPermissionLauncher.launch(
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                )
+                            }
                             false
                         }
                     }

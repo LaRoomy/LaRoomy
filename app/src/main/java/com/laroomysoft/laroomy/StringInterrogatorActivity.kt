@@ -99,14 +99,24 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         // add confirm button onClick listener
         this.confirmButton.setOnClickListener {
-            val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
-            it.startAnimation(buttonAnimation)
-
-            this.collectDataAndSendCommand()
-
-            if(navigateBackOnButtonPress){
-                (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired = true
-                handleBackEvent()
+            if(this.validateUserInput()) {
+                val buttonAnimation =
+                    AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+                it.startAnimation(buttonAnimation)
+    
+                this.collectDataAndSendCommand()
+    
+                if (navigateBackOnButtonPress) {
+                    (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired =
+                        true
+                    handleBackEvent()
+                }
+            } else {
+                // invalid user input - notify user
+                notifyUser(
+                    getString(R.string.StringInterrogatorActivity_InvalidInputMessage),
+                    R.color.errorLightColor
+                )
             }
         }
 
@@ -195,6 +205,18 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                     )
                 }
             }
+        }
+    }
+    
+    private fun validateUserInput() : Boolean {
+        val fieldOneInputData = this.fieldTwoInputText.text.toString()
+        val fieldTwoInputData = this.fieldTwoInputText.text.toString()
+        return when {
+            fieldOneInputData.contains(";;") -> false
+            fieldOneInputData == "_" -> false
+            fieldTwoInputData.contains(";;") -> false
+            fieldTwoInputData == "_" -> false
+            else -> true
         }
     }
 

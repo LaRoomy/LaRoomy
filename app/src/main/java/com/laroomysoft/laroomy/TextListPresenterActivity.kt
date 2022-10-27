@@ -2,6 +2,9 @@ package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
+import android.content.Intent
+import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,10 +33,14 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
     private lateinit var clearListButton: AppCompatImageButton
+    private lateinit var exportListButton: AppCompatImageButton
 
     private lateinit var textPresenterList: RecyclerView
     private lateinit var textPresenterListAdapter: RecyclerView.Adapter<*>
     private lateinit var textPresenterListLayoutManager: RecyclerView.LayoutManager
+    
+    private lateinit var exportButtonAnimation: AnimatedVectorDrawable
+    private lateinit var deleteButtonAnimation: AnimatedVectorDrawable
 
     private var textList = ArrayList<String>()
 
@@ -86,19 +93,59 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // get UI-Elements
         this.textPresenterList = findViewById(R.id.textListPresenterPresentationRecyclerView)
-        this.clearListButton = findViewById(R.id.textListPresenterClearListButton)
-
-        // add clear list button onClick handler
-        this.clearListButton.setOnClickListener {
-            // clear the list + notify
-            runOnUiThread {
-                this.textList.clear()
-                this.textPresenterListAdapter.notifyDataSetChanged()
+        
+        // get clear button and add onClick handler
+        this.clearListButton = findViewById<AppCompatImageButton?>(R.id.textListPresenterClearListButton).apply {
+            
+            deleteButtonAnimation = background as AnimatedVectorDrawable
+            
+            setOnClickListener {
+                // animate
+                deleteButtonAnimation.start()
+                
+                // clear the list + notify
+                runOnUiThread {
+                    textList.clear()
+                    textPresenterListAdapter.notifyDataSetChanged()
+                }
+        
+                // delete the str member of the complexProperty state object in the internal and the ui array (internal content of the list)
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.strValue =
+                    ""
+                ApplicationProperty.bluetoothConnectionManager.clearInternalPropertyStateStringValue(
+                    relatedElementID
+                )
             }
-
-            // delete the str member of the complexProperty state object in the internal and the ui array (internal content of the list)
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).complexPropertyState.strValue = ""
-            ApplicationProperty.bluetoothConnectionManager.clearInternalPropertyStateStringValue(this.relatedElementID)
+        }
+        
+        // get export button and add onClick listener
+        this.exportListButton = findViewById<AppCompatImageButton?>(R.id.textListPresenterExportListButton).apply {
+            exportButtonAnimation = background as AnimatedVectorDrawable
+            
+            setOnClickListener {
+                // animate
+                exportButtonAnimation.start()
+                
+                // format the list
+                var listBuffer = ""
+                textList.forEach {
+                    listBuffer += when(it.elementAt(0)) {
+                        'I' -> "INFO: "
+                        'W' -> "WARNING: "
+                        'E' -> "ERROR: "
+                        else -> "NORMAL: "
+                    }
+                    listBuffer += "${it.removeRange(0, 1)}\r\n"
+                }
+                // export
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, listBuffer)
+                    type = "text/plain"
+                }
+                val shareIntent = Intent.createChooser(sendIntent, "Export")
+                startActivity(shareIntent)
+            }
         }
 
         val textListPresenterState = TextListPresenterState()

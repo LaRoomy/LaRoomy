@@ -28,6 +28,14 @@ class AddedDevices(private val appContext: Context) {
             this.save()
         }
     }
+    
+    fun getMacAddressAt(index: Int) : String {
+        return if(index >= 0 && index > this.devices.size){
+            this.devices.elementAt(index).macAddress
+        } else {
+            ""
+        }
+    }
 
 /*
     fun clearAll(){
@@ -44,8 +52,10 @@ class AddedDevices(private val appContext: Context) {
 */
 
     fun removeAt(index: Int){
-        val adr = devices.elementAt(index).macAddress
-        this.remove(adr)
+        if(index >= 0 && index < this.devices.size) {
+            val adr = devices.elementAt(index).macAddress
+            this.remove(adr)
+        }
     }
 
     fun remove(macAddress: String){

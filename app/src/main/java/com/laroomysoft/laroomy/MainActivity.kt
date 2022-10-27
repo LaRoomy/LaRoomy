@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-
 class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     private val mainActivityNormalState = 0
@@ -123,10 +122,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         this.noContentImageView = findViewById(R.id.mainActivityNoContentImageView)
         this.noContentTextView = findViewById(R.id.mainActivityNoContentTextView)
 
+        // init recycler view
         this.availableDevicesViewManager = LinearLayoutManager(this)
-
         this.availableDevicesViewAdapter = AvailableDevicesListAdapter(this.availableDevices, this)
-
         this.availableDevicesRecyclerView =
             findViewById<RecyclerView>(R.id.AvailableDevicesListView)
                 .apply {
@@ -134,15 +132,20 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                     layoutManager = availableDevicesViewManager
                     adapter = availableDevicesViewAdapter
                 }
-
+        // define a swipe handler for the recycler view
         val swipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
+                // get item position in adapter
                 val pos =
                     viewHolder.absoluteAdapterPosition
-
-                (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(pos)//viewHolder.position)
-                (applicationContext as ApplicationProperty).addedDevices.removeAt(pos)//viewHolder.position)
+                // get mac address of item
+                val mac = (applicationContext as ApplicationProperty).addedDevices.getMacAddressAt(pos)
+                // remove the item in the recycler view
+                (availableDevicesViewAdapter as AvailableDevicesListAdapter).removeAt(pos)
+                // remove the saved device from the added devices
+                (applicationContext as ApplicationProperty).addedDevices.removeAt(pos)
+                // remove the saved property data for the device (if it was saved)
+                PropertyCacheManager(applicationContext).removePCacheEntry(mac)
                 
                 // TODO: UPDATE THE POSITIONS, WHEN THE REMOVED ELEMENT WAS NOT THE LAST IN THE LIST, ALL SUCCESSIVE ELEMENTS HAVE AN INVALID POSITION VALUE!!!!!!!!!!!!
                 
@@ -154,7 +157,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 }
             }
         }
-
+        // attach the swipe handler to the recycler view
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(availableDevicesRecyclerView)
 
@@ -451,11 +454,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     private fun setItemColors(index: Int, textColorID: Int, backGroundDrawable: Int){
         val ll = availableDevicesViewManager.findViewByPosition(index) as? ConstraintLayout
-
         val textView = ll?.findViewById<AppCompatTextView>(R.id.deviceNameTextView)
-
         textView?.setTextColor(getColor(textColorID))
-
         ll?.background = AppCompatResources.getDrawable(this, backGroundDrawable)
     }
 

@@ -161,6 +161,17 @@ class PropertyCacheManager(val appContext: Context) {
         }
         return devicePropertyCacheData
     }
+    
+    fun removePCacheEntry(macAddress: String){
+        try {
+            appContext.deleteFile("$propertyCacheNameEntry$macAddress")
+        } catch (e: Exception){
+            if(verboseLog){
+                Log.e("PropCacheManager", "Deleting the cache file for device with mac address '$macAddress' failed.")
+            }
+        }
+    
+    }
 
     fun clearCache() {
         appContext.filesDir.listFiles()?.forEach {
