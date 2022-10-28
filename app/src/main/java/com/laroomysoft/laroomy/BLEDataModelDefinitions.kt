@@ -1978,7 +1978,7 @@ class BLEDeviceData {
     var isBindingRequired = false
     var hasCachingPermission = false
     var authenticationSuccess = false
-    var fragmentedTransmissionRequired = false
+    //var fragmentedTransmissionRequired = false
 
     var propertyCount = 0
     var groupCount = 0
@@ -1988,7 +1988,7 @@ class BLEDeviceData {
         isBindingRequired = false
         hasCachingPermission = false
         authenticationSuccess = false
-        fragmentedTransmissionRequired = false
+        //fragmentedTransmissionRequired = false
 
         propertyCount = 0
         groupCount = 0

@@ -1247,7 +1247,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
 
         // check if the length of the transmission is valid (the payload size for the init response is 7 bytes)
-        if((payLoadDataSize < 7)||(data.length < 13)){
+        if((payLoadDataSize < 7)||(data.length < 14)){
             //invalid data size
             if(verboseLog){
                 Log.e("readInitTransmission", "Invalid payLoadData size. Data-Size was: $payLoadDataSize > minimum is 7!\n" +
@@ -1303,10 +1303,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-                // check if the remote device needs fragmented transmission
-                if(data[14] == '1'){
-                    bleDeviceData.fragmentedTransmissionRequired = true
-                }
+                // position 14 to 17 reserved for future usage
+                
+                // deprecated: check if the remote device needs fragmented transmission
+//                if(data[14] == '1'){
+//                    bleDeviceData.fragmentedTransmissionRequired = true
+//                }
+                // note: this is outdated since the transmission from the app to the device needs not fragmented transmission
 
                 // check if this is a reload process
                 if(this.reloadInitRequestPending){
