@@ -209,7 +209,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     }
     
     private fun validateUserInput() : Boolean {
-        val fieldOneInputData = this.fieldTwoInputText.text.toString()
+        val fieldOneInputData = this.fieldOneInputText.text.toString()
         val fieldTwoInputData = this.fieldTwoInputText.text.toString()
         return when {
             fieldOneInputData.contains(";;") -> false
