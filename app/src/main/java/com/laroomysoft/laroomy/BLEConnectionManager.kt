@@ -516,6 +516,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     )
                 }
                 applicationProperty.logControl("E: Exception while dispatching the incoming transmission. Exception: $e / Message: ${e.message}")
+                
+                // clean broken transmission data
+                cleanUpOnDispatchError()
             }
         }
     
@@ -532,20 +535,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return false
         } else {
             // first read data size
-            var strPayLoadDataSize = "0x"
-            strPayLoadDataSize += data[4]
-            strPayLoadDataSize += data[5]
-
-            // convert to integer
             val payLoadDataSize =
-                Integer.decode(strPayLoadDataSize)
-
-            // add the header length
-            //payLoadDataSize += 8
+                a2CharHexValueToIntValue(data[4], data[5])
 
             // check error flag
             if(data[6] != '0'){
                 this.onErrorFlag(data[6])
+                return false
             }
 
             var dataProcessed = false
@@ -645,7 +641,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     dataProcessed = readFragmentedTransmission(data)
                 }
                 else -> {
-                    // TODO: error invalid character
+                    if(verboseLog){
+                        Log.d("M:CB:Dispatcher", "Invalid Transmission Identification Character: ${data[0]} in data-string: $data")
+                    }
+                    applicationProperty.logControl("E: Invalid Transmission Identification Character: ${data[0]} in data-string: $data")
                 }
             }
             // return true if the data is fully handled, otherwise it will be forwarded to the callback
@@ -3540,6 +3539,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                     )
                                 }
                                 applicationProperty.logControl("W: Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}")
+                                
+                                // reset fragmented transmission data
+                                resetFragmentedTransmissionData(timeoutWatcherData.loopType)
 
                                 // increase repeat counter
                                 timeoutWatcherData.loopRepeatCounter++
@@ -3655,6 +3657,51 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         val currentPageIndex = this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
         val dataToSend = "${this.deviceReconnectedNotificationEntry}${a8bitValueTo2CharHexValue(currentPageIndex)}\r"
         this.sendData(dataToSend)
+    }
+    
+    private fun resetFragmentedTransmissionData(loopType: Int = -1){
+        when(loopType){
+            LOOPTYPE_PROPERTY -> {
+                // this is a property loop = char a
+                for(i in this.openFragmentedTransmissionData.lastIndex downTo 0){
+                    if(this.openFragmentedTransmissionData.elementAt(i).transmissionString.elementAt(0) == 'a'){
+                        this.openFragmentedTransmissionData.removeAt(i)
+                    }
+                }
+            }
+            LOOPTYPE_GROUP -> {
+                // this is a group loop = char b
+                for(i in this.openFragmentedTransmissionData.lastIndex downTo 0){
+                    if(this.openFragmentedTransmissionData.elementAt(i).transmissionString.elementAt(0) == 'b'){
+                        this.openFragmentedTransmissionData.removeAt(i)
+                    }
+                }
+            }
+            LOOPTYPE_SIMPLESTATE -> {
+                // this is a simple state loop, we cannot distinguish between simple and complex
+                for(i in this.openFragmentedTransmissionData.lastIndex downTo 0){
+                    if(this.openFragmentedTransmissionData.elementAt(i).transmissionString.elementAt(0) == 'c'){
+                        this.openFragmentedTransmissionData.removeAt(i)
+                    }
+                }
+            }
+            LOOPTYPE_COMPLEXSTATE -> {
+                // this is a complex state loop, we cannot distinguish between simple and complex
+                for(i in this.openFragmentedTransmissionData.lastIndex downTo 0){
+                    if(this.openFragmentedTransmissionData.elementAt(i).transmissionString.elementAt(0) == 'c'){
+                        this.openFragmentedTransmissionData.removeAt(i)
+                    }
+                }
+            }
+            else -> {
+                // otherwise delete all data
+                this.openFragmentedTransmissionData.clear()
+            }
+        }
+    }
+    
+    fun cleanUpOnDispatchError(){
+        this.openFragmentedTransmissionData.clear()
     }
 
     // the callback definition for the event handling in the calling class

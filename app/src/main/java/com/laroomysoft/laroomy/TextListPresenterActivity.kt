@@ -90,7 +90,6 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)
 
-
         // get UI-Elements
         this.textPresenterList = findViewById(R.id.textListPresenterPresentationRecyclerView)
         
