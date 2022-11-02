@@ -30,7 +30,7 @@ class AddedDevices(private val appContext: Context) {
     }
     
     fun getMacAddressAt(index: Int) : String {
-        return if(index >= 0 && index > this.devices.size){
+        return if(index >= 0 && index < this.devices.size){
             this.devices.elementAt(index).macAddress
         } else {
             ""

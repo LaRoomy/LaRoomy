@@ -2994,12 +2994,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         when(c){
             '1' -> {
                 Log.e("onErrorFlag", "Error was: unknown")
+                applicationProperty.logControl("E: Error was: unknown")
             }
             '2' -> {
                 Log.e("onErrorFlag", "Error was: Transmission undeliverable")
+                applicationProperty.logControl("E: Error was: Transmission undeliverable")
+            }
+            '3' -> {
+                Log.e("onErrorFlag", "Error was: Index out of bounds")
+                applicationProperty.logControl("E: Error was Index out of bounds")
             }
             else -> {
-                Log.e("onErrorFlag", "Error was: undefined flag value")
+                Log.e("onErrorFlag", "Error was: unknown flag value")
+                applicationProperty.logControl("E: Error was: Unknown flag value")
             }
         }
     }

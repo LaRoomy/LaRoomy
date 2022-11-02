@@ -170,7 +170,6 @@ class PropertyCacheManager(val appContext: Context) {
                 Log.e("PropCacheManager", "Deleting the cache file for device with mac address '$macAddress' failed.")
             }
         }
-    
     }
 
     fun clearCache() {

@@ -148,7 +148,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 PropertyCacheManager(applicationContext).removePCacheEntry(mac)
                 
                 // TODO: UPDATE THE POSITIONS, WHEN THE REMOVED ELEMENT WAS NOT THE LAST IN THE LIST, ALL SUCCESSIVE ELEMENTS HAVE AN INVALID POSITION VALUE!!!!!!!!!!!!
-                
                 // TODO: PROBLEM SOLVED BY USING BINDING ADAPTER POSITION IN RECYCLER VIEW ADAPTER -> BUT MUST BE TESTED!
 
                 if((applicationContext as ApplicationProperty).addedDevices.devices.isEmpty()){

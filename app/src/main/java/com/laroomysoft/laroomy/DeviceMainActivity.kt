@@ -105,7 +105,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
         this.deviceHeaderNotificationContainer = findViewById(R.id.deviceInfoSubHeaderContainer)
 
-        // init recycler view!!
+        // init recycler view layout manager
         this.devicePropertyListLayoutManager = object : LinearLayoutManager(this) {
             override fun supportsPredictiveItemAnimations(): Boolean {
                 return false
