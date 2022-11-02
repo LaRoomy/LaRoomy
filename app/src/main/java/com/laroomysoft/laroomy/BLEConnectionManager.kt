@@ -2143,6 +2143,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.laRoomyPropertyGroupList.clear()
         this.simpleStatePropertyIndexes.clear()
         this.complexStatePropertyIndexes.clear()
+        this.bleDeviceData.clear()
 
         // reset other params
         this.currentSimpleStateRetrievingIndex = -1
