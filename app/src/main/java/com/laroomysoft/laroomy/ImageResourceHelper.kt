@@ -148,6 +148,7 @@ fun resourceIdForImageId(imageID: Int): Int {
         142 -> R.drawable.ic_142_plant_lighting_vect        // done
         143 -> R.drawable.ic_143_plant_water_vect           // done
         144 -> R.drawable.ic_144_plant_irrigation_vect      // done
+        145 -> R.drawable.ic_145_password_vect              // done
 
         // TODO: implement all new image resources here...
 
@@ -303,6 +304,7 @@ fun resourceIdForDisabledImageId(imageID: Int): Int {
         142 -> R.drawable.ic_142_dis_plant_lighting_vect
         143 -> R.drawable.ic_143_dis_plant_water_vect
         144 -> R.drawable.ic_144_dis_plant_irrigation_vect
+        145 -> R.drawable.ic_145_dis_password_vect
 
 
         // TODO: implement all new disabled image resources here...
