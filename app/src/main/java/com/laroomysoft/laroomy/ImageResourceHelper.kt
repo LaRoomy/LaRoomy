@@ -156,6 +156,9 @@ fun resourceIdForImageId(imageID: Int): Int {
         150 -> R.drawable.ic_150_format_list                // done
         151 -> R.drawable.ic_151_sort_list                  // done
         152 -> R.drawable.ic_152_filter_list                // done
+        153 -> R.drawable.ic_153_manage_search              // done
+        
+        156 -> R.drawable.ic_156_play                       // done
 
         // TODO: implement all new image resources here...
 
@@ -319,6 +322,9 @@ fun resourceIdForDisabledImageId(imageID: Int): Int {
         150 -> R.drawable.ic_150_dis_format_list
         151 -> R.drawable.ic_151_dis_sort_list
         152 -> R.drawable.ic_152_dis_filter_list
+        153 -> R.drawable.ic_153_dis_manage_search
+        
+        156 -> R.drawable.ic_156_dis_play
 
 
         // TODO: implement all new disabled image resources here...
