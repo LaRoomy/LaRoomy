@@ -149,6 +149,13 @@ fun resourceIdForImageId(imageID: Int): Int {
         143 -> R.drawable.ic_143_plant_water_vect           // done
         144 -> R.drawable.ic_144_plant_irrigation_vect      // done
         145 -> R.drawable.ic_145_password_vect              // done
+        146 -> R.drawable.ic_146_wifi_password              // done
+        147 -> R.drawable.ic_147_lock_clock                 // done
+        148 -> R.drawable.ic_148_lock_reset                 // done
+        149 -> R.drawable.ic_149_filter                     // done
+        150 -> R.drawable.ic_150_format_list                // done
+        151 -> R.drawable.ic_151_sort_list                  // done
+        152 -> R.drawable.ic_152_filter_list                // done
 
         // TODO: implement all new image resources here...
 
@@ -305,6 +312,13 @@ fun resourceIdForDisabledImageId(imageID: Int): Int {
         143 -> R.drawable.ic_143_dis_plant_water_vect
         144 -> R.drawable.ic_144_dis_plant_irrigation_vect
         145 -> R.drawable.ic_145_dis_password_vect
+        146 -> R.drawable.ic_146_dis_wifi_password
+        147 -> R.drawable.ic_147_dis_lock_clock
+        148 -> R.drawable.ic_148_dis_lock_reset
+        149 -> R.drawable.ic_149_dis_filter
+        150 -> R.drawable.ic_150_dis_format_list
+        151 -> R.drawable.ic_151_dis_sort_list
+        152 -> R.drawable.ic_152_dis_filter_list
 
 
         // TODO: implement all new disabled image resources here...
