@@ -109,7 +109,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/deviceSettingsActivityBindingHintTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:alpha="0.5"
@@ -179,7 +179,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/deviceSettingsActivityShareBindingHint"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:alpha="0.5"
@@ -243,7 +243,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/deviceSettingsActivityFactoryResetHintTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:alpha="0.5"

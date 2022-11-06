@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 R.string.DataKey_AutoConnect
             )
         ) {
-            // check if there are more than one bonded device
+            // check if there are more than one device
             when (this.availableDevices.size) {
                 0 -> {
                     // do nothing
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                     // there is only one available device -> connect to it!
                     Handler(Looper.getMainLooper()).postDelayed({
                     val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-                    intent.putExtra("BondedDeviceIndex", 0)
+                    intent.putExtra("DeviceListIndex", 0)
                     startActivity(intent)
                     }, 1000)
                 }
@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                         Handler(Looper.getMainLooper()).postDelayed({
                             // move forward with delay...!
                             val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-                            intent.putExtra("BondedDeviceIndex", -2)// -2 means: connect to the last device
+                            intent.putExtra("DeviceListIndex", -2)// -2 means: connect to the last device
                             startActivity(intent)
 
                         }, 1000)
