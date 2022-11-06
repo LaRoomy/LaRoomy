@@ -54,6 +54,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     // timer
     private lateinit var timeoutTimer: Timer
+    private lateinit var rssiReadTimer: Timer
 
     var isConnected:Boolean = false
         private set
@@ -200,6 +201,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             val dataAsString: String = value.decodeToString()
             processOnCharacteristicChanged(dataAsString)
         }
+    
+        override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
+            super.onReadRemoteRssi(gatt, rssi, status)
+            
+            if(status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d("BLEConnectionManager", "M:GattCallback:onReadRemoteRssi: Value read: $rssi")
+                callback.onRssiValueRead(rssi)
+            } else {
+                Log.e("BLEConnectionManager", "M:GattCallback:onReadRemoteRssi: reading rssi value failed!")
+            }
+        }
     }
     
     // callback implementation for BluetoothGatt for older versions (API LEVEL LOW THAN 33)
@@ -225,6 +237,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             @Suppress("DEPRECATION") val dataAsString = characteristic?.getStringValue(0)
             processOnCharacteristicChanged(dataAsString ?: "")
         }
+    
+        override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
+            super.onReadRemoteRssi(gatt, rssi, status)
+            
+            if(status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d("BLEConnectionManager", "M:GattCallback:onReadRemoteRssi: Value read: $rssi")
+                callback.onRssiValueRead(rssi)
+            } else {
+                Log.e("BLEConnectionManager", "M:GattCallback:onReadRemoteRssi: reading rssi value failed!")
+            }
+        }
     }
     
     @SuppressLint("MissingPermission")
@@ -244,6 +267,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     Log.d("M:CB:ConStateChanged", "Connection-state changed to: CONNECTED")
                 }
                 callback.onConnectionStateChanged(true)
+                
+                startRssiReadTimer()
             
                 if(!isResumeConnectionAttempt) {
                     if(verboseLog) {
@@ -302,6 +327,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             BluetoothProfile.STATE_DISCONNECTED -> {
             
                 isConnected = false
+                
+                stopRssiReadTimer()
             
                 if(verboseLog) {
                     Log.d("M:CB:ConStateChanged", "Connection-state changed to: DISCONNECTED")
@@ -2084,6 +2111,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     fun clear(){
         try {
+            this.stopRssiReadTimer()
+            this.stopLoopTimeoutWatcher()
+        } catch (e: Exception){
+            Log.e("BLEConnectionManager", "M:onClear exception - $e")
+        }
+        try {
             this.bluetoothGatt?.close()
         } catch(e: SecurityException){
             Log.e("BleManager:Clear()", "BleManager:onClear - $e")
@@ -2125,6 +2158,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.timeoutWatcherData.clear()
         this.discoveryWatcherData.clear()
         this.openFragmentedTransmissionData.clear()
+        
+        
     }
 
     private fun clearPropertyRelatedParameterAndStopAllLoops(){
@@ -2190,8 +2225,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     macAddress
                 )
 
-            // old:
-            //BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddress)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 this.bluetoothGatt = this.currentDevice?.connectGatt(
                     applicationProperty.applicationContext,
@@ -3621,7 +3654,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-            }, (0).toLong(), (800).toLong()
+            }, (0).toLong(), (1000).toLong()
         )
     }
 
@@ -3708,8 +3741,39 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
     
-    fun cleanUpOnDispatchError(){
+    private fun cleanUpOnDispatchError(){
         this.openFragmentedTransmissionData.clear()
+    }
+    
+    private fun startRssiReadTimer(){
+        try {
+            this.rssiReadTimer = Timer()
+            this.rssiReadTimer.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    if (ActivityCompat.checkSelfPermission(
+                            applicationProperty.applicationContext,
+                            Manifest.permission.BLUETOOTH_CONNECT
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        bluetoothGatt?.readRemoteRssi()
+                    }
+                }
+            }, (2000).toLong(), (2000).toLong())
+            
+            Log.d("BLEConnectionManager", "M:startRssiReadTimer: RSSI Timer started")
+            
+        } catch (e: Exception){
+            Log.e("BLEConnectionManager", "M:startRssiReadTimer error: $e")
+        }
+    }
+    
+    private fun stopRssiReadTimer(){
+        try {
+            this.rssiReadTimer.cancel()
+            Log.d("BLEConnectionManager", "M:stopRssiTimer: RSSI Timer stopped!")
+        } catch (e: Exception){
+            Log.e("BLEConnectionManager", "M:stopRssiTimer error: $e")
+        }
     }
 
     // the callback definition for the event handling in the calling class
@@ -3721,6 +3785,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onInitializationSuccessful(){}
         fun onBindingPasskeyRejected(){}
         fun onDeviceReadyForCommunication(){}
+        fun onRssiValueRead(rssi: Int){}
     }
 
     interface PropertyCallback: Serializable {

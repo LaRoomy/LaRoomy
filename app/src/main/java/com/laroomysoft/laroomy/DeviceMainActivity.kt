@@ -41,6 +41,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private lateinit var deviceTypeHeaderTextView: AppCompatTextView
     private lateinit var deviceConnectionStatusTextView: AppCompatTextView
     private lateinit var deviceMenuButton: AppCompatImageButton
+    
+    private lateinit var signalStrengthImageView: AppCompatImageView
 
     //private lateinit var deviceHeaderNotificationImageView: AppCompatImageView
 
@@ -58,6 +60,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var restoreIndex = -1
     //private var deviceImageResourceId = -1
     private var currentSeekBarPopUpRelatedGlobalIndex = -1
+    private var currentSignalStrength = 0
     private var propertyLoadingFinished = true
     private var levelSelectorPopUpOpen = false
     private var optionSelectorPopUpOpen = false
@@ -96,7 +99,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         this.deviceTypeHeaderTextView = findViewById(R.id.deviceMainActivityDeviceTypeHeaderNameTextView)
         this.deviceConnectionStatusTextView = findViewById(R.id.deviceMainActivityDeviceConnectionStatusTextView)
         this.deviceHeaderNameContainer = findViewById(R.id.deviceMainActivityDeviceHeaderNameContainer)
-
+        
+        this.signalStrengthImageView = findViewById(R.id.deviceMainActivitySignalStrengthIndicationImageView)
+        
         // add on click listener to name-container
         this.deviceHeaderNameContainer.setOnClickListener {
             this.onReconnectDevice()
@@ -1436,6 +1441,33 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
         // no complex property page is open
         return -1
+    }
+    
+    override fun onRssiValueRead(rssi: Int) {
+        runOnUiThread {
+            val strength = when {
+                rssi < -88 -> 1
+                rssi < -75 -> 2
+                rssi < -65 -> 3
+                rssi < -55 -> 4
+                else -> 5
+            }
+            
+            if(strength != this.currentSignalStrength){
+                this.currentSignalStrength = strength
+                
+                this.signalStrengthImageView.apply {
+                    when(strength){
+                        1 -> setBackgroundResource(R.drawable.signal_20perc)
+                        2 -> setBackgroundResource(R.drawable.signal_40perc)
+                        3 -> setBackgroundResource(R.drawable.signal_60perc)
+                        4 -> setBackgroundResource(R.drawable.signal_80perc)
+                        5 -> setBackgroundResource(R.drawable.signal_100perc)
+                        else -> setBackgroundResource(R.drawable.no_signal)
+                    }
+                }
+            }
+        }
     }
 
     // device property list adapter:
