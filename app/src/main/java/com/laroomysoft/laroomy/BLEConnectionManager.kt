@@ -3749,14 +3749,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         try {
             this.rssiReadTimer = Timer()
             this.rssiReadTimer.scheduleAtFixedRate(object : TimerTask() {
+                @SuppressLint("MissingPermission")
                 override fun run() {
-                    if (ActivityCompat.checkSelfPermission(
-                            applicationProperty.applicationContext,
-                            Manifest.permission.BLUETOOTH_CONNECT
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        bluetoothGatt?.readRemoteRssi()
-                    }
+                    bluetoothGatt?.readRemoteRssi()
                 }
             }, (2000).toLong(), (2000).toLong())
             
