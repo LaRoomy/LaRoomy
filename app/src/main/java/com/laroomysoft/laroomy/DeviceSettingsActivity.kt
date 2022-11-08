@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -42,9 +43,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private lateinit var deviceTxCharacteristicUUIDTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
     private lateinit var deviceInfoButton: AppCompatButton
+    private lateinit var signalStrengthIndicationImageView: AppCompatImageView
+    private lateinit var signalStrengthValueDisplayTextView: AppCompatTextView
 
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var currentSignalStrength = 0
 
     private var pendingBindingTransmission = dbNONE
 
@@ -78,6 +82,8 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         deviceServiceUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoServiceUUIDTextView)
         deviceTxCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoTxCharacteristicUUIDTextView)
         deviceRxCharacteristicUUIDTextView = findViewById(R.id.deviceSettingsActivityDeviceInfoRxCharacteristicUUIDTextView)
+        signalStrengthIndicationImageView = findViewById(R.id.deviceSettingsActivitySignalStrengthIndicationImageView)
+        signalStrengthValueDisplayTextView = findViewById(R.id.deviceSettingsActivitySignalStrengthValueDisplayTextView)
         
         // get backButton and add onClick handler
         backButton = findViewById<AppCompatImageButton?>(R.id.deviceSettingsActivityBackButton).apply {
@@ -364,6 +370,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         } else {
             notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
             setUIElementsEnabledState(false)
+            this.onRssiValueRead(-100)
 
             if(!this.expectedConnectionLoss) {
                 // unexpected loss of connection
@@ -397,6 +404,45 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
                 finish()
             }
+        }
+    }
+    
+    override fun onRssiValueRead(rssi: Int) {
+        try {
+            runOnUiThread {
+                // update textView
+                val displayText = "$rssi db"
+                this.signalStrengthValueDisplayTextView.apply {
+                    text = displayText
+                }
+                
+                // update graphic (if necessary)
+                val strength = when {
+                    rssi < -99 -> 0
+                    rssi < -88 -> 1
+                    rssi < -75 -> 2
+                    rssi < -65 -> 3
+                    rssi < -55 -> 4
+                    else -> 5
+                }
+            
+                if(strength != this.currentSignalStrength){
+                    this.currentSignalStrength = strength
+                
+                    this.signalStrengthIndicationImageView.apply {
+                        when(strength){
+                            1 -> setImageResource(R.drawable.signal_20perc)
+                            2 -> setImageResource(R.drawable.signal_40perc)
+                            3 -> setImageResource(R.drawable.signal_60perc)
+                            4 -> setImageResource(R.drawable.signal_80perc)
+                            5 -> setImageResource(R.drawable.signal_100perc)
+                            else -> setImageResource(R.drawable.no_signal)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception){
+            Log.e("deviceSettingsActivity", "onRssiValueRead: Exception: $e")
         }
     }
 

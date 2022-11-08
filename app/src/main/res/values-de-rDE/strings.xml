@@ -249,6 +249,8 @@
     <string name="DeviceSettingsActivity_ShowDeviceInfoButtonText">Geräte-Info anzeigen</string>
     <string name="DeviceSettingsActivity_BindingNotConfirmed">Bestätigung nicht empfangen. Geräte-Bindung nicht sichergestellt.</string>
     <string name="DeviceSettingsActivity_ReleaseNotConfirmed">Bestätigung nicht empfangen. Lösen der Geräte-Bindung nicht sichergestellt.</string>
+    <string name="DeviceSettingsActivity_SignalStrengthDescriptionText">Signalstärke:</string>
+
 
 
     <string name="AppHelpActivityHeaderText">Hilfe-Themen</string>

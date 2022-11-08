@@ -427,7 +427,8 @@ fun deviceImageFromName(name: String): Int {
                     R.drawable.ic_light_bulb_white_48dp
                 }
                 else -> {
-                    R.drawable.ic_bluetooth_connected_white_48dp
+                    //R.drawable.ic_bluetooth_connected_white_48dp
+                    R.drawable.ic_dev_03_home_temp
                 }
             }
         }

@@ -103,7 +103,7 @@
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Cancel</string>
-    <string name="GeneralString_UnexpectedConnectionLossMessage">The connection was interrupted. Try to connect again?</string>
+    <string name="GeneralString_UnexpectedConnectionLossMessage">The connection was interrupted. Reconnect?</string>
     <string name="GeneralString_ConnectionLossDialogTitle">Connection Error</string>
 
 
@@ -234,6 +234,7 @@
     <string name="DeviceSettingsActivity_ShowDeviceInfoButtonText">Show device info</string>
     <string name="DeviceSettingsActivity_BindingNotConfirmed">No response received from remote device. Binding not confirmed.</string>
     <string name="DeviceSettingsActivity_ReleaseNotConfirmed">No response received from remote device. Release of device-binding not confirmed.</string>
+    <string name="DeviceSettingsActivity_SignalStrengthDescriptionText">Signal Strength:</string>
 
 
     <string name="AppHelpActivityHeaderText">Help-Topics</string>
