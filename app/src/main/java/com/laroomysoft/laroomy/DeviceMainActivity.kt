@@ -1183,6 +1183,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
             }
         } else {
+            // connection lost - set no signal indicator
+            this.onRssiValueRead(-100)
+            
             // the connection is lost, check if this was expected
             if(!this.expectedConnectionLoss){
                 // the loss of the connection is unexpected, display popup
@@ -1446,6 +1449,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     override fun onRssiValueRead(rssi: Int) {
         runOnUiThread {
             val strength = when {
+                rssi < -99 -> 0
                 rssi < -88 -> 1
                 rssi < -75 -> 2
                 rssi < -65 -> 3
@@ -1458,12 +1462,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 
                 this.signalStrengthImageView.apply {
                     when(strength){
-                        1 -> setBackgroundResource(R.drawable.signal_20perc)
-                        2 -> setBackgroundResource(R.drawable.signal_40perc)
-                        3 -> setBackgroundResource(R.drawable.signal_60perc)
-                        4 -> setBackgroundResource(R.drawable.signal_80perc)
-                        5 -> setBackgroundResource(R.drawable.signal_100perc)
-                        else -> setBackgroundResource(R.drawable.no_signal)
+                        1 -> setImageResource(R.drawable.signal_20perc)
+                        2 -> setImageResource(R.drawable.signal_40perc)
+                        3 -> setImageResource(R.drawable.signal_60perc)
+                        4 -> setImageResource(R.drawable.signal_80perc)
+                        5 -> setImageResource(R.drawable.signal_100perc)
+                        else -> setImageResource(R.drawable.no_signal)
                     }
                 }
             }
