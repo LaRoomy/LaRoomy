@@ -13,7 +13,7 @@
         android:minWidth="64dp"
         android:id="@+id/myDevicesListElementImageView"
         android:contentDescription="@string/AvailableDeviceListImageDescription"
-        android:src="@drawable/ic_settings_remote_white_48dp"
+        android:src="@drawable/ic_dev_03_home_temp"
         android:layout_marginStart="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
