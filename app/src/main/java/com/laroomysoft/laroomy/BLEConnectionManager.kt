@@ -3569,81 +3569,89 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         timeoutWatcherData.clear()
                         cancel()
                     } else {
-
                         if (timeoutWatcherData.timeoutFlag) {
                             // the flag was not reset during the reception of a response, there must be a problem
-                            if (timeoutWatcherData.loopRepeatCounter < 4) {
-                                if (verboseLog) {
-                                    Log.w(
-                                        "LoopTimeoutWatcher",
-                                        "Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}"
-                                    )
-                                }
-                                applicationProperty.logControl("W: Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}")
-                                
-                                // reset fragmented transmission data
-                                resetFragmentedTransmissionData(timeoutWatcherData.loopType)
-
-                                // increase repeat counter
-                                timeoutWatcherData.loopRepeatCounter++
-
-                                // restart loop from loop-type
-                                when(timeoutWatcherData.loopType){
-                                    LOOPTYPE_SIMPLESTATE -> {
-                                        cancel()
-                                        startSimpleStateDataLoop()
-                                    }
-                                    LOOPTYPE_COMPLEXSTATE -> {
-                                        cancel()
-                                        startComplexStateDataLoop()
-                                    }
-                                    LOOPTYPE_PROPERTY -> {
-                                        cancel()
-
-                                        //clearPropertyRelatedParameterAndStopAllLoops()
-                                        //startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
-
-                                        // TODO: reload, not start!!!!!!!!
-
-                                        reloadProperties()
-
-                                    }
-                                    LOOPTYPE_GROUP -> {
-                                        cancel()
-                                        laRoomyPropertyGroupList.clear()
-                                        startGroupListing()
-                                    }
-                                }
-                            } else {
-                                // loop could not be finalized
-                                Log.e("LoopTimeoutWatcher", "Loop-Timeout occurred 3 times! - Device not responding! Loop-Type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
-                                applicationProperty.logControl("E: Loop-Timeout occurred 3 times! - Device not responding! Loop-Type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
-
-                                // reset loop param
-                                when(timeoutWatcherData.loopType) {
-                                    LOOPTYPE_SIMPLESTATE -> {
-                                        simpleStateLoopActive = false
-                                    }
-                                    LOOPTYPE_COMPLEXSTATE -> {
-                                        complexStateLoopActive = false
-                                    }
-                                    LOOPTYPE_PROPERTY -> {
-                                        propertyLoopActive = false
-                                    }
-                                    LOOPTYPE_GROUP -> {
-                                        groupLoopActive = false
-                                    }
-                                }
-
+                            if(timeoutWatcherData.loopType == LOOPTYPE_NONE){
+                                // unexpected loop-type
+                                Log.e("LoopTimeoutWatcher", "Unexpected Loop-Type: None. Cancel watcher!")
+                                applicationProperty.logControl("E: Unexpected Loop-Type: None. Cancel watcher!")
                                 // clear watcher data
                                 timeoutWatcherData.clear()
-
-                                // raise event
-                                callback.onConnectionError(
-                                    BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING
-                                )
-
                                 cancel()
+                            } else {
+                                if (timeoutWatcherData.loopRepeatCounter < 4) {
+                                    if (verboseLog) {
+                                        Log.w(
+                                            "LoopTimeoutWatcher",
+                                            "Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}"
+                                        )
+                                    }
+                                    applicationProperty.logControl("W: Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}")
+                                    
+                                    // reset fragmented transmission data
+                                    resetFragmentedTransmissionData(timeoutWatcherData.loopType)
+    
+                                    // increase repeat counter
+                                    timeoutWatcherData.loopRepeatCounter++
+    
+                                    // restart loop from loop-type
+                                    when(timeoutWatcherData.loopType){
+                                        LOOPTYPE_SIMPLESTATE -> {
+                                            cancel()
+                                            startSimpleStateDataLoop()
+                                        }
+                                        LOOPTYPE_COMPLEXSTATE -> {
+                                            cancel()
+                                            startComplexStateDataLoop()
+                                        }
+                                        LOOPTYPE_PROPERTY -> {
+                                            cancel()
+    
+                                            //clearPropertyRelatedParameterAndStopAllLoops()
+                                            //startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
+    
+                                            // TODO: reload, not start!!!!!!!!
+    
+                                            reloadProperties()
+    
+                                        }
+                                        LOOPTYPE_GROUP -> {
+                                            cancel()
+                                            laRoomyPropertyGroupList.clear()
+                                            startGroupListing()
+                                        }
+                                    }
+                                } else {
+                                    // loop could not be finalized
+                                    Log.e("LoopTimeoutWatcher", "Loop-Timeout occurred 3 times! - Device not responding! Loop-Type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
+                                    applicationProperty.logControl("E: Loop-Timeout occurred 3 times! - Device not responding! Loop-Type was: ${loopTypeToString(timeoutWatcherData.loopType)}")
+    
+                                    // reset loop param
+                                    when(timeoutWatcherData.loopType) {
+                                        LOOPTYPE_SIMPLESTATE -> {
+                                            simpleStateLoopActive = false
+                                        }
+                                        LOOPTYPE_COMPLEXSTATE -> {
+                                            complexStateLoopActive = false
+                                        }
+                                        LOOPTYPE_PROPERTY -> {
+                                            propertyLoopActive = false
+                                        }
+                                        LOOPTYPE_GROUP -> {
+                                            groupLoopActive = false
+                                        }
+                                    }
+    
+                                    // clear watcher data
+                                    timeoutWatcherData.clear()
+    
+                                    // raise event
+                                    callback.onConnectionError(
+                                        BLE_CONNECTION_MANAGER_CRITICAL_DEVICE_NOT_RESPONDING
+                                    )
+    
+                                    cancel()
+                                }
                             }
                         } else {
                             if(verboseLog){
