@@ -13,6 +13,7 @@
       android:id="@+id/devicePropertyIdentificationImage"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:src="@drawable/ic_08_led"
       android:layout_marginStart="20dp"
       android:layout_gravity="center_vertical"
       android:contentDescription="@string/DevicePropertyListElementImageDescription"
