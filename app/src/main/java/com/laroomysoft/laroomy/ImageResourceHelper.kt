@@ -32,6 +32,23 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             25 -> R.drawable.ic_25_access_ctrl
             26 -> R.drawable.ic_26_lock_retry
             27 -> R.drawable.ic_27_safe
+            28 -> R.drawable.ic_28_password
+            29 -> R.drawable.ic_29_wifi_pwd
+            30 -> R.drawable.ic_30_unlock_ctrl
+            31 -> R.drawable.ic_31_batt_loading
+            32 -> R.drawable.ic_32_batt_100p
+            33 -> R.drawable.ic_33_batt_75p
+            34 -> R.drawable.ic_34_batt_50p
+            35 -> R.drawable.ic_35_batt_25p
+            36 -> R.drawable.ic_36_batt_empty
+            37 -> R.drawable.ic_37_batt_pow_save
+            38 -> R.drawable.ic_38_level_100
+            39 -> R.drawable.ic_39_level_75
+            40 -> R.drawable.ic_40_level_50
+            41 -> R.drawable.ic_41_level_25
+            42 -> R.drawable.ic_42_level_0
+            43 -> R.drawable.ic_43_level_adjust
+            44 -> R.drawable.ic_44_meter
             
             151 -> R.drawable.ic_151_enum_point
             
