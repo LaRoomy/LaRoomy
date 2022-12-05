@@ -13,6 +13,25 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             6 -> R.drawable.ic_06_stand_lamp
             7 -> R.drawable.ic_07_ceil_lamp
             8 -> R.drawable.ic_08_led
+            9 -> R.drawable.ic_09_brightness
+            10 -> R.drawable.ic_10_day_mode
+            11 -> R.drawable.ic_11_night_mode
+            12 -> R.drawable.ic_12_time
+            13 -> R.drawable.ic_13_time_frame
+            14 -> R.drawable.ic_14_time_setup
+            15 -> R.drawable.ic_15_clock_reload
+            16 -> R.drawable.ic_16_date
+            17 -> R.drawable.ic_17_date_time
+            18 -> R.drawable.ic_18_rgb_slider
+            19 -> R.drawable.ic_19_rgb_circles
+            20 -> R.drawable.ic_20_rgb_flower
+            21 -> R.drawable.ic_21_lock_closed
+            22 -> R.drawable.ic_22_lock_opened
+            23 -> R.drawable.ic_23_key
+            24 -> R.drawable.ic_24_time_lock
+            25 -> R.drawable.ic_25_access_ctrl
+            26 -> R.drawable.ic_26_lock_retry
+            27 -> R.drawable.ic_27_safe
             
             151 -> R.drawable.ic_151_enum_point
             
