@@ -62,6 +62,29 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             55 -> R.drawable.ic_55_destination
             56 -> R.drawable.ic_56_navigator
             57 -> R.drawable.ic_57_set_gear
+            58 -> R.drawable.ic_58_set_tool
+            59 -> R.drawable.ic_59_human_setup
+            60 -> R.drawable.ic_60_tools
+            61 -> R.drawable.ic_61_tool_circle
+            62 -> R.drawable.ic_62_sound_on
+            63 -> R.drawable.ic_63_sound_off
+            64 -> R.drawable.ic_64_play
+            65 -> R.drawable.ic_65_pause
+            66 -> R.drawable.ic_66_stop
+            67 -> R.drawable.ic_67_notification
+            68 -> R.drawable.ic_68_noti_text
+            69 -> R.drawable.ic_69_noti_excl
+            70 -> R.drawable.ic_70_noti_bell
+            71 -> R.drawable.ic_71_noti_bell_off
+            72 -> R.drawable.ic_72_reload
+            73 -> R.drawable.ic_73_sync
+            74 -> R.drawable.ic_74_undo
+            75 -> R.drawable.ic_75_redo
+            76 -> R.drawable.ic_76_add
+            77 -> R.drawable.ic_77_subtract
+            78 -> R.drawable.ic_78_open
+            79 -> R.drawable.ic_79_close
+            80 -> R.drawable.ic_80_share
             
             151 -> R.drawable.ic_151_enum_point
             
