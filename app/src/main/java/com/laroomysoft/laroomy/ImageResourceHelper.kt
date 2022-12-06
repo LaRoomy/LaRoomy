@@ -49,6 +49,19 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             42 -> R.drawable.ic_42_level_0
             43 -> R.drawable.ic_43_level_adjust
             44 -> R.drawable.ic_44_meter
+            45 -> R.drawable.ic_45_arrow_up
+            46 -> R.drawable.ic_46_arrow_right
+            47 -> R.drawable.ic_47_arrow_down
+            48 -> R.drawable.ic_48_arrow_left
+            49 -> R.drawable.ic_49_up_down
+            50 -> R.drawable.ic_50_right_left
+            51 -> R.drawable.ic_51_turn_right
+            52 -> R.drawable.ic_52_turn_left
+            53 -> R.drawable.ic_53_location
+            54 -> R.drawable.ic_54_direction
+            55 -> R.drawable.ic_55_destination
+            56 -> R.drawable.ic_56_navigator
+            57 -> R.drawable.ic_57_set_gear
             
             151 -> R.drawable.ic_151_enum_point
             
