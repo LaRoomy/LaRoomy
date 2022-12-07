@@ -95,6 +95,19 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             88 -> R.drawable.ic_88_cloud_snow
             89 -> R.drawable.ic_89_wind
             90 -> R.drawable.ic_90_fog
+            91 -> R.drawable.ic_91_freeze
+            92 -> R.drawable.ic_92_auto_ctrl
+            93 -> R.drawable.ic_93_manual_ctrl
+            94 -> R.drawable.ic_94_slider_adjust
+            95 -> R.drawable.ic_95_touch
+            96 -> R.drawable.ic_96_plant
+            97 -> R.drawable.ic_97_plant_light
+            98 -> R.drawable.ic_98_plant_water
+            99 -> R.drawable.ic_99_plant_irri
+            100 -> R.drawable.ic_100_eco_mode
+            101 -> R.drawable.ic_101_plant_care
+            102 -> R.drawable.ic_102_plant_sensor
+            103 -> R.drawable.ic_103_eco_light
             
             151 -> R.drawable.ic_151_enum_point
             
