@@ -85,6 +85,16 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             78 -> R.drawable.ic_78_open
             79 -> R.drawable.ic_79_close
             80 -> R.drawable.ic_80_share
+            81 -> R.drawable.ic_81_search
+            82 -> R.drawable.ic_82_delete
+            83 -> R.drawable.ic_83_sun
+            84 -> R.drawable.ic_84_sun_cloud
+            85 -> R.drawable.ic_85_cloud_rain
+            86 -> R.drawable.ic_86_cloud
+            87 -> R.drawable.ic_87_thunderstorm
+            88 -> R.drawable.ic_88_cloud_snow
+            89 -> R.drawable.ic_89_wind
+            90 -> R.drawable.ic_90_fog
             
             151 -> R.drawable.ic_151_enum_point
             
