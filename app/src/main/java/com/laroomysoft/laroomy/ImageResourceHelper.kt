@@ -119,6 +119,14 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             112 -> R.drawable.ic_112_plug
             113 -> R.drawable.ic_113_power_unit
             114 -> R.drawable.ic_114_fuse_box
+            115 -> R.drawable.ic_115_sensor
+            116 -> R.drawable.ic_116_motion_sense
+            117 -> R.drawable.ic_117_level_sensor
+            118 -> R.drawable.ic_118_temp_sense
+            119 -> R.drawable.ic_119_gravi_sensor
+            120 -> R.drawable.ic_120_dist_sense
+            121 -> R.drawable.ic_121_door_sensor
+            122 -> R.drawable.ic_122_window_sensor
             
             151 -> R.drawable.ic_151_enum_point
             
