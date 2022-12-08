@@ -108,6 +108,17 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             101 -> R.drawable.ic_101_plant_care
             102 -> R.drawable.ic_102_plant_sensor
             103 -> R.drawable.ic_103_eco_light
+            104 -> R.drawable.ic_104_green_energy
+            105 -> R.drawable.ic_105_recycle
+            106 -> R.drawable.ic_106_flash
+            107 -> R.drawable.ic_107_pow_save
+            108 -> R.drawable.ic_108_solar_power
+            109 -> R.drawable.ic_109_wind_power
+            110 -> R.drawable.ic_110_standby
+            111 -> R.drawable.ic_111_wallplug
+            112 -> R.drawable.ic_112_plug
+            113 -> R.drawable.ic_113_power_unit
+            114 -> R.drawable.ic_114_fuse_box
             
             151 -> R.drawable.ic_151_enum_point
             
