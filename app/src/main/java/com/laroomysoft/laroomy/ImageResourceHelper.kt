@@ -138,8 +138,25 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             131 -> R.drawable.ic_131_satellite
             132 -> R.drawable.ic_132_heater
             133 -> R.drawable.ic_133_speaker
-            
+            134 -> R.drawable.ic_134_fan
+            135 -> R.drawable.ic_135_tv
+            136 -> R.drawable.ic_136_water_valve
+            137 -> R.drawable.ic_137_water_temp
+            138 -> R.drawable.ic_138_water_setup
+            139 -> R.drawable.ic_139_valve
+            140 -> R.drawable.ic_140_water_flow
+            141 -> R.drawable.ic_141_flow_control
+            142 -> R.drawable.ic_142_air_circ
+            143 -> R.drawable.ic_143_pressure
+            144 -> R.drawable.ic_144_warn_normal
+            145 -> R.drawable.ic_145_warn_severe
+            146 -> R.drawable.ic_146_info_circle
+            147 -> R.drawable.ic_147_question_circle
+            148 -> R.drawable.ic_148_circle_empty
+            149 -> R.drawable.ic_149_circle_check
+            150 -> R.drawable.ic_150_circle_radio
             151 -> R.drawable.ic_151_enum_point
+            
             
             180 -> R.drawable.ic_180_group
         
