@@ -127,6 +127,17 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             120 -> R.drawable.ic_120_dist_sense
             121 -> R.drawable.ic_121_door_sensor
             122 -> R.drawable.ic_122_window_sensor
+            123 -> R.drawable.ic_123_remote_ctrl
+            124 -> R.drawable.ic_124_e_motor
+            125 -> R.drawable.ic_125_engine
+            126 -> R.drawable.ic_126_printer
+            127 -> R.drawable.ic_127_fuel_disp
+            128 -> R.drawable.ic_128_microchip
+            129 -> R.drawable.ic_129_car
+            130 -> R.drawable.ic_130_bike
+            131 -> R.drawable.ic_131_satellite
+            132 -> R.drawable.ic_132_heater
+            133 -> R.drawable.ic_133_speaker
             
             151 -> R.drawable.ic_151_enum_point
             
