@@ -156,7 +156,27 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             149 -> R.drawable.ic_149_circle_check
             150 -> R.drawable.ic_150_circle_radio
             151 -> R.drawable.ic_151_enum_point
-            
+            152 -> R.drawable.ic_152_filter
+            153 -> R.drawable.ic_153_house_connect
+            154 -> R.drawable.ic_154_con_light
+            155 -> R.drawable.ic_155_garage_setup
+            156 -> R.drawable.ic_156_smart_light
+            157 -> R.drawable.ic_157_con_wplug
+            158 -> R.drawable.ic_158_house_temp
+            159 -> R.drawable.ic_159_smart_lock
+            160 -> R.drawable.ic_160_house_ctrl
+            161 -> R.drawable.ic_161_house_setup
+            162 -> R.drawable.ic_162_bar_graph
+            163 -> R.drawable.ic_163_line_graph
+            164 -> R.drawable.ic_164_oscilloscope
+            165 -> R.drawable.ic_165_enter_text
+            166 -> R.drawable.ic_166_string_req
+            167 -> R.drawable.ic_167_format_list
+            168 -> R.drawable.ic_168_sort_list
+            169 -> R.drawable.ic_169_filter_list
+            170 -> R.drawable.ic_170_option_list
+            171 -> R.drawable.ic_171_wifi
+            172 -> R.drawable.ic_172_wifi_off
             
             180 -> R.drawable.ic_180_group
         
