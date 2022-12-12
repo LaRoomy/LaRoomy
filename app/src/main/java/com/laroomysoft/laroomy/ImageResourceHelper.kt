@@ -177,8 +177,17 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             170 -> R.drawable.ic_170_option_list
             171 -> R.drawable.ic_171_wifi
             172 -> R.drawable.ic_172_wifi_off
-            
+            173 -> R.drawable.ic_173_con_sync
+            174 -> R.drawable.ic_174_circuit
+            175 -> R.drawable.ic_175_world
+            176 -> R.drawable.ic_176_indiff_bars
+            177 -> R.drawable.ic_177_fire
+            178 -> R.drawable.ic_178_meander
+            179 -> R.drawable.ic_179_hierarchy
             180 -> R.drawable.ic_180_group
+            181 -> R.drawable.ic_181_bluetooth
+            182 -> R.drawable.ic_182_heartrate
+            183 -> R.drawable.ic_183_upstairs
         
             // TODO: implement all new image resources here...
         
