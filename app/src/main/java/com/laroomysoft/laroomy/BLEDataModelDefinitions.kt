@@ -1695,7 +1695,7 @@ class DevicePropertyListContentInformation(val elementType: Int) {
 //        }
 //    }
 
-    var imageResourceID = R.drawable.ic_00_dis_image_error_state_vect
+    var imageResourceID = R.drawable.ic_151_enum_point
     private set
 
     var simplePropertyState = -1
@@ -1725,9 +1725,9 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     fun update(context: Context){
         // at first set the right image resource id
         this.imageResourceID = if(this.isEnabled) {
-            resourceIdForImageId(this.imageID)
+            resourceIdForImageId(this.imageID, this.elementType, (context.applicationContext as ApplicationProperty).isPremiumAppVersion)
         } else {
-            resourceIdForDisabledImageId(this.imageID)
+            resourceIdForDisabledImageId(this.imageID, this.elementType, (context.applicationContext as ApplicationProperty).isPremiumAppVersion)
         }
         // set the text color in relation to the enabled param
         this.textColorResource = if(this.isEnabled){

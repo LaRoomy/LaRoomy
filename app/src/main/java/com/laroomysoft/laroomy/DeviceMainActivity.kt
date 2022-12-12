@@ -521,7 +521,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set the appropriate image and seekbar position
         this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.levelSelectorPopUpImageView).setImageResource(
-            resourceIdForImageId(devicePropertyListContentInformation.imageID)
+            resourceIdForImageId(devicePropertyListContentInformation.imageID, PROPERTY_ELEMENT, (applicationContext as ApplicationProperty).isPremiumAppVersion)
         )
         val percentageLevelPropertyGenerator =
             PercentageLevelPropertyGenerator(devicePropertyListContentInformation.simplePropertyState)
@@ -591,7 +591,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
         // set the appropriate image and option selection
         this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.optionSelectorPopUpImageView).setImageResource(
-            resourceIdForImageId(devicePropertyListContentInformation.imageID)
+            resourceIdForImageId(devicePropertyListContentInformation.imageID, PROPERTY_ELEMENT, (applicationContext as ApplicationProperty).isPremiumAppVersion)
         )
 
         this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.optionSelectorPopUpTextView).text =

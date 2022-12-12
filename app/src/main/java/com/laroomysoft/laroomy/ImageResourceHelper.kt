@@ -188,6 +188,10 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             181 -> R.drawable.ic_181_bluetooth
             182 -> R.drawable.ic_182_heartrate
             183 -> R.drawable.ic_183_upstairs
+            184 -> R.drawable.ic_184_sleep
+            185 -> R.drawable.ic_185_user
+            186 -> R.drawable.ic_186_users
+            187 -> R.drawable.ic_187_conjunction
         
             // TODO: implement all new image resources here...
         
@@ -203,6 +207,26 @@ fun resourceIdForDisabledImageId(imageID: Int, elementType: Int, isPremiumVersio
     // if the user has paid or this is a free trial, use all images
     return if(isPremiumVersion) {
         when (imageID) {
+            1 -> R.drawable.ic_01_house_dis
+            2 -> R.drawable.ic_02_garage_dis
+            3 -> R.drawable.ic_03_garden_dis
+            4 -> R.drawable.ic_04_lightbulb_dis
+            5 -> R.drawable.ic_05_light_setup_dis
+            6 -> R.drawable.ic_06_stand_lamp_dis
+            7 -> R.drawable.ic_07_ceil_lamp_dis
+            8 -> R.drawable.ic_08_led_dis
+            9 -> R.drawable.ic_09_brightness_dis
+            10 -> R.drawable.ic_10_day_mode_dis
+            11 -> R.drawable.ic_11_night_mode_dis
+            12 -> R.drawable.ic_12_time_dis
+            13 -> R.drawable.ic_13_time_frame_dis
+            14 -> R.drawable.ic_14_time_setup_dis
+            15 -> R.drawable.ic_15_clock_reload_dis
+            16 -> R.drawable.ic_16_date_dis
+            17 -> R.drawable.ic_17_date_time_dis
+            18 -> R.drawable.ic_18_rgb_slider_dis
+            19 -> R.drawable.ic_19_rgb_circles_dis
+            20 -> R.drawable.ic_20_rgb_flower_dis
             
             151 -> R.drawable.ic_151_dis_enum_point
             
