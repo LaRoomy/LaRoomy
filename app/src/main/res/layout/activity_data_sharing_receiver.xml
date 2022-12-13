@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/dataSharingActivityLaroomyImageView"
-        android:src="@drawable/symbol_128_transparent"
+        android:src="@drawable/gn_laroomy_128"
         android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

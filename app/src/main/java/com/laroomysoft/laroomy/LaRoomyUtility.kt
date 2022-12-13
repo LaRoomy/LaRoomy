@@ -396,7 +396,7 @@ fun isLaroomyDevice(name: String) : Boolean {
 
 fun deviceImageFromName(name: String): Int {
     return when {
-        (isLaroomyDevice(name)) -> R.drawable.ic_laroomy_icon_sq48_vect
+        (isLaroomyDevice(name)) -> R.drawable.gn_laroomy_48
         else -> {
             when {
                 name.contains("HME") -> {

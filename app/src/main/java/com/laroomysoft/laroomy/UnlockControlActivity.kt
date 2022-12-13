@@ -193,7 +193,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 } else {
                     if (unlockControlState.unLocked) {
                         this.lockState = UC_STATE_UNLOCKED
-                        this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_unlocked_sq128_vect)
+                        this.lockUnlockImageView.setImageResource(R.drawable.uc_lock_128_unlocked)
                         this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
                         this.lockStatusTextView.text =
                             getString(R.string.UnlockCtrl_ConditionText_Unlocked)
@@ -203,7 +203,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                         )
                     } else {
                         this.lockState = UC_STATE_LOCKED
-                        this.lockUnlockImageView.setImageResource(R.drawable.ic_lock_blue_white_locked_sq128_vect)
+                        this.lockUnlockImageView.setImageResource(R.drawable.uc_lock_128_locked)
                         this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
                         this.lockStatusTextView.text =
                             getString(R.string.UnlockCtrl_ConditionText_Locked)

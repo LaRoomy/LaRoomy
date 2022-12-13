@@ -337,14 +337,63 @@ fun resourceIdForDisabledImageId(imageID: Int, elementType: Int, isPremiumVersio
             128 -> R.drawable.ic_128_microchip_dis
             129 -> R.drawable.ic_129_car_dis
             130 -> R.drawable.ic_130_bike_dis
-            
-            
-            
-            
-            151 -> R.drawable.ic_151_dis_enum_point
-            
-            180 -> R.drawable.ic_180_dis_group
-        
+            131 -> R.drawable.ic_131_satellite_dis
+            132 -> R.drawable.ic_132_heater_dis
+            133 -> R.drawable.ic_133_speaker_dis
+            134 -> R.drawable.ic_134_fan_dis
+            135 -> R.drawable.ic_135_tv_dis
+            136 -> R.drawable.ic_136_water_valve_dis
+            137 -> R.drawable.ic_137_water_temp_dis
+            138 -> R.drawable.ic_138_water_setup_dis
+            139 -> R.drawable.ic_139_valve_dis
+            140 -> R.drawable.ic_140_water_flow_dis
+            141 -> R.drawable.ic_141_flow_control_dis
+            142 -> R.drawable.ic_142_air_circ_dis
+            143 -> R.drawable.ic_143_pressure_dis
+            144 -> R.drawable.ic_144_warn_normal_dis
+            145 -> R.drawable.ic_145_warn_severe_dis
+            146 -> R.drawable.ic_146_info_circle_dis
+            147 -> R.drawable.ic_147_question_circle_dis
+            148 -> R.drawable.ic_148_circle_empty_dis
+            149 -> R.drawable.ic_149_circle_check_dis
+            150 -> R.drawable.ic_150_circle_radio_dis
+            151 -> R.drawable.ic_151_enum_point_dis
+            152 -> R.drawable.ic_152_filter_dis
+            153 -> R.drawable.ic_153_house_connect_dis
+            154 -> R.drawable.ic_154_con_light_dis
+            155 -> R.drawable.ic_155_garage_setup_dis
+            156 -> R.drawable.ic_156_smart_light_dis
+            157 -> R.drawable.ic_157_con_wplug_dis
+            158 -> R.drawable.ic_158_house_temp_dis
+            159 -> R.drawable.ic_159_smart_lock_dis
+            160 -> R.drawable.ic_160_house_ctrl_dis
+            161 -> R.drawable.ic_161_house_setup_dis
+            162 -> R.drawable.ic_162_bar_graph_dis
+            163 -> R.drawable.ic_163_line_graph_dis
+            164 -> R.drawable.ic_164_oscilloscope_dis
+            165 -> R.drawable.ic_165_enter_text_dis
+            166 -> R.drawable.ic_166_string_req_dis
+            167 -> R.drawable.ic_167_format_list_dis
+            168 -> R.drawable.ic_168_sort_list_dis
+            169 -> R.drawable.ic_169_filter_list_dis
+            170 -> R.drawable.ic_170_option_list_dis
+            171 -> R.drawable.ic_171_wifi_dis
+            172 -> R.drawable.ic_172_wifi_off_dis
+            173 -> R.drawable.ic_173_con_sync_dis
+            174 -> R.drawable.ic_174_circuit_dis
+            175 -> R.drawable.ic_175_world_dis
+            176 -> R.drawable.ic_176_indiff_bars_dis
+            177 -> R.drawable.ic_177_fire_dis
+            178 -> R.drawable.ic_178_meander_dis
+            179 -> R.drawable.ic_179_hierarchy_dis
+            180 -> R.drawable.ic_180_group_dis
+            181 -> R.drawable.ic_181_bluetooth_dis
+            182 -> R.drawable.ic_182_heartrate_dis
+            183 -> R.drawable.ic_183_upstairs_dis
+            184 -> R.drawable.ic_184_sleep_dis
+            185 -> R.drawable.ic_185_user_dis
+            186 -> R.drawable.ic_186_users_dis
+            187 -> R.drawable.ic_187_conjunction_dis
         
             // TODO: implement all new disabled image resources here...
         
@@ -366,8 +415,8 @@ fun commonResourceID(elementType: Int): Int {
 fun commonDisabledResourceID(elementType: Int): Int {
     // return the common disabled image for the type
     return when(elementType){
-        GROUP_ELEMENT -> R.drawable.ic_180_dis_group
-        else -> R.drawable.ic_151_dis_enum_point
+        GROUP_ELEMENT -> R.drawable.ic_180_group_dis
+        else -> R.drawable.ic_151_enum_point_dis
     }
 }
 
