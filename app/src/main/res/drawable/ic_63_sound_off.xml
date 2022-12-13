@@ -14,7 +14,7 @@
       android:pathData="M3.581,32.056H11.039V16.043H3.581c-2.167,0 -2.01,1.941 -2.01,1.941v11.914c0,0 -0.113,2.158 2.01,2.158z"
       android:strokeLineJoin="round"
       android:strokeWidth="1"
-      android:fillColor="#a6bff3"
+      android:fillColor="#a6bee3"
       android:strokeColor="#000000"
       android:strokeLineCap="round"/>
   <path
