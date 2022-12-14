@@ -43,12 +43,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         field.clear()
 
         for (device in (applicationContext as ApplicationProperty).addedDevices.devices) {
-            val dev = LaRoomyDevicePresentationModel()
-            dev.address = device.macAddress
-            dev.name = device.name
-            dev.image = deviceImageFromName(device.name)
-
-            field.add(dev)
+            field.add(device.toPresentationModel((applicationContext as ApplicationProperty).isPremiumAppVersion))
         }
         return field
     }

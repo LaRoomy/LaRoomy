@@ -11,6 +11,7 @@ const val NOTIFICATION_TYPE_INFO = 2
 //const val UNDEFINED_ELEMENT = -1
 const val PROPERTY_ELEMENT = 1
 const val GROUP_ELEMENT = 2
+const val DEVICE_ELEMENT = 3
 
 // the numbers must conform to the types of the device!
 const val PROPERTY_TYPE_BUTTON = 1

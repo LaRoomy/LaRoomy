@@ -408,6 +408,7 @@ fun commonResourceID(elementType: Int): Int {
     // return the common image for the type
     return when(elementType){
         GROUP_ELEMENT -> R.drawable.ic_180_group
+        DEVICE_ELEMENT -> R.drawable.ic_181_bluetooth
         else -> R.drawable.ic_151_enum_point
     }
 }
@@ -416,6 +417,7 @@ fun commonDisabledResourceID(elementType: Int): Int {
     // return the common disabled image for the type
     return when(elementType){
         GROUP_ELEMENT -> R.drawable.ic_180_group_dis
+        DEVICE_ELEMENT -> R.drawable.ic_181_bluetooth_dis
         else -> R.drawable.ic_151_enum_point_dis
     }
 }

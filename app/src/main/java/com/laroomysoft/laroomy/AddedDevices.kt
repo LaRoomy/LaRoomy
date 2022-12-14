@@ -2,7 +2,47 @@ package com.laroomysoft.laroomy
 
 import android.content.Context
 
-class KnownDevices(var macAddress:String, var name:String)
+class KnownDevices(var macAddress:String, var name:String){
+    
+    fun toPresentationModel(isPremium: Boolean) : LaRoomyDevicePresentationModel {
+        val dev = LaRoomyDevicePresentationModel()
+        dev.address = this.macAddress
+        
+        if(isPremium){
+            // check name string for the image definition
+            val imageID = checkDeviceNameForImageDefinition(this.name)
+            if(imageID >= 0){
+                // definition exists and is valid
+                dev.image = resourceIdForImageId(imageID, DEVICE_ELEMENT, true)
+                
+                // remove trailing image definition
+                var realName = ""
+                this.name.forEachIndexed { index, c ->
+                    if(index < (realName.length - 3)){
+                            realName += c
+                    } else {
+                        return@forEachIndexed
+                    }
+                }
+                dev.name = realName
+            } else {
+                // there is no valid image definition in the name string
+                dev.name = this.name
+                dev.image = when {
+                    (isLaroomyDevice(name)) -> R.drawable.gn_laroomy_48
+                    else -> R.drawable.ic_181_bluetooth
+                }
+            }
+        } else {
+            dev.name = this.name
+            dev.image = when {
+                (isLaroomyDevice(name)) -> R.drawable.gn_laroomy_48
+                else -> R.drawable.ic_181_bluetooth
+            }
+        }
+        return dev
+    }
+}
 
 class AddedDevices(private val appContext: Context) {
 

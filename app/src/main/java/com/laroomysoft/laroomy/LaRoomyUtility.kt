@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -394,45 +395,22 @@ fun isLaroomyDevice(name: String) : Boolean {
     return name.contains("laroomy", true)||(name.contains("lry", true))
 }
 
-fun deviceImageFromName(name: String): Int {
-    return when {
-        (isLaroomyDevice(name)) -> R.drawable.gn_laroomy_48
-        else -> {
-            when {
-                name.contains("HME") -> {
-                    R.drawable.ic_home_white_48dp
-                }
-                name.contains("LGB") -> {
-                    R.drawable.ic_light_bulb_white_48dp
-                }
-                name.contains("RMT") -> {
-                    R.drawable.ic_settings_remote_white_48dp
-                }
-                name.contains("ANL") -> {
-                    R.drawable.ic_analytics_white_48dp
-                }
-                name.contains("WFS") -> {
-                    R.drawable.ic_wifi_white_48dp
-                }
-                name.contains("TSP") -> {
-                    R.drawable.ic_schedule_white_48dp
-                }
-                name.contains("TNE") -> {
-                    R.drawable.ic_tune_white_48dp
-                }
-                name.contains("LCK") -> {
-                    R.drawable.ic_lock_open_white_48dp
-                }
-                (name.contains("LED") || name.contains("Led")) -> {
-                    R.drawable.ic_light_bulb_white_48dp
-                }
-                else -> {
-                    //R.drawable.ic_bluetooth_connected_white_48dp
-                    R.drawable.ic_181_bluetooth
-                }
+fun checkDeviceNameForImageDefinition(deviceName: String) : Int {
+    // check the last 3 chars of the name for a image id definition
+    if(deviceName.length > 3){
+        try {
+            if(deviceName.elementAt(deviceName.length - 3) == '_') {
+                val idStr = "0x${deviceName.elementAt(deviceName.length - 2)}${
+                    deviceName.elementAt(deviceName.length - 1)
+                }"
+                return Integer.decode(idStr)
             }
+        } catch(e: Exception){
+            Log.e("checkDeviceName", "Function checkDeviceNameForImageDefinition exception: $e")
+            return -2
         }
     }
+    return -1
 }
 
 fun makeSimplePropertyExecutionString(propertyIndex: Int, stateVal: Int) : String {
