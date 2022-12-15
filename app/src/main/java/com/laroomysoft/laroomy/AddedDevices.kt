@@ -18,7 +18,7 @@ class KnownDevices(var macAddress:String, var name:String){
                 // remove trailing image definition
                 var realName = ""
                 this.name.forEachIndexed { index, c ->
-                    if(index < (realName.length - 3)){
+                    if(index < (name.length - 3)){
                             realName += c
                     } else {
                         return@forEachIndexed

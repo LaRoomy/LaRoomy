@@ -371,10 +371,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             if(element.isGroupMember){
                 if(element.isLastInGroup){
                     rootLayoutElement?.background =
-                        AppCompatResources.getDrawable(this, R.drawable.inside_group_property_last_list_element_selected_background)
+                        AppCompatResources.getDrawable(this, R.drawable.p_group_last_element_sel_bkgnd)
                 } else {
                     rootLayoutElement?.background =
-                        AppCompatResources.getDrawable(this, R.drawable.inside_group_property_list_element_selected_background)
+                        AppCompatResources.getDrawable(this, R.drawable.p_group_element_sel_bkgnd)
                 }
             } else {
                 rootLayoutElement?.background =
@@ -919,13 +919,13 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     rootLayoutElement?.background =
                         AppCompatResources.getDrawable(
                             this,
-                            R.drawable.inside_group_property_last_list_element_background
+                            R.drawable.p_group_last_element_bkgnd
                         )
                 } else {
                     rootLayoutElement?.background =
                         AppCompatResources.getDrawable(
                             this,
-                            R.drawable.inside_group_property_list_element_background
+                            R.drawable.p_group_element_bkgnd
                         )
                 }
 

@@ -1746,7 +1746,7 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                 // define the background
                 this.backgroundDrawable = AppCompatResources.getDrawable(
                     context,
-                    R.drawable.property_list_group_header_element_background
+                    R.drawable.p_group_header_element_bkgnd
                 )!!
                 // define the visibility of the optional items
                 this.switchVisibility = View.GONE
@@ -1772,13 +1772,13 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                         // draw the closing group-member background
                         this.backgroundDrawable = AppCompatResources.getDrawable(
                             context,
-                            R.drawable.inside_group_property_last_list_element_background
+                            R.drawable.p_group_last_element_bkgnd
                         )!!
                     } else {
                         // draw the inside group-member background
                         this.backgroundDrawable = AppCompatResources.getDrawable(
                             context,
-                            R.drawable.inside_group_property_list_element_background
+                            R.drawable.p_group_element_bkgnd
                         )!!
                     }
                 }

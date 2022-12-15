@@ -65,9 +65,12 @@
     <color name="myDevicesListElementSelectedBackgroundColor">#FF555555</color>
     <color name="myDevicesListDeleteElementColor">#FFF44336</color>
     <color name="propertyListElementBackgroundColor">#FF444444</color>
-    <color name="propertyListGroupHeaderBackgroundColor">#FF222222</color>
-    <color name="propertyListGroupBorderColor">#000000</color>
-    <color name="propertyListGroupBackgroundColor">#222222</color>
+
+    <color name="propertyListElementInGroupColor">#FF404040</color>
+    <color name="propertyListGroupHeaderBackgroundColor">#FF555555</color>
+    <!--<color name="propertyListGroupBorderColor">#FF666666</color>-->
+    <color name="propertyListGroupBackgroundColor">#FF555555</color>
+
     <color name="propertyListElementSelectedBackgroundColor">#FF555555</color>
     <color name="propertyListElementNavImageDisabledBackground">#FF888888</color>
 
