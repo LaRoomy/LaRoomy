@@ -905,7 +905,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // TODO: set item drawable to normal state
 
         // reset the selected item background if necessary
-        if (restoreIndex >= 0) {
+        if (restoreIndex >= 0 && ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size > 0) {
             val element =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(restoreIndex)
 
