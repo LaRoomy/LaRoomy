@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Global System Colors **************************************************************** -->
-    <color name="colorPrimary">#AAAAAA</color>
-    <color name="colorTextPrimary">#000000</color>
-    <color name="colorTextSecondary">#000000</color>
-    <color name="colorTextTertiary">#000000</color>
-    <color name="colorPrimaryDark">#AAAAAA</color>
-    <color name="appBackgroundColor">#AAAAAA</color>
-    <color name="colorAccent">#FF005599</color>
-    <!-- ************************************************************************************* -->
+    <!-- SYSTEM COLORS !! -->
+    <color name="colorPrimary">#282828</color>
+    <color name="colorTextPrimary">#DDDDDD</color>
+    <color name="colorTextSecondary">#DDDDDD</color>
+    <color name="colorTextTertiary">#DDDDDD</color>
+    <color name="colorPrimaryDark">#282828</color>
+    <color name="appBackgroundColor">#282828</color>
+    <color name="colorAccent">#03DAC5</color>
 
     <!-- Notification Colors ***************************************************************** -->
-    <color name="ErrorColor">#FFFF0000</color>
-    <color name="WarningColor">#FF9E9833</color>
-    <color name="InfoColor">#FF000000</color>
-    <color name="errorLightColor">#FFAA2222</color>
-    <color name="warningLightColor">#FFCC8808</color>
-    <color name="successLightColor">#FF6CA378</color>
+    <color name="ErrorColor">#FF0000</color>
+    <color name="WarningColor">#FFFF00</color>
+    <color name="InfoColor">#FFFFFF</color>
+    <color name="errorLightColor">#FF8888</color>
+    <color name="warningLightColor">#F99F08</color>
+    <color name="successLightColor">#88FFAA</color>
     <!-- ************************************************************************************* -->
 
     <!-- Text Colors ************************************************************************* -->
-    <color name="normalTextColor">#FF000000</color>
-    <color name="disabledTextColor">#FF555555</color>
-    <color name="selectedTextColor">#FF16354D</color>
-    <color name="disconnectedTextColor">#FFBB3333</color>
-    <color name="connectedTextColor">#FF6CA378</color>
+    <color name="normalTextColor">#FFFFFF</color>
+    <color name="disabledTextColor">#888888</color>
+    <color name="selectedTextColor">#F5CD06</color>
+    <color name="disconnectedTextColor">#FF8888</color>
+    <color name="connectedTextColor">#88FFAA</color>
     <color name="connectingTextColor">#AAAA00</color>
     <color name="clickableTextColor">#00C1F1</color>
-    <color name="fullWhiteTextColor">#FF000000</color>
+    <color name="fullWhiteTextColor">#FFFFFFFF</color>
     <!-- ************************************************************************************* -->
 
     <!-- Default Control Colors ************************************************************** -->
-    <color name="generalButtonBackgroundColor">#FFDDDDDD</color>
+    <color name="generalButtonBackgroundColor">#FF666666</color>
     <color name="separatorColor">#777777</color>
     <color name="complexPropertyPanelBackgroundColor">#FF222222</color>
     <!-- ************************************************************************************* -->
@@ -40,19 +39,19 @@
     <color name="normalOutlineColor">#FFFFFF</color>
     <color name="transparentColor">#00000000</color>
     <color name="transparentViewColor">#00FFFFFF</color>
-    <color name="mode_accent_color">#FF16354D</color>
+    <color name="mode_accent_color">#F5CD06</color>
     <color name="yellowAccentColor">#FFF6D82E</color>
-    <color name="pureWhite">#FF000000</color>
+    <color name="pureWhite">#FFFFFFFF</color>
     <!-- ************************************************************************************* -->
 
     <!-- Main Activity *********************************************************************** -->
-    <color name="myDevicesListElementBackgroundColor">#FF888888</color>
-    <color name="myDevicesListElementSelectedBackgroundColor">#FF999999</color>
-    <color name="myDevicesListDeleteElementColor">#FFA1130C</color>
+    <color name="myDevicesListElementBackgroundColor">#FF444444</color>
+    <color name="myDevicesListElementSelectedBackgroundColor">#FF555555</color>
+    <color name="myDevicesListDeleteElementColor">#FFF44336</color>
 
-    <color name="mainActivityPopUpFlyoutBackgroundColor">#FFDDDDDD</color>
-    <color name="mainActivityPopUpFlyoutSeparatorColor">#FF909090</color>
-    <color name="mainActivityPopUpMenuItemSelectedColor">#FF909090</color>
+    <color name="mainActivityPopUpFlyoutBackgroundColor">#FF505050</color>
+    <color name="mainActivityPopUpFlyoutSeparatorColor">#FF606060</color>
+    <color name="mainActivityPopUpMenuItemSelectedColor">#FF606060</color>
     <!-- ************************************************************************************* -->
 
     <!-- Device Main Activity **************************************************************** -->
@@ -67,14 +66,14 @@
     <!-- ************************************************************************************* -->
 
     <!-- Settings Activity ****************************************************************** -->
-    <color name="setupActivityButtonNormalBackground">#FFCCCCCC</color>
-    <color name="setupActivityButtonDisabledBackground">#FF888888</color>
-    <color name="setupActivityButtonPressedBackground">#FFBBBBBB</color>
+    <color name="setupActivityButtonNormalBackground">#FF111111</color>
+    <color name="setupActivityButtonDisabledBackground">#FF222222</color>
+    <color name="setupActivityButtonPressedBackground">#FF333333</color>
     <!-- ************************************************************************************* -->
 
     <!-- Information Activity **************************************************************** -->
-    <color name="info_activity_header_background_color">#FF666666</color>
-    <color name="info_activity_text_color">#FF16354D</color>
+    <color name="info_activity_header_background_color">#FF000000</color>
+    <color name="info_activity_text_color">#FFF5CD06</color>
     <!-- ************************************************************************************* -->
 
     <!-- RGB Selector Activity *************************************************************** -->
@@ -92,23 +91,23 @@
     <color name="extendedLevelSelectorActivitySliderBackgroundColor">#FF666666</color>
 
     <!-- View Log Activity ******************************************************************* -->
-    <color name="viewLogActivityToolPanelBackgroundColor">#ee666666</color>
-    <color name="viewLogActivityToolPanelSeparatorColor">#FF777777</color>
+    <color name="viewLogActivityToolPanelBackgroundColor">#ee111111</color>
+    <color name="viewLogActivityToolPanelSeparatorColor">#444444</color>
     <!-- ************************************************************************************* -->
 
     <!-- Add Device Activity ***************************************************************** -->
-    <color name="addDeviceListElementBackgroundColor">#FFBBBBBB</color>
-    <color name="addDeviceActivityContainerBackgroundColor">#FF888888</color>
+    <color name="addDeviceListElementBackgroundColor">#FF444444</color>
+    <color name="addDeviceActivityContainerBackgroundColor">#FF202020</color>
     <!-- ************************************************************************************* -->
 
     <!-- Manage and Edit UUID Activity ******************************************************* -->
-    <color name="uuidListSelectedItemColor">#FFCCCCCC</color>
-    <color name="manage_uuids_list_element_background_color">#FFCCCCCC</color>
-    <color name="manage_uuids_list_element_selected_background_color">#FFBBBBBB</color>
+    <color name="uuidListSelectedItemColor">#FF000000</color>
+    <color name="manage_uuids_list_element_background_color">#FF444444</color>
+    <color name="manage_uuids_list_element_selected_background_color">#FF555555</color>
     <!-- ************************************************************************************* -->
 
     <!-- Manage Binding Data Activity ******************************************************** -->
-    <color name="manageBindingDataActivityContainerBackgroundColor">#DD808080</color>
+    <color name="manageBindingDataActivityContainerBackgroundColor">#DD202020</color>
     <!-- ************************************************************************************* -->
 
     <!-- barGraph colors -->
@@ -124,7 +123,7 @@
     <color name="decent_bar_8_color">#FF7BC7CC</color>
 
     <!-- lineGraph colors -->
-    <color name="lineGraphLineColor">#FF00FF00</color> <!-- make this to gold accent color later!? -->
+    <color name="lineGraphLineColor">#FF00FF00</color> <!-- make this to gold accent color later! -->
     <color name="lineGraphAxisColor">#FFFFFFFF</color>
     <color name="lineGraphGridLineColor">#66FFFFFF</color>
     <color name="lineGraphErrorColor">#FFCC5555</color>
@@ -134,40 +133,40 @@
 
 </resources>
 
-<!--
+    <!--
 
-WASTE SECTION:
+    WASTE SECTION:
 
-    <color name="expectedBackground">#222222</color>
+        <color name="expectedBackground">#222222</color>
 
-    <color name="groupColor">#444444</color>
-    <color name="groupHeaderColor">#555555</color>
-    <color name="groupBottomSeparatorColor">#FF000000</color>
-    <color name="groupTopSeparatorColor">#FF000000</color>
-    <color name="propertyItemBottomSeparatorColor">#FF000000</color>
-
-
-    <color name="DMA_ItemSelectedColor">#222222</color>
-
-    <color name="TFS_ReachedColor">#222222</color>
-
-    <color name="grayAccentColor">#777777</color>
+        <color name="groupColor">#444444</color>
+        <color name="groupHeaderColor">#555555</color>
+        <color name="groupBottomSeparatorColor">#FF000000</color>
+        <color name="groupTopSeparatorColor">#FF000000</color>
+        <color name="propertyItemBottomSeparatorColor">#FF000000</color>
 
 
-    <color name="helpTopicBackground">#444444</color>
-    <color name="navigatorButtonBackground">#ffaa00</color>
+        <color name="DMA_ItemSelectedColor">#222222</color>
+
+        <color name="TFS_ReachedColor">#222222</color>
+
+        <color name="grayAccentColor">#777777</color>
 
 
-    <color name="unLockCtrlActivityPopupEditTextBackground">#555555</color>
+        <color name="helpTopicBackground">#444444</color>
+        <color name="navigatorButtonBackground">#ffaa00</color>
 
-    <color name="propertyListElementInGroupColor">#FF444444</color>
-    <color name="propertyListGroupBorderColor">#FF666666</color>
 
-    <color name="mainActivityPopUpMenuItemSelectedColor">#FF606060</color>
+        <color name="unLockCtrlActivityPopupEditTextBackground">#555555</color>
 
-    <color  name="deviceMainHeaderColor">#000000</color>
+        <color name="propertyListElementInGroupColor">#FF444444</color>
+        <color name="propertyListGroupBorderColor">#FF666666</color>
 
-    <color name="lineGraphGridValueTextColor">#FFFFFFFF</color>
-    <color name="lineGraphGridValueStyleTextColor">#AA27F05D</color>
+        <color name="mainActivityPopUpMenuItemSelectedColor">#FF606060</color>
 
--->
+        <color  name="deviceMainHeaderColor">#000000</color>
+
+        <color name="lineGraphGridValueTextColor">#FFFFFFFF</color>
+        <color name="lineGraphGridValueStyleTextColor">#AA27F05D</color>
+
+    -->

@@ -89,7 +89,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                         // if the index is lower than 2 -> mark all as readonly and notify user
                         saveButton.isEnabled = false
                         deleteButton.isEnabled = false
-                        notifyUser(getString(R.string.EditUUIDProfileActivityIsStaticProfileNotification), R.color.goldAccentColor)
+                        notifyUser(getString(R.string.EditUUIDProfileActivityIsStaticProfileNotification), R.color.mode_accent_color)
                     }
                     // set the text to the existing data and adapt the UI
                     val profile =

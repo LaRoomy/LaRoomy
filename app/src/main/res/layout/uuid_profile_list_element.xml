@@ -3,15 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
+    android:background="@drawable/manage_uuid_profiles_list_element_background"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="70dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="20dp"
-        app:srcCompat="@android:drawable/presence_invisible" />
+        app:srcCompat="@drawable/link_36dp" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/profileListItemProfileNameTextView"
@@ -19,7 +20,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="20sp"
-        android:textColor="@color/goldAccentColor"
+        android:textColor="@color/mode_accent_color"
         android:layout_marginStart="20dp"
         android:text="@string/uuidProfileListPlaceholder"
         android:layout_gravity="center_vertical"

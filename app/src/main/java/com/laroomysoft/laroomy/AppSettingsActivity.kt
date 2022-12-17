@@ -233,10 +233,10 @@ class AppSettingsActivity : AppCompatActivity() {
         findViewById<AppCompatImageView>(R.id.setupActivityShowLogButtonImage).apply {
             when(logActive){
                 true -> {
-                    setBackgroundResource(R.drawable.ic_complex_property_navigation_arrow)
+                    setImageResource(R.drawable.ic_general_navigation_arrow_48dp)
                 }
                 else -> {
-                    setBackgroundResource(R.drawable.ic_complex_property_disabled_navigation_arrow)
+                    setImageResource(R.drawable.ic_general_disable_navigation_arrow_48dp)
                 }
             }
         }

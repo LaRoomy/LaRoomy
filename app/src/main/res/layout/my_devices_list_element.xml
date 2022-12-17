@@ -13,7 +13,7 @@
         android:minWidth="64dp"
         android:id="@+id/myDevicesListElementImageView"
         android:contentDescription="@string/AvailableDeviceListImageDescription"
-        android:src="@drawable/ic_bluetooth_white_48dp"
+        android:src="@drawable/ic_bluetooth_48dp"
         android:layout_marginStart="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -71,7 +71,7 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
 
         internalBackNavigation = true
 
-        setListItemColor(index, R.color.uuidListSelectedItemColor)
+        setListItemBackgroundDrawable(index, R.drawable.manage_uuid_profiles_list_element_selected_background)
 
         val intent = Intent(this@ManageUUIDProfilesActivity, EditUUIDProfileActivity::class.java)
         intent.putExtra("activity-mode", "edit$index")
@@ -88,14 +88,14 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
 
     }
 
-    private fun setListItemColor(index: Int, colorID: Int){
+    private fun setListItemBackgroundDrawable(index: Int, resourceID: Int){
         val ll = this.uuidProfileListViewManager.findViewByPosition(index) as? LinearLayout
-        ll?.setBackgroundColor(getColor(colorID))
+        ll?.setBackgroundResource(resourceID)
     }
 
     private fun resetListItemColor(){
         for(x in 0 until uuidProfileListAdapter.itemCount){
-            setListItemColor(x, R.color.transparentViewColor)
+            setListItemBackgroundDrawable(x, R.drawable.manage_uuid_profiles_list_element_background)
         }
     }
 

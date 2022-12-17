@@ -29,7 +29,7 @@
                 android:minWidth="48dp"
                 android:background="@color/transparentColor"
                 android:layout_marginStart="10dp"
-                android:src="@drawable/ic_arrow_back_white_24dp"
+                android:src="@drawable/ic_arrow_back_24dp"
                 android:contentDescription="@string/GeneralBackButtonLabel"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -90,6 +90,7 @@
                 android:minHeight="48dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
+                android:checked="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityAutoConnectElementTextView"
@@ -151,13 +152,14 @@
                 android:id="@+id/setupActivitySavePropertiesSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivitySavePropertiesElementTextView"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DuplicateSpeakableTextCheck" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -217,7 +219,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityUUIDManagerButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
+                app:srcCompat="@drawable/ic_general_navigation_arrow_48dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -323,7 +325,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityShowLogButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
+                app:srcCompat="@drawable/ic_general_navigation_arrow_48dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -428,7 +430,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityBindingManagerButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
+                app:srcCompat="@drawable/ic_general_navigation_arrow_48dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -474,7 +476,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityResetDataButtonDescriptor"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_complex_property_navigation_arrow" />
+                app:srcCompat="@drawable/ic_general_navigation_arrow_48dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

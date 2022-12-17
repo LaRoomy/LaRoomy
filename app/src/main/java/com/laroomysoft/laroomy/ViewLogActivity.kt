@@ -130,7 +130,7 @@ class ViewLogActivity : AppCompatActivity() {
             } else {
                 notifyUser(
                     (applicationContext as ApplicationProperty).logRecordingTime,
-                    R.color.goldAccentColor
+                    R.color.mode_accent_color
                 )
             }
         } else {

@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -12,14 +12,30 @@
         <item name="android:textColorSecondary">@color/colorTextSecondary</item>
         <item name="android:textColorTertiary">@color/colorTextTertiary</item>
     </style>
+    <!-- **************************************************************************** -->
 
+<!--
+     Dark Mode application theme
+    <style name="darkTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="app_background_color">@color/global_background_color_dark</item>
+
+
+    </style>
+     ****************************************************************************
+-->
+
+    <!-- Splash theme style -->
     <style name="SplashTheme" parent="AppTheme">
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
+    <!-- **************************************************************************** -->
 
+    <!-- TODO: Splash theme dark ??? -->
+
+    <!-- Navigation animation styles -->
     <style name="sideSlidePopUpAnimationStyle">
         <item name="android:windowEnterAnimation">@anim/side_slide_popup_slide_in_animation</item>
         <item name="android:windowExitAnimation">@anim/side_slide_popup_slide_out_animation</item>
     </style>
-
+    <!-- **************************************************************************** -->
 </resources>

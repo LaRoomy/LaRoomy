@@ -16,7 +16,7 @@
         android:minHeight="48dp"
         android:contentDescription="@string/GeneralBackButtonLabel"
         android:background="@color/transparentColor"
-        android:src="@drawable/ic_arrow_back_white_24dp"
+        android:src="@drawable/ic_arrow_back_24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />

@@ -194,7 +194,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                     if (unlockControlState.unLocked) {
                         this.lockState = UC_STATE_UNLOCKED
                         this.lockUnlockImageView.setImageResource(R.drawable.uc_lock_128_unlocked)
-                        this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Unlocked))
+                        this.lockStatusTextView.setTextColor(getColor(R.color.unlock_ctrl_activity_status_text_color_unlocked))
                         this.lockStatusTextView.text =
                             getString(R.string.UnlockCtrl_ConditionText_Unlocked)
                         this.notifyUser(
@@ -204,7 +204,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                     } else {
                         this.lockState = UC_STATE_LOCKED
                         this.lockUnlockImageView.setImageResource(R.drawable.uc_lock_128_locked)
-                        this.lockStatusTextView.setTextColor(getColor(R.color.unLockCtrlActivityStatusTextColor_Locked))
+                        this.lockStatusTextView.setTextColor(getColor(R.color.unlock_ctrl_activity_status_text_color_locked))
                         this.lockStatusTextView.text =
                             getString(R.string.UnlockCtrl_ConditionText_Locked)
                         this.notifyUser("", R.color.normalTextColor)

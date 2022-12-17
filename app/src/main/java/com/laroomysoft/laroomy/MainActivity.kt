@@ -297,7 +297,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         // normalize controls on back navigation
         if (addButtonNormalizationRequired) {
             addButtonNormalizationRequired = false
-            addDeviceButton.setImageResource(R.drawable.ic_add_white_36dp)
+            addDeviceButton.setImageResource(R.drawable.ic_add_36dp)
         }
 
         // show or hide the no-content hint if the list is empty or not, but only if bluetooth is enabled, otherwise this must be displayed
