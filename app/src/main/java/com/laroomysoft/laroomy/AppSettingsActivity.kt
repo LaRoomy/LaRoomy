@@ -1,19 +1,23 @@
 package com.laroomysoft.laroomy
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.PopupWindow
+import android.widget.RadioButton
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.appcompat.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class AppSettingsActivity : AppCompatActivity() {
 
+    private lateinit var rootContainer: ConstraintLayout
     private lateinit var autoConnectSwitch: SwitchCompat
     private lateinit var savePropertiesSwitch: SwitchCompat
     private lateinit var enableLogSwitch: SwitchCompat
@@ -23,12 +27,18 @@ class AppSettingsActivity : AppCompatActivity() {
     private lateinit var showLogButton: ConstraintLayout
     private lateinit var resetAppButton: ConstraintLayout
     private lateinit var bindingManagerButton: ConstraintLayout
+    private lateinit var designSelectionButton: ConstraintLayout
+    private lateinit var popUpWindow: PopupWindow
 
     private var buttonNormalizationRequired = false
+    private var preventPopUpDoubleExecution = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_settings)
+        
+        // get the root container
+        this.rootContainer = findViewById(R.id.setupActivityRootContainer)
         
         // register onBackPressed event
         this.onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true){
@@ -41,6 +51,27 @@ class AppSettingsActivity : AppCompatActivity() {
         this.backButton = findViewById<AppCompatImageButton?>(R.id.setupActivityBackButton).apply {
             setOnClickListener {
                 handleBackEvent()
+            }
+        }
+        
+        // get design button and add functionality
+        this.designSelectionButton = findViewById<ConstraintLayout?>(R.id.setupActivityDesignSelectionContainer).apply {
+            setOnClickListener {
+                onChangeDesignButtonClick(it)
+            }
+            val designDefaultValue = getString(R.string.DefaultValue_DesignSelection)
+            val currentDesign = (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DesignSelection, designDefaultValue)
+            if(currentDesign != designDefaultValue) {
+    
+                this.findViewById<AppCompatTextView>(R.id.setupActivityDesignSelectionValueDisplay)
+                    .apply {
+                        text = if (currentDesign == "light") {
+                            getString(R.string.SetupActivity_Design_Light)
+                        } else {
+                            // currentDesign == "dark"
+                            getString(R.string.SetupActivity_Design_Dark)
+                        }
+                    }
             }
         }
         
@@ -174,9 +205,20 @@ class AppSettingsActivity : AppCompatActivity() {
             }
             // normalize showLog-Button
             showLogButton.apply {
-                setBackgroundColor(
-                    getColor(R.color.setupActivityButtonNormalBackground)
-                )
+                val state =
+                    (applicationContext as ApplicationProperty).loadBooleanData(
+                        R.string.FileKey_AppSettings,
+                        R.string.DataKey_EnableLog
+                    )
+                if(state) {
+                    setBackgroundColor(
+                        getColor(R.color.setupActivityButtonNormalBackground)
+                    )
+                } else {
+                    setBackgroundColor(
+                        getColor(R.color.setupActivityButtonDisabledBackground)
+                    )
+                }
             }
             // normalize binding-manager-Button
             bindingManagerButton.apply {
@@ -239,6 +281,115 @@ class AppSettingsActivity : AppCompatActivity() {
                     setImageResource(R.drawable.ic_general_disable_navigation_arrow_48dp)
                 }
             }
+        }
+    }
+    
+    @SuppressLint("InflateParams")
+    private fun onChangeDesignButtonClick(view: View){
+        
+        if(this.preventPopUpDoubleExecution){
+            return
+        } else {
+            val currentDesign = (applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DesignSelection, getString(R.string.DefaultValue_DesignSelection))
+    
+            (view as ConstraintLayout).apply {
+                setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
+            }
+            // prevent double execution
+            this.preventPopUpDoubleExecution = true
+            // shade the background
+            this.rootContainer.alpha = 0.2f
+    
+            // create popUp
+            val layoutInflater =
+                getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            
+            val popUpView =
+                layoutInflater.inflate(R.layout.setup_activity_design_selection_popup, null)
+    
+            this.popUpWindow =
+                PopupWindow(
+                    popUpView,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    true
+                )
+    
+            // add light radio button functionality
+            popUpView.findViewById<RadioButton>(R.id.setupActivity_DesignPopUpRadioButton_Light).apply {
+                if(currentDesign == "light"){
+                    this.isChecked = true
+                }
+                this.setOnClickListener {
+                    (applicationContext as ApplicationProperty).saveStringData("light", R.string.FileKey_AppSettings, R.string.DataKey_DesignSelection)
+                    setDefaultNightMode(MODE_NIGHT_NO)
+                    designSelectionButton.findViewById<AppCompatTextView>(R.id.setupActivityDesignSelectionValueDisplay)
+                        .apply {
+                            text = getString(R.string.SetupActivity_Design_Light)
+                        }
+                    popUpWindow.apply {
+                        dismiss()
+                    }
+                }
+            }
+            // add dark radio button functionality
+            popUpView.findViewById<RadioButton>(R.id.setupActivity_DesignPopUpRadioButton_Dark).apply {
+                if(currentDesign == "dark"){
+                    this.isChecked = true
+                }
+                this.setOnClickListener {
+                    (applicationContext as ApplicationProperty).saveStringData("dark", R.string.FileKey_AppSettings, R.string.DataKey_DesignSelection)
+                    setDefaultNightMode(MODE_NIGHT_YES)
+                    designSelectionButton.findViewById<AppCompatTextView>(R.id.setupActivityDesignSelectionValueDisplay)
+                        .apply {
+                            text = getString(R.string.SetupActivity_Design_Dark)
+                        }
+                    popUpWindow.apply {
+                        dismiss()
+                    }
+                }
+            }
+            // add system default radio button functionality
+            popUpView.findViewById<RadioButton>(R.id.setupActivity_DesignPopUpRadioButton_SystemDefault).apply {
+                if(currentDesign == getString(R.string.DefaultValue_DesignSelection)){
+                    this.isChecked = true
+                }
+                this.setOnClickListener {
+                    (applicationContext as ApplicationProperty).saveStringData(getString(R.string.DefaultValue_DesignSelection), R.string.FileKey_AppSettings, R.string.DataKey_DesignSelection)
+                    setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+                    designSelectionButton.findViewById<AppCompatTextView>(R.id.setupActivityDesignSelectionValueDisplay)
+                        .apply {
+                            text = getString(R.string.SetupActivity_Design_SystemDefault)
+                        }
+                    popUpWindow.apply {
+                        dismiss()
+                    }
+                }
+            }
+            // add cancel button functionality
+            popUpView.findViewById<AppCompatButton>(R.id.setupActivity_DesignPopUp_CancelButton).apply {
+                this.setOnClickListener {
+                    popUpWindow.apply {
+                        dismiss()
+                    }
+                }
+            }
+            
+            // set dismiss listener
+            this.popUpWindow.setOnDismissListener {
+                
+                // reset the background of the design button (constraint layout)
+                designSelectionButton.setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+                
+                // reset other control params
+                this.preventPopUpDoubleExecution = false
+                
+                // normalize the background
+                this.rootContainer.alpha = 1.0f
+            }
+            
+            // at last show the popUp centered
+            this.popUpWindow.showAtLocation(designSelectionButton, Gravity.CENTER, 0,0)
         }
     }
 

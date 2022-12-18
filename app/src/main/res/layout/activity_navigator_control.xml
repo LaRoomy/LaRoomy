@@ -86,10 +86,11 @@
                     android:clickable="true"
                     android:contentDescription="@string/NavigatorControlActivityUpButtonContentDescription"
                     android:focusable="true"
-                    android:src="@drawable/navbutton_up_image"
+                    android:src="@drawable/navigator_up_button_image_selector"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ImageContrastCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -111,7 +112,7 @@
                     android:clickable="true"
                     android:contentDescription="@string/NavigatorControlActivityLeftButtonContentDescription"
                     android:focusable="true"
-                    android:src="@drawable/navbutton_left_image"
+                    android:src="@drawable/navigator_left_button_image_selector"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -126,7 +127,7 @@
                     android:clickable="true"
                     android:contentDescription="@string/NavigatorControlActivityOkButtonContentDescription"
                     android:focusable="true"
-                    android:src="@drawable/navbutton_mid_image"
+                    android:src="@drawable/navigator_mid_button_image_selector"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/navConNavigateLeftButton"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -141,11 +142,12 @@
                     android:clickable="true"
                     android:contentDescription="@string/NavigatorControlActivityRightButtonContentDescription"
                     android:focusable="true"
-                    android:src="@drawable/navbutton_right_image"
+                    android:src="@drawable/navigator_right_button_image_selector"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/navConNavigateMiddleButton"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ImageContrastCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -166,7 +168,7 @@
                     android:clickable="true"
                     android:contentDescription="@string/NavigatorControlActivityDownButtonContentDescription"
                     android:focusable="true"
-                    android:src="@drawable/navbutton_down_image"
+                    android:src="@drawable/navigator_down_button_image_selector"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />

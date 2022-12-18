@@ -26,7 +26,7 @@
     <color name="connectedTextColor">#88FFAA</color>
     <color name="connectingTextColor">#AAAA00</color>
     <color name="clickableTextColor">#00C1F1</color>
-    <color name="fullWhiteTextColor">#FFFFFFFF</color>
+    <color name="max_contrast_text_color">#FFFFFFFF</color>
     <!-- ************************************************************************************* -->
 
     <!-- Default Control Colors ************************************************************** -->
@@ -40,17 +40,17 @@
     <color name="transparentColor">#00000000</color>
     <color name="transparentViewColor">#00FFFFFF</color>
     <color name="mode_accent_color">#F5CD06</color>
-    <color name="yellowAccentColor">#FFF6D82E</color>
+    <color name="app_help_activity_text_important_color">#FFF6D82E</color>
     <color name="pureWhite">#FFFFFFFF</color>
+    <color name="swipe_to_delete_item_color">#FFF44336</color>
     <!-- ************************************************************************************* -->
 
     <!-- Main Activity *********************************************************************** -->
     <color name="myDevicesListElementBackgroundColor">#FF444444</color>
     <color name="myDevicesListElementSelectedBackgroundColor">#FF555555</color>
-    <color name="myDevicesListDeleteElementColor">#FFF44336</color>
 
     <color name="mainActivityPopUpFlyoutBackgroundColor">#FF505050</color>
-    <color name="mainActivityPopUpFlyoutSeparatorColor">#FF606060</color>
+    <color name="pop_up_flyout_separator_background">#FF606060</color>
     <color name="mainActivityPopUpMenuItemSelectedColor">#FF606060</color>
     <!-- ************************************************************************************* -->
 
@@ -69,6 +69,7 @@
     <color name="setupActivityButtonNormalBackground">#FF111111</color>
     <color name="setupActivityButtonDisabledBackground">#FF222222</color>
     <color name="setupActivityButtonPressedBackground">#FF333333</color>
+    <color name="setup_activity_popup_background_color">#FF222222</color>
     <!-- ************************************************************************************* -->
 
     <!-- Information Activity **************************************************************** -->
@@ -88,7 +89,11 @@
     <color name="unlock_ctrl_activity_num_pad_other_button_color">#FF444444</color>
     <!-- ************************************************************************************* -->
 
+    <!-- ExLevel Selector Activity *********************************************************** -->
     <color name="extendedLevelSelectorActivitySliderBackgroundColor">#FF666666</color>
+    <color name="extendedLevelSelectorBubbleColor">#FFF5CD06</color>
+    <color name="extendedLevelSelectorSliderTextColor">#FF000000</color>
+    <!-- ************************************************************************************* -->
 
     <!-- View Log Activity ******************************************************************* -->
     <color name="viewLogActivityToolPanelBackgroundColor">#ee111111</color>
@@ -108,6 +113,11 @@
 
     <!-- Manage Binding Data Activity ******************************************************** -->
     <color name="manageBindingDataActivityContainerBackgroundColor">#DD202020</color>
+    <!-- ************************************************************************************* -->
+
+    <!-- Navigator Control Activity ********************************************************** -->
+    <color name="navigator_normal_arrow_color">#FFFFFFFF</color>
+    <color name="navigator_pressed_arrow_color">#FF00C1F1</color>
     <!-- ************************************************************************************* -->
 
     <!-- barGraph colors -->

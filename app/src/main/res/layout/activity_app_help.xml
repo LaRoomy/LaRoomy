@@ -92,7 +92,7 @@
                     android:id="@+id/appHelpActivityTheConceptShortExplainedImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    android:src="@drawable/ic_expand_arrow_right_32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -182,7 +182,7 @@
                     android:id="@+id/appHelpActivityConnectDeviceExpandImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    android:src="@drawable/ic_expand_arrow_right_32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -252,7 +252,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="@string/AppHelpActivity_Topic_ConnectDevice_BondingHint"
-                    android:textColor="@color/yellowAccentColor"
+                    android:textColor="@color/app_help_activity_text_important_color"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicImportantHintTextSize"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/appHelpActivityConnectDeviceP3" />
@@ -314,7 +314,7 @@
                     android:id="@+id/appHelpActivityDeviceBindingExpandImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    android:src="@drawable/ic_expand_arrow_right_32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -480,7 +480,7 @@
                     android:id="@+id/appHelpActivityConnectionProcessImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    android:src="@drawable/ic_expand_arrow_right_32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -580,7 +580,7 @@
                     android:id="@+id/appHelpActivityUUIDProfilesImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    android:src="@drawable/ic_expand_arrow_right_32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -670,7 +670,7 @@
                     android:id="@+id/appHelpActivityAppResetImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_expand_arrow_right_sq32_vect"
+                    android:src="@drawable/ic_expand_arrow_right_32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -720,7 +720,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:paddingBottom="15dp"
-                    android:textColor="@color/yellowAccentColor"
+                    android:textColor="@color/app_help_activity_text_important_color"
                     android:text="@string/AppHelpActivity_Topic_AppReset_P2"
                     android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                     app:layout_constraintStart_toStartOf="parent"

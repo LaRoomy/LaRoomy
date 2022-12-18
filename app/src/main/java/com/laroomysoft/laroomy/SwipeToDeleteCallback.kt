@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete_white_36dp)
+    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete_36dp)
     private val intrinsicWidth = deleteIcon?.intrinsicWidth
     private val intrinsicHeight = deleteIcon?.intrinsicHeight
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
@@ -91,6 +91,6 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
 
     private val itemPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         this.style = Paint.Style.FILL
-        this.color = context.getColor(R.color.myDevicesListDeleteElementColor)
+        this.color = context.getColor(R.color.swipe_to_delete_item_color)
     }
 }

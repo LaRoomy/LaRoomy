@@ -157,7 +157,29 @@ class ApplicationProperty : Application() {
         )
         return data ?: ""
     }
-
+    
+    fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int, defaultValue: String) : String {
+        
+        if(verboseLog) {
+            Log.d(
+                "M:LoadSavedStringData",
+                "Loading String-Data. FileKey: ${getString(fileKeyID)} / DataKey: ${
+                    getString(dataKeyID)
+                }"
+            )
+        }
+        
+        val sharedPref = getSharedPreferences(
+            getString(fileKeyID),
+            Context.MODE_PRIVATE)
+        val data = sharedPref.getString(
+            getString(dataKeyID),
+            defaultValue
+        )
+        return data ?: defaultValue
+    }
+    
+    
     fun saveStringData(data: String, fileKeyID: Int, dataKeyID: Int){
 
         if(verboseLog) {

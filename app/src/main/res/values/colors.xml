@@ -12,11 +12,11 @@
 
     <!-- Notification Colors ***************************************************************** -->
     <color name="ErrorColor">#FFFF0000</color>
-    <color name="WarningColor">#FF9E9833</color>
+    <color name="WarningColor">#FF8A3C04</color>
     <color name="InfoColor">#FF000000</color>
     <color name="errorLightColor">#FFAA2222</color>
-    <color name="warningLightColor">#FFCC8808</color>
-    <color name="successLightColor">#FF6CA378</color>
+    <color name="warningLightColor">#FF8A3C04</color>
+    <color name="successLightColor">#FF057304</color>
     <!-- ************************************************************************************* -->
 
     <!-- Text Colors ************************************************************************* -->
@@ -24,16 +24,16 @@
     <color name="disabledTextColor">#FF555555</color>
     <color name="selectedTextColor">#FF16354D</color>
     <color name="disconnectedTextColor">#FFBB3333</color>
-    <color name="connectedTextColor">#FF6CA378</color>
-    <color name="connectingTextColor">#AAAA00</color>
-    <color name="clickableTextColor">#00C1F1</color>
-    <color name="fullWhiteTextColor">#FF000000</color>
+    <color name="connectedTextColor">#FF057304</color>
+    <color name="connectingTextColor">#FF4A4704</color>
+    <color name="clickableTextColor">#009BC2</color>
+    <color name="max_contrast_text_color">#FF000000</color>
     <!-- ************************************************************************************* -->
 
     <!-- Default Control Colors ************************************************************** -->
     <color name="generalButtonBackgroundColor">#FFDDDDDD</color>
     <color name="separatorColor">#777777</color>
-    <color name="complexPropertyPanelBackgroundColor">#FF222222</color>
+    <color name="complexPropertyPanelBackgroundColor">#FFCCCCCC</color>
     <!-- ************************************************************************************* -->
 
     <!-- Decoration and Helper Colors ******************************************************** -->
@@ -41,41 +41,46 @@
     <color name="transparentColor">#00000000</color>
     <color name="transparentViewColor">#00FFFFFF</color>
     <color name="mode_accent_color">#FF16354D</color>
-    <color name="yellowAccentColor">#FFF6D82E</color>
     <color name="pureWhite">#FF000000</color>
+    <color name="swipe_to_delete_item_color">#FFDE0A00</color>
     <!-- ************************************************************************************* -->
 
     <!-- Main Activity *********************************************************************** -->
-    <color name="myDevicesListElementBackgroundColor">#FF888888</color>
-    <color name="myDevicesListElementSelectedBackgroundColor">#FF999999</color>
-    <color name="myDevicesListDeleteElementColor">#FFA1130C</color>
+    <color name="myDevicesListElementBackgroundColor">#FFCCCCCC</color>
+    <color name="myDevicesListElementSelectedBackgroundColor">#FFBBBBBB</color>
 
     <color name="mainActivityPopUpFlyoutBackgroundColor">#FFDDDDDD</color>
-    <color name="mainActivityPopUpFlyoutSeparatorColor">#FF909090</color>
+    <color name="pop_up_flyout_separator_background">#FF909090</color>
     <color name="mainActivityPopUpMenuItemSelectedColor">#FF909090</color>
     <!-- ************************************************************************************* -->
 
     <!-- Device Main Activity **************************************************************** -->
-    <color name="deviceMainActivityUserNotificationHeaderBackgroundColor">#FF404040</color>
-    <color name="deviceMainActivityPopUpBackgroundColor">#FF505050</color>
-    <color name="propertyListElementBackgroundColor">#FF444444</color>
-    <color name="propertyListGroupHeaderBackgroundColor">#FF404040</color>
-    <color name="propertyListGroupBackgroundColor">#FF404040</color>
-    <color name="propertyListElementSelectedBackgroundColor">#FF555555</color>
-    <color name="propertyListElementNavImageDisabledBackground">#FF888888</color>
-    <color name="propertyListElementSeparatorColor">#FF555555</color>
+    <color name="deviceMainActivityUserNotificationHeaderBackgroundColor">#FFBBBBBB</color>
+    <color name="deviceMainActivityPopUpBackgroundColor">#FFDDDDDD</color>
+    <color name="propertyListElementBackgroundColor">#FFC0C0C0</color>
+    <color name="propertyListGroupHeaderBackgroundColor">#CCCCCC</color>
+    <color name="propertyListGroupBackgroundColor">#FFCCCCCC</color>
+    <color name="propertyListElementSelectedBackgroundColor">#FF999999</color>
+    <color name="propertyListElementNavImageDisabledBackground">#FF666666</color>
+    <color name="propertyListElementSeparatorColor">#FF999999</color>
     <!-- ************************************************************************************* -->
 
     <!-- Settings Activity ****************************************************************** -->
     <color name="setupActivityButtonNormalBackground">#FFCCCCCC</color>
     <color name="setupActivityButtonDisabledBackground">#FF888888</color>
     <color name="setupActivityButtonPressedBackground">#FFBBBBBB</color>
+    <color name="setup_activity_popup_background_color">#FFDDDDDD</color>
     <!-- ************************************************************************************* -->
 
     <!-- Information Activity **************************************************************** -->
     <color name="info_activity_header_background_color">#FF666666</color>
     <color name="info_activity_text_color">#FF16354D</color>
     <!-- ************************************************************************************* -->
+
+    <!-- Information Activity **************************************************************** -->
+    <color name="app_help_activity_text_important_color">#FF9C1D54</color>
+    <!-- ************************************************************************************* -->
+
 
     <!-- RGB Selector Activity *************************************************************** -->
     <color name="RGB_SelectedButtonColor">#444444</color>
@@ -89,11 +94,15 @@
     <color name="unlock_ctrl_activity_num_pad_other_button_color">#FF444444</color>
     <!-- ************************************************************************************* -->
 
-    <color name="extendedLevelSelectorActivitySliderBackgroundColor">#FF666666</color>
+    <!-- ExLevel Selector Activity *********************************************************** -->
+    <color name="extendedLevelSelectorActivitySliderBackgroundColor">#FF999999</color>
+    <color name="extendedLevelSelectorBubbleColor">#FFF5CD06</color>
+    <color name="extendedLevelSelectorSliderTextColor">#FF000000</color>
+    <!-- ************************************************************************************* -->
 
     <!-- View Log Activity ******************************************************************* -->
-    <color name="viewLogActivityToolPanelBackgroundColor">#ee666666</color>
-    <color name="viewLogActivityToolPanelSeparatorColor">#FF777777</color>
+    <color name="viewLogActivityToolPanelBackgroundColor">#ee777777</color>
+    <color name="viewLogActivityToolPanelSeparatorColor">#FF888888</color>
     <!-- ************************************************************************************* -->
 
     <!-- Add Device Activity ***************************************************************** -->
@@ -110,6 +119,12 @@
     <!-- Manage Binding Data Activity ******************************************************** -->
     <color name="manageBindingDataActivityContainerBackgroundColor">#DD808080</color>
     <!-- ************************************************************************************* -->
+
+    <!-- Navigator Control Activity ********************************************************** -->
+    <color name="navigator_normal_arrow_color">#FF000000</color>
+    <color name="navigator_pressed_arrow_color">#FF00C1F1</color>
+    <!-- ************************************************************************************* -->
+
 
     <!-- barGraph colors -->
     <color name="barGraphGridLineColor">#FFFFFFFF</color>

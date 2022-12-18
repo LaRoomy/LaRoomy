@@ -24,7 +24,7 @@
         android:text="@string/UniversalPlaceholderName"
         android:textSize="18sp"
         android:layout_marginStart="10dp"
-        android:textColor="@color/fullWhiteTextColor"
+        android:textColor="@color/max_contrast_text_color"
         android:textAlignment="viewStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"

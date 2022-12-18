@@ -186,6 +186,13 @@
     <string name="SetupActivity_KeepScreenActiveElementText">Bildschirm aktiv halten</string>
     <string name="SetupActivity_KeepScreenActiveHint">Verhindert den Stromsparmodus wenn das Gerät verbunden ist.</string>
     <string name="SetupActivity_BindingManagerButtonText">Bindungsdaten verwalten</string>
+    <string name="SetupActivity_DesignSelectionDescriptorText">Design</string>
+    <string name="SetupActivity_Design_Light">Hell</string>
+    <string name="SetupActivity_Design_Dark">Dunkel</string>
+    <string name="SetupActivity_Design_SystemDefault">Systemstandard</string>
+    <string name="SetupActivity_DesignSelectionPopUpHeaderText">Design auswählen</string>
+
+
 
     <string name="BindingManagerActivity_HeaderText">Bindungsdaten verwalten</string>
     <string name="BindingManagerActivity_BindingTypeAsOriginator">Urheber</string>

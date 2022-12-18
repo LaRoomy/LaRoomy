@@ -6,8 +6,8 @@
         android:right="5dp"
         android:top="5dp">
         <shape>
-            <solid android:color="@color/mainActivityPopUpFlyoutBackgroundColor" />
-            <corners android:radius="10dp" />
+            <solid android:color="@color/setup_activity_popup_background_color" />
+            <corners android:radius="16dp" />
             <padding
                 android:bottom="0dp"
                 android:left="0dp"

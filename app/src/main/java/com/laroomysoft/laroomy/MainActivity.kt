@@ -20,6 +20,9 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
@@ -102,6 +105,21 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     private var isBluetoothEnabled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // first check if the design was overridden by the user and change it if necessary
+        val userDesignSelection = (applicationContext as ApplicationProperty).loadSavedStringData(
+            R.string.FileKey_AppSettings,
+            R.string.DataKey_DesignSelection,
+            getString(R.string.DefaultValue_DesignSelection)
+        )
+        if (userDesignSelection != getString(R.string.DefaultValue_DesignSelection)) {
+            if (userDesignSelection == "light") {
+                AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
+            } else {
+                // userDesignSelection == "dark"
+                AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
+            }
+        }
+        // do system initialization
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -329,7 +347,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         if(!preventListSelection) {
             setItemColors(
                 index,
-                R.color.fullWhiteTextColor,
+                R.color.max_contrast_text_color,
                 R.drawable.my_devices_list_element_selected_background
             )
 
@@ -455,7 +473,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     private fun resetSelectionInDeviceListView(){
         for(x in 0 until this.availableDevices.size){
-            setItemColors(x, R.color.fullWhiteTextColor, R.drawable.my_devices_list_element_background)
+            setItemColors(x, R.color.max_contrast_text_color, R.drawable.my_devices_list_element_background)
         }
     }
 

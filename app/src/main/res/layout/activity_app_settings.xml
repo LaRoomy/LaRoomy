@@ -9,32 +9,31 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/setupActivityRootContainer"
         android:paddingBottom="100dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/setupActivityHeaderContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/setupActivityHeaderContainer"
             android:orientation="horizontal"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            >
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/setupActivityBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/setupActivityBackButton"
-                android:minHeight="48dp"
-                android:minWidth="48dp"
-                android:background="@color/transparentColor"
                 android:layout_marginStart="10dp"
-                android:src="@drawable/ic_arrow_back_24dp"
+                android:background="@color/transparentColor"
                 android:contentDescription="@string/GeneralBackButtonLabel"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:src="@drawable/ic_arrow_back_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/setupActivityHeaderTextView"
@@ -43,8 +42,8 @@
                 android:text="@string/SetupActivity_Header"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -87,10 +86,9 @@
                 android:id="@+id/setupActivityAutoConnectSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
-                android:checked="true"
+                android:layout_marginEnd="20dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityAutoConnectElementTextView"
@@ -117,14 +115,57 @@
             android:id="@+id/setupActivityFirstSeparatorView"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
             android:background="@color/separatorColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectHintTextView" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/setupActivityDesignSelectionContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/setupActivityButtonNormalBackground"
+            android:minHeight="60dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/setupActivityFirstSeparatorView">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityDesignDescriptorTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="@string/SetupActivity_DesignSelectionDescriptorText"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityDesignSelectionValueDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:text="@string/SetupActivity_Design_SystemDefault"
+                android:textColor="@color/mode_accent_color"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/setupActivityOnePoint5SeparatorView"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityDesignSelectionContainer" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setupActivitySavePropertiesContainer"
@@ -134,7 +175,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityFirstSeparatorView">
+            app:layout_constraintTop_toBottomOf="@id/setupActivityOnePoint5SeparatorView">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/setupActivitySavePropertiesElementTextView"
@@ -258,9 +299,9 @@
                 android:id="@+id/setupActivityEnableLoggingSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityEnableLoggingTextView"
@@ -364,9 +405,9 @@
                 android:id="@+id/setupActivityKeepScreenActiveSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityKeepScreenActiveTextView"

@@ -117,7 +117,7 @@
             android:gravity="center"
             android:singleLine="false"
             android:text="@string/MA_NoContentUserHintText"
-            android:textColor="@color/fullWhiteTextColor"
+            android:textColor="@color/max_contrast_text_color"
             android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
