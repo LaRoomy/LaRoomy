@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+    
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
         (applicationContext as ApplicationProperty).addedDevices = AddedDevices(applicationContext)
 

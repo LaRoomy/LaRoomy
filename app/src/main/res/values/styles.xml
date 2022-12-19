@@ -14,16 +14,6 @@
     </style>
     <!-- **************************************************************************** -->
 
-<!--
-     Dark Mode application theme
-    <style name="darkTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="app_background_color">@color/global_background_color_dark</item>
-
-
-    </style>
-     ****************************************************************************
--->
-
     <!-- Splash theme style -->
     <style name="SplashTheme" parent="AppTheme">
         <item name="android:windowBackground">@drawable/splash_screen</item>

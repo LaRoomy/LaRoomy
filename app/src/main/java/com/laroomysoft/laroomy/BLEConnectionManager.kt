@@ -953,7 +953,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         // make sure the element is a property element,
                             // -> otherwise the internal element index of a group could be used, and this is an invalid operation
                     devicePropertyListContentInformation.simplePropertyState = newState
-                    devicePropertyListContentInformation.update(applicationProperty.applicationContext)
+                    devicePropertyListContentInformation.update(applicationProperty.cViewContext)
                     uiChangeIndex = index
                     return@forEachIndexed
                 }
@@ -2552,12 +2552,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             if(addInALoop){
                                 tempList.elementAt(globalIndex - 1).apply {
                                     isLastInGroup = true
-                                    update(applicationProperty.applicationContext)
+                                    update(applicationProperty.cViewContext)
                                 }
                             } else {
                                 this.uIAdapterList.elementAt(globalIndex - 1).apply {
                                     isLastInGroup = true
-                                    update(applicationProperty.applicationContext)
+                                    update(applicationProperty.cViewContext)
                                 }
 //                                this.uIAdapterList.elementAt(globalIndex - 1).isLastInGroup = true
 //                                this.uIAdapterList.elementAt(globalIndex - 1)
@@ -2584,7 +2584,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 dpl.globalIndex = globalIndex
                                 globalIndex++
                                 // generate internal data and resources
-                                dpl.update(applicationProperty.applicationContext)
+                                dpl.update(applicationProperty.cViewContext)
                                 // add the group to the list
                                 if(addInALoop){
                                     tempList.add(dpl)
@@ -2612,7 +2612,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyEntry.globalIndex = globalIndex
                         globalIndex++
                         // generate internal data and resources
-                        propertyEntry.update(applicationProperty.applicationContext)
+                        propertyEntry.update(applicationProperty.cViewContext)
                         // add it to the list
                         if(addInALoop){
                             tempList.add(propertyEntry)
@@ -2629,13 +2629,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 tempList.elementAt(globalIndex - 1)
                                     .apply {
                                         this.isLastInGroup = true
-                                        this.update(applicationProperty.applicationContext)
+                                        this.update(applicationProperty.cViewContext)
                                     }
                             } else {
                                 this.uIAdapterList.elementAt(globalIndex - 1)
                                     .apply {
                                         this.isLastInGroup = true
-                                        this.update(applicationProperty.applicationContext)
+                                        this.update(applicationProperty.cViewContext)
                                     }
                             }
                             return@forEachIndexed // TODO: check if this will work!!!
@@ -2653,13 +2653,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 tempList.elementAt(globalIndex - 1)
                                     .apply {
                                         this.isLastInGroup = true
-                                        this.update(applicationProperty.applicationContext)
+                                        this.update(applicationProperty.cViewContext)
                                     }
                             } else {
                                 this.uIAdapterList.elementAt(globalIndex - 1)
                                     .apply {
                                         this.isLastInGroup = true
-                                        this.update(applicationProperty.applicationContext)
+                                        this.update(applicationProperty.cViewContext)
                                     }
                             }
                         }
@@ -2676,7 +2676,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         propertyEntry.globalIndex = globalIndex
                         globalIndex++
                         // generate internal data and resources
-                        propertyEntry.update(applicationProperty.applicationContext)
+                        propertyEntry.update(applicationProperty.cViewContext)
                         // add it to the list
                         if(addInALoop){
                             tempList.add(propertyEntry)
@@ -3059,7 +3059,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.simplePropertyState = laRoomyDeviceProperty.propertyState
 
                 // update the internal generated parameter and resources
-                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
+                devicePropertyListContentInformation.update(applicationProperty.cViewContext)
 
                 if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
                     applicationProperty.uiAdapterChanged = true
@@ -3082,7 +3082,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 devicePropertyListContentInformation.imageID = laRoomyDevicePropertyGroup.imageID
 
                 // update the internal generated parameter and resources
-                devicePropertyListContentInformation.update(applicationProperty.applicationContext)
+                devicePropertyListContentInformation.update(applicationProperty.cViewContext)
 
                 if(propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
                     applicationProperty.uiAdapterChanged = true
@@ -3232,7 +3232,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 uIElementContentInformation.isLastInGroup = true
             }
             // generate internal object resources
-            uIElementContentInformation.update(applicationProperty.applicationContext)
+            uIElementContentInformation.update(applicationProperty.cViewContext)
 
             // find the index to insert
             var uIIndexToInsert = -1

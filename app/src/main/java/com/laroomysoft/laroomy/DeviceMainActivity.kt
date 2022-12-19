@@ -145,6 +145,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     layoutManager = devicePropertyListLayoutManager
                     adapter = devicePropertyListViewAdapter
                     itemAnimator = DevicePropertyListItemAnimator()
+                    
+                    // save context to application property
+                    (applicationContext as ApplicationProperty).cViewContext = this.context
                 }
     }
 
@@ -621,7 +624,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
                         .apply {
                             this.simplePropertyState = newVal
-                            this.update(applicationContext)
+                            this.update(devicePropertyListRecyclerView.context)
                         }
                     devicePropertyListViewAdapter.notifyItemChanged(index)
                     
@@ -711,7 +714,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
                 .apply {
                     this.simplePropertyState = bitValue
-                    this.update(applicationContext)
+                    this.update(devicePropertyListRecyclerView.context)
                 }
             this.devicePropertyListViewAdapter.notifyItemChanged(index)
             
@@ -1268,7 +1271,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         // check if the internal parameter and resources are generated
         if(!item.isAccessible){
             // if not -> update it
-            item.update(applicationContext)
+            item.update(devicePropertyListRecyclerView.context)
         }
 
 //        if(item.globalIndex == -1){
@@ -1345,7 +1348,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
             .apply {
                 if (!this.isAccessible) {
-                    this.update(applicationContext)
+                    this.update(devicePropertyListRecyclerView.context)
                 }
             }
         // apply changes to list

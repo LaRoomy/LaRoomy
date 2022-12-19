@@ -91,6 +91,8 @@ class ApplicationProperty : Application() {
 
     var connectionLog = ArrayList<String>()
     var logRecordingTime = ""
+    
+    lateinit var cViewContext: Context
 
     override fun onCreate() {
         super.onCreate()

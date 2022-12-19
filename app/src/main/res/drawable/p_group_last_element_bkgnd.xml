@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list
     xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:top="-2dp"
         android:bottom="2dp"
         android:left="4dp"
         android:right="4dp" >
         <shape android:shape="rectangle">
-            <!--<stroke android:color="@color/propertyListGroupBorderColor" android:width="1dp"/>-->
             <solid android:color="@color/propertyListGroupBackgroundColor"/>
             <corners
                 android:bottomLeftRadius="10dp"
@@ -25,35 +23,4 @@
             <solid android:color="@color/propertyListElementSeparatorColor"/>
         </shape>
     </item>
-
-    <!--
-        <item
-            android:left="30dp"
-            android:right="30dp"
-            android:top="6dp"
-
-            >
-            <shape android:shape="line">
-                <stroke
-                    android:color="@color/propertyListElementSeparatorColor"
-                    android:width="1dp"/>
-
-
-            </shape>
-        </item>
-    -->
-
-    <!--
-        <item
-            android:top="6dp"
-            android:bottom="6dp"
-            android:left="10dp"
-            android:right="10dp" >
-            <shape android:shape="rectangle">
-                <solid android:color="@color/propertyListElementInGroupColor"/>
-                <corners android:radius="10dp"/>
-            </shape>
-        </item>
-    -->
-
 </layer-list>

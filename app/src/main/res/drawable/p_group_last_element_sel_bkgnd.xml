@@ -7,7 +7,6 @@
         android:left="4dp"
         android:right="4dp" >
         <shape android:shape="rectangle">
-            <!--<stroke android:color="@color/propertyListGroupBorderColor" android:width="1dp"/>-->
             <solid android:color="@color/propertyListGroupBackgroundColor"/>
             <corners
                 android:bottomLeftRadius="10dp"

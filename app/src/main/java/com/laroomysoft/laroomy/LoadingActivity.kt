@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.github.ybq.android.spinkit.SpinKitView
 import java.lang.IndexOutOfBoundsException
 import java.util.*
@@ -34,6 +35,7 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
 
     private lateinit var spinKitView: SpinKitView
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var rootContainer: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +55,11 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         this.backButton = findViewById(R.id.loadingActivityBackButton)
         this.backButton.setOnClickListener {
             handleBackEvent()
+        }
+        
+        // get root container + save context to application property
+        this.rootContainer = findViewById<ConstraintLayout?>(R.id.loadingActivityRootContainer).apply {
+            (applicationContext as ApplicationProperty).cViewContext = this.context
         }
 
         // if logging is enabled set the appropriate data
