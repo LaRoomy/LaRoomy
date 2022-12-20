@@ -29,6 +29,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -119,9 +120,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
             }
         }
+        
         // do system initialization
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContentView(R.layout.activity_main)
     
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
