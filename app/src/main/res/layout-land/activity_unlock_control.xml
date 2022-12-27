@@ -23,6 +23,7 @@
         android:background="@drawable/unlock_activity_status_panel_background"
         android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
+        android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" >
