@@ -35,7 +35,7 @@ class BarGraph : View {
         )
         try {
             barTextColor = a.getInteger(R.styleable.BarGraph_barTextColor, R.color.normalTextColor)
-            barGraphOutlineColor = a.getInteger(R.styleable.BarGraph_barGraphOutlineColor, R.color.normalOutlineColor)
+            barGraphOutlineColor = a.getInteger(R.styleable.BarGraph_barGraphOutlineColor, R.color.barGraphOutlineColor)
             barDescriptionGap = a.getDimensionPixelSize(R.styleable.BarGraph_barDescriptionGap, defaultBarDescriptionGapHeight)
             barTextHeight = a.getDimensionPixelSize(R.styleable.BarGraph_barTextSize, defaultBarTextHeight)
             scaleTextSize = a.getDimensionPixelSize(R.styleable.BarGraph_scaleTextSize, 25)
@@ -57,7 +57,7 @@ class BarGraph : View {
 
     // attribute values
     private var barTextColor = R.color.normalTextColor
-    private var barGraphOutlineColor = R.color.normalOutlineColor
+    private var barGraphOutlineColor = R.color.barGraphOutlineColor
     private var barTextHeight = defaultBarTextHeight
     private var barDescriptionGap = defaultBarDescriptionGapHeight
     private var scaleSectionWidth = defScaleSectionWidth
@@ -317,7 +317,7 @@ class BarGraph : View {
                 }
 
                 // draw the axis-lines
-                linePaint.color = context.getColor(R.color.normalOutlineColor)
+                linePaint.color = context.getColor(R.color.barGraphOutlineColor)
                 this?.drawLine(scaleSectionWidth.toFloat(), 0F, scaleSectionWidth.toFloat(), barHeight.toFloat() + extraTopPadding, linePaint)
                 this?.drawLine(scaleSectionWidth.toFloat(), barHeight.toFloat() + extraTopPadding, (effectiveChartWidth + scaleSectionWidth).toFloat(), barHeight.toFloat() + extraTopPadding, linePaint)
             }

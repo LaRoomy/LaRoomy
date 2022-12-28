@@ -68,7 +68,7 @@
         app:scaleTextSize="10sp"
         app:barDescriptionGap="22dp"
         app:barTextColor="@color/normalTextColor"
-        app:barGraphOutlineColor="@color/normalOutlineColor"
+        app:barGraphOutlineColor="@color/barGraphOutlineColor"
         app:scaleSectionWidth="40dp"
         app:extraTopPadding="20dp"
         app:layout_constraintBottom_toTopOf="@id/bgdActivityNotificationTextView"

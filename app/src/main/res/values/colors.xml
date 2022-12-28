@@ -127,7 +127,8 @@
 
 
     <!-- barGraph colors -->
-    <color name="barGraphGridLineColor">#FFFFFFFF</color>
+    <color name="barGraphGridLineColor">#FF222222</color>
+    <color name="barGraphOutlineColor">#FF222222</color>
     <color name="decent_bar_0_color">#FF7BC7CC</color>
     <color name="decent_bar_1_color">#FF7BB7CC</color>
     <color name="decent_bar_2_color">#FF7BA7CC</color>
@@ -139,13 +140,13 @@
     <color name="decent_bar_8_color">#FF7BC7CC</color>
 
     <!-- lineGraph colors -->
-    <color name="lineGraphLineColor">#FF00FF00</color> <!-- make this to gold accent color later!? -->
-    <color name="lineGraphAxisColor">#FFFFFFFF</color>
-    <color name="lineGraphGridLineColor">#66FFFFFF</color>
-    <color name="lineGraphErrorColor">#FFCC5555</color>
+    <color name="lineGraphLineColor">#FF16354D</color>
+    <color name="lineGraphAxisColor">#FF333333</color>
+    <color name="lineGraphGridLineColor">#66333333</color>
+    <color name="lineGraphErrorColor">#FFAA2222</color>
 
-    <color name="lineGraphXAxisGridValueTextColor">#FFBBBBFF</color>
-    <color name="lineGraphYAxisGridValueTextColor">#FFE0CC55</color>
+    <color name="lineGraphXAxisGridValueTextColor">#FF344F91</color>
+    <color name="lineGraphYAxisGridValueTextColor">#FFD17546</color>
 
 </resources>
 

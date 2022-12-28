@@ -15,22 +15,22 @@
                 <path
                     android:name="dot_path"
                     android:pathData="M 0,0 m -20,0 a 10,10 0 1,0 40,0 a 10,10 0 1,0 -40,0"
-                    android:fillColor="#00000000"
+                    android:fillColor="#00aaaaaa"
                     />
             </group>
         </vector>
     </aapt:attr>
     <target android:name="dot_path">
-    <aapt:attr name="android:animation">
-        <set>
-            <objectAnimator
-                android:propertyName="fillColor"
-                android:duration="200"
-                android:valueFrom="#00000000"
-                android:valueTo="#88005599"
-                android:interpolator="@android:interpolator/fast_out_slow_in"/>
-        </set>
-    </aapt:attr>
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:propertyName="fillColor"
+                    android:duration="200"
+                    android:valueFrom="#00000000"
+                    android:valueTo="#aaaaaaaa"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"/>
+            </set>
+        </aapt:attr>
     </target>
     <target android:name="dot">
         <aapt:attr name="android:animation">

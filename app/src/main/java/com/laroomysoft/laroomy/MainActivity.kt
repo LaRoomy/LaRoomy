@@ -443,7 +443,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 this.availableDevicesRecyclerView.visibility = View.VISIBLE
                 this.noContentContainer.visibility = View.GONE
 
-                this.noContentImageView.setImageResource(R.drawable.ic_list_add_white_48dp)
+                this.noContentImageView.setImageResource(R.drawable.ic_list_add_48dp)
                 this.noContentTextView.text = getString(R.string.MA_NoContentUserHintText)
                 this.noContentTextView.textSize = 22F
             }

@@ -123,6 +123,7 @@
 
     <!-- barGraph colors -->
     <color name="barGraphGridLineColor">#FFFFFFFF</color>
+    <color name="barGraphOutlineColor">#FFFFFFFF</color>
     <color name="decent_bar_0_color">#FF7BC7CC</color>
     <color name="decent_bar_1_color">#FF7BB7CC</color>
     <color name="decent_bar_2_color">#FF7BA7CC</color>

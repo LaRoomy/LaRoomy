@@ -150,7 +150,9 @@
             android:id="@+id/deviceSettingsActivityShareBindingContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:visibility="gone"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/deviceSettingsActivitySecondSeparator">
@@ -182,7 +184,7 @@
                     android:layout_width="90dp"
                     android:layout_height="50dp"
                     android:onClick="deviceSettingsActivityShareBindingButtonClick"
-                    android:src="@android:drawable/ic_menu_share"
+                    android:src="@drawable/ic_share_36dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

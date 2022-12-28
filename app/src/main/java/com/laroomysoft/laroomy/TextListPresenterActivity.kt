@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.AnimatedVectorDrawable
-import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -471,7 +470,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                         setImageResource(R.drawable.ic_textlistpresenternone)
                     }
                     'I' -> {
-                        setImageResource(R.drawable.ic_info_white_24dp)
+                        setImageResource(R.drawable.ic_info_24dp)
                     }
                     'W' -> {
                         setImageResource(R.drawable.ic_textlistpresenterwarning)
@@ -490,5 +489,4 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
             return textPresenterList.size
         }
     }
-
 }
