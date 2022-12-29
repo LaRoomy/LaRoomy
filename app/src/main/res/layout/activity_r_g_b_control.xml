@@ -110,26 +110,29 @@
                 android:id="@+id/singleColorSelectionButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@color/RGB_SelectedButtonColor"
+                android:background="@drawable/rgb_selector_mode_button_left_selected"
                 android:onClick="onSingleColorModeButtonClick"
                 android:text="@string/RGB_SingleColorModeButtonText"
                 android:textColor="@color/selectedTextColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/transitionSelectionButton"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextContrastCheck" />
 
             <Button
                 android:id="@+id/transitionSelectionButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@color/colorPrimaryDark"
+                android:background="@drawable/rgb_selector_mode_button_right_normal"
                 android:onClick="onTransitionModeButtonClick"
                 android:text="@string/RGB_TransitionModeButtonText"
+                android:textColor="@color/disabledTextColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/singleColorSelectionButton"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextContrastCheck" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

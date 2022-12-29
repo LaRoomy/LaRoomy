@@ -26,6 +26,8 @@
         android:layout_marginStart="10dp"
         android:textColor="@color/max_contrast_text_color"
         android:textAlignment="viewStart"
+        android:maxLines="1"
+        android:ellipsize="end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/addDeviceListElementImageView"

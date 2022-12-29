@@ -371,7 +371,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         // shade the background
         this.availableDevicesRecyclerView.alpha = 0.2f
         this.noContentContainer.alpha = 0.2f
-        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_yellow_36dp)
+        findViewById<AppCompatImageButton>(R.id.mainActivityHamburgerButton).setImageResource(R.drawable.ic_menu_pressed_36dp)
 
         // block the invocation of a list element during the popup lifecycle
         this.preventListSelection = true
@@ -451,7 +451,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 this.availableDevicesRecyclerView.visibility = View.GONE
                 this.noContentContainer.visibility = View.VISIBLE
 
-                this.noContentImageView.setImageResource(R.drawable.ic_remove_circle_outline_white_48dp)
+                this.noContentImageView.setImageResource(R.drawable.ic_remove_circle_48dp)
                 this.noContentTextView.text = getString(R.string.MA_BluetoothPermissionMissionHintText)
                 this.noContentTextView.textSize = 18F
             }
@@ -459,7 +459,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 this.availableDevicesRecyclerView.visibility = View.GONE
                 this.noContentContainer.visibility = View.VISIBLE
 
-                this.noContentImageView.setImageResource(R.drawable.ic_bluetooth_disabled_white_48dp)
+                this.noContentImageView.setImageResource(R.drawable.ic_bluetooth_disabled_48dp)
                 this.noContentTextView.text = getString(R.string.MA_BluetoothNotEnabledHintText)
                 this.noContentTextView.textSize = 18F
             }
@@ -536,7 +536,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
         if(this.bluetoothPermissionGranted) {
 
-            addDeviceButton.setImageResource(R.drawable.ic_add_yellow_36dp)
+            addDeviceButton.setImageResource(R.drawable.ic_add_pressed_36dp)
             addButtonNormalizationRequired = true
 
             val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)

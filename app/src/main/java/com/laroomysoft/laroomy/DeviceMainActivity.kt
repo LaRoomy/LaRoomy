@@ -313,17 +313,24 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                     // make sure to set the right name for the device
                     try {
+                        var deviceName: String
                         // try to get the device name from the bluetooth device object (could be empty)
-                        this.deviceTypeHeaderTextView.text =
-                            ApplicationProperty.bluetoothConnectionManager.currentDevice?.name
+                        deviceName =
+                            ApplicationProperty.bluetoothConnectionManager.currentDevice?.name ?: ""
                         // check if there is a name
-                        if(this.deviceTypeHeaderTextView.text.isEmpty()){
+                        if(deviceName.isEmpty()){
                             // there is no name provided, so lookup in the friendly device list for a name
-                            this.deviceTypeHeaderTextView.text =
+                            deviceName =
                                 (applicationContext as ApplicationProperty)
                                     .addedDevices
                                     .lookupForDeviceNameWithAddress(ApplicationProperty.bluetoothConnectionManager.currentDevice?.address ?: "")
                         }
+                        // check if the the name must be truncated due to an image appendix and assign the result to the view
+                        this.deviceTypeHeaderTextView.text =
+                            removeImageDefintionFromNameStringIfApplicable(
+                                deviceName,
+                                (applicationContext as ApplicationProperty).isPremiumAppVersion
+                            )
                     } catch (e: SecurityException) {
                         Log.e("DMA:onResume", "Exception while trying to access the current device: $e")
                         (applicationContext as ApplicationProperty).logControl("E: onResume: Exception while trying to access the current device: $e")
@@ -1016,7 +1023,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             this.devicePropertyListRecyclerView.alpha = 0.2f
 
             // set the menu button to selected state
-            this.deviceMenuButton.setImageResource(R.drawable.ic_menu_yellow_36dp)
+            this.deviceMenuButton.setImageResource(R.drawable.ic_menu_pressed_36dp)
 
             // set popup open parameter
             this.deviceMenuOpen = true

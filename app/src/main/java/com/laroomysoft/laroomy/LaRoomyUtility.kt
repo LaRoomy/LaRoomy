@@ -413,6 +413,33 @@ fun checkDeviceNameForImageDefinition(deviceName: String) : Int {
     return -1
 }
 
+fun removeImageDefintionFromNameStringIfApplicable(name: String, isPremium: Boolean) : String {
+    if(isPremium){
+        // check name string for the image definition
+        val imageID = checkDeviceNameForImageDefinition(name)
+        if(imageID >= 0){
+            // definition exists and is valid
+            // ---- !
+            // remove trailing image definition
+            var realName = ""
+            name.forEachIndexed { index, c ->
+                if(index < (name.length - 3)){
+                    realName += c
+                } else {
+                    return@forEachIndexed
+                }
+            }
+            return realName
+        } else {
+            // there is no valid image definition in the name string
+            return name
+        }
+    } else {
+        // is not premium, so do nothing
+        return name
+    }
+}
+
 fun makeSimplePropertyExecutionString(propertyIndex: Int, stateVal: Int) : String {
     // static part
     var executionString = "41"

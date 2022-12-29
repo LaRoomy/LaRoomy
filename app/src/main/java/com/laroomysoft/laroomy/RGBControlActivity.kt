@@ -353,10 +353,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
             when (state) {
                 RGB_MODE_SINGLE_COLOR -> {
-                    singleButton.setBackgroundColor(getColor(R.color.RGB_SelectedButtonColor))
+                    singleButton.setBackgroundResource(R.drawable.rgb_selector_mode_button_left_selected)
                     singleButton.setTextColor(getColor(R.color.selectedTextColor))
-                    transButton.setBackgroundColor(getColor(R.color.transparentViewColor))
-                    transButton.setTextColor(getColor(R.color.normalTextColor))
+                    transButton.setBackgroundResource(R.drawable.rgb_selector_mode_button_right_normal)
+                    transButton.setTextColor(getColor(R.color.disabledTextColor))
                     colorPickerContainer.visibility = View.VISIBLE
                     transitionSelectorContainer.visibility = View.GONE
 
@@ -364,10 +364,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     this.currentColorTransitionProgram = 0
                 }
                 RGB_MODE_TRANSITION -> {
-                    transButton.setBackgroundColor(getColor(R.color.RGB_SelectedButtonColor))
+                    transButton.setBackgroundResource(R.drawable.rgb_selector_mode_button_right_selected)
                     transButton.setTextColor(getColor(R.color.selectedTextColor))
-                    singleButton.setBackgroundColor(getColor(R.color.transparentViewColor))
-                    singleButton.setTextColor(getColor(R.color.normalTextColor))
+                    singleButton.setBackgroundResource(R.drawable.rgb_selector_mode_button_left_normal)
+                    singleButton.setTextColor(getColor(R.color.disabledTextColor))
                     colorPickerContainer.visibility = View.GONE
                     transitionSelectorContainer.visibility = View.VISIBLE
 
