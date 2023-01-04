@@ -406,7 +406,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
 
     override fun onConnectionError(errorID: Int) {
-        super.onConnectionError(errorID)
 
         val errorMessage = when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
@@ -447,17 +446,78 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
-        super.onUIAdaptableArrayListGenerationComplete(UIArray)
-
+        // check if this is the single property mode
+        if(!ApplicationProperty.bluetoothConnectionManager.isStandAlonePropertyMode){
+            // hide the loading indicator
+            runOnUiThread {
+                this.spinKitView.visibility = View.INVISIBLE
+            }
+            // prevent the normal onPause execution (otherwise a disconnection would occur)
+            this.preventNormalOnPauseExecution = true
+    
+            // this is the normal mode, so call the deviceMainActivity
+            val intent =
+                Intent(this@LoadingActivity, DeviceMainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+    
+    override fun onStandAlonePropertyModePreparationComplete() {
+        // hide the loading indicator
         runOnUiThread {
             this.spinKitView.visibility = View.INVISIBLE
         }
-
+        // prevent the normal onPause execution (otherwise a disconnection would occur)
         this.preventNormalOnPauseExecution = true
-
-        val intent =
-            Intent(this@LoadingActivity, DeviceMainActivity::class.java)
-        startActivity(intent)
-        finish()
+        
+        // navigate to the appropriate complex property page
+        if(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size > 0) {
+            when (ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(0).propertyType){
+                COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
+                    // navigate to the rgb selector page
+                    val intent = Intent(this@LoadingActivity, RGBControlActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
+                    //overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+                }
+                COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_BARGRAPH -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_STRING_INTERROGATOR -> {
+                
+                }
+                COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER -> {
+                
+                }
+                else -> {
+                    // TODO: error unknown type, navigate back !!!
+                }
+            }
+            // finish the loading activity
+            finish()
+        } else {
+            // TODO: error, navigate back !!!
+        }
     }
 }

@@ -64,6 +64,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     val isBindingRequired
     get() = this.bleDeviceData.isBindingRequired
+    
+    val isStandAlonePropertyMode
+    get() = this.bleDeviceData.isStandAlonePropertyMode
 
     private var connectionSuspended = false
 
@@ -1087,6 +1090,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         )
                     }
                     applicationProperty.logControl("I: Complex property state loop finished: Count is: $finalCount")
+                    
+                    // report to subscriber (if this is the single property mode)
+                    if(this.bleDeviceData.isStandAlonePropertyMode) {
+                        this.propertyCallback.onStandAlonePropertyModePreparationComplete()
+                    }
                 } else {
                     // request next complex property state
                     if (verboseLog) {
@@ -1214,10 +1222,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     applicationProperty.logControl("W: Invalid transmission sub-type on property-transmission. Type was: ${data[1]} | 2 was expected (response)")
                 }
             } else {
-
-
-                // TODO: this could be an update or insert transmission. So update or insert data and launch event respectively
-
+                // this could be an update or insert transmission. So update or insert data and launch event respectively
                 when(data[1]) {
                     '4' -> {    // update
                         if (verboseLog) {
@@ -1329,13 +1334,20 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-                // position 14 to 17 reserved for future usage
                 
-                // deprecated: check if the remote device needs fragmented transmission
-//                if(data[14] == '1'){
-//                    bleDeviceData.fragmentedTransmissionRequired = true
-//                }
-                // note: this is outdated since the transmission from the app to the device needs not fragmented transmission
+                // check if single property mode is requested
+                if(data.length >= 15){
+                    // the length checkup is required since older implementations of the protocol end by index 13
+                    if(data[14] == '1'){
+                        // single property mode requested
+                        if(bleDeviceData.propertyCount == 1 && bleDeviceData.groupCount == 0){
+                            // only apply the request if the property count is one and the group count is zero!
+                            bleDeviceData.isStandAlonePropertyMode = true
+                        }
+                    }
+                }
+                
+                // position 15 to 17 reserved for future usage !!!
 
                 // check if this is a reload process
                 if(this.reloadInitRequestPending){
@@ -3797,6 +3809,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onUIAdaptableArrayItemChanged(index: Int){}
         fun onUIAdaptableArrayItemInserted(index: Int){}
         fun onUIAdaptableArrayItemRemoved(index: Int){}
+        fun onStandAlonePropertyModePreparationComplete(){}
         fun onPropertyInvalidated(){}
         fun onRemoteBackNavigationRequested(){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
