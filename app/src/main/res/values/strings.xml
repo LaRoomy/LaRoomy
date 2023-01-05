@@ -347,6 +347,7 @@
     <string name="DeviceMainActivityPropertyListDescription" translatable="false">Shows the properties of the remote device</string>
     <string name="AddDeviceListElementContentDescription" translatable="false">Adds the device to the known devices</string>
     <string name="GeneralBackButtonLabel" translatable="false">Goes back to previous activity</string>
+    <string name="ComplexSubPageDeviceSettingsButtonLabel" translatable="false">Open the device settings</string>
     <string name="GeneralForwardButtonLabel" translatable="false">Navigates to the next activity</string>
     <string name="GeneralClearButtonContentDescription" translatable="false">Clear the content</string>
     <string name="GeneralReloadButtonContentDescription" translatable="false">Reload the Content</string>
@@ -372,6 +373,8 @@
     <string name="Error_InitFailed_NoProperties">Initialization failed. Property count is zero.</string>
     <string name="Error_NoMatchingServicesFound">No service matching the defined UUIDs was found. May take a look at the UUID-Profiles to solve the problem.</string>
     <string name="Error_NoMatchingCharacteristicsFound">No characteristic(s) matching the defined UUIDs were found. May take a look at the UUID-Profiles to solve the problem.</string>
+    <string name="Error_InvalidPropertyTypeForStandaloneMode">Invalid Property-Type for the stand-alone mode.</string>
+    <string name="Error_StandAlonePropertyModeError_NoData">Stand-alone mode error: no property data.</string>
 
 
     <!-- FileKeys: -->

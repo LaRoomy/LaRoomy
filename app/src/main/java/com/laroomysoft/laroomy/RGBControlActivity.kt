@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -37,6 +38,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private lateinit var modeSelectorContainer: ConstraintLayout
     private lateinit var transitionTypeSetupContainer: ConstraintLayout
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var deviceSettingsButton: AppCompatImageButton
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
@@ -49,6 +51,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var preventOnPauseExecutionInStandAloneMode = false
+    private var buttonNormalizationRequired = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,9 +95,27 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         colorPickerView.addOnColorChangedListener(this)
 
         // add back button functionality
-        this.backButton = findViewById(R.id.rgbBackButton)
-        this.backButton.setOnClickListener {
-            handleBackPressed()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.rgbBackButton).apply {
+            setOnClickListener {
+                handleBackPressed()
+            }
+        }
+        
+        // add device settings button functionality
+        this.deviceSettingsButton = findViewById<AppCompatImageButton?>(R.id.rgbHeaderSettingsButton).apply {
+            if(isStandAlonePropertyMode){
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    setImageResource(R.drawable.ic_settings_pressed_48dp)
+                    buttonNormalizationRequired = true
+                    // prevent connection suspension in onPause
+                    preventOnPauseExecutionInStandAloneMode = true
+                    // navigate to device settings page
+                    // navigate to the device settings activity..
+                    val intent = Intent(this@RGBControlActivity, DeviceSettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         // get the state for this RGB control
@@ -191,18 +213,23 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
     }
     
     private fun handleBackPressed(){
-        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementIndex
-        // close activity
-        finish()
+        // check the mode and act in relation to it
         if(!isStandAlonePropertyMode) {
+            // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+            (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementIndex
+            // close activity
+            finish()
             // only set slide transition if the activity was invoked from the deviceMainActivity
             overridePendingTransition(
                 R.anim.finish_activity_slide_animation_in,
                 R.anim.finish_activity_slide_animation_out
             )
+        } else {
+            // this is stand-alone mode, so when back navigation occurs, the connection must be cleared
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
         }
     }
 
@@ -217,18 +244,39 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // if the user closed the application -> suspend connection
         // set information parameter for onResume()
 
-        // if this is true, onBackPressed was executed before
-        if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            if(verboseLog) {
-                Log.d(
-                    "M:RGBPage:onPause",
-                    "RGB Control Activity: The user closes the app -> suspend connection"
-                )
+        if(!this.isStandAlonePropertyMode) {
+            // NOT stand-alone mode:
+            // if the following is true, onBackPressed was executed before and the connection must remain active
+            // because this is a back navigation to the device main activity
+            if (!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                if (verboseLog) {
+                    Log.d(
+                        "M:RGBPage:onPause",
+                        "RGB Control Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
             }
-            // suspend connection and set indication-parameter
-            this.mustReconnect = true
-            this.expectedConnectionLoss = true
-            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+        } else {
+            // this is stand-alone property mode
+            if(this.preventOnPauseExecutionInStandAloneMode){
+                this.preventOnPauseExecutionInStandAloneMode = false
+            } else {
+                // normal onPause execution:
+                if (verboseLog) {
+                    Log.d(
+                        "M:RGBPage:onPause",
+                        "RGB Control Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+            }
         }
     }
 
@@ -241,14 +289,26 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // reset parameter anyway
         this.expectedConnectionLoss = false
+    
+        // recover button if applicable
+        if (isStandAlonePropertyMode && buttonNormalizationRequired) {
+            buttonNormalizationRequired = false
+            this.deviceSettingsButton.setImageResource(R.drawable.ic_settings_48dp)
+        }
 
         when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
             BLE_BLUETOOTH_PERMISSION_MISSING -> {
                 // permission was revoked while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             BLE_IS_DISABLED -> {
                 // bluetooth was disabled while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             else -> {
@@ -433,8 +493,13 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
-                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    // NOTE: do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page! Only call in stand-alone mode
+                    if(!isStandAlonePropertyMode) {
+                        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                            true
+                    } else {
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                    }
                     finish()
                     if(!isStandAlonePropertyMode) {
                         // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -595,7 +660,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // if there is a connection failure -> navigate back
         when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -606,7 +676,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 }
             }
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -673,5 +748,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 R.anim.finish_activity_slide_animation_out
             )
         }
+        // else do nothing: property reload is not supported in stand-alone mode
     }
 }

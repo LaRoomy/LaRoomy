@@ -371,15 +371,14 @@
     <string name="Error_InitFailed_NoProperties">Initialisierung fehlgeschlagen. Anzahl der Geräte-Eigenschaften: 0.</string>
     <string name="Error_NoMatchingServicesFound">Es wurde kein mit den definierten UUIDs übereinstimmender Service gefunden. Sie können die UUID-Profile anpassen um das Problem zu lösen.</string>
     <string name="Error_NoMatchingCharacteristicsFound">Es wurden keine mit den definierten UUIDs übereinstimmenden Characteristiken gefunden. Sie können die UUID-Profile anpassen um das Problem zu lösen.</string>
-
-
+    <string name="Error_InvalidPropertyTypeForStandaloneMode">Ungültiger Geräte-Eigenschaften Typ für den Solo-Eigenschaften-Modus</string>
+    <string name="Error_StandAlonePropertyModeError_NoData">Solo-Eigenschaften Fehler: keine Daten vorhanden.</string>
 
     <!-- FileKeys: -->
     <!-- FileKeys are not translateable -->
 
     <!-- DataKeys: -->
     <!-- DataKeys are not translateable -->
-
 
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>

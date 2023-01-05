@@ -471,6 +471,8 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
         // prevent the normal onPause execution (otherwise a disconnection would occur)
         this.preventNormalOnPauseExecution = true
         
+        var normalFinish = true
+        
         // navigate to the appropriate complex property page
         if(ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size > 0) {
             when (ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(0).propertyType){
@@ -484,40 +486,96 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     //overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
-                
+                    // navigate to the ex level selector page
+                    val intent = Intent(this@LoadingActivity, ExtendedLevelSelectorActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
-                
+                    // navigate to the time selector page
+                    val intent = Intent(this@LoadingActivity, TimeFrameSelectorActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
-                
+                    // navigate to the time frame selector page
+                    val intent = Intent(this@LoadingActivity, TimeFrameSelectorActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
-                
+                    // navigate to the unlock control page
+                    val intent = Intent(this@LoadingActivity, UnlockControlActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
-                
+                    // navigate to the navigator page
+                    val intent = Intent(this@LoadingActivity, NavigatorControlActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_BARGRAPH -> {
-                
+                    // navigate to the barGraph page
+                    val intent = Intent(this@LoadingActivity, BarGraphActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH -> {
-                
+                    // navigate to the ex lineGraph page
+                    val intent = Intent(this@LoadingActivity, LineGraphActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_STRING_INTERROGATOR -> {
-                
+                    // navigate to the string interrogator page
+                    val intent = Intent(this@LoadingActivity, StringInterrogatorActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER -> {
-                
+                    // navigate to the text list presenter page
+                    val intent = Intent(this@LoadingActivity, TextListPresenterActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
                 }
                 else -> {
-                    // TODO: error unknown type, navigate back !!!
+                    // error: unknown type, notify user and exit activity
+                    normalFinish = false
+                    setErrorText(getString(R.string.Error_InvalidPropertyTypeForStandaloneMode))
+                    Executors.newSingleThreadScheduledExecutor().schedule({
+                        finish()
+                    }, 3000, TimeUnit.MILLISECONDS)
                 }
             }
             // finish the loading activity
-            finish()
+            if(normalFinish) {
+                finish()
+            }
         } else {
-            // TODO: error, navigate back !!!
+            // error: no property data
+            setErrorText(getString(R.string.Error_StandAlonePropertyModeError_NoData))
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                finish()
+            }, 3000, TimeUnit.MILLISECONDS)
         }
     }
 }

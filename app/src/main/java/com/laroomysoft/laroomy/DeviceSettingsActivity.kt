@@ -48,7 +48,11 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var preventOnPauseExecutionInStandAloneMode = false
     private var currentSignalStrength = 0
+    
+    private val isStandAlonePropertyMode
+    get() = ApplicationProperty.bluetoothConnectionManager.isStandAlonePropertyMode
 
     private var pendingBindingTransmission = dbNONE
 
@@ -220,25 +224,49 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     
     private fun handleBackEvent(){
         // handle the back-navigation like a property-sub-page, because the device should remain connected during this procedure
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+        if(!isStandAlonePropertyMode) {
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+        } else {
+            this.preventOnPauseExecutionInStandAloneMode = true
+        }
         // close
         finish()
     }
     
     override fun onPause() {
         super.onPause()
-        // if this is not called due to a back-navigation, the user must have left the app
-        if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            if(verboseLog) {
-                Log.d(
-                    "M:DSPPage:onPause",
-                    "Device Settings Activity: The user closes the app -> suspend connection"
-                )
+        if(!isStandAlonePropertyMode) {
+            // NOT stand-alone mode:
+            // if this is not called due to a back-navigation, the user must have left the app
+            if (!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                if (verboseLog) {
+                    Log.d(
+                        "M:DSPPage:onPause",
+                        "Device Settings Activity: The user closes the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
             }
-            // suspend connection and set indication-parameter
-            this.mustReconnect = true
-            this.expectedConnectionLoss = true
-            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+        } else {
+            // this is stand-alone mode, check if this is a back navigation and only suspend the connection if it's not
+            if(preventOnPauseExecutionInStandAloneMode){
+                preventOnPauseExecutionInStandAloneMode = false
+            } else {
+                // the user must have left the app
+                if (verboseLog) {
+                    Log.d(
+                        "M:DSPPage:onPause",
+                        "Device Settings Activity: The user closes the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+            }
         }
     }
 
