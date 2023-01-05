@@ -110,7 +110,8 @@
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ucLockConditionImageView" />
+                app:layout_constraintTop_toBottomOf="@id/ucLockConditionImageView"
+                tools:ignore="TextContrastCheck" />
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -176,20 +177,20 @@
                         />
 
                     <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/ucShowPinButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/ucShowPinButton"
-                        android:minWidth="48dp"
-                        android:minHeight="48dp"
                         android:layout_marginStart="10dp"
                         android:background="@color/transparentColor"
-                        android:src="@drawable/ic_visibility_gray"
                         android:contentDescription="@string/UnlockControlActivityShowHidePinButtonLabel"
-                        app:layout_constraintStart_toEndOf="@id/ucCurrentPinDisplayTextView"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
+                        android:src="@drawable/ic_visibility_gray"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ucCurrentPinDisplayTextView"
                         app:layout_constraintTop_toTopOf="parent"
-                        />
+                        tools:ignore="ImageContrastCheck" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -264,6 +265,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:padding="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/complex_property_page_panel_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ucLeftPaneContainer"
@@ -274,7 +278,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -291,7 +294,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucEightButton"
@@ -322,7 +325,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucEightButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -350,7 +353,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucFiveButton"
@@ -365,7 +368,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucFourButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucSixButton"
@@ -381,7 +384,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucFiveButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -408,7 +411,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucTwoButton"
@@ -423,7 +426,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucOneButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucThreeButton"
@@ -439,9 +442,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucTwoButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
-
-
+                    tools:ignore="HardcodedText,TextContrastCheck" />
+                
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -467,7 +469,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucZeroButton"
@@ -482,7 +484,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/clearButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/OkButton"
@@ -498,7 +500,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucZeroButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -506,7 +508,20 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ucHeaderSettingsButton"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/transparentColor"
+        android:src="@drawable/ic_settings_48dp"
+        android:visibility="gone"
+        android:contentDescription="@string/ComplexSubPageDeviceSettingsButtonLabel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
