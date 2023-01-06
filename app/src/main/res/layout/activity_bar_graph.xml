@@ -32,16 +32,35 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bgdHeaderTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/BarGraphActivity_HeaderText"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:layout_marginStart="65dp"
+            android:layout_marginEnd="65dp"
+            android:textAlignment="center"
+            android:ellipsize="end"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bgdHeaderSettingsButton"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/transparentColor"
+            android:src="@drawable/ic_settings_48dp"
+            android:visibility="gone"
+            android:contentDescription="@string/ComplexSubPageDeviceSettingsButtonLabel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

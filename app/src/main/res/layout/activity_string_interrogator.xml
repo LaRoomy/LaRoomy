@@ -32,15 +32,35 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/stringInterrogatorHeaderTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/StringInterrogatorActivity_HeaderText"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:layout_marginEnd="65dp"
+            android:layout_marginStart="65dp"
+            android:textAlignment="center"
+            android:ellipsize="end"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/stringInterrogatorHeaderSettingsButton"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/transparentColor"
+            android:src="@drawable/ic_settings_48dp"
+            android:visibility="gone"
+            android:contentDescription="@string/ComplexSubPageDeviceSettingsButtonLabel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -90,16 +110,15 @@
             />
 
         <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/stringInterrogatorFieldOneInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:minWidth="250dp"
             android:layout_marginStart="40dp"
-            android:layout_marginEnd="20dp"
-            android:id="@+id/stringInterrogatorFieldOneInput"
-            app:layout_constraintTop_toBottomOf="@+id/stringInterrogatorFieldOneDescriptor"
+            android:minWidth="250dp"
+            android:minHeight="48dp"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/stringInterrogatorFieldOneDescriptor"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -126,16 +145,15 @@
             />
 
         <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/stringInterrogatorFieldTwoInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:minWidth="250dp"
             android:layout_marginStart="40dp"
-            android:layout_marginEnd="20dp"
-            android:id="@+id/stringInterrogatorFieldTwoInput"
-            app:layout_constraintTop_toBottomOf="@+id/stringInterrogatorFieldTwoDescriptor"
+            android:minWidth="250dp"
+            android:minHeight="48dp"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/stringInterrogatorFieldTwoDescriptor"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

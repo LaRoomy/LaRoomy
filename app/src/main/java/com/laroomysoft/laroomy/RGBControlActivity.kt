@@ -101,7 +101,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             }
         }
         
-        // add device settings button functionality
+        // add device settings button functionality (if applicable)
         this.deviceSettingsButton = findViewById<AppCompatImageButton?>(R.id.rgbHeaderSettingsButton).apply {
             if(isStandAlonePropertyMode){
                 visibility = View.VISIBLE
@@ -748,6 +748,6 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 R.anim.finish_activity_slide_animation_out
             )
         }
-        // else do nothing: property reload is not supported in stand-alone mode
+        // else: do nothing: property reload is not supported in stand-alone mode
     }
 }
