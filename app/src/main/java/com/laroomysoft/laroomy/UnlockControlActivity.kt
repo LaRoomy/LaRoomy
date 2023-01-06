@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit
 class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var mustReconnect = false
-    private var relatedElementID = -1
+    private var relatedElementIndex = -1
     private var relatedGlobalElementIndex = -1
 
     private var showPin = false
@@ -34,7 +35,9 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private var pinChangePopupOpen = false
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
-
+    private var preventOnPauseExecutionInStandAloneMode = false
+    private var buttonNormalizationRequired = false
+    
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var lockStatusTextView: AppCompatTextView
     private lateinit var showHideButton: AppCompatImageButton
@@ -45,6 +48,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     private lateinit var popupWindow: PopupWindow
     private lateinit var lockConditionStatusContainer: ConstraintLayout
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var deviceSettingsButton: AppCompatImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +77,26 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.lockConditionStatusContainer = findViewById(R.id.ucLockConditionStatusContainer)
 
         // add back button functionality
-        this.backButton = findViewById(R.id.unlockControlBackButton)
-        this.backButton.setOnClickListener {
-            handleBackEvent()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.unlockControlBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
+        }
+        
+        // add device settings button functionality (if applicable)
+        this.deviceSettingsButton = findViewById<AppCompatImageButton?>(R.id.ucHeaderSettingsButton).apply {
+            if(isStandAlonePropertyMode){
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    setImageResource(R.drawable.ic_settings_pressed_48dp)
+                    buttonNormalizationRequired = true
+                    // prevent connection suspension in onPause
+                    preventOnPauseExecutionInStandAloneMode = true
+                    // navigate to the device settings activity..
+                    val intent = Intent(this@UnlockControlActivity, DeviceSettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         // add show/hide pin button functionality
@@ -84,7 +105,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         }
 
         // get the element ID + UI-Adapter Index
-        relatedElementID = intent.getIntExtra("elementID", -1)
+        relatedElementIndex = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
@@ -109,36 +130,61 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     }
     
     private fun handleBackEvent(){
-        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-        // close activity
-        finish()
+        // check the mode and act in relation to it
         if(!isStandAlonePropertyMode) {
+            // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+            (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementIndex
+            // close activity
+            finish()
             // only set slide transition if the activity was invoked from the deviceMainActivity
             overridePendingTransition(
                 R.anim.finish_activity_slide_animation_in,
                 R.anim.finish_activity_slide_animation_out
             )
+        } else {
+            // this is stand-alone mode, so when back navigation occurs, the connection must be cleared
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        super.onPause()
-        // if this is not called due to a back-navigation, the user must have left the app
-        if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            if(verboseLog) {
-                Log.d(
-                    "M:UCA:onPause",
-                    "Unlock Control Activity: The user closes the app -> suspend connection"
-                )
+        if(!isStandAlonePropertyMode) {
+            // NOT stand-alone mode:
+            // if the following is true, onBackPressed was executed before and the connection must remain active
+            // because this is a back navigation to the device main activity
+            if (!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                if (verboseLog) {
+                    Log.d(
+                        "UnlockControl:onPause",
+                        "Unlock Control Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
             }
-            // suspend connection and set indication-parameter
-            this.mustReconnect = true
-            this.expectedConnectionLoss = true
-            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+        } else {
+            // this is stand-alone property mode
+            if(this.preventOnPauseExecutionInStandAloneMode){
+                this.preventOnPauseExecutionInStandAloneMode = false
+            } else {
+                // normal onPause execution:
+                if (verboseLog) {
+                    Log.d(
+                        "Unlock Control:onPause",
+                        "Time-Frame Selector Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+            }
         }
     }
 
@@ -150,14 +196,26 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
         // reset parameter anyway
         this.expectedConnectionLoss = false
-
+    
+        // recover button if applicable
+        if (isStandAlonePropertyMode && buttonNormalizationRequired) {
+            buttonNormalizationRequired = false
+            this.deviceSettingsButton.setImageResource(R.drawable.ic_settings_48dp)
+        }
+    
         when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
             BLE_BLUETOOTH_PERMISSION_MISSING -> {
                 // permission was revoked while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             BLE_IS_DISABLED -> {
                 // bluetooth was disabled while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             else -> {
@@ -174,7 +232,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 } else {
                     // notify the remote device of the invocation of this property-page
                     ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(
-                        this.relatedElementID
+                        this.relatedElementIndex
                     )
                 }
             }
@@ -226,7 +284,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             }
 
             ApplicationProperty.bluetoothConnectionManager.sendData(
-                unlockControlState.toExecutionString(this.relatedElementID)
+                unlockControlState.toExecutionString(this.relatedElementIndex)
             )
         }
     }
@@ -283,7 +341,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
                 // send unlock request
                 ApplicationProperty.bluetoothConnectionManager.sendData(
-                    unlockControlState.toExecutionString(this.relatedElementID)
+                    unlockControlState.toExecutionString(this.relatedElementIndex)
                 )
                 // clear the entered pin
                 this.currentEnteredPin = ""
@@ -443,7 +501,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         }
 
         ApplicationProperty.bluetoothConnectionManager.sendData(
-            unlockControlState.toExecutionString(this.relatedElementID)
+            unlockControlState.toExecutionString(this.relatedElementIndex)
         )
     }
 
@@ -485,8 +543,14 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
-                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    if(!isStandAlonePropertyMode) {
+                        // do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page!
+                        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                            true
+                    } else {
+                        // stand-alone-mode: here 'clear()' must be called - finish goes back to main activity directly
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                    }
                     finish()
                     if(!isStandAlonePropertyMode) {
                         // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -549,7 +613,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         // if there is a connection failure -> navigate back
         when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -560,7 +629,12 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 }
             }
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -586,7 +660,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
-        return this.relatedElementID
+        return this.relatedElementIndex
     }
 
     override fun onComplexPropertyStateChanged(
@@ -596,7 +670,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.internalElementIndex == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementIndex){
             if(verboseLog) {
                 Log.d(
                     "UnlockControlActivity",
@@ -651,6 +725,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 R.anim.finish_activity_slide_animation_out
             )
         }
+        // else: do nothing: property reload is not supported in stand-alone mode
     }
     
     override fun onRemoteBackNavigationRequested() {
@@ -666,5 +741,6 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 )
             }, 500, TimeUnit.MILLISECONDS)
         }
+        // else: do nothing: back navigation to device main is not possible in stand-alone-mode
     }
 }

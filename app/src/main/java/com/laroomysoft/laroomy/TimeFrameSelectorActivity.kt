@@ -1,9 +1,11 @@
 package com.laroomysoft.laroomy
 
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import android.widget.TimePicker
 import androidx.activity.OnBackPressedCallback
@@ -17,11 +19,13 @@ import java.util.concurrent.TimeUnit
 class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
     private var mustReconnect = false
-    private var relatedElementID = -1
+    private var relatedElementIndex = -1
     private var relatedGlobalElementIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var preventOnPauseExecutionInStandAloneMode = false
+    private var buttonNormalizationRequired = false
     
     private var updateDelayStarted = false
 
@@ -30,6 +34,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private lateinit var toTimePicker: TimePicker
     private lateinit var fromTimePicker: TimePicker
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var deviceSettingsButton: AppCompatImageButton
     
     private val successiveComplexUpdateStorage = SuccessiveComplexUpdateStorage()
     private lateinit var setupTimer: Timer
@@ -51,16 +56,33 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         })
 
         // get the element ID + UI-Adapter Index
-        relatedElementID = intent.getIntExtra("elementID", -1)
+        relatedElementIndex = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
 
         // add back button functionality
-        this.backButton = findViewById(R.id.tfsBackButton)
-        this.backButton.setOnClickListener {
-            handleBackEvent()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.tfsBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
+        }
+        
+        // add device settings button functionality
+        this.deviceSettingsButton = findViewById<AppCompatImageButton?>(R.id.tfsHeaderSettingsButton).apply {
+            if(isStandAlonePropertyMode){
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    setImageResource(R.drawable.ic_settings_pressed_48dp)
+                    buttonNormalizationRequired = true
+                    // prevent connection suspension in onPause
+                    preventOnPauseExecutionInStandAloneMode = true
+                    // navigate to the device settings activity..
+                    val intent = Intent(this@TimeFrameSelectorActivity, DeviceSettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         // set the header-text to the property Name
@@ -101,35 +123,61 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     }
     
     private fun handleBackEvent(){
-        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-        // close activity
-        finish()
+        // check the mode and act in relation to it
         if(!isStandAlonePropertyMode) {
+            // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+            (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementIndex
+            // close activity
+            finish()
             // only set slide transition if the activity was invoked from the deviceMainActivity
             overridePendingTransition(
                 R.anim.finish_activity_slide_animation_in,
                 R.anim.finish_activity_slide_animation_out
             )
+        } else {
+            // this is stand-alone mode, so when back navigation occurs, the connection must be cleared
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        // if this is not called due to a back-navigation, the user must have left the app
-        if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            if(verboseLog) {
-                Log.d(
-                    "M:TFSPage:onPause",
-                    "Time-Frame Selector Activity: The user closes the app -> suspend connection"
-                )
+        if(!isStandAlonePropertyMode) {
+            // NOT stand-alone mode:
+            // if the following is true, onBackPressed was executed before and the connection must remain active
+            // because this is a back navigation to the device main activity
+            if (!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                if (verboseLog) {
+                    Log.d(
+                        "TimeFrameSelector:onPause",
+                        "Time-Frame Selector Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
             }
-            // suspend connection and set indication-parameter
-            this.mustReconnect = true
-            this.expectedConnectionLoss = true
-            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+        } else {
+            // this is stand-alone property mode
+            if(this.preventOnPauseExecutionInStandAloneMode){
+                this.preventOnPauseExecutionInStandAloneMode = false
+            } else {
+                // normal onPause execution:
+                if (verboseLog) {
+                    Log.d(
+                        "TimeFrameSelector:onPause",
+                        "Time-Frame Selector Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+            }
         }
     }
 
@@ -142,14 +190,26 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // reset parameter anyway
         this.expectedConnectionLoss = false
-
+    
+        // recover button if applicable
+        if (isStandAlonePropertyMode && buttonNormalizationRequired) {
+            buttonNormalizationRequired = false
+            this.deviceSettingsButton.setImageResource(R.drawable.ic_settings_48dp)
+        }
+    
         when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
             BLE_BLUETOOTH_PERMISSION_MISSING -> {
                 // permission was revoked while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             BLE_IS_DISABLED -> {
                 // bluetooth was disabled while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             else -> {
@@ -169,7 +229,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 } else {
                     // notify the remote device of the invocation of this property-page
                     ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(
-                        this.relatedElementID
+                        this.relatedElementIndex
                     )
                 }
             }
@@ -209,14 +269,14 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
             timeFrameSelectorState.toComplexPropertyState(),
-            this.relatedElementID
+            this.relatedElementIndex
         )
     
         // control the output transmissions in a sensible manner
         if(!this.successiveComplexUpdateStorage.isStarted){
             // set initial update data
             this.successiveComplexUpdateStorage.keep = true
-            this.successiveComplexUpdateStorage.data = timeFrameSelectorState.toExecutionString(this.relatedElementID)
+            this.successiveComplexUpdateStorage.data = timeFrameSelectorState.toExecutionString(this.relatedElementIndex)
             this.successiveComplexUpdateStorage.isStarted = true
         
             // start timer
@@ -240,7 +300,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         } else {
             // timer is running, set keep to true to mark the time-setup-process as pending and save the data, not more!
             this.successiveComplexUpdateStorage.keep = true
-            this.successiveComplexUpdateStorage.data = timeFrameSelectorState.toExecutionString(this.relatedElementID)
+            this.successiveComplexUpdateStorage.data = timeFrameSelectorState.toExecutionString(this.relatedElementIndex)
         }
     }
 
@@ -274,8 +334,14 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
-                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    if(!isStandAlonePropertyMode) {
+                        // do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page!
+                        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                            true
+                    } else {
+                        // stand-alone-mode: here 'clear()' must be called - finish goes back to main activity directly
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                    }
                     finish()
                     if(!isStandAlonePropertyMode) {
                         // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -338,7 +404,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         // if there is a connection failure -> navigate back
         when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -349,7 +420,12 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 }
             }
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -368,7 +444,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
-        return this.relatedElementID
+        return this.relatedElementIndex
     }
 
     override fun onComplexPropertyStateChanged(
@@ -380,7 +456,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.internalElementIndex == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementIndex){
             if(verboseLog) {
                 Log.d(
                     "M:CB:TFSPage:ComplexPCg",
@@ -412,5 +488,6 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 R.anim.finish_activity_slide_animation_out
             )
         }
+        // else: do nothing: property reload is not supported in stand-alone mode
     }
 }

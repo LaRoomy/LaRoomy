@@ -230,7 +230,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
     override fun onPause() {
         super.onPause()
-        if(isStandAlonePropertyMode) {
+        if(!isStandAlonePropertyMode) {
             // NOT stand-alone mode:
             // if the following is true, onBackPressed was executed before and the connection must remain active
             // because this is a back navigation to the device main activity
@@ -380,11 +380,12 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
                     if(!isStandAlonePropertyMode) {
+                        // do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page!
                         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
                             true
                     } else {
+                        // stand-alone-mode: here 'clear()' must be called - finish goes back to main activity directly
                         ApplicationProperty.bluetoothConnectionManager.clear()
                     }
                     finish()

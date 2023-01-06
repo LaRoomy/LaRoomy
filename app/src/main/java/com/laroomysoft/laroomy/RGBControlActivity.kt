@@ -493,11 +493,12 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page! Only call in stand-alone mode
                     if(!isStandAlonePropertyMode) {
+                        // do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page
                         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
                             true
                     } else {
+                        // stand-alone-mode: here 'clear()' must be called - finish goes back to main activity directly
                         ApplicationProperty.bluetoothConnectionManager.clear()
                     }
                     finish()

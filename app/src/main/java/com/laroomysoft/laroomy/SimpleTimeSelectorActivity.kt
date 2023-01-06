@@ -77,7 +77,6 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                     buttonNormalizationRequired = true
                     // prevent connection suspension in onPause
                     preventOnPauseExecutionInStandAloneMode = true
-                    // navigate to device settings page
                     // navigate to the device settings activity..
                     val intent = Intent(this@SimpleTimeSelectorActivity, DeviceSettingsActivity::class.java)
                     startActivity(intent)
@@ -117,7 +116,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     override fun onPause() {
         super.onPause()
-        if(isStandAlonePropertyMode) {
+        if(!isStandAlonePropertyMode) {
             // NOT stand-alone mode:
             // if the following is true, onBackPressed was executed before and the connection must remain active
             // because this is a back navigation to the device main activity
@@ -142,7 +141,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 if (verboseLog) {
                     Log.d(
                         "TimeSelector:onPause",
-                        "Simple Selector Activity: The user left the app -> suspend connection"
+                        "Simple Time Selector Activity: The user left the app -> suspend connection"
                     )
                 }
                 // suspend connection and set indication-parameter
@@ -319,11 +318,12 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
                     if(!isStandAlonePropertyMode) {
+                        // do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page!
                         (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
                             true
                     } else {
+                        // stand-alone-mode: here 'clear()' must be called - finish goes back to main activity directly
                         ApplicationProperty.bluetoothConnectionManager.clear()
                     }
                     finish()
