@@ -655,4 +655,20 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
         // else: do nothing: property reload is not supported in stand-alone mode
     }
+    
+    override fun onRemoteBackNavigationRequested() {
+        if (!isStandAlonePropertyMode) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                
+                finish()
+                
+                overridePendingTransition(
+                    R.anim.finish_activity_slide_animation_in,
+                    R.anim.finish_activity_slide_animation_out
+                )
+            }, 500, TimeUnit.MILLISECONDS)
+        }
+        // else: do nothing: back navigation to device main is not possible in stand-alone-mode
+    }
 }

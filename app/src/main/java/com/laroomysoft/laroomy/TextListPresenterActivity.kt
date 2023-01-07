@@ -480,7 +480,23 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         }
         // else: do nothing: property reload is not supported in stand-alone mode
     }
-
+    
+    override fun onRemoteBackNavigationRequested() {
+        if (!isStandAlonePropertyMode) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                
+                finish()
+                
+                overridePendingTransition(
+                    R.anim.finish_activity_slide_animation_in,
+                    R.anim.finish_activity_slide_animation_out
+                )
+            }, 500, TimeUnit.MILLISECONDS)
+        }
+        // else: do nothing: back navigation to device main is not possible in stand-alone-mode
+    }
+    
     private fun notifyUser(notificationType: Int, message: String){
         // in this activity the notification is not displayed in a separate textView, instead it is added as list-element
         val notiString =  when(notificationType){

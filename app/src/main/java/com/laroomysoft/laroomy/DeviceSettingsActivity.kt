@@ -651,14 +651,22 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     }
 
     override fun onPropertyInvalidated() {
-        (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = true
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-
-        finish()
-
-        overridePendingTransition(
-            R.anim.finish_activity_slide_animation_in,
-            R.anim.finish_activity_slide_animation_out
-        )
+        if(!ApplicationProperty.bluetoothConnectionManager.isStandAlonePropertyMode) {
+            (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = true
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+    
+            finish()
+        }
+        // else: do nothing. property reload is not supported in stand-alone mode
+    }
+    
+    override fun onRemoteBackNavigationRequested() {
+        if (!isStandAlonePropertyMode) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                finish()
+            }, 500, TimeUnit.MILLISECONDS)
+        }
+        // else: do nothing: back navigation to device main is not possible in stand-alone-mode
     }
 }

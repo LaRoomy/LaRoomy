@@ -225,7 +225,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
                         // schedule back-navigation
                         Handler(Looper.getMainLooper()).postDelayed({
-                            (applicationContext as ApplicationProperty).resetControlParameter()
+                            (applicationContext as ApplicationProperty).resetPropertyControlParameter()
                             ApplicationProperty.bluetoothConnectionManager.clear()
                             finish()
                         }, 1000)

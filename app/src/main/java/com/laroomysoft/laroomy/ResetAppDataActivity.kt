@@ -40,9 +40,10 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         })
 
         // add back button functionality
-        this.backButton = findViewById(R.id.resetAppActivityBackButton)
-        this.backButton.setOnClickListener {
-            handleBackPressed()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.resetAppActivityBackButton).apply {
+            setOnClickListener {
+                handleBackPressed()
+            }
         }
 
         (applicationContext as ApplicationProperty).appSettingsResetDone = false

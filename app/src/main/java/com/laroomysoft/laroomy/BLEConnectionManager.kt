@@ -817,7 +817,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 '3' -> {
                     // property invalidated notification
-                    this.propertyCallback.onPropertyInvalidated()
+                    handlePropertyInvalidationRequest()
                 }
                 '4' -> {
                     // save properties to cache notification
@@ -885,6 +885,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         timeRequestResponse += a8bitValueTo2CharHexValue(sec)
         timeRequestResponse += '\r'
         this.sendData(timeRequestResponse)
+    }
+    
+    private fun handlePropertyInvalidationRequest(){
+        if(this.bleDeviceData.isStandAlonePropertyMode) {
+            if (verboseLog) {
+                Log.e("PropertyInvalidation", "Unexpected: Property was invalidated during a stand-alone-property session. Notification will be forwarded, but should have no effect.")
+            }
+            applicationProperty.logControl("W: Unexpected: Property was invalidated during a stand-alone-property session. Notification will be forwarded, but should have no effect. To navigate back in stand-alone mode: close the device.")
+        }
+        this.propertyCallback.onPropertyInvalidated()
     }
 
     private fun handleLanguageRequest(){
@@ -3710,7 +3720,17 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     
     private fun handleForcedBackNavigation(){
         if(this.isOtherThanDeviceMainActivity()){
+            if (verboseLog) {
+                Log.e("ForcedBackNavigation", "Unexpected: Forced back navigation was requested during a stand-alone-property session. Notification will be forwarded, but should have no effect.")
+            }
+            applicationProperty.logControl("W: Unexpected: Forced back navigation was requested during a stand-alone-property session. Notification will be forwarded, but should have no effect. To navigate back in stand-alone mode: close the device.")
+            
             this.propertyCallback.onRemoteBackNavigationRequested()
+        } else {
+            if(verboseLog){
+                Log.e("ForcedBackNavigation", "Unexpected: back-navigation notification received in DeviceMainActivity.")
+            }
+            applicationProperty.logControl("W: Unexpected: back-navigation notification received in DeviceMainActivity. This only works on complex property pages. To navigate back on Device-Main-Page: close the device.")
         }
     }
     

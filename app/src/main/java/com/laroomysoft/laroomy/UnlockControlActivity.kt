@@ -65,7 +65,14 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
                 handleBackEvent()
             }
         })
-
+    
+        // get the element ID + UI-Adapter Index
+        relatedElementIndex = intent.getIntExtra("elementID", -1)
+        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+    
+        // detect invocation method
+        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
+    
         // get UI-Views
         this.notificationTextView = findViewById(R.id.ucNotificationTextView)
         this.lockStatusTextView = findViewById(R.id.ucLockConditionStatusTextView)
@@ -103,14 +110,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         this.showHideButton.setOnClickListener {
             this.onShowHideButtonClick(it)
         }
-
-        // get the element ID + UI-Adapter Index
-        relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
-
-        // detect invocation method
-        isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
-
+        
         // set the header-text to the property-name
         this.headerTextView.text =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
@@ -282,7 +282,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
             if(ApplicationProperty.bluetoothConnectionManager.isConnectionDoneWithSharedKey) {
                 unlockControlState.flags = unlockControlState.flags or 0x08
             }
-
+    
             ApplicationProperty.bluetoothConnectionManager.sendData(
                 unlockControlState.toExecutionString(this.relatedElementIndex)
             )
@@ -384,7 +384,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     @SuppressLint("InflateParams")
     fun onChangePinButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-
+    
         // exit if popup is already open
         if(this.pinChangePopupOpen){
             return

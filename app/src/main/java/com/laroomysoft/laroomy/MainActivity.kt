@@ -161,9 +161,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 (applicationContext as ApplicationProperty).addedDevices.removeAt(pos)
                 // remove the saved property data for the device (if it was saved)
                 PropertyCacheManager(applicationContext).removePCacheEntry(mac)
-                
-                // TODO: UPDATE THE POSITIONS, WHEN THE REMOVED ELEMENT WAS NOT THE LAST IN THE LIST, ALL SUCCESSIVE ELEMENTS HAVE AN INVALID POSITION VALUE!!!!!!!!!!!!
-                // TODO: PROBLEM SOLVED BY USING BINDING ADAPTER POSITION IN RECYCLER VIEW ADAPTER -> BUT MUST BE TESTED!
 
                 if((applicationContext as ApplicationProperty).addedDevices.devices.isEmpty()){
                     availableDevicesRecyclerView.visibility = View.GONE
@@ -231,6 +228,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
         // update the global app params
         (applicationContext as ApplicationProperty).onResume()
+        
+        // reset property related control parameter
+        (applicationContext as ApplicationProperty).resetPropertyControlParameter()
 
         // control bottom separator in alignment to the screen orientation
         bottomSeparator.visibility = when (this.resources.configuration.orientation) {

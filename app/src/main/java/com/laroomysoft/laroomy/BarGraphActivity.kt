@@ -521,4 +521,35 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             (applicationContext as ApplicationProperty).logControl("E: BarGraphDataPipe exception: $e.")
         }
     }
+    
+    override fun onPropertyInvalidated() {
+        if(!isStandAlonePropertyMode) {
+            (this.applicationContext as ApplicationProperty).propertyInvalidatedOnSubPage = true
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            
+            finish()
+            
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
+        // else: do nothing: property reload is not supported in stand-alone mode
+    }
+    
+    override fun onRemoteBackNavigationRequested() {
+        if (!isStandAlonePropertyMode) {
+            Executors.newSingleThreadScheduledExecutor().schedule({
+                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                
+                finish()
+                
+                overridePendingTransition(
+                    R.anim.finish_activity_slide_animation_in,
+                    R.anim.finish_activity_slide_animation_out
+                )
+            }, 500, TimeUnit.MILLISECONDS)
+        }
+        // else: do nothing: back navigation to device main is not possible in stand-alone-mode
+    }
 }
