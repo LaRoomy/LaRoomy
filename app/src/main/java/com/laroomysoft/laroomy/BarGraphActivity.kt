@@ -1,8 +1,10 @@
 package com.laroomysoft.laroomy
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit
 class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
 
     private var mustReconnect = false
-    private var relatedElementID = -1
+    private var relatedElementIndex = -1
     private var relatedGlobalElementIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
@@ -23,6 +25,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     private lateinit var notificationTextView: AppCompatTextView
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
+    private lateinit var deviceSettingsButton: AppCompatImageButton
 
     private var barDataList = ArrayList<BarGraphData>()
     private var maxBarIndex = -1
@@ -31,7 +34,10 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     private var useValueAsBarDescriptor = false
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
-
+    private var preventOnPauseExecutionInStandAloneMode = false
+    private var buttonNormalizationRequired = false
+    
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bar_graph)
@@ -49,7 +55,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         }
 
         // get the element ID + UI-Adapter Index
-        relatedElementID = intent.getIntExtra("elementID", -1)
+        relatedElementIndex = intent.getIntExtra("elementID", -1)
         relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
@@ -64,9 +70,26 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         }
 
         // add back button functionality
-        this.backButton = findViewById(R.id.barGraphActivityBackButton)
-        this.backButton.setOnClickListener {
-            handleBackEvent()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.barGraphActivityBackButton).apply {
+            setOnClickListener {
+                handleBackEvent()
+            }
+        }
+        
+        // add device settings button functionality (if applicable)
+        this.deviceSettingsButton = findViewById<AppCompatImageButton?>(R.id.bgdHeaderSettingsButton).apply {
+            if(isStandAlonePropertyMode){
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    setImageResource(R.drawable.ic_settings_pressed_48dp)
+                    buttonNormalizationRequired = true
+                    // prevent connection suspension in onPause
+                    preventOnPauseExecutionInStandAloneMode = true
+                    // navigate to the device settings activity..
+                    val intent = Intent(this@BarGraphActivity, DeviceSettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         // bind the callbacks of the bluetooth-manager to this activity
@@ -90,39 +113,63 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             barGraphState
         )
     }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
-//        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-//        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-//        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-//
-//        // close activity
-//        finish()
-//        if(!isStandAlonePropertyMode) {
-//            // only set slide transition if the activity was invoked from the deviceMainActivity
-//            overridePendingTransition(
-//                R.anim.finish_activity_slide_animation_in,
-//                R.anim.finish_activity_slide_animation_out
-//            )
-//        }
-//    }
-
+    
+    private fun handleBackEvent(){
+        // check the mode and act in relation to it
+        if(!isStandAlonePropertyMode) {
+            // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
+            (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementIndex
+            // close activity
+            finish()
+            // only set slide transition if the activity was invoked from the deviceMainActivity
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        } else {
+            // this is stand-alone mode, so when back navigation occurs, the connection must be cleared
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
+        }
+    }
+    
     override fun onPause() {
         super.onPause()
-        // if this is not called due to a back-navigation, the user must have left the app
-        if(!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage){
-            if(verboseLog) {
-                Log.d(
-                    "M:BGD:onPause",
-                    "Bar Graph Activity: The user closes the app -> suspend connection"
-                )
+        if(!isStandAlonePropertyMode) {
+            // NOT stand-alone mode:
+            // if the following is true, onBackPressed was executed before and the connection must remain active
+            // because this is a back navigation to the device main activity
+            if (!(this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage) {
+                if (verboseLog) {
+                    Log.d(
+                        "BarGraph:onPause",
+                        "Bar Graph Activity: The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
             }
-            // suspend connection and set indication-parameter
-            this.expectedConnectionLoss = true
-            this.mustReconnect = true
-            ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+        } else {
+            // this is stand-alone property mode
+            if(this.preventOnPauseExecutionInStandAloneMode){
+                this.preventOnPauseExecutionInStandAloneMode = false
+            } else {
+                // normal onPause execution:
+                if (verboseLog) {
+                    Log.d(
+                        "BarGraph:onPause",
+                        "Bar Graph Activity (stand-alone-mode): The user left the app -> suspend connection"
+                    )
+                }
+                // suspend connection and set indication-parameter
+                this.mustReconnect = true
+                this.expectedConnectionLoss = true
+                ApplicationProperty.bluetoothConnectionManager.suspendConnection()
+            }
         }
     }
 
@@ -135,14 +182,26 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // reset parameter anyway
         this.expectedConnectionLoss = false
-
+    
+        // recover button if applicable
+        if (isStandAlonePropertyMode && buttonNormalizationRequired) {
+            buttonNormalizationRequired = false
+            this.deviceSettingsButton.setImageResource(R.drawable.ic_settings_48dp)
+        }
+    
         when(ApplicationProperty.bluetoothConnectionManager.checkBluetoothEnabled()) {
             BLE_BLUETOOTH_PERMISSION_MISSING -> {
                 // permission was revoked while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             BLE_IS_DISABLED -> {
                 // bluetooth was disabled while app was in suspended state
+                if(isStandAlonePropertyMode){
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
             }
             else -> {
@@ -159,30 +218,13 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 } else {
                     // notify the remote device of the invocation of this property-page
                     ApplicationProperty.bluetoothConnectionManager.notifyComplexPropertyPageInvoked(
-                        this.relatedElementID
+                        this.relatedElementIndex
                     )
                 }
             }
         }
     }
     
-    private fun handleBackEvent(){
-        // when the user navigates back, schedule a final complex-state request to make sure the saved state is the same as the current state
-        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
-        (this.applicationContext as ApplicationProperty).complexPropertyUpdateRequired = true
-        (this.applicationContext as ApplicationProperty).complexUpdateIndex = this.relatedElementID
-    
-        // close activity
-        finish()
-        if(!isStandAlonePropertyMode) {
-            // only set slide transition if the activity was invoked from the deviceMainActivity
-            overridePendingTransition(
-                R.anim.finish_activity_slide_animation_in,
-                R.anim.finish_activity_slide_animation_out
-            )
-        }
-    }
-
     private fun initOrAdaptBarGraphDataHolder(newSize: Int){
 
         if(this.barDataList.isEmpty()){
@@ -232,8 +274,14 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
             dialog.setNegativeButton(R.string.GeneralString_Cancel) { dialogInterface: DialogInterface, _: Int ->
                 // cancel action
                 Executors.newSingleThreadScheduledExecutor().schedule({
-                    // NOTE: do not call clear() on the bleManager, this corrupts the list on the device main page!
-                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                    if(!isStandAlonePropertyMode) {
+                        // do not call clear() on the bleManager in normal mode, this corrupts the list on the device main page!
+                        (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                            true
+                    } else {
+                        // stand-alone-mode: here 'clear()' must be called - finish goes back to main activity directly
+                        ApplicationProperty.bluetoothConnectionManager.clear()
+                    }
                     finish()
                     if(!isStandAlonePropertyMode) {
                         // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -325,7 +373,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // if there is a connection failure -> navigate back
         when(errorID){
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_NO_DEVICE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -336,7 +389,12 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
                 }
             }
             BLE_CONNECTION_MANAGER_COMPONENT_ERROR_RESUME_FAILED_DEVICE_NOT_REACHABLE -> {
-                (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+                if(!isStandAlonePropertyMode) {
+                    (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage =
+                        true
+                } else {
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                }
                 finish()
                 if(!isStandAlonePropertyMode) {
                     // only set slide transition if the activity was invoked from the deviceMainActivity
@@ -356,7 +414,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {
-        return this.relatedElementID
+        return this.relatedElementIndex
     }
 
     override fun onComplexPropertyStateChanged(
@@ -368,7 +426,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         val element =
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(UIAdapterElementIndex)
 
-        if(element.internalElementIndex == this.relatedElementID){
+        if(element.internalElementIndex == this.relatedElementIndex){
             if(verboseLog) {
                 Log.d(
                     "M:CB:BGD:ComplexPCg",

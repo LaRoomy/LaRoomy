@@ -141,7 +141,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
                 if (verboseLog) {
                     Log.d(
                         "Navigator:onPause",
-                        "Navigator Activity: The user left the app -> suspend connection"
+                        "Navigator Activity (stand-alone-mode): The user left the app -> suspend connection"
                     )
                 }
                 // suspend connection and set indication-parameter
