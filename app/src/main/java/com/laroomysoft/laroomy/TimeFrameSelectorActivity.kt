@@ -20,7 +20,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
@@ -57,7 +57,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -88,7 +88,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         // set the header-text to the property Name
         this.headerTextView = findViewById<AppCompatTextView>(R.id.tfsHeaderTextView).apply {
             text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                relatedGlobalElementIndex
+                relatedUIAdapterIndex
             ).elementText
         }
 
@@ -99,7 +99,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         // get the related complex-state object
         val timeFrameState = TimeFrameSelectorState()
         timeFrameState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // save reference to UI elements

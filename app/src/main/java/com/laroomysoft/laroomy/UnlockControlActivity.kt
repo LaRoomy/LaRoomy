@@ -24,7 +24,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
 
     private var showPin = false
     //private var currentMode = UC_NORMAL_MODE
@@ -68,7 +68,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
     
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
     
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -113,7 +113,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         
         // set the header-text to the property-name
         this.headerTextView.text =
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
@@ -122,7 +122,7 @@ class UnlockControlActivity : AppCompatActivity(), BLEConnectionManager.BleEvent
         // get the related complex state object
         val lockState = UnlockControlState()
         lockState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // set the UI State

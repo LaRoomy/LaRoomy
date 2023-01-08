@@ -67,6 +67,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     
     val isStandAlonePropertyMode
     get() = this.bleDeviceData.isStandAlonePropertyMode
+    
+    val isInitialComplexStateLoopFinished
+    get() = this.bleDeviceData.isInitialComplexLoopFinished
 
     private var connectionSuspended = false
 
@@ -1092,6 +1095,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.complexStatePropertyIndexes.clear()
                     this.complexStateLoopActive = false
                     this.stopLoopTimeoutWatcher()
+                    
+                    this.bleDeviceData.isInitialComplexLoopFinished = true
 
                     if (verboseLog) {
                         Log.d(

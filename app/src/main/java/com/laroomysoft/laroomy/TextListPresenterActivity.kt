@@ -27,7 +27,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     private lateinit var headerTextView: AppCompatTextView
@@ -69,7 +69,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -78,7 +78,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         this.headerTextView = findViewById<AppCompatTextView>(R.id.textListPresenterHeaderTextView).apply {
             text =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    relatedGlobalElementIndex
+                    relatedUIAdapterIndex
                 ).elementText
         }
 
@@ -128,7 +128,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 }
         
                 // delete the str member of the complexProperty state object in the internal and the ui array (internal content of the list)
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState.strValue =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState.strValue =
                     ""
                 ApplicationProperty.bluetoothConnectionManager.clearInternalPropertyStateStringValue(
                     relatedElementIndex
@@ -168,7 +168,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         val textListPresenterState = TextListPresenterState()
         textListPresenterState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedUIAdapterIndex).complexPropertyState
         )
 
         this.textList = textListPresenterState.textListBackgroundStack
@@ -434,7 +434,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         newState: ComplexPropertyState
     ) {
         try {
-            if (UIAdapterElementIndex == this.relatedGlobalElementIndex) {
+            if (UIAdapterElementIndex == this.relatedUIAdapterIndex) {
                 when (newState.valueOne) {
                     0 -> {
                         // clear the list

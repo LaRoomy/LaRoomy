@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, TimePicker.OnTimeChangedListener {
 
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var mustReconnect = false
     private var currentHour = 0
     private var currentMinute = 0
@@ -56,7 +56,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -87,7 +87,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // set the header-text to the property Name
         this.headerTextView = findViewById<AppCompatTextView>(R.id.stsHeaderTextView).apply {
             text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                relatedGlobalElementIndex
+                relatedUIAdapterIndex
             ).elementText
         }
         this.notificationTextView = findViewById(R.id.stsUserNotificationTextView)
@@ -95,7 +95,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         // get the complex state data for the time selector
         val timeSelectorState = TimeSelectorState()
         timeSelectorState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // set the displayed time to the current device setting

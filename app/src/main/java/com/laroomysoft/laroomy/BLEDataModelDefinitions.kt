@@ -1979,6 +1979,7 @@ class BLEDeviceData {
     var hasCachingPermission = false
     var authenticationSuccess = false
     var isStandAlonePropertyMode = false
+    var isInitialComplexLoopFinished = false
     //var fragmentedTransmissionRequired = false
 
     var propertyCount = 0
@@ -1990,6 +1991,7 @@ class BLEDeviceData {
         hasCachingPermission = false
         authenticationSuccess = false
         isStandAlonePropertyMode = false
+        isInitialComplexLoopFinished = false
         //fragmentedTransmissionRequired = false
 
         propertyCount = 0

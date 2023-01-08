@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback, View.OnTouchListener {
 
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var mustReconnect = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
@@ -59,7 +59,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -67,7 +67,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         // get the complex state data for the navigator
         val navigatorState = NavigatorState()
         navigatorState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // get UI-Views
@@ -98,7 +98,7 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
         }
 
         // set header text to property name
-        this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).elementText
 
         // bind the callbacks and context of the bluetooth-manager to this activity
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)

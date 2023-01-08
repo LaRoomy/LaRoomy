@@ -34,8 +34,6 @@
     <string name="CA_FirstTimeoutSecondTryout">Verbindung kann nicht hergestellt werden. Erneuter Versuch..</string>
 
 
-
-
     <string name="DMA_ConnectionStatus_disconnected">getrennt</string>
     <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">getrennt - wird erneut versucht</string>
     <string name="DMA_ConnectionStatus_connected">verbunden</string>
@@ -50,7 +48,7 @@
     <string name="DMA_ReconnectDevice">Verbindung wird wiederhergestellt..</string>
     <string name="GeneralString_UnexpectedConnectionLossMessage">Die Verbindung wurde unerwartet unterbrochen. Erneut versuchen?</string>
     <string name="GeneralString_ConnectionLossDialogTitle">Verbindungsfehler</string>
-
+    <string name="DMA_WaitForComplexClickMessage">Zustand der Eigenschaft wird im Hintergrund aktualisiert. Bitte versuchen Sie es gleich noch einmal.</string>
 
 
 

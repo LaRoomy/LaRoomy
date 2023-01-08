@@ -26,10 +26,6 @@ import com.github.ybq.android.spinkit.SpinKitView
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-const val STATUS_DISCONNECTED = 0
-const val STATUS_CONNECTED = 1
-const val STATUS_CONNECTING = 2
-
 class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCallback, BLEConnectionManager.BleEventCallback, OnPropertyClickListener, SeekBar.OnSeekBarChangeListener {
 
     // device property list elements
@@ -764,149 +760,273 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onNavigatableElementClick(index: Int) {
-
-        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
-
-        if(verboseLog) {
-            Log.d(
-                "M:CB:onNavElementClk",
-                "Property element was clicked. Element-Type is Complex/Navigate forward at index: $index\n\nData is:\n" +
-                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
-                        "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
-            )
-        }
-
-        // if item is disabled skip execution of this method
-        if(!devicePropertyListContentInformation.isEnabled){
-            if(verboseLog){
-                Log.d("M:CB:onNavElementClk", "Navigatable element was clicked. Element is disabled. Skip execution!")
+        try {
+            val devicePropertyListContentInformation =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+    
+            if (verboseLog) {
+                Log.d(
+                    "M:CB:onNavElementClk",
+                    "Property element was clicked. Element-Type is Complex/Navigate forward at index: $index\n\nData is:\n" +
+                            "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                            "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                            "Element-ID: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                            "Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+                )
             }
-            return
-        }
-
-        // set it to selected color
-        setPropertyToSelectedState(index)
-
-        // save the index of the highlighted item to reset it on back-navigation
-        restoreIndex = index
-
-        // navigate
-        when(devicePropertyListContentInformation.propertyType){
-            COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the RGB Page
-                val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+    
+            // if item is disabled skip execution of this method
+            if (!devicePropertyListContentInformation.isEnabled) {
+                if (verboseLog) {
+                    Log.d(
+                        "M:CB:onNavElementClk",
+                        "Navigatable element was clicked. Element is disabled. Skip execution!"
+                    )
+                }
+                return
             }
-            COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the extended level selector page
-                val intent = Intent(this@DeviceMainActivity, ExtendedLevelSelectorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+    
+            // check if the complex state loop is pending (if so the complex state data is not valid)
+            if (!ApplicationProperty.bluetoothConnectionManager.isInitialComplexStateLoopFinished) {
+                val infoData = DeviceInfoHeaderData()
+                infoData.message = getString(R.string.DMA_WaitForComplexClickMessage)
+                infoData.type = USERMESSAGE_TYPE_INFO
+                infoData.displayTime = 0
+                this.showNotificationHeaderAndPostMessage(infoData)
+                return
             }
-            COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the time selector page with single-select-mode
-                val intent = Intent(this@DeviceMainActivity, SimpleTimeSelectorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+    
+            // set it to selected color
+            setPropertyToSelectedState(index)
+    
+            // save the index of the highlighted item to reset it on back-navigation
+            restoreIndex = index
+    
+            // navigate
+            when (devicePropertyListContentInformation.propertyType) {
+                COMPLEX_PROPERTY_TYPE_ID_RGB_SELECTOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the RGB Page
+                    val intent = Intent(this@DeviceMainActivity, RGBControlActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_EX_LEVEL_SELECTOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the extended level selector page
+                    val intent =
+                        Intent(this@DeviceMainActivity, ExtendedLevelSelectorActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_TIME_SELECTOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the time selector page with single-select-mode
+                    val intent =
+                        Intent(this@DeviceMainActivity, SimpleTimeSelectorActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the time-frame selector page
+                    val intent =
+                        Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the unlock control page
+                    val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the navigator page
+                    val intent =
+                        Intent(this@DeviceMainActivity, NavigatorControlActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_BARGRAPH -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the barGraph page
+                    val intent = Intent(this@DeviceMainActivity, BarGraphActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the lineGraph page
+                    val intent = Intent(this@DeviceMainActivity, LineGraphActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_STRING_INTERROGATOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the string interrogator page
+                    val intent =
+                        Intent(this@DeviceMainActivity, StringInterrogatorActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the text-list-presenter page
+                    val intent =
+                        Intent(this@DeviceMainActivity, TextListPresenterActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
+                else -> {
+                    // what to do here??
+                }
             }
-            COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the time-frame selector page
-                val intent = Intent(this@DeviceMainActivity, TimeFrameSelectorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the unlock control page
-                val intent = Intent(this@DeviceMainActivity, UnlockControlActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            COMPLEX_PROPERTY_TYPE_ID_NAVIGATOR -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the navigator page
-                val intent = Intent(this@DeviceMainActivity, NavigatorControlActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            COMPLEX_PROPERTY_TYPE_ID_BARGRAPH -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the barGraph page
-                val intent = Intent(this@DeviceMainActivity, BarGraphActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            COMPLEX_PROPERTY_TYPE_ID_LINEGRAPH -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the lineGraph page
-                val intent = Intent(this@DeviceMainActivity, LineGraphActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            COMPLEX_PROPERTY_TYPE_ID_STRING_INTERROGATOR -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the string interrogator page
-                val intent = Intent(this@DeviceMainActivity, StringInterrogatorActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER -> {
-                // prevent the normal "onPause" execution
-                (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution = true
-                // navigate to the text-list-presenter page
-                val intent = Intent(this@DeviceMainActivity, TextListPresenterActivity::class.java)
-                intent.putExtra("elementID", devicePropertyListContentInformation.internalElementIndex)
-                intent.putExtra("globalElementIndex", devicePropertyListContentInformation.globalIndex)
-                intent.putExtra("isStandAlonePropertyMode", false)
-                startActivity(intent)
-                overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
-            }
-            else -> {
-                // what to do here??
-            }
+        } catch (e: Exception){
+            Log.e("DeviceMainActivity", "(onNavigatableElementClick) Fatal Exception: ${e.message}")
+            (applicationContext as ApplicationProperty).logControl("E: (onNavigatableElementClick) Fatal Exception: ${e.message}")
         }
     }
 

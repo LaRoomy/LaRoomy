@@ -43,6 +43,7 @@
     <string name="DMA_PopUpMenuText_DiscardDevice">Close Device</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Reload Properties</string>
     <string name="DMA_ReconnectDevice">Resuming Connection..</string>
+    <string name="DMA_WaitForComplexClickMessage">Background state update in progress. Please wait a second and try again.</string>
 
 
     <string name="RGB_HeaderText">RGB Control</string>

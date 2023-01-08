@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,21 +9,28 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     tools:context=".UnlockControlActivity">
+-->
 
 <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
     android:id="@+id/unLockActivityParentContainer"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="horizontal"
     tools:context=".UnlockControlActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/ucLeftPaneContainer"
         android:background="@drawable/unlock_activity_status_panel_background"
         android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
+        android:layout_marginBottom="5dp"
+        android:minHeight="340dp"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -266,7 +274,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:padding="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@drawable/complex_property_page_panel_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -309,7 +318,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ucSevenButton"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText" />
+                    tools:ignore="HardcodedText,TextContrastCheck" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/ucNineButton"
@@ -525,4 +534,5 @@
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-</ScrollView>
+<!--
+</ScrollView>-->

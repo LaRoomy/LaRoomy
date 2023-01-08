@@ -25,7 +25,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     private lateinit var notificationTextView: AppCompatTextView
@@ -65,7 +65,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -74,7 +74,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         this.headerTextView = findViewById<AppCompatTextView>(R.id.stringInterrogatorHeaderTextView).apply {
             text =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    relatedGlobalElementIndex
+                    relatedUIAdapterIndex
                 ).elementText
         }
 
@@ -127,9 +127,20 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                 this.collectDataAndSendCommand()
     
                 if (navigateBackOnButtonPress) {
-                    (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired =
-                        true
-                    handleBackEvent()
+                    if(isStandAlonePropertyMode){
+                        // make sure to hide the soft keyboard
+                        val imm =
+                            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(this.fieldTwoInputText.windowToken, 0)
+                        // navigate back with a delay
+                        Executors.newSingleThreadScheduledExecutor().schedule({
+                            handleBackEvent()
+                        }, 600, TimeUnit.MILLISECONDS)
+                    } else {
+                        (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired =
+                            true
+                        handleBackEvent()
+                    }
                 }
             } else {
                 // invalid user input - notify user
@@ -142,7 +153,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
 
         val stringInterrogatorState = StringInterrogatorState()
         stringInterrogatorState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         this.setCurrentViewStateFromComplexPropertyState(stringInterrogatorState)
@@ -524,7 +535,7 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         UIAdapterElementIndex: Int,
         newState: ComplexPropertyState
     ) {
-        if (UIAdapterElementIndex == this.relatedGlobalElementIndex) {
+        if (UIAdapterElementIndex == this.relatedUIAdapterIndex) {
             val element =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                     UIAdapterElementIndex

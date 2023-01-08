@@ -26,7 +26,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
     
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var currentLevel = 0
     private var minValue = 0
     private var maxValue = 100
@@ -78,7 +78,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -88,7 +88,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         this.headerTextView.apply {
             text =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    relatedGlobalElementIndex
+                    relatedUIAdapterIndex
                 ).elementText
         }
 
@@ -129,7 +129,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         // get the related complex state object
         val exLevelState = ExtendedLevelSelectorState()
         exLevelState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // save the ex level data

@@ -42,7 +42,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var currentColor = Color.WHITE
     private var currentColorTransitionProgram = -1
     private var currentMode = RGB_MODE_SINGLE_COLOR
@@ -73,7 +73,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // get the element ID
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -121,7 +121,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         // get the state for this RGB control
         val rgbState = RGBSelectorState()
         rgbState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // set the visibility state of elements
@@ -152,7 +152,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
 
         // set the header-text to the property-name
         this.headerTextView = findViewById(R.id.rgbHeaderTextView)
-        this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).elementText
+        this.headerTextView.text = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).elementText
 
         ApplicationProperty.bluetoothConnectionManager.setBleEventHandler(this)
         ApplicationProperty.bluetoothConnectionManager.setPropertyEventHandler(this)

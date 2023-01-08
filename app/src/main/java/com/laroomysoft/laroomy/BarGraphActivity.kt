@@ -18,7 +18,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
-    private var relatedGlobalElementIndex = -1
+    private var relatedUIAdapterIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
 
     private lateinit var barGraph: BarGraph
@@ -56,7 +56,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
 
         // get the element ID + UI-Adapter Index
         relatedElementIndex = intent.getIntExtra("elementID", -1)
-        relatedGlobalElementIndex = intent.getIntExtra("globalElementIndex", -1)
+        relatedUIAdapterIndex = intent.getIntExtra("globalElementIndex", -1)
 
         // detect invocation method
         isStandAlonePropertyMode = intent.getBooleanExtra("isStandAlonePropertyMode", COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE)
@@ -65,7 +65,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         this.headerTextView = findViewById<AppCompatTextView>(R.id.bgdHeaderTextView).apply {
             text =
                 ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
-                    relatedGlobalElementIndex
+                    relatedUIAdapterIndex
                 ).elementText
         }
 
@@ -105,7 +105,7 @@ class BarGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallb
         // get the initial bar data
         val barGraphState = BarGraphState()
         barGraphState.fromComplexPropertyState(
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedGlobalElementIndex).complexPropertyState
+            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(relatedUIAdapterIndex).complexPropertyState
         )
 
         // create and set the bar-graph data
