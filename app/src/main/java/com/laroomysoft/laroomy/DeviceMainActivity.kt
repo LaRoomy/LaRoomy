@@ -891,6 +891,28 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         R.anim.start_activity_slide_animation_out
                     )
                 }
+                COMPLEX_PROPERTY_TYPE_ID_DATE_SELECTOR -> {
+                    // prevent the normal "onPause" execution
+                    (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =
+                        true
+                    // navigate to the date selector page
+                    val intent =
+                        Intent(this@DeviceMainActivity, DateSelectorActivity::class.java)
+                    intent.putExtra(
+                        "elementID",
+                        devicePropertyListContentInformation.internalElementIndex
+                    )
+                    intent.putExtra(
+                        "globalElementIndex",
+                        devicePropertyListContentInformation.globalIndex
+                    )
+                    intent.putExtra("isStandAlonePropertyMode", false)
+                    startActivity(intent)
+                    overridePendingTransition(
+                        R.anim.start_activity_slide_animation_in,
+                        R.anim.start_activity_slide_animation_out
+                    )
+                }
                 COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                     // prevent the normal "onPause" execution
                     (this.applicationContext as ApplicationProperty).noConnectionKillOnPauseExecution =

@@ -74,6 +74,8 @@
     <string name="TFS_From">Von</string>
     <string name="TFS_To">Bis</string>
 
+    <string name="DateSelector_HeaderText">Datum auswählen</string>
+
     <string name="BarGraphActivity_HeaderText">Balkendiagramm Anzeige</string>
 
     <string name="LineGraphActivity_HeaderText">Diagramm Anzeige</string>

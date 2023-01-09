@@ -532,6 +532,62 @@ class TimeFrameSelectorState : IComplexPropertySubTypeProtocolClass() {
     }
 }
 
+class DateSelectorState : IComplexPropertySubTypeProtocolClass() {
+    
+    var year = 2023
+    var month = 1
+    var day = 1
+    
+    override fun isValid(): Boolean {
+        return ((year >= 0)&&(month > 0)&&(day > 0))
+    }
+    
+    override fun fromComplexPropertyState(complexPropertyState: ComplexPropertyState) {
+        this.year = complexPropertyState.valueOne
+        this.month = complexPropertyState.valueTwo
+        this.day = complexPropertyState.valueThree
+    }
+    
+    override fun toComplexPropertyState(): ComplexPropertyState {
+        val cState = ComplexPropertyState()
+        cState.valueOne = this.year
+        cState.valueTwo = this.month
+        cState.valueThree = this.day
+        return cState
+    }
+    
+    override fun fromString(data: String): Boolean {
+        return if (data.length < 17) {
+            if (verboseLog) {
+                Log.e(
+                    "DateSelData:fromString",
+                    "Error reading Data from Date Selector Data Transmission. Data-length too short: Length was: ${data.length}"
+                )
+            }
+            false
+        } else {
+            this.day = a2CharHexValueToIntValue(data[8], data[9])
+            this.month = a2CharHexValueToIntValue(data[10], data[11])
+            this.year = a4CharHexValueToSignedIntValue(data[12], data[13], data[14], data[15]).toInt()
+            true
+        }
+    }
+    
+    override fun toExecutionString(propertyIndex: Int): String {
+        // generate transmission header:
+        var executionString = "43"
+        executionString += a8bitValueTo2CharHexValue(propertyIndex)
+        executionString += "0900"
+    
+        // add date selector specific data
+        executionString += a8bitValueTo2CharHexValue(this.day)
+        executionString += a8bitValueTo2CharHexValue(this.month)
+        executionString += aSigned16bitValueTo4CharHexValue(this.year.toShort())
+        executionString += '\r'
+        return executionString
+    }
+}
+
 class NavigatorState : IComplexPropertySubTypeProtocolClass() {
 
     var upperButton = false
@@ -2249,7 +2305,7 @@ class SuccessiveSimpleUpdateStorage {
 
 class SuccessiveComplexUpdateStorage {
     var data = ""
-    var isHandled = true
+    //var isHandled = true
     var isStarted = false
     var keep = false
     //var eIndex = -1

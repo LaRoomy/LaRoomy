@@ -1057,6 +1057,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             COMPLEX_PROPERTY_TYPE_ID_TIME_FRAME_SELECTOR -> {
                 this.processTimeFrameSelectorData(propertyIndex, data)
             }
+            COMPLEX_PROPERTY_TYPE_ID_DATE_SELECTOR -> {
+                this.processDateSelectorData(propertyIndex, data)
+            }
             COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                 this.processUnlockControlData(propertyIndex, data)
             }
@@ -1870,6 +1873,23 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             val cState =
                 timeFrameSelectorState.toComplexPropertyState()
 
+            this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
+        }
+    }
+    
+    private fun processDateSelectorData(propertyIndex: Int, data: String){
+        
+        val dateSelectorState = DateSelectorState()
+        
+        // extract the date-selector data
+        if(!dateSelectorState.fromString(data)){
+            // handle error
+            applicationProperty.logControl("E: Error reading data from Date-Selector data transmission.")
+            return
+        } else {
+            val cState =
+                dateSelectorState.toComplexPropertyState()
+            
             this.updateInternalComplexPropertyStateDataAndTriggerEvent(cState, propertyIndex)
         }
     }

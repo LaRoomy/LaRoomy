@@ -68,6 +68,8 @@
     <string name="TFS_From">From</string>
     <string name="TFS_To">To</string>
 
+    <string name="DateSelector_HeaderText">Date Selector</string>
+
     <string name="BarGraphActivity_HeaderText">Bar Graph View</string>
 
     <string name="LineGraphActivity_HeaderText">Line Graph View</string>

@@ -509,6 +509,14 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                     intent.putExtra("isStandAlonePropertyMode", true)
                     startActivity(intent)
                 }
+                COMPLEX_PROPERTY_TYPE_ID_DATE_SELECTOR -> {
+                    // navigate to the time frame selector page
+                    val intent = Intent(this@LoadingActivity, DateSelectorActivity::class.java)
+                    intent.putExtra("elementID", 0)
+                    intent.putExtra("globalElementIndex", 0)
+                    intent.putExtra("isStandAlonePropertyMode", true)
+                    startActivity(intent)
+                }
                 COMPLEX_PROPERTY_TYPE_ID_UNLOCK_CONTROL -> {
                     // navigate to the unlock control page
                     val intent = Intent(this@LoadingActivity, UnlockControlActivity::class.java)
