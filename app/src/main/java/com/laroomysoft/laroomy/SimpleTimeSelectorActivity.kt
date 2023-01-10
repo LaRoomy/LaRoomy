@@ -21,6 +21,7 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private var relatedElementIndex = -1
     private var relatedUIAdapterIndex = -1
     private var mustReconnect = false
+    private var blockExecutionCommand = false
     private var currentHour = 0
     private var currentMinute = 0
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
@@ -250,7 +251,9 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         runOnUiThread {
             this.currentHour = timeSelectorState.hour
             this.currentMinute = timeSelectorState.minute
+            this.blockExecutionCommand = true
             this.simpleTimePicker.hour = timeSelectorState.hour
+            this.blockExecutionCommand = true
             this.simpleTimePicker.minute = timeSelectorState.minute
         }
     }
@@ -266,16 +269,16 @@ class SimpleTimeSelectorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         val timeSelectorState = TimeSelectorState()
         timeSelectorState.hour = this.currentHour
         timeSelectorState.minute = this.currentMinute
-        
-//          old update, no transmission control
-//        ApplicationProperty.bluetoothConnectionManager.sendData(
-//            timeSelectorState.toExecutionString(this.relatedElementID)
-//        )
 
         ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
             timeSelectorState.toComplexPropertyState(),
             this.relatedElementIndex
         )
+        
+        if(this.blockExecutionCommand){
+            this.blockExecutionCommand = false
+            return
+        }
 
         // control the output transmissions in a sensible manner
         if(!this.successiveComplexUpdateStorage.isStarted){

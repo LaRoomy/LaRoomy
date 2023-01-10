@@ -30,6 +30,7 @@ class DateSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventC
     private var relatedElementIndex = -1
     private var relatedUIAdapterIndex = -1
     private var mustReconnect = false
+    private var blockExecutionCommand = false
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
@@ -113,9 +114,6 @@ class DateSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventC
             this.updateDate(dateSelectorState.year, (dateSelectorState.month - 1), dateSelectorState.day)
             this.setOnDateChangedListener(this@DateSelectorActivity)
         }
-    
-        // TODO: set current date ???
-        
     }
     
     private fun handleBackEvent(){
@@ -252,9 +250,13 @@ class DateSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventC
         dateSelectorState.year = this.year
         
         // send update transmission
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            dateSelectorState.toExecutionString(this.relatedElementIndex)
-        )
+        if(!this.blockExecutionCommand) {
+            ApplicationProperty.bluetoothConnectionManager.sendData(
+                dateSelectorState.toExecutionString(this.relatedElementIndex)
+            )
+        } else {
+            this.blockExecutionCommand = false
+        }
     
         // update internal state
         ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
@@ -268,6 +270,7 @@ class DateSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventC
             this.day = dateSelectorState.day
             this.month = dateSelectorState.month - 1 // make month 0-based!
             this.year = dateSelectorState.year
+            this.blockExecutionCommand = true
             this.dateSelector.updateDate(this.year, this.month, this.day)
         }
     }
