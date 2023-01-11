@@ -345,6 +345,12 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             var counter = 0
 
             override fun run() {
+                if(verboseLog){
+                    Log.d(
+                        "LoadingActivity",
+                        "onDeviceReadyForCommunication: Init Tryout Timer event raised. IsConnected: ${ApplicationProperty.bluetoothConnectionManager.isConnected} / InitSuccess: ${ApplicationProperty.bluetoothConnectionManager.initializationSuccess}"
+                    )
+                }
                 if(counter < 8) {
                     if(!ApplicationProperty.bluetoothConnectionManager.isConnected){
                         cancel()

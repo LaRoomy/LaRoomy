@@ -1296,6 +1296,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // the remote device, if another request is sent and the device does respond to the first request there are two requests pending
             // when the first was processed, then the second will be treated normally like in the initial connection process
             // this must be prohibited
+            if(verboseLog){
+                Log.e("readInitTransmission", "Unexpected: Init transmission received while other loops are in progress.")
+            }
             return false
         }
 
@@ -1376,6 +1379,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // reset control params
                     this.reloadInitRequestPending = false
                     this.reloadAttemptCounter = 0
+                    
+                    // mark the auth as success
+                    this.bleDeviceData.authenticationSuccess = true
 
                     // start the property loop
                     this.invokeCallbackLoopAfterUIDataGeneration = true
@@ -1631,6 +1637,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun startReloadProperties(){
+        
+        if(verboseLog){
+            Log.d("startReloadProperties", "Property reload started.")
+        }
 
         this.reloadInitRequestPending = true
         this.initDeviceTransmission()
@@ -3632,7 +3642,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             } else {
                                 if (timeoutWatcherData.loopRepeatCounter < 4) {
                                     if (verboseLog) {
-                                        Log.w(
+                                        Log.e(
                                             "LoopTimeoutWatcher",
                                             "Timeout occurred in ${loopTypeToString(timeoutWatcherData.loopType)} loop - restarting loop. Repeat-Counter is: ${timeoutWatcherData.loopRepeatCounter}"
                                         )
@@ -3657,14 +3667,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         }
                                         LOOPTYPE_PROPERTY -> {
                                             cancel()
-    
-                                            //clearPropertyRelatedParameterAndStopAllLoops()
-                                            //startPropertyListing(invokeCallbackLoopAfterUIDataGeneration)
-    
-                                            // TODO: reload, not start!!!!!!!!
-    
                                             reloadProperties()
-    
                                         }
                                         LOOPTYPE_GROUP -> {
                                             cancel()
