@@ -211,6 +211,14 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     // **************************************************************************************
                     // THIS IS A BACK NAVIGATION FROM A PROPERTY SUB-PAGE
                     // **************************************************************************************
+                    
+                    // check if a close-device command was received on the sub-page
+                    if((applicationContext as ApplicationProperty).closeDeviceRequested){
+                        (applicationContext as ApplicationProperty).closeDeviceRequested = false
+                        this.onCloseDeviceRequested()
+                        // exit immediately
+                        return
+                    }
 
                     // if the device was disconnected on a property sub-page, navigate back with delay
                     if (!ApplicationProperty.bluetoothConnectionManager.isConnected) {
@@ -1591,6 +1599,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         (applicationContext as ApplicationProperty).logControl("I: Property was invalidated from remote device -> Reload Properties")
 
         this.reloadProperties()
+    }
+    
+    override fun onCloseDeviceRequested() {
+        ApplicationProperty.bluetoothConnectionManager.clear()
+        finish()
     }
 
     override fun getCurrentOpenComplexPropPagePropertyIndex(): Int {

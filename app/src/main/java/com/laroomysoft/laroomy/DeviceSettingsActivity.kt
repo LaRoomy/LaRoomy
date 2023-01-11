@@ -669,4 +669,15 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         }
         // else: do nothing: back navigation to device main is not possible in stand-alone-mode
     }
+    
+    override fun onCloseDeviceRequested() {
+        if(isStandAlonePropertyMode){
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
+        } else {
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            (this.applicationContext as ApplicationProperty).closeDeviceRequested = true
+            finish()
+        }
+    }
 }

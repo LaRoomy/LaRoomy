@@ -838,6 +838,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // handle the remote back navigation request
                     this.handleForcedBackNavigation()
                 }
+                '8' -> {
+                    // handle the close-device command
+                    this.handleCloseDeviceCommand()
+                }
                 else -> {
                     if(verboseLog){
                         Log.e("readDeviceNotification", "Unknown device notification type")
@@ -3759,6 +3763,18 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
     }
     
+    private fun handleCloseDeviceCommand() {
+        if (verboseLog) {
+            Log.d(
+                "BluetoothManagerClass",
+                "Remote device sent close command."
+            )
+        }
+        applicationProperty.logControl("I: Remote device sent close command. Processing it..!")
+        
+        this.propertyCallback.onCloseDeviceRequested()
+    }
+    
     private fun sendDeviceReconnectedNotification(){
         val currentPageIndex = this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
         val dataToSend = "${this.deviceReconnectedNotificationEntry}${a8bitValueTo2CharHexValue(currentPageIndex)}\r"
@@ -3857,6 +3873,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onStandAlonePropertyModePreparationComplete(){}
         fun onPropertyInvalidated(){}
         fun onRemoteBackNavigationRequested(){}
+        fun onCloseDeviceRequested(){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
         fun onComplexPropertyStateChanged(UIAdapterElementIndex: Int, newState: ComplexPropertyState){}
         fun onRemoteUserMessage(deviceHeaderData: DeviceInfoHeaderData){}

@@ -671,4 +671,21 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
         }
         // else: do nothing: back navigation to device main is not possible in stand-alone-mode
     }
+    
+    override fun onCloseDeviceRequested() {
+        if(isStandAlonePropertyMode){
+            ApplicationProperty.bluetoothConnectionManager.clear()
+            finish()
+        } else {
+            (this.applicationContext as ApplicationProperty).navigatedFromPropertySubPage = true
+            (this.applicationContext as ApplicationProperty).closeDeviceRequested = true
+            
+            finish()
+            
+            overridePendingTransition(
+                R.anim.finish_activity_slide_animation_in,
+                R.anim.finish_activity_slide_animation_out
+            )
+        }
+    }
 }

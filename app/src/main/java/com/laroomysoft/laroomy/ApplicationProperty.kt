@@ -90,6 +90,7 @@ class ApplicationProperty : Application() {
     var mainActivityListElementWasAdded = false
     var complexUpdateIndex = -1
     var propertyInvalidatedOnSubPage = false
+    var closeDeviceRequested = false
     var isPremiumAppVersion = false
 
     lateinit var uuidManager: UUIDManager
@@ -129,6 +130,7 @@ class ApplicationProperty : Application() {
         this.complexUpdateIndex = -1
         this.navigatedFromPropertySubPage = false
         this.propertyInvalidatedOnSubPage = false
+        this.closeDeviceRequested = false
     }
 
     fun logControl(message: String){
