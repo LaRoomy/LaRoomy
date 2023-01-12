@@ -842,6 +842,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // handle the close-device command
                     this.handleCloseDeviceCommand()
                 }
+                '9' -> {
+                    // handle date request command
+                    this.handleDateRequest()
+                }
                 else -> {
                     if(verboseLog){
                         Log.e("readDeviceNotification", "Unknown device notification type")
@@ -894,6 +898,21 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData(timeRequestResponse)
     }
     
+    private fun handleDateRequest(){
+        // get the date and send the client command to the device
+        val calendar = Calendar.getInstance()
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH) + 1 // the month is zero based, so increase it!
+        val year = calendar.get(Calendar.YEAR)
+        
+        var dateRequestResponse = "52000a009"
+        dateRequestResponse += a8bitValueTo2CharHexValue(day)
+        dateRequestResponse += a8bitValueTo2CharHexValue(month)
+        dateRequestResponse += aSigned16bitValueTo4CharHexValue(year.toShort())
+        dateRequestResponse += '\r'
+        this.sendData(dateRequestResponse)
+    }
+    
     private fun handlePropertyInvalidationRequest(){
         if(this.bleDeviceData.isStandAlonePropertyMode) {
             if (verboseLog) {
@@ -921,6 +940,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun dispatchPropertyStateTransmission(data: String, dataSize: Int) : Boolean {
+        // when the property is not loaded, the states cannot be updated, so check if loading is in progress
+        if(this.propertyLoopActive){
+            if(verboseLog){
+                Log.e("BLEConnectionManager", "Unexpected: -dispatchPropertyStateTransmission- invoked while property loop is in progress. Discarding transmission.")
+            }
+            applicationProperty.logControl("W: Property-State transmission received while property-loop is in progress. State transmissions not accepted before property loading is done. Transmission discarded!")
+            return false
+        }
 
         // at first retrieve the property-index
         var propIndex = "0x"
@@ -3779,7 +3806,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
     
     private fun sendDeviceReconnectedNotification(){
-        val currentPageIndex = this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+        var currentPageIndex = this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+        if(currentPageIndex < 0){
+            currentPageIndex = 0
+        }
         val dataToSend = "${this.deviceReconnectedNotificationEntry}${a8bitValueTo2CharHexValue(currentPageIndex)}\r"
         this.sendData(dataToSend)
     }
