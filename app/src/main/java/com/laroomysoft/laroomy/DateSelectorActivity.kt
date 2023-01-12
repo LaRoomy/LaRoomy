@@ -233,7 +233,7 @@ class DateSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleEventC
         if (verboseLog) {
             Log.d(
                 "DateSelector:onDateChanged",
-                "Date changed in DateSelector. Day: $dayOfMonth / Month: $month / Year: $year"
+                "Date changed in DateSelector. Day: $dayOfMonth ; Month: $month ; Year: $year"
             )
         }
         this.day = dayOfMonth
