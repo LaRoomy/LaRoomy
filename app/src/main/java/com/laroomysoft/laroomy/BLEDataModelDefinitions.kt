@@ -37,7 +37,6 @@ const val SI_INPUT_TYPE_TEXT_PASSWORD = 1
 const val SI_INPUT_TYPE_NUMBER = 2
 const val SI_INPUT_TYPE_NUMBER_PASSWORD = 3
 
-
 class LaRoomyDevicePresentationModel {
     // NOTE: This is the data-model for the DeviceListItem in the main-activity
     var name = ""

@@ -54,8 +54,8 @@ fun isNumber(char: Char): Boolean {
 fun colorForUserMessageType(type: Char) : Int {
     return when(type){
         '0' -> R.color.InfoColor
-        '1' -> R.color.WarningColor
-        '2' -> R.color.ErrorColor
+        '1' -> R.color.warningLightColor
+        '2' -> R.color.errorLightColor
         else -> R.color.InfoColor
     }
 }

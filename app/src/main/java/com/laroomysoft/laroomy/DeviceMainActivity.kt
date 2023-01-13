@@ -44,6 +44,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private lateinit var deviceHeaderNotificationTextView: AppCompatTextView
     private lateinit var deviceHeaderNotificationContainer: ConstraintLayout
+    private lateinit var deviceHeaderClickOverlayContainer: ConstraintLayout
     private lateinit var deviceHeaderNameContainer: ConstraintLayout
 
     //private lateinit var deviceSettingsButton: AppCompatImageButton
@@ -105,9 +106,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
-        this.deviceHeaderNotificationContainer = findViewById<ConstraintLayout?>(R.id.deviceInfoSubHeaderContainer).apply {
+        this.deviceHeaderNotificationContainer = findViewById(R.id.deviceInfoSubHeaderContainer)
+        this.deviceHeaderClickOverlayContainer = findViewById<ConstraintLayout?>(R.id.deviceMainActivityDeviceInfoSubHeaderSubContainer).apply {
             setOnClickListener {
-                this@DeviceMainActivity.onDeviceInfoHeaderClick()
+                onDeviceInfoHeaderClick()
             }
         }
 
@@ -1249,10 +1251,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     private fun showNotificationHeaderAndPostMessage(deviceHeaderData: DeviceInfoHeaderData) {
         runOnUiThread {
-            //this.deviceHeaderNotificationImageView.setImageResource(
-            //resourceIdForImageId(imageID)
-            //)
-            
             this.deviceHeaderClickAction = deviceHeaderData.onClickAction
 
             //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
@@ -1264,8 +1262,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     )
                 )
             )
-
-            //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
 
             val expandCollapseExtension = ExpandCollapseExtension()
             expandCollapseExtension.expand(this.deviceHeaderNotificationContainer)//, 600)
@@ -1283,10 +1279,22 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
     
     private fun onDeviceInfoHeaderClick(){
+        if(verboseLog){
+            Log.d("DeviceMainActivity", "onDeviceInfoHeaderClick: Action is = ${this.deviceHeaderClickAction}")
+        }
         when(this.deviceHeaderClickAction){
-            DEV_HEADER_CLICK_ACTION_NONE -> return
+            DEV_HEADER_CLICK_ACTION_NONE -> {
+                runOnUiThread {
+                    this.hideNotificationHeader()
+                }
+            }
             DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD -> {
                 ApplicationProperty.bluetoothConnectionManager.startNewComplexStateLoop()
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    runOnUiThread {
+                        this.hideNotificationHeader()
+                    }
+                }, 500, TimeUnit.MILLISECONDS)
             }
         }
     }
