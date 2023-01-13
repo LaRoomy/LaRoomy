@@ -70,6 +70,10 @@ const val LAROOMY_WEBAPI_BASIS_LINK = "https://epl2-datatransmission.blogspot.co
 // times
 const val TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT:Long = 1000
 
+// device header click actions
+const val DEV_HEADER_CLICK_ACTION_NONE = 0
+const val DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD = 1
+
 class ApplicationProperty : Application() {
 
     companion object {

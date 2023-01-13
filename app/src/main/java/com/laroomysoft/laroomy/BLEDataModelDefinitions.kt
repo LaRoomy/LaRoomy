@@ -53,7 +53,8 @@ class DeviceInfoHeaderData {
     var message = ""
     var imageID = -1
     var type = USERMESSAGE_TYPE_INFO
-
+    var onClickAction = DEV_HEADER_CLICK_ACTION_NONE
+    
     var displayTime: Long = 5000
     set(value) {
         field = when(value){

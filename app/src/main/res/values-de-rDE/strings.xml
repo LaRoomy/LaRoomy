@@ -46,9 +46,9 @@
     <string name="DMA_PopUpMenuText_DiscardDevice">Gerät schließen</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Eigenschaften neu laden</string>
     <string name="DMA_ReconnectDevice">Verbindung wird wiederhergestellt..</string>
-    <string name="GeneralString_UnexpectedConnectionLossMessage">Die Verbindung wurde unerwartet unterbrochen. Erneut versuchen?</string>
-    <string name="GeneralString_ConnectionLossDialogTitle">Verbindungsfehler</string>
     <string name="DMA_WaitForComplexClickMessage">Zustand der Eigenschaft wird im Hintergrund aktualisiert. Bitte versuchen Sie es gleich noch einmal.</string>
+    <string name="DMA_PropertyDataLoadingIncomplete">Eigenschaften-Daten konnten nicht vollständig geladen werden. Hier klicken um es erneut zu versuchen.</string>
+
 
 
 
@@ -113,8 +113,11 @@
     <string name="GeneralMessage_connectionSuspended">Verbindung unterbrochen</string>
     <string name="GeneralMessage_resumingConnection">Verbindung wird wiederhergestellt..</string>
     <string name="GeneralMessage_connectingFailed">Verbindung fehlgeschlagen:</string>
+
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Abbrechen</string>
+    <string name="GeneralString_UnexpectedConnectionLossMessage">Die Verbindung wurde unerwartet unterbrochen. Erneut versuchen?</string>
+    <string name="GeneralString_ConnectionLossDialogTitle">Verbindungsfehler</string>
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamische Fernsteuerung</string>

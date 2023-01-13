@@ -64,6 +64,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
     private var scrollToTop = false
+    private var deviceHeaderClickAction = DEV_HEADER_CLICK_ACTION_NONE
     
     private val slideUpdateData = SuccessiveSimpleUpdateStorage()
     private val optionSelectUpdateData = SuccessiveSimpleUpdateStorage()
@@ -104,7 +105,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         this.deviceHeaderNotificationTextView = findViewById(R.id.deviceMainActivityDeviceInfoSubHeaderTextView)
-        this.deviceHeaderNotificationContainer = findViewById(R.id.deviceInfoSubHeaderContainer)
+        this.deviceHeaderNotificationContainer = findViewById<ConstraintLayout?>(R.id.deviceInfoSubHeaderContainer).apply {
+            setOnClickListener {
+                this@DeviceMainActivity.onDeviceInfoHeaderClick()
+            }
+        }
 
         // init recycler view layout manager
         this.devicePropertyListLayoutManager = object : LinearLayoutManager(this) {
@@ -1247,6 +1252,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             //this.deviceHeaderNotificationImageView.setImageResource(
             //resourceIdForImageId(imageID)
             //)
+            
+            this.deviceHeaderClickAction = deviceHeaderData.onClickAction
 
             //this.deviceHeaderNotificationContainer.visibility = View.VISIBLE
             this.deviceHeaderNotificationTextView.text = deviceHeaderData.message
@@ -1272,6 +1279,15 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     this.hideNotificationHeader()
                 }
             }, deviceHeaderData.displayTime, TimeUnit.MILLISECONDS)
+        }
+    }
+    
+    private fun onDeviceInfoHeaderClick(){
+        when(this.deviceHeaderClickAction){
+            DEV_HEADER_CLICK_ACTION_NONE -> return
+            DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD -> {
+                ApplicationProperty.bluetoothConnectionManager.startNewComplexStateLoop()
+            }
         }
     }
 
@@ -1599,6 +1615,19 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         (applicationContext as ApplicationProperty).logControl("I: Property was invalidated from remote device -> Reload Properties")
 
         this.reloadProperties()
+    }
+    
+    override fun onPropertyError(error: Int) {
+        if(error == BLE_COMPLEX_STATE_LOOP_FINAL_FAILED){
+            // notify user
+            val deviceHeaderData = DeviceInfoHeaderData()
+            deviceHeaderData.displayTime = 9L
+            deviceHeaderData.onClickAction = DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD
+            deviceHeaderData.type = USERMESSAGE_TYPE_ERROR
+            deviceHeaderData.message = getString(R.string.DMA_PropertyDataLoadingIncomplete)
+            
+            this.showNotificationHeaderAndPostMessage(deviceHeaderData)
+        }
     }
     
     override fun onCloseDeviceRequested() {

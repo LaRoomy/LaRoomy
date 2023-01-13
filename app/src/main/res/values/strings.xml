@@ -44,6 +44,7 @@
     <string name="DMA_PopUpMenuText_ReloadProperties">Reload Properties</string>
     <string name="DMA_ReconnectDevice">Resuming Connection..</string>
     <string name="DMA_WaitForComplexClickMessage">Background state update in progress. Please wait a second and try again.</string>
+    <string name="DMA_PropertyDataLoadingIncomplete">Property data could not be fully loaded. Click here to try again.</string>
 
 
     <string name="RGB_HeaderText">RGB Control</string>
@@ -378,7 +379,6 @@
     <string name="Error_NoMatchingCharacteristicsFound">No characteristic(s) matching the defined UUIDs were found. May take a look at the UUID-Profiles to solve the problem.</string>
     <string name="Error_InvalidPropertyTypeForStandaloneMode">Invalid Property-Type for the stand-alone mode.</string>
     <string name="Error_StandAlonePropertyModeError_NoData">Stand-alone mode error: no property data.</string>
-
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>

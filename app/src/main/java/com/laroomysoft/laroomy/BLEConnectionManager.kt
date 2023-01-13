@@ -33,6 +33,7 @@ const val BLE_INIT_NO_PROPERTIES = 6
 const val BLE_BLUETOOTH_PERMISSION_MISSING = 7
 const val BLE_NO_MATCHING_SERVICES = 8
 const val BLE_NO_MATCHING_CHARACTERISTICS = 9
+const val BLE_COMPLEX_STATE_LOOP_FINAL_FAILED = 10
 
 const val BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED = 101
 
@@ -93,9 +94,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var complexStateLoopActive = false
     private var complexStatePropertyIndexes = ArrayList<Int>()
 
-    // parameter regarding the fragmented transmission?
+    // parameter regarding the fragmented transmission
     private val openFragmentedTransmissionData = ArrayList<FragmentTransmissionData>()
-
 
     // Callbacks
     private lateinit var callback: BleEventCallback
@@ -3224,6 +3224,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             }
         }
     }
+    
+    fun startNewComplexStateLoop(){
+        if(this.isConnected){
+            if(!this.propertyLoopActive && !this.groupLoopActive && !this.simpleStateLoopActive){
+                this.startComplexStateDataLoop()
+            }
+        }
+    }
 
     private fun insertPropertyElement(laRoomyDeviceProperty: LaRoomyDeviceProperty){
         if(laRoomyDeviceProperty.propertyIndex > this.laRoomyDevicePropertyList.size){
@@ -3714,6 +3722,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         }
                                         LOOPTYPE_COMPLEXSTATE -> {
                                             complexStateLoopActive = false
+                                            this@BLEConnectionManager.propertyCallback.onPropertyError(
+                                                BLE_COMPLEX_STATE_LOOP_FINAL_FAILED
+                                            )
                                         }
                                         LOOPTYPE_PROPERTY -> {
                                             propertyLoopActive = false
@@ -3905,6 +3916,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         fun onUIAdaptableArrayItemRemoved(index: Int){}
         fun onStandAlonePropertyModePreparationComplete(){}
         fun onPropertyInvalidated(){}
+        fun onPropertyError(error: Int){}
         fun onRemoteBackNavigationRequested(){}
         fun onCloseDeviceRequested(){}
         fun onSimplePropertyStateChanged(UIAdapterElementIndex: Int, newState: Int){}
