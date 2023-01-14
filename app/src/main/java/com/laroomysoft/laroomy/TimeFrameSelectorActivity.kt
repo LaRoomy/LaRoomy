@@ -24,6 +24,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
+    private var blockExecutionCommand = false
     private var preventOnPauseExecutionInStandAloneMode = false
     private var buttonNormalizationRequired = false
     
@@ -104,22 +105,22 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
         // save reference to UI elements
         this.notificationTextView = findViewById(R.id.tfsNotificationTextView)
-        this.toTimePicker = findViewById(R.id.toTimePicker)
-        this.fromTimePicker = findViewById(R.id.fromTimePicker)
-
-        // set the 24h format in the timePicker
-        this.toTimePicker.setIs24HourView(true)
-        this.fromTimePicker.setIs24HourView(true)
-
-        // set the initial time of the pickers from the complex-state-data
-        this.fromTimePicker.hour = timeFrameState.onTimeHour
-        this.fromTimePicker.minute = timeFrameState.onTimeMinute
-        this.toTimePicker.hour = timeFrameState.offTimeHour
-        this.toTimePicker.minute = timeFrameState.offTimeMinute
-
-        // set the time-changed listeners
-        this.fromTimePicker.setOnTimeChangedListener(this)
-        this.toTimePicker.setOnTimeChangedListener(this)
+        
+        // configure off time picker
+        this.toTimePicker = findViewById<TimePicker?>(R.id.toTimePicker).apply {
+            setIs24HourView(true)
+            hour = timeFrameState.offTimeHour
+            minute = timeFrameState.offTimeMinute
+            setOnTimeChangedListener(this@TimeFrameSelectorActivity)
+        }
+        
+        // configure on time picker
+        this.fromTimePicker = findViewById<TimePicker?>(R.id.fromTimePicker).apply {
+            setIs24HourView(true)
+            hour = timeFrameState.onTimeHour
+            minute = timeFrameState.onTimeMinute
+            setOnTimeChangedListener(this@TimeFrameSelectorActivity)
+        }
     }
     
     private fun handleBackEvent(){
@@ -262,15 +263,15 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
         timeFrameSelectorState.offTimeHour = this.toTimePicker.hour
         timeFrameSelectorState.offTimeMinute = this.toTimePicker.minute
         
-//          old update - no transmission control!
-//        ApplicationProperty.bluetoothConnectionManager.sendData(
-//            timeFrameSelectorState.toExecutionString(this.relatedElementID)
-//        )
-
         ApplicationProperty.bluetoothConnectionManager.updatePropertyStateDataNoEvent(
             timeFrameSelectorState.toComplexPropertyState(),
             this.relatedElementIndex
         )
+        
+        if(blockExecutionCommand){
+            blockExecutionCommand = false
+            return
+        }
     
         // control the output transmissions in a sensible manner
         if(!this.successiveComplexUpdateStorage.isStarted){
@@ -306,6 +307,7 @@ class TimeFrameSelectorActivity : AppCompatActivity(), BLEConnectionManager.BleE
 
     private fun setCurrentViewStateFromComplexPropertyState(timeFrameSelectorState: TimeFrameSelectorState){
         runOnUiThread {
+            this.blockExecutionCommand = true
             this.fromTimePicker.hour = timeFrameSelectorState.onTimeHour
             this.fromTimePicker.minute = timeFrameSelectorState.onTimeMinute
             this.toTimePicker.hour = timeFrameSelectorState.offTimeHour

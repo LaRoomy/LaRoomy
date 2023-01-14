@@ -1147,14 +1147,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             Log.e("onDevSettingButtonClick", "Exception occurred on device settings button click. Info: $e")
         }
     }
-
-    fun onDeviceMainNotificationAreaClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        runOnUiThread {
-            this.hideNotificationHeader()
-        }
-    }
-
-
+    
     private fun onReconnectDevice(){
         if(!ApplicationProperty.bluetoothConnectionManager.isConnected) {
             ApplicationProperty.bluetoothConnectionManager.suspendConnection()
@@ -1223,6 +1216,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 this.devicePropertyListRecyclerView,
                 Gravity.NO_GRAVITY, 0, recyclerViewPos.elementAt(1) - 5
             )
+            
+            // add cancel button event handler
+            this.deviceMenuPopUpWindow.contentView.findViewById<AppCompatImageButton>(R.id.deviceMainActivityPopUpCancelButton).apply {
+                setOnClickListener {
+                    try {
+                        this@DeviceMainActivity.deviceMenuPopUpWindow.dismiss()
+                    } catch (e: java.lang.Exception){
+                        Log.e("DeviceMainActivity", "Exception in PopUp cancel button click listener: ${e.message}")
+                    }
+                }
+            }
         }
     }
 

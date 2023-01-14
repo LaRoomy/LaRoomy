@@ -33,6 +33,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -126,6 +127,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         installSplashScreen()
         setContentView(R.layout.activity_main)
     
+        // init classes
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
         (applicationContext as ApplicationProperty).addedDevices = AddedDevices(applicationContext)
 
@@ -136,6 +138,16 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         this.noContentContainer = findViewById(R.id.mainActivityNoContentContainer)
         this.noContentImageView = findViewById(R.id.mainActivityNoContentImageView)
         this.noContentTextView = findViewById(R.id.mainActivityNoContentTextView)
+    
+        // save UI Mode to application property
+        (applicationContext as ApplicationProperty).isNightMode =
+            when (this.addDeviceButton.context.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
+                Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+        
+        // check if the user has purchased
+        this.checkPremiumAppStatus()
 
         // init recycler view
         this.availableDevicesViewManager = LinearLayoutManager(this)
@@ -403,17 +415,16 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             Gravity.NO_GRAVITY, 0, headerViewPos.elementAt(1) + 5
         )
         
-        // set gesture detection
-        this.popUpWindow.contentView.setOnTouchListener(object : OnSwipeTouchListener(this@MainActivity){
-            override fun onSwipeLeft() : Boolean {
+        // register close button event
+        this.popUpWindow.contentView.findViewById<AppCompatImageButton>(R.id.mainActivityPopUpCancelButton).apply {
+            setOnClickListener {
                 try {
                     this@MainActivity.popUpWindow.dismiss()
-                } catch(e: Exception){
-                    Log.e("MainActivity", "M: onSwipeLeft gesture on popUp -> exception occurred: $e")
+                } catch (e: java.lang.Exception){
+                    Log.e("MainActivity", "Exception in PopUp Window: ${e.message}")
                 }
-                return true
             }
-        })
+        }
     }
 
     private fun notifyUser(message: String){
@@ -426,6 +437,35 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
         dialog.create()
         dialog.show()
+    }
+    
+    private fun checkPremiumAppStatus(){
+        // check if the app is already purchased
+        val hasPurchased = (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_PurchaseDoneByUser, false)
+        if(!hasPurchased){
+            // check if this is the first usage
+            val testPeriodStarted = (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_TestPeriodStarted, false)
+            if(!testPeriodStarted){
+                // first usage: mark the test period as started
+                (applicationContext as ApplicationProperty).saveBooleanData(true, R.string.FileKey_PremVersion, R.string.DataKey_TestPeriodStarted)
+                // save the start date
+                
+                // TODO save the start date
+                
+            } else {
+                // test period has started, check the date (if the period is over)
+            
+            }
+        } else {
+            // user has purchased, set premium to true
+            (applicationContext as ApplicationProperty).isPremiumAppVersion = true
+        }
+        
+        
+        // TODO: set premium param in application property class
+        
+        // TODO: if the test period is over and the user has not purchased, set the UI to missing purchase style
+    
     }
 
     private fun setUIState(state: Int){
@@ -476,13 +516,22 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 R.string.DataKey_AutoConnect
             )
         ) {
+            if(verboseLog){
+                Log.d("MainActivity", "AutoConnect: active!")
+            }
             // check if there are more than one device
             when (this.availableDevices.size) {
                 0 -> {
-                    // do nothing
+                    // no devices - do nothing
+                    if(verboseLog){
+                        Log.d("MainActivity", "AutoConnect: no devices - nothing to do")
+                    }
                 }
                 1 -> {
                     // there is only one available device -> connect to it!
+                    if(verboseLog){
+                        Log.d("MainActivity", "AutoConnect: Only one device - connecting to (${this.availableDevices.elementAt(0).name}")
+                    }
                     
                     //Handler(Looper.getMainLooper()).postDelayed({
                         
@@ -499,7 +548,12 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 else -> {
                     // try to connect to the last successful connected device
                     if (ApplicationProperty.bluetoothConnectionManager.isLastAddressValid) {
-                        
+                        if(verboseLog){
+                            
+                            Log.d("MainActivity", "AutoConnect: Trying to connect to last device!")
+                        }
+    
+    
                         //Handler(Looper.getMainLooper()).postDelayed({
                             
                             // move forward with delay...!
@@ -513,6 +567,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     
                         //}, 1000)
                         
+                    } else {
+                        if(verboseLog){
+                            Log.d("MainActivity", "AutoConnect: Last device address invalid - skip!")
+                        }
                     }
                 }
             }

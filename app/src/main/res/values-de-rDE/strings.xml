@@ -376,6 +376,8 @@
     <string name="Error_NoMatchingCharacteristicsFound">Es wurden keine mit den definierten UUIDs übereinstimmenden Characteristiken gefunden. Sie können die UUID-Profile anpassen um das Problem zu lösen.</string>
     <string name="Error_InvalidPropertyTypeForStandaloneMode">Ungültiger Geräte-Eigenschaften Typ für den Solo-Eigenschaften-Modus</string>
     <string name="Error_StandAlonePropertyModeError_NoData">Solo-Eigenschaften Fehler: keine Daten vorhanden.</string>
+    <string name="Error_InvalidDeviceAddress">Geräte-Adresse ungültig.</string>
+
 
     <!-- FileKeys: -->
     <!-- FileKeys are not translateable -->

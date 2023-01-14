@@ -435,6 +435,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             BLE_NO_MATCHING_CHARACTERISTICS -> {
                 getString(R.string.Error_NoMatchingCharacteristicsFound)
             }
+            BLE_INVALID_DEVICE_ADDRESS -> {
+                getString(R.string.Error_InvalidDeviceAddress)
+            }
             else -> {
                 getString(R.string.Error_UnknownError)
             }

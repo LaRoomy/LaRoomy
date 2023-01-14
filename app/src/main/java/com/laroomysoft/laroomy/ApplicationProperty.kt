@@ -92,6 +92,7 @@ class ApplicationProperty : Application() {
     var isBackNavigationToMain = false
     var appSettingsResetDone = false
     var eventLogEnabled = false
+    var isNightMode = false
     var mainActivityListElementWasAdded = false
     var complexUpdateIndex = -1
     var propertyInvalidatedOnSubPage = false

@@ -34,6 +34,7 @@ const val BLE_BLUETOOTH_PERMISSION_MISSING = 7
 const val BLE_NO_MATCHING_SERVICES = 8
 const val BLE_NO_MATCHING_CHARACTERISTICS = 9
 const val BLE_COMPLEX_STATE_LOOP_FINAL_FAILED = 10
+const val BLE_INVALID_DEVICE_ADDRESS = 11
 
 const val BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED = 101
 
@@ -846,6 +847,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // handle date request command
                     this.handleDateRequest()
                 }
+                'a' -> {
+                    // handle UI Mode request
+                    this.handleUIModeRequest()
+                }
                 else -> {
                     if(verboseLog){
                         Log.e("readDeviceNotification", "Unknown device notification type")
@@ -911,6 +916,16 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         dateRequestResponse += aSigned16bitValueTo4CharHexValue(year.toShort())
         dateRequestResponse += '\r'
         this.sendData(dateRequestResponse)
+    }
+    
+    private fun handleUIModeRequest(){
+        var uiModeRequestResponse = "52000200a"
+        uiModeRequestResponse += when(applicationProperty.isNightMode){
+            true -> '1'
+            else -> '0'
+        }
+        uiModeRequestResponse += '\r'
+        this.sendData(uiModeRequestResponse)
     }
     
     private fun handlePropertyInvalidationRequest(){
@@ -2345,10 +2360,19 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
             if(!deviceFound){
                 // device not found, the requested device is maybe not bonded anymore, but remains in the myDeviceList !
-                this.currentDevice =
-                    (applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter.getRemoteDevice(
-                        macAddress
-                    )
+                try {
+                    this.currentDevice =
+                        (applicationProperty.applicationContext.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter.getRemoteDevice(
+                            macAddress
+                        )
+                } catch (e: java.lang.Exception){
+                    if(verboseLog){
+                        Log.e("conToBondedDevWithMacAddress", "Exception while retrieving the remote device: ${e.message}")
+                    }
+                    applicationProperty.logControl("E: Exception while retrieving the remote device: ${e.message}")
+                    this.callback.onConnectionError(BLE_INVALID_DEVICE_ADDRESS)
+                    return
+                }
             }
     
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -2418,11 +2442,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             Manifest.permission.BLUETOOTH_CONNECT
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        this.bluetoothGatt?.writeCharacteristic(
-                            this.txGattCharacteristic,
-                            data.toByteArray(),
-                            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-                        )
+                        if(this.timeoutWatcherData.loopRepeatCounter > 1){
+                            if(verboseLog){
+                                Log.w("BLEManager:SendData", "Speed reducer active due to failed loops.")
+                            }
+                            applicationProperty.logControl("W: Transmission speed reducer active due to failed loops.")
+                            
+                            Executors.newSingleThreadScheduledExecutor().schedule({
+                                this.bluetoothGatt?.writeCharacteristic(
+                                    this.txGattCharacteristic,
+                                    data.toByteArray(),
+                                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                                )
+                            }, 50, TimeUnit.MILLISECONDS)
+                        } else {
+                            this.bluetoothGatt?.writeCharacteristic(
+                                this.txGattCharacteristic,
+                                data.toByteArray(),
+                                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                            )
+                        }
                     }
                 } else {
                     // deprecated since api level 33
@@ -3754,7 +3793,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         }
                     }
                 }
-            }, (0).toLong(), (1000).toLong()
+            }, (0).toLong(), (500).toLong()
         )
     }
 
@@ -3876,9 +3915,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.rssiReadTimer.scheduleAtFixedRate(object : TimerTask() {
                 @SuppressLint("MissingPermission")
                 override fun run() {
-                    bluetoothGatt?.readRemoteRssi()
+                    if(!propertyLoopActive && !groupLoopActive && !simpleStateLoopActive && !complexStateLoopActive) {
+                        bluetoothGatt?.readRemoteRssi()
+                    }
                 }
-            }, (2000).toLong(), (2000).toLong())
+            }, (3000).toLong(), (2000).toLong())
             
             Log.d("BLEConnectionManager", "M:startRssiReadTimer: RSSI Timer started")
             

@@ -355,6 +355,7 @@
     <string name="GeneralForwardButtonLabel" translatable="false">Navigates to the next activity</string>
     <string name="GeneralClearButtonContentDescription" translatable="false">Clear the content</string>
     <string name="GeneralReloadButtonContentDescription" translatable="false">Reload the Content</string>
+    <string name="GeneralCloseButtonLabel" translatable="false">Close the element</string>
     <string name="UnlockControlActivityChangePinButtonLabel" translatable="false">Change the pin of the remote device</string>
     <string name="UnlockControlActivityLockImageLabel" translatable="false">This image indicates the lock-status of the remote device. If unlocked, the remote device can be locked by tapping this image.</string>
     <string name="UnlockControlActivityShowHidePinButtonLabel" translatable="false">Show or hide the pin by pressing this image</string>
@@ -379,12 +380,14 @@
     <string name="Error_NoMatchingCharacteristicsFound">No characteristic(s) matching the defined UUIDs were found. May take a look at the UUID-Profiles to solve the problem.</string>
     <string name="Error_InvalidPropertyTypeForStandaloneMode">Invalid Property-Type for the stand-alone mode.</string>
     <string name="Error_StandAlonePropertyModeError_NoData">Stand-alone mode error: no property data.</string>
+    <string name="Error_InvalidDeviceAddress">Device address invalid.</string>
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>
     <string name="FileKey_AppSettings" translatable="false">fileKeyApplicationSettingsData</string>
     <string name="FileKey_BindingPairs" translatable="false">fileKeyBindingPairData</string>
     <string name="FileKey_AddedDevices" translatable="false">fileKeyAddedDevices</string>
+    <string name="FileKey_PremVersion" translatable="false">fileKeyPremVersion</string>
 
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>
@@ -397,6 +400,9 @@
     <string name="DataKey_KeepScreenActive" translatable="false">keepScreenActiveKey</string>
     <string name="DataKey_A11orLowerLocationPermissionRequestFirstRequest" translatable="false">a11orLowerLocationFirstRequest</string>
     <string name="DataKey_DesignSelection" translatable="false">userDesignSelection</string>
+    <string name="DataKey_PurchaseDoneByUser" translatable="false">purchaseDoneByUser</string>
+    <string name="DataKey_TestPeriodStarted" translatable="false">testPeriodStarted</string>
+    <string name="DataKey_FirstUseDate" translatable="false">firstUseDate</string>
 
     <!-- Default values -->
     <string name="DefaultValue_DesignSelection" translatable="false">systemDefault</string>
