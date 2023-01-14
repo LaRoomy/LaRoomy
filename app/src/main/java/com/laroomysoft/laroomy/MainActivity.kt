@@ -177,40 +177,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             val defaultKey = createRandomPasskey(10)
             (applicationContext as ApplicationProperty).saveStringData(defaultKey, R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
         }
-
-        // schedule the auto-connect process if required
-        if ((applicationContext as ApplicationProperty).loadBooleanData(
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_AutoConnect
-            )
-        ) {
-            // check if there are more than one device
-            when (this.availableDevices.size) {
-                0 -> {
-                    // do nothing
-                }
-                1 -> {
-                    // there is only one available device -> connect to it!
-                    Handler(Looper.getMainLooper()).postDelayed({
-                    val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-                    intent.putExtra("DeviceListIndex", 0)
-                    startActivity(intent)
-                    }, 1000)
-                }
-                else -> {
-                    // try to connect to the last successful connected device
-                    if (ApplicationProperty.bluetoothConnectionManager.isLastAddressValid) {
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            // move forward with delay...!
-                            val intent = Intent(this@MainActivity, LoadingActivity::class.java)
-                            intent.putExtra("DeviceListIndex", -2)// -2 means: connect to the last device
-                            startActivity(intent)
-
-                        }, 1000)
-                    }
-                }
-            }
-        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -236,6 +202,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         bottomSeparator.visibility = when (this.resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> View.GONE
             else -> View.VISIBLE
+        }
+        
+        // check if this was a back navigation
+        var wasBackNavigation = false
+        if((applicationContext as ApplicationProperty).isBackNavigationToMain){
+            (applicationContext as ApplicationProperty).isBackNavigationToMain = false
+            wasBackNavigation = true
         }
 
         // check bluetooth connect permission:
@@ -284,6 +257,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                     this.bluetoothPermissionGranted = true
                     this.isBluetoothEnabled = true
                     this.setUIState(mainActivityNormalState)
+                    if(!wasBackNavigation){
+                        autoConnect()
+                    }
                 }
                 BLE_IS_DISABLED -> {
                     if(verboseLog){
@@ -357,6 +333,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 Intent(this@MainActivity, LoadingActivity::class.java)
             intent.putExtra("DeviceListIndex", index)
             startActivity(intent)
+            
+            // set param for auto-connect function
+            (applicationContext as ApplicationProperty).isBackNavigationToMain = true
         }
     }
 
@@ -423,12 +402,24 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             this.availableDevicesRecyclerView,
             Gravity.NO_GRAVITY, 0, headerViewPos.elementAt(1) + 5
         )
+        
+        // set gesture detection
+        this.popUpWindow.contentView.setOnTouchListener(object : OnSwipeTouchListener(this@MainActivity){
+            override fun onSwipeLeft() : Boolean {
+                try {
+                    this@MainActivity.popUpWindow.dismiss()
+                } catch(e: Exception){
+                    Log.e("MainActivity", "M: onSwipeLeft gesture on popUp -> exception occurred: $e")
+                }
+                return true
+            }
+        })
     }
 
     private fun notifyUser(message: String){
         val dialog = AlertDialog.Builder(this)
         dialog.setMessage(message)
-        dialog.setIcon(R.drawable.ic_announcement_white_36dp)
+        dialog.setIcon(R.drawable.ic_announcement_36dp)
         dialog.setTitle(R.string.MA_UserNotificationDialogTitle)
         dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
@@ -478,6 +469,55 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             setItemColors(x, R.color.max_contrast_text_color, R.drawable.my_devices_list_element_background)
         }
     }
+    
+    private fun autoConnect(){
+        if ((applicationContext as ApplicationProperty).loadBooleanData(
+                R.string.FileKey_AppSettings,
+                R.string.DataKey_AutoConnect
+            )
+        ) {
+            // check if there are more than one device
+            when (this.availableDevices.size) {
+                0 -> {
+                    // do nothing
+                }
+                1 -> {
+                    // there is only one available device -> connect to it!
+                    
+                    //Handler(Looper.getMainLooper()).postDelayed({
+                        
+                        val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+                        intent.putExtra("DeviceListIndex", 0)
+                        startActivity(intent)
+    
+                    // set param for auto-connect function
+                    (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+    
+    
+                    //}, 1000)
+                }
+                else -> {
+                    // try to connect to the last successful connected device
+                    if (ApplicationProperty.bluetoothConnectionManager.isLastAddressValid) {
+                        
+                        //Handler(Looper.getMainLooper()).postDelayed({
+                            
+                            // move forward with delay...!
+                            val intent = Intent(this@MainActivity, LoadingActivity::class.java)
+                            intent.putExtra("DeviceListIndex", -2)// -2 means: connect to the last device
+                            startActivity(intent)
+    
+                        // set param for auto-connect function
+                        (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+    
+    
+                        //}, 1000)
+                        
+                    }
+                }
+            }
+        }
+    }
 
     class AvailableDevicesListAdapter(
         private val laRoomyDevListAdapter : ArrayList<LaRoomyDevicePresentationModel>,
@@ -486,20 +526,12 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
         class DSLRViewHolder(val constraintLayout: ConstraintLayout) :
             RecyclerView.ViewHolder(constraintLayout){
-
-//            fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener, position: Int){
-//                itemView.setOnClickListener{
-//                    deviceListItemClick.onItemClicked(position, data)
-//                }
-//            }
     
             fun bind(data: LaRoomyDevicePresentationModel, deviceListItemClick: OnDeviceListItemClickListener){
                 itemView.setOnClickListener{
                     deviceListItemClick.onItemClicked(bindingAdapterPosition, data)
                 }
             }
-    
-    
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DSLRViewHolder {
@@ -516,8 +548,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             holder.constraintLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].name
             // set the appropriate image for the device type
             holder.constraintLayout.findViewById<ImageView>(R.id.myDevicesListElementImageView).setImageResource(laRoomyDevListAdapter[position].image)
-
-            //holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener, position)
     
             holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener)
         }
@@ -541,6 +571,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
             val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
             startActivity(intent)
+    
+            // set param for auto-connect function
+            (applicationContext as ApplicationProperty).isBackNavigationToMain = true
         }
     }
 
@@ -567,6 +600,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 startActivity(intent)
             }
         }
+    
+        // set param for auto-connect function
+        (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+    
         try {
             this.popUpWindow.dismiss()
         } catch(e: Exception){
@@ -581,8 +618,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
 
         if(this.isBluetoothEnabled && this.bluetoothPermissionGranted) {
+            // start add activity
             val intent = Intent(this@MainActivity, AddDeviceActivity::class.java)
             startActivity(intent)
+            // set param for auto-connect function
+            (applicationContext as ApplicationProperty).isBackNavigationToMain = true
         } else {
             // if bluetooth permission is not granted the UI is expected to be in grant-permission-request state
             if(!this.bluetoothPermissionGranted){
@@ -591,10 +631,15 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                     this.grantPermissionRequestReclined = false
 
                     try {
+                        // goto application settings
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         val uri: Uri = Uri.fromParts("package", packageName, null)
                         intent.data = uri
                         startActivity(intent)
+    
+                        // set param for auto-connect function
+                        (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+                        
                     } catch (e: java.lang.Exception){
                         Log.e("noContentContainerClicked", "Exception occurred while trying to launch settings app. E: $e")
                     }

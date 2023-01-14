@@ -89,6 +89,7 @@ class ApplicationProperty : Application() {
     var uiAdapterChanged = false
     var uiAdapterInvalidatedOnPropertySubPage = false
     var complexPropertyUpdateRequired = false
+    var isBackNavigationToMain = false
     var appSettingsResetDone = false
     var eventLogEnabled = false
     var mainActivityListElementWasAdded = false
