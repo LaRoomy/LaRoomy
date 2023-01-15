@@ -97,10 +97,14 @@ class ApplicationProperty : Application() {
     var complexUpdateIndex = -1
     var propertyInvalidatedOnSubPage = false
     var closeDeviceRequested = false
-    var isPremiumAppVersion = false
+    
+    
+    val isPremiumAppVersion
+    get() = this.premiumManager.isPremiumAppVersion
 
     lateinit var uuidManager: UUIDManager
     lateinit var addedDevices: AddedDevices
+    lateinit var premiumManager: PremiumManager
 
     var connectionLog = ArrayList<String>()
     var logRecordingTime = ""
@@ -111,6 +115,8 @@ class ApplicationProperty : Application() {
         super.onCreate()
         bluetoothConnectionManager = BLEConnectionManager(this)
         
+        premiumManager = PremiumManager(this.applicationContext)
+        
         //systemLanguage = Locale.getDefault().displayLanguage - returns 'Deutsch' for example
         //systemLanguage = Locale.getDefault().language - returns the system language in iso 639-1 format 'de' for example
         systemLanguage = resources.configuration.locales.get(0).language // returns the app language in iso 639-1 format
@@ -118,7 +124,8 @@ class ApplicationProperty : Application() {
         eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
         
         // TODO: check for the paid version of the app
-        this.isPremiumAppVersion = true
+        // TODO: remove this, the premium manager can do this
+        //this.isPremiumAppVersion = true
 
         // add the initial placeholder value
         //this.connectionLog.add(getString(R.string.ConnectionLog_NoContent))

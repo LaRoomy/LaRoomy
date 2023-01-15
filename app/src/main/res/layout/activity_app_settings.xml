@@ -61,6 +61,154 @@
             app:layout_constraintTop_toBottomOf="@id/setupActivityHeaderContainer" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/setupActivityPremiumAppStatusContainer"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/setupActivityHeaderSeparator"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/setupActivityPremiumAppUserStatusContainer"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                >
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/setupActivityPremiumImageView"
+                    android:src="@drawable/ic_premium_36dp"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/setupActivityPremiumAppUserStatusDescriptorView"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/SetupActivity_PremiumAppUserStatusDescriptorText"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/setupActivityPremiumImageView"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/setupActivityPremiumAppUserStatusTextView"
+                    android:text="@string/SetupActivity_PremiumAppUserStatus_TestPeriod"
+                    android:layout_marginStart="20dp"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toEndOf="@+id/setupActivityPremiumAppUserStatusDescriptorView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityPremiumAppUserStatusHintTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.7"
+                android:text="@string/SetupActivity_PremiumAppStatusHint_TestPeriod"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/setupActivityPremiumAppUserStatusContainer"
+                tools:ignore="TextContrastCheck" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityPremiumAppUserTestEndTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.7"
+                android:text="@string/SetupActivity_PremiumAppStatusHint_TestEndIn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/setupActivityPremiumAppUserStatusHintTextView"
+                tools:ignore="TextContrastCheck" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityPremiumActionLinkMoreInfoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:text="@string/SetupActivity_PremiumAppActionLinkMoreInfoText"
+                android:textColor="@color/clickableTextColor"
+                android:textSize="16sp"
+                android:gravity="center_vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/setupActivityPremiumAppUserTestEndTextView"
+                tools:ignore="TextContrastCheck" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityPremiumActionLinkRestorePurchaseTextView"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="20dp"
+                android:textStyle="bold"
+                android:text="@string/SetupActivity_PremiumAppActionLinkRecoverPurchase"
+                android:textColor="@color/clickableTextColor"
+                android:textSize="16sp"
+                android:gravity="center_vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/setupActivityPremiumActionLinkMoreInfoTextView"
+                tools:ignore="TextContrastCheck" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/setupActivityPremiumActionLinkUnlockPremiumTextView"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="20dp"
+                android:textStyle="bold"
+                android:text="@string/SetupActivity_PremiumAppActionLinkUnlockPremium"
+                android:textColor="@color/clickableTextColor"
+                android:textSize="16sp"
+                android:gravity="center_vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/setupActivityPremiumActionLinkRestorePurchaseTextView"
+                tools:ignore="TextContrastCheck" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/setupActivityPremiumSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/separatorColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityPremiumAppStatusContainer" />
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/setupActivityAutoConnectContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +216,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setupActivityHeaderSeparator">
+            app:layout_constraintTop_toBottomOf="@id/setupActivityPremiumSeparator">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/setupActivityAutoConnectElementTextView"
@@ -89,6 +237,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:minHeight="48dp"
+                android:minWidth="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityAutoConnectElementTextView"
@@ -109,7 +258,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectContainer"
-            tools:ignore="TextContrastCheck" />
+            tools:ignore="TextContrastCheck,VisualLintLongText" />
 
         <View
             android:id="@+id/setupActivityFirstSeparatorView"
@@ -196,6 +345,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:minHeight="48dp"
+                android:minWidth="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivitySavePropertiesElementTextView"
@@ -216,7 +366,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivitySavePropertiesContainer"
-            tools:ignore="TextContrastCheck" />
+            tools:ignore="TextContrastCheck,VisualLintLongText" />
 
         <View
             android:id="@+id/setupActivitySecondSeparatorView"
@@ -302,6 +452,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:minHeight="48dp"
+                android:minWidth="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityEnableLoggingTextView"
@@ -321,7 +472,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityEnableLoggingContainer"
-            tools:ignore="TextContrastCheck" />
+            tools:ignore="TextContrastCheck,VisualLintLongText" />
 
         <View
             android:id="@+id/setupActivityFourthSeparatorView"
@@ -408,6 +559,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:minHeight="48dp"
+                android:minWidth="48dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/setupActivityKeepScreenActiveTextView"

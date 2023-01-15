@@ -238,7 +238,6 @@ class AddDeviceActivity : AppCompatActivity(),
                         else -> {
                             if((applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_A11orLowerLocationPermissionRequestFirstRequest, true)){
                                 (applicationContext as ApplicationProperty).saveBooleanData(false, R.string.FileKey_AppSettings, R.string.DataKey_A11orLowerLocationPermissionRequestFirstRequest)
-                                // TODO: test it !
                                 showPermissionRationaleDialog()
                             } else {
                                 this.requestAndroid11orLowerLocationPermissionLauncher.launch(

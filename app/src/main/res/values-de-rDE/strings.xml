@@ -194,6 +194,20 @@
     <string name="SetupActivity_Design_Dark">Dunkel</string>
     <string name="SetupActivity_Design_SystemDefault">Systemstandard</string>
     <string name="SetupActivity_DesignSelectionPopUpHeaderText">Design auswählen</string>
+    <string name="SetupActivity_PremiumHeaderText">Premium</string>
+    <string name="SetupActivity_PremiumAppUserStatusDescriptorText">Premium Status:</string>
+    <string name="SetupActivity_PremiumAppUserStatus_NotPurchased">Eingeschränkte Funktion</string>
+    <string name="SetupActivity_PremiumAppUserStatus_Purchased">Vollzugriff</string>
+    <string name="SetupActivity_PremiumAppUserStatus_TestPeriod">Testzeitraum</string>
+    <string name="SetupActivity_PremiumAppStatusHint_NotPurchased">Die Funktionen der App sind eingeschränkt.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">Sie befinden sich in einem 30 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_TestEndIn">Tage bis zum Ende des Testzeitraumes:</string>
+    <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Weitere Informationen</string>
+    <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Kauf wiederherstellen</string>
+    <string name="SetupActivity_PremiumAppActionLinkUnlockPremium">Premium Funktionen freischalten</string>
+
+
+
 
 
 

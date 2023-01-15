@@ -11,8 +11,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.*
@@ -33,7 +31,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.util.concurrent.CopyOnWriteArraySet
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -146,8 +144,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 else -> false
             }
         
-        // check if the user has purchased
-        this.checkPremiumAppStatus()
+        // init the premium manager and check if the user has purchased
+        (applicationContext as ApplicationProperty).premiumManager.checkPremiumAppStatus()
 
         // init recycler view
         this.availableDevicesViewManager = LinearLayoutManager(this)
@@ -439,35 +437,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         dialog.show()
     }
     
-    private fun checkPremiumAppStatus(){
-        // check if the app is already purchased
-        val hasPurchased = (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_PurchaseDoneByUser, false)
-        if(!hasPurchased){
-            // check if this is the first usage
-            val testPeriodStarted = (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_TestPeriodStarted, false)
-            if(!testPeriodStarted){
-                // first usage: mark the test period as started
-                (applicationContext as ApplicationProperty).saveBooleanData(true, R.string.FileKey_PremVersion, R.string.DataKey_TestPeriodStarted)
-                // save the start date
-                
-                // TODO save the start date
-                
-            } else {
-                // test period has started, check the date (if the period is over)
-            
-            }
-        } else {
-            // user has purchased, set premium to true
-            (applicationContext as ApplicationProperty).isPremiumAppVersion = true
-        }
-        
-        
-        // TODO: set premium param in application property class
-        
-        // TODO: if the test period is over and the user has not purchased, set the UI to missing purchase style
-    
-    }
-
     private fun setUIState(state: Int){
         when(state){
             mainActivityNormalState -> {

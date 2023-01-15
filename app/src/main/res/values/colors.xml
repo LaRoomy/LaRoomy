@@ -26,7 +26,7 @@
     <color name="disconnectedTextColor">#FFBB3333</color>
     <color name="connectedTextColor">#FF057304</color>
     <color name="connectingTextColor">#FF4A4704</color>
-    <color name="clickableTextColor">#009BC2</color>
+    <color name="clickableTextColor">#15677C</color>
     <color name="max_contrast_text_color">#FF000000</color>
     <!-- ************************************************************************************* -->
 

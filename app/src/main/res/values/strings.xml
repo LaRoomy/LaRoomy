@@ -183,6 +183,17 @@
     <string name="SetupActivity_Design_Dark">Dark</string>
     <string name="SetupActivity_Design_SystemDefault">System Default</string>
     <string name="SetupActivity_DesignSelectionPopUpHeaderText">Design Selection</string>
+    <string name="SetupActivity_PremiumHeaderText">Premium</string>
+    <string name="SetupActivity_PremiumAppUserStatusDescriptorText">Premium Status:</string>
+    <string name="SetupActivity_PremiumAppUserStatus_NotPurchased">Limited Functionality</string>
+    <string name="SetupActivity_PremiumAppUserStatus_Purchased">Full Access</string>
+    <string name="SetupActivity_PremiumAppUserStatus_TestPeriod">Test Period</string>
+    <string name="SetupActivity_PremiumAppStatusHint_NotPurchased">The app is running with a restricted functionality.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">You are in a 30 days test period with full access to all app capabilities.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_TestEndIn">Remaining days:</string>
+    <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Get more information</string>
+    <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Restore Purchase</string>
+    <string name="SetupActivity_PremiumAppActionLinkUnlockPremium">Unlock Premium Capabilities</string>
 
 
     <string name="BindingManagerActivity_HeaderText">Manage Binding-Data</string>

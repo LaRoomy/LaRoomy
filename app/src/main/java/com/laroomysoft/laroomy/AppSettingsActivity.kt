@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +30,15 @@ class AppSettingsActivity : AppCompatActivity() {
     private lateinit var bindingManagerButton: ConstraintLayout
     private lateinit var designSelectionButton: ConstraintLayout
     private lateinit var popUpWindow: PopupWindow
+    
+    private lateinit var currentPremiumStatusTextView: AppCompatTextView
+    private lateinit var premiumStatusHintTextView: AppCompatTextView
+    private lateinit var premiumTestPeriodRemainderTextView: AppCompatTextView
+    private lateinit var premiumMoreInfoLink: AppCompatTextView
+    private lateinit var premiumRestorePurchaseLink: AppCompatTextView
+    private lateinit var premiumUnlockPurchaseLink: AppCompatTextView
+    private lateinit var premiumImageView: AppCompatImageView
+    
 
     private var buttonNormalizationRequired = false
     private var preventPopUpDoubleExecution = false
@@ -51,6 +61,81 @@ class AppSettingsActivity : AppCompatActivity() {
         this.backButton = findViewById<AppCompatImageButton?>(R.id.setupActivityBackButton).apply {
             setOnClickListener {
                 handleBackEvent()
+            }
+        }
+        
+        // get elements of premium section and configure it
+        this.currentPremiumStatusTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserStatusTextView).apply {
+            text = when((applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion){
+                true -> {
+                    if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
+                        getString(R.string.SetupActivity_PremiumAppUserStatus_TestPeriod)
+                    } else {
+                        getString(R.string.SetupActivity_PremiumAppUserStatus_Purchased)
+                    }
+                } else -> {
+                    getString(R.string.SetupActivity_PremiumAppUserStatus_NotPurchased)
+                }
+            }
+        }
+        this.premiumStatusHintTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserStatusHintTextView).apply {
+            if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
+                // test period
+                text = getString(R.string.SetupActivity_PremiumAppStatusHint_TestPeriod)
+            } else {
+                if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+                    // purchased
+                    visibility = View.GONE
+                } else {
+                    // not purchased
+                    text = getString(R.string.SetupActivity_PremiumAppStatusHint_NotPurchased)
+                }
+            }
+        }
+        this.premiumTestPeriodRemainderTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserTestEndTextView).apply {
+            if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
+                val strToSet = "$text  ${(applicationContext as ApplicationProperty).premiumManager.remainingTestPeriodDays}"
+                text = strToSet
+            } else {
+                visibility = View.GONE
+            }
+        }
+        this.premiumImageView = findViewById<AppCompatImageView?>(R.id.setupActivityPremiumImageView).apply {
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+                setImageResource(R.drawable.ic_premium_purchased_36dp)
+            }
+        }
+        this.premiumMoreInfoLink = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumActionLinkMoreInfoTextView).apply {
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+                visibility = View.GONE
+            } else {
+                setOnClickListener {
+                    // TODO: handle on more info click !
+                    
+                    Log.d("SetupActivity", "More Info Link clicked !!!")
+                }
+            }
+        }
+        this.premiumRestorePurchaseLink = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumActionLinkRestorePurchaseTextView).apply {
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+                visibility = View.GONE
+            } else {
+                setOnClickListener {
+                    // TODO: handle on restore purchase click !
+    
+                    Log.d("SetupActivity", "Restore purchase Link clicked !!!")
+                }
+            }
+        }
+        this.premiumUnlockPurchaseLink = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumActionLinkUnlockPremiumTextView).apply {
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+                visibility = View.GONE
+            } else {
+                setOnClickListener {
+                    // TODO: handle purchase !!!
+    
+                    Log.d("SetupActivity", "Unlock Premium Link clicked !!!")
+                }
             }
         }
         
