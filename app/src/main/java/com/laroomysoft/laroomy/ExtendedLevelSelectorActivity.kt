@@ -142,7 +142,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
 
         // hide the switch if requested
         if(!this.showOnOffSwitch){
-            // TODO: the slider must be shifted up if the switch is not visible!
+            // the slider must be shifted up if the switch is not visible!
             this.switchContainer.visibility = View.GONE
             this.setSliderUpDown(true)
         }
@@ -341,7 +341,7 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                 // set visible
                 View.VISIBLE
             } else {
-                // TODO: the slider must be shifted up if the switch is not visible!
+                // the slider must be shifted up if the switch is not visible!
                 // set slider constraint
                 this.setSliderUpDown(true)
                 // set visibility to gone
@@ -356,7 +356,6 @@ class ExtendedLevelSelectorActivity : AppCompatActivity(), BLEConnectionManager.
                 this.invalidate()
             }
         }
-        // TODO: check if the onChecked event is triggered by the setting process
     }
 
     private fun notifyUser(message: String, colorID: Int){

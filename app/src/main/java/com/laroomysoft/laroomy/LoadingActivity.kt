@@ -183,9 +183,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             )
             this.connectionMustResetDueToOnPauseExecution = false
         }
-
-        // TODO: HANDLE INTERRUPTED PROPERTY LOADING ????? OR IS THIS NOT NECESSARY??????????
-
     }
 
     private fun setProgressText(text: String){
@@ -310,8 +307,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                         // try to connect again with 1 sec delay
                         Handler(Looper.getMainLooper()).postDelayed({
                             ApplicationProperty.bluetoothConnectionManager.connectToBondedDeviceWithMacAddress(this.macAddressToConnect)
-                            // TODO: check this!
-                            //ApplicationProperty.bluetoothConnectionManager.connectToLastSuccessfulConnectedDevice()
                         }, 1000)
                     }
                 } else {
@@ -388,27 +383,6 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 }
             }
         }, 1500, 1500)
-
-//        // device ready -> send authentication
-//        runOnUiThread {
-//            setProgressText(getString(R.string.CA_Connected))
-//            // send init request (with a short delay to make sure the remote device is ready)
-//            Handler(Looper.getMainLooper()).postDelayed({
-//                ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
-//
-//                // check the init with delay an try again if it is false
-//                Handler(Looper.getMainLooper()).postDelayed({
-//
-//                    if(!ApplicationProperty.bluetoothConnectionManager.initializationSuccess){
-//                        ApplicationProperty.bluetoothConnectionManager.initDeviceTransmission()
-//                    }
-//
-//                },2000)// FIXME: what is the right time interval??
-//
-//                // notify User:
-//                setProgressText(getString(R.string.CA_Initialize))
-//            }, 1500) // FIXME: what is the right time interval??
-//        }
     }
 
     override fun onConnectionError(errorID: Int) {
@@ -436,6 +410,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 getString(R.string.Error_NoMatchingCharacteristicsFound)
             }
             BLE_INVALID_DEVICE_ADDRESS -> {
+                getString(R.string.Error_InvalidDeviceAddress)
+            }
+            BLE_INVALID_LAST_DEVICE_ADDRESS -> {
                 getString(R.string.Error_InvalidDeviceAddress)
             }
             else -> {
@@ -469,6 +446,22 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
                 Intent(this@LoadingActivity, DeviceMainActivity::class.java)
             startActivity(intent)
             finish()
+        }
+    }
+    
+    override fun onPropertyError(error: Int) {
+        when(error){
+            BLE_UI_ADAPTER_GENERATION_FAIL -> {
+                this.setErrorText(getString(R.string.Error_UIAdapterGenerationFail))
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    ApplicationProperty.bluetoothConnectionManager.clear()
+                    finish()
+                }, 3000, TimeUnit.MILLISECONDS)
+            }
+            else -> {
+                Log.e("LoadingActivity", "onPropertyError: unexpected error. Error-ID: $error")
+                (applicationContext as ApplicationProperty).logControl("E: Loading Activity: unexpected error. Error-ID: $error")
+            }
         }
     }
     

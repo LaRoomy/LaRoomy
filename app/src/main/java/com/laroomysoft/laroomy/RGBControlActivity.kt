@@ -238,12 +238,8 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
         if(verboseLog) {
             Log.d("M:RGBPage:onPause", "onPause executed in RGBControlActivity")
         }
-
-        // TODO: check if onPause will be executed after onBackPressed!!!!!!!!!!!!!!!
-
         // if the user closed the application -> suspend connection
         // set information parameter for onResume()
-
         if(!this.isStandAlonePropertyMode) {
             // NOT stand-alone mode:
             // if the following is true, onBackPressed was executed before and the connection must remain active
@@ -573,10 +569,11 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
             if (programStatus != -1) {
                 // program must be active
                 programSpeedSeekBar.progress = programStatus
-                this.currentColorTransitionProgram = rgbSelectorState.colorTransitionValue // TODO: check this!!!
+                this.currentColorTransitionProgram = rgbSelectorState.colorTransitionValue
 
-                if (this.currentMode != RGB_MODE_TRANSITION)
+                if (this.currentMode != RGB_MODE_TRANSITION) {
                     setPageSelectorModeState(RGB_MODE_TRANSITION)
+                }
             } else {
                 // must be single color mode
                 if (this.currentMode != RGB_MODE_SINGLE_COLOR)

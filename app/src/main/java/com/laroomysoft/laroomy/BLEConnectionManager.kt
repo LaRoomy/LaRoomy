@@ -35,6 +35,8 @@ const val BLE_NO_MATCHING_SERVICES = 8
 const val BLE_NO_MATCHING_CHARACTERISTICS = 9
 const val BLE_COMPLEX_STATE_LOOP_FINAL_FAILED = 10
 const val BLE_INVALID_DEVICE_ADDRESS = 11
+const val BLE_INVALID_LAST_DEVICE_ADDRESS = 12
+const val BLE_UI_ADAPTER_GENERATION_FAIL = 13
 
 const val BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED = 101
 
@@ -177,7 +179,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     private var uIItemAddCounter = -1
 
     /*
-     TODO: the following double implementation of the gatt callback is necessary, because on systems
+     NOTE: the following double implementation of the gatt callback is necessary, because on systems
            with api level 33 or higher the callback method 'onCharacteristicChanged(gatt, characteristic)
            is deprecated. So the replacement 'onCharacteristicChanged(gatt, characteristic, value)' should
            be used. But on systems running api level lower than 33 the new method is not called. To guarantee
@@ -750,9 +752,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 FragmentTransmissionData(stringToAdd)
             )
         }
-
-        // TODO: error handling??
-
         return true
     }
 
@@ -949,7 +948,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         if(verboseLog){
             Log.d("BLEConnectionManager", "readPropertyExecutionResponse: exec:data: $data / exec:payLoadDataSize: $payLoadDataSize")
         }
-        // FIXME: what to do here?
+        // there is no property execution response by now..
         // if a property was executed and no response is received, send a state-update to verify the user-interface??
         return true
     }
@@ -1208,44 +1207,42 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     applicationProperty.logControl("W: Invalid transmission sub-type on group transmission. Type was: ${data[1]} | 2 was expected (response)")
                 }
             } else {
-
-                // TODO: this could be a update, insert or remove transmission. So update, insert or remove data and launch event respectively
-
-                    when(data[1]) {
-                        '4' -> {    // update
-                            if (verboseLog) {
-                                Log.d(
-                                    "readGroupString",
-                                    "Group-Transmission received. Loop not active. UPDATE element with index: ${laRoomyDevicePropertyGroup.groupIndex}"
-                                )
-                            }
-                            applicationProperty.logControl("I: Group-Transmission received. Loop not active. UPDATE element with index: ${laRoomyDevicePropertyGroup.groupIndex}")
-
-                            // if the loop is not active this must be an update-transmission, so replace the group
-                            if (this.laRoomyPropertyGroupList.size > laRoomyDevicePropertyGroup.groupIndex) {
-                                this.laRoomyPropertyGroupList[laRoomyDevicePropertyGroup.groupIndex] =
-                                    laRoomyDevicePropertyGroup
-                            }
-                            // update UI
-                            this.updateGroupElementInUIList(laRoomyDevicePropertyGroup)
+                // this could be a update or insert transmission. So update or insert data and launch event respectively (remove is handled in dispatchTransmission())
+                when(data[1]) {
+                    '4' -> {    // update
+                        if (verboseLog) {
+                            Log.d(
+                                "readGroupString",
+                                "Group-Transmission received. Loop not active. UPDATE element with index: ${laRoomyDevicePropertyGroup.groupIndex}"
+                            )
                         }
-                        '5' -> {    // insert
-                            if (verboseLog) {
-                                Log.d(
-                                    "readGroupString",
-                                    "Group-Transmission received. Loop not active. INSERT element with index: ${laRoomyDevicePropertyGroup.groupIndex}"
-                                )
-                            }
-                            applicationProperty.logControl("I: Group-Transmission received. Loop not active. INSERT element with index: ${laRoomyDevicePropertyGroup.groupIndex}")
+                        applicationProperty.logControl("I: Group-Transmission received. Loop not active. UPDATE element with index: ${laRoomyDevicePropertyGroup.groupIndex}")
+
+                        // if the loop is not active this must be an update-transmission, so replace the group
+                        if (this.laRoomyPropertyGroupList.size > laRoomyDevicePropertyGroup.groupIndex) {
+                            this.laRoomyPropertyGroupList[laRoomyDevicePropertyGroup.groupIndex] =
+                                laRoomyDevicePropertyGroup
                         }
-                        else -> {
-                            // invalid transmission sub-type (at this point)
-                            if(verboseLog){
-                                Log.e("readGroupString", "Invalid transmission sub-type on group transmission. Type was: ${data[1]}")
-                            }
-                            applicationProperty.logControl("W: Invalid transmission sub-type on group transmission. Type was: ${data[1]}")
-                        }
+                        // update UI
+                        this.updateGroupElementInUIList(laRoomyDevicePropertyGroup)
                     }
+                    '5' -> {    // insert
+                        if (verboseLog) {
+                            Log.d(
+                                "readGroupString",
+                                "Group-Transmission received. Loop not active. INSERT element with index: ${laRoomyDevicePropertyGroup.groupIndex}"
+                            )
+                        }
+                        applicationProperty.logControl("I: Group-Transmission received. Loop not active. INSERT element with index: ${laRoomyDevicePropertyGroup.groupIndex}")
+                    }
+                    else -> {
+                        // invalid transmission sub-type (at this point)
+                        if(verboseLog){
+                            Log.e("readGroupString", "Invalid transmission sub-type on group transmission. Type was: ${data[1]}")
+                        }
+                        applicationProperty.logControl("W: Invalid transmission sub-type on group transmission. Type was: ${data[1]}")
+                    }
+                }
             }
             return true
         }
@@ -1266,18 +1263,26 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // decode property string to class
             val laRoomyDeviceProperty = LaRoomyDeviceProperty()
             laRoomyDeviceProperty.fromString(data)
-            
-            // TODO: what if the sub-type of the transmission is not correct, e.g. this is a request, not a response ????
 
             // add property and request next property if the loop is active
             if(this.propertyLoopActive){
                 // check transmission sub-type (only response is valid)
                 if(data[1] == '2') {
-    
-                    // TODO: question: when the property-index member of the decoded object does not equal the index which must be follow in the collection, is this an error?
-    
-                    this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
-                    this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
+                    // check if the index is valid
+                    if(laRoomyDeviceProperty.propertyIndex != this.laRoomyDevicePropertyList.size){
+                        // the index is invalid
+                        Log.e(
+                            "BLEConnectionManager",
+                            "Invalid property index of received element. PropertyIndex: ${laRoomyDeviceProperty.propertyIndex} - Expected index: ${this.laRoomyDevicePropertyList.size}"
+                        )
+                        applicationProperty.logControl("E: Invalid property index of received element. PropertyIndex: ${laRoomyDeviceProperty.propertyIndex} - Expected index: ${this.laRoomyDevicePropertyList.size}")
+                        
+                        // send the property request again
+                        this.sendNextPropertyRequest(this.laRoomyDevicePropertyList.size - 1)
+                    } else {
+                        this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
+                        this.sendNextPropertyRequest(laRoomyDeviceProperty.propertyIndex)
+                    }
                 } else {
                     // wrong transmission sub-type (response was expected)
                     if(verboseLog){
@@ -1463,10 +1468,24 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                     callback.onBindingPasskeyRejected()
                                 }
                                 '2' -> {
-                                    // TODO: binding not supported
+                                    if (verboseLog) {
+                                        Log.e("BLEConnectionManager", "Authentication response: FAILED. Binding not supported!")
+                                    }
+                                    applicationProperty.logControl("E: Received Authentication-Fail response from the device. -Binding not supported")
+    
+                                    this.propertyCallback.onBindingResponse(
+                                        BINDING_RESPONSE_BINDING_NOT_SUPPORTED
+                                    )
                                 }
                                 else -> {
-                                    // TODO: unknown error
+                                    if (verboseLog) {
+                                        Log.e("BLEConnectionManager", "Authentication Response: FAILED. -Unknown error")
+                                    }
+                                    applicationProperty.logControl("E: Received Authentication-Failed response from the device. -Unknown error")
+    
+                                    this.propertyCallback.onBindingResponse(
+                                        BINDING_RESPONSE_BINDING_ERROR
+                                    )
                                 }
                             }
                         true
@@ -2027,17 +2046,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             res = barGraphState.fromString(data)
         }
         
-        // TODO: remove !
-//        val res = if(barGraphState.isValid()){
-//            if(!barGraphState.updateFromString(data)){
-//                barGraphState.fromString(data)
-//            } else {
-//                true
-//            }
-//        } else {
-//            barGraphState.fromString(data)
-//        }
-
         // check the result and update the data (or handle error)
         if(!res){
             // handle error (log + return)
@@ -2312,10 +2320,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.applicationProperty.loadSavedStringData(R.string.FileKey_BLEManagerData, R.string.DataKey_LastSuccessfulConnectedDeviceAddress)
 
         if(address == ERROR_NOTFOUND) {
-            //this.callback.onConnectionAttemptFailed("Error: no device address found")
-
-            // TODO: error callback!
-
+            if(verboseLog){
+                Log.e("BLEConnectionManager", "Error: saved address of last device is invalid.")
+            }
+            this.callback.onConnectionError(BLE_INVALID_LAST_DEVICE_ADDRESS)
         } else {
             this.connectToRemoteDevice(address)
         }
@@ -2660,15 +2668,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             if (verboseLog) {
                                 Log.w(
                                     "generateUIArray",
-                                    "Inconsistency detected: Group-Index has not the expected value on Property Index: $index\nGroup Index was: ${laRoomyDeviceProperty.groupIndex} - Expected index: $expectedGroupIndex"
+                                    "Inconsistency detected: Group-Index has not the expected value on Property-Element with index: $index\nGroup Index was: ${laRoomyDeviceProperty.groupIndex} - Expected index: $expectedGroupIndex"
                                 )
                             }
                             applicationProperty.logControl(
-                                "W: Inconsistency detected: Group-Index has not the expected value on Property Index: $index " +
+                                "W: Inconsistency detected: Group-Index has not the expected value on Property-Element with index: $index " +
                                         "Group Index was: ${laRoomyDeviceProperty.groupIndex} - Expected index: $expectedGroupIndex - " +
                                         "The visual state may not be as expected!"
                             )
-                            // TODO: maybe fix the inconsistency automatically?? laRoomyDeviceProperty.groupIndex = expectedGroupIndex ???
+                            // fix the inconsistency automatically?? laRoomyDeviceProperty.groupIndex = expectedGroupIndex ???
                         }
 
                         // check if this element is part of the next group
@@ -2765,7 +2773,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                         this.update(applicationProperty.cViewContext)
                                     }
                             }
-                            return@forEachIndexed // TODO: check if this will work!!!
+                            return@forEachIndexed
                         }
 
                     } else {
@@ -2824,6 +2832,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } catch (e: Exception) {
             Log.e("generateUIArray", "Fatal error while generating the UI-Adapter Array. Exception: $e")
             applicationProperty.logControl("E: Fatal error while generating the UIAdapter data. Exception: $e")
+            propertyCallback.onPropertyError(BLE_UI_ADAPTER_GENERATION_FAIL)
             return
         }
 
@@ -2835,7 +2844,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 object : TimerTask() {
                     override fun run() {
                         try {
-
                             uIAdapterList.add(tempList.elementAt(uIItemAddCounter))
 
                             propertyCallback.onUIAdaptableArrayListItemAdded(
@@ -2864,7 +2872,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                     startComplexStateDataLoop()
                                 }, 300, TimeUnit.MILLISECONDS)
                             }
-                        } catch (e: IndexOutOfBoundsException) {
+                        } catch (e: Exception) {
                             if (verboseLog) {
                                 Log.e(
                                     "generateUIArray",
@@ -2872,7 +2880,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 )
                             }
                             applicationProperty.logControl("E: Error while adding the elements to the view. Exception: $e")
-                            // FIXME: reset the whole???
+                            propertyCallback.onPropertyError(BLE_UI_ADAPTER_GENERATION_FAIL)
                             cancel()
                         }
                     }
@@ -3331,9 +3339,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // insert in internal property list
             val insertAsLast = if(this.laRoomyDevicePropertyList.size == laRoomyDeviceProperty.propertyIndex){
                 this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
-
-                // TODO: if the element is inserted at the end the property index cannot be found in the UIList, fix that!
-
                 true
 
             } else {

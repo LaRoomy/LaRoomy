@@ -69,8 +69,6 @@ class BLEDiscoveryManager(private val appContext: Context, private val discovery
             }
 
         } else {
-            // TODO set UI to missing location permission error state
-
             if (!this.scanning) {
                 // schedule the stop of scanning
                 Executors.newSingleThreadScheduledExecutor().schedule({

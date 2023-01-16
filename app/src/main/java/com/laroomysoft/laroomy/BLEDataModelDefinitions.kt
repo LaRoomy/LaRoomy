@@ -2070,9 +2070,8 @@ class LaRoomyDeviceProperty {
     var isEnabled = true
 
     override fun equals(other: Any?): Boolean {
-
-        // TODO: update
-
+        // only compare the basic params (for example: it could be the same property, even if the state is different)
+        
         // check if this is the same reference
         if (this === other) return true
         // check if other is an invalid type
@@ -2134,9 +2133,6 @@ class LaRoomyDeviceProperty {
                 // save descriptor
                 this.propertyDescriptor = string.removeRange(0, 18)
                 this.propertyDescriptor = this.propertyDescriptor.removeSuffix("\r")
-
-                // TODO: decode descriptor (unicode!)
-                // TODO: test it!
                 this.propertyDescriptor = unescapeUTF8String(this.propertyDescriptor)
 
                 // decode hex values
@@ -2244,16 +2240,10 @@ class LaRoomyDevicePropertyGroup {
                 this.memberCount = Integer.decode(localMemberCount)
                 this.imageID = Integer.decode(imgID)
 
-
                 // get the descriptor
                 this.groupName = groupString.removeRange(0, 12)
                 this.groupName = this.groupName.removeSuffix("\r")
-
-                // TODO: decode groupName (unicode!) do it also on all visible strings!
-                // TODO: test it!
                 this.groupName = unescapeUTF8String(this.groupName)
-                
-                
 
                 if (verboseLog) {
                     Log.d("M:PropGroup:fromString", "Data Recorded - Results:")

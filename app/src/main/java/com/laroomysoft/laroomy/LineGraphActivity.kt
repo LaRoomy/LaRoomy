@@ -542,16 +542,14 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
                 }
             }
             if(!this.lineGraph.drawProcessActive) {
-
-                // FIXME: this is useless. The draw routines are async, so the 'drawProcessActive' param will be set to false directly after the method call while the draw is in progress !?
-
+                // there is no draw process active, so invalidate the view
                 this.lineGraph.setRange(lRange)
                 this.lineGraph.lineGraphData = this.lineDataList
-                this.lineGraph.invalidate()
+                this.lineGraph.postInvalidate()
             } else {
-                Log.e("LineGraphFastDataSetter", "Operation was skipped. Too much data.")
-
-                // TODO: better log! user log!
+                // the next draw should occur before the last wasn't finished - must be too fast for the view
+                Log.e("LineGraphFastDataSetter", "LineGraph UI-Update Operation was skipped. Too much data.")
+                (applicationContext as ApplicationProperty).logControl("W: LineGraph UI-Update Operation was skipped due to update queue overflow.")
             }
 
         } catch (e: Exception){

@@ -175,28 +175,47 @@ class EditUUIDProfileActivity : AppCompatActivity() {
 
         val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
         view.startAnimation(buttonAnimation)
+    
+        val profile = UUIDProfile()
+        profile.useSingleCharacteristic = !useDistCharCheckBox.isChecked
+        profile.profileName = this.profileNameEditText.text.toString()
+        profile.serviceUUID = UUID.fromString(
+            this.convertToHyphenConformUUIDString(
+                this.serviceUUIDEditText.text.toString()
+            ))
+        profile.rxCharacteristicUUID = UUID.fromString(
+            this.convertToHyphenConformUUIDString(
+                this.rxCharacteristicUUIDEditText.text.toString()
+            ))
+        profile.txCharacteristicUUID = if (profile.useSingleCharacteristic) {
+            profile.rxCharacteristicUUID
+        } else {
+            UUID.fromString(
+                this.convertToHyphenConformUUIDString(
+                    this.txCharacteristicUUIDEditText.text.toString()
+                ))
+        }
 
         if(this.mode.startsWith("edit")){
-            
             // this is an edit operation of an existing profile
-            
-            val profile = UUIDProfile()
-            profile.useSingleCharacteristic = !useDistCharCheckBox.isChecked
-            profile.profileName = this.profileNameEditText.text.toString()
-            profile.serviceUUID = UUID.fromString(this.serviceUUIDEditText.text.toString())
-            profile.rxCharacteristicUUID = UUID.fromString(this.rxCharacteristicUUIDEditText.text.toString())
-            profile.txCharacteristicUUID = if(profile.useSingleCharacteristic){
-                profile.rxCharacteristicUUID
-            } else {
-                UUID.fromString(this.txCharacteristicUUIDEditText.text.toString())
-            }
-
             val result = (applicationContext as ApplicationProperty).uuidManager.changeExistingProfile(
                 this.elementIndex,
                 profile
             )
             when(result){
                 CHANGE_SUCCESS -> finish()
+                UUID_SERVICE_INVALID -> {
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.ErrorColor)
+                }
+                UUID_RX_CHAR_INVALID -> {
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.ErrorColor)
+                }
+                UUID_TX_CHAR_INVALID -> {
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.ErrorColor)
+                }
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.ErrorColor)
@@ -204,22 +223,21 @@ class EditUUIDProfileActivity : AppCompatActivity() {
             }
 
         } else {
-            
             //  this must be a new-action
-            
-            val profile = UUIDProfile()
-            profile.useSingleCharacteristic = !useDistCharCheckBox.isChecked
-            profile.profileName = this.profileNameEditText.text.toString()
-            profile.serviceUUID = UUID.fromString(this.serviceUUIDEditText.text.toString())
-            profile.rxCharacteristicUUID = UUID.fromString(this.rxCharacteristicUUIDEditText.text.toString())
-            profile.txCharacteristicUUID = if(profile.useSingleCharacteristic){
-                profile.rxCharacteristicUUID
-            } else {
-                UUID.fromString(this.txCharacteristicUUIDEditText.text.toString())
-            }
-    
             when ((applicationContext as ApplicationProperty).uuidManager.addNewProfile(profile)) {
                 ADD_SUCCESS -> finish()
+                UUID_SERVICE_INVALID -> {
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.ErrorColor)
+                }
+                UUID_RX_CHAR_INVALID -> {
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.ErrorColor)
+                }
+                UUID_TX_CHAR_INVALID -> {
+                    // notify user and do not finish
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.ErrorColor)
+                }
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
                     notifyUser(
@@ -248,5 +266,29 @@ class EditUUIDProfileActivity : AppCompatActivity() {
     
     fun onEditUUIDActivityTXCharacteristicUUIDDescriptorClick(@Suppress("UNUSED_PARAMETER") view: View) {
         this.txCharacteristicUUIDEditText.setText(getString(R.string.UUIDDefaultFill))
+    }
+    
+    private fun  convertToHyphenConformUUIDString(uuid: String) : String {
+        var converted = ""
+        uuid.forEachIndexed { index, c ->
+            when(index){
+                8 -> {
+                    converted += '-'
+                }
+                13 -> {
+                    converted += '-'
+                }
+                18 -> {
+                    converted += '-'
+                }
+                23 -> {
+                    converted += '-'
+                }
+                else -> {
+                    converted += c
+                }
+            }
+        }
+        return converted
     }
 }

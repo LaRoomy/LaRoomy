@@ -406,20 +406,17 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     @SuppressLint("NotifyDataSetChanged")
     private fun reloadProperties(){
-
-        // TODO: log
-
         if(verboseLog) {
             Log.d(
                 "M:DMA:reloadProperties",
                 "Reloading Properties requested!"
             )
         }
-
+        (applicationContext as ApplicationProperty).logControl("I: Property-Reload requested.")
+    
         // at first update the UI
         runOnUiThread {
             this.propertyLoadingFinished = false
-            //this.propertyList.clear()
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.clear()
             this.devicePropertyListViewAdapter.notifyDataSetChanged()
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.VISIBLE
@@ -430,9 +427,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
             this.showNotificationHeaderAndPostMessage(deviceHeaderData)
         }
-        Handler(Looper.getMainLooper()).postDelayed({
+        // then start the reload process
+        Executors.newSingleThreadScheduledExecutor().schedule({
             ApplicationProperty.bluetoothConnectionManager.reloadProperties()
-        }, 500) // TODO: shorter time?
+        }, 500, TimeUnit.MILLISECONDS)
     }
 
     override fun onPropertyElementButtonClick(index: Int) {
@@ -474,7 +472,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
             )
         }
-        // TODO: check if the newState comes with the right terminology
 
         val c = when(state){
             true -> 1
@@ -1068,9 +1065,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     private fun resetSelectedItemBackground(){
-
-        // TODO: set item drawable to normal state
-
         // reset the selected item background if necessary
         if (restoreIndex >= 0 && ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size > 0) {
             val element =
@@ -1425,30 +1419,12 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     override fun onUIAdaptableArrayListGenerationComplete(UIArray: ArrayList<DevicePropertyListContentInformation>) {
         super.onUIAdaptableArrayListGenerationComplete(UIArray)
-
-        // ?? description!
-
-
+        
         this.propertyLoadingFinished = true
 
-
         runOnUiThread {
-
-            // TODO: ??
-            //this.deviceHeaderNotificationContainer.visibility = View.GONE
-
             this.hideNotificationHeader()
-
             this.findViewById<SpinKitView>(R.id.devicePageSpinKit).visibility = View.GONE
-
-
-
-
-            //this.setDeviceInfoHeader(43, getString(R.string.DMA_Ready))
-
-
-            // TODO: test!
-            //this.devicePropertyListViewAdapter.notifyDataSetChanged()
         }
     }
 
@@ -1458,13 +1434,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // if not -> update it
             item.update(devicePropertyListRecyclerView.context)
         }
-
-//        if(item.globalIndex == -1){
-//            Log.e("itemAdded", "severe error, invalid index! globalIndex: ${item.globalIndex} | Internal index: ${item.internalElementIndex}")
-//        }
-
-        // add the data to the UI-List
-        //this.propertyList.add(item)
 
         try {
             runOnUiThread {
@@ -1551,49 +1520,18 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
                             UIAdapterElementIndex
                         )
-
-                    // temp:
-                    //Log.e("onSimpleStateChanged", "Callback invoked: type is: ${uIElement.propertyType}")
-
-
-//                    val linearLayout =
-//                        this.devicePropertyListLayoutManager.findViewByPosition(
-//                            UIAdapterElementIndex
-//                        ) as? LinearLayout
-
                     // update the appropriate element
                     when (uIElement.propertyType) {
                         PROPERTY_TYPE_BUTTON -> {
                             // NOTE: this is not used, because the button has no state (by now)
                         }
                         PROPERTY_TYPE_SWITCH -> {
-//                    val switch =
-//                        linearLayout?.findViewById<SwitchCompat>(R.id.elementSwitch)
-//                    switch?.isChecked = (newState != 0)
-
-
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
                         }
                         PROPERTY_TYPE_LEVEL_SELECTOR -> {
-
-                            // TODO: set textview value to the newState!
-
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
-
-                            /*
-                    val seekBar =
-                        linearLayout?.findViewById<SeekBar>(R.id.elementSeekBar)
-                    seekBar?.progress = get8BitValueAsPercent(newState)
-                    */
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
-//                    val textView =
-//                        linearLayout?.findViewById<TextView>(R.id.levelIndicationTextView)
-//                    val percentageLevelPropertyGenerator = PercentageLevelPropertyGenerator(
-//                        get8BitValueAsPercent(newState)
-//                    )
-//                    textView?.setTextColor(percentageLevelPropertyGenerator.colorID)
-//                    textView?.text = percentageLevelPropertyGenerator.percentageString
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
                         }
                         PROPERTY_TYPE_OPTION_SELECTOR -> {
@@ -1630,15 +1568,25 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
     
     override fun onPropertyError(error: Int) {
-        if(error == BLE_COMPLEX_STATE_LOOP_FINAL_FAILED){
-            // notify user
-            val deviceHeaderData = DeviceInfoHeaderData()
-            deviceHeaderData.displayTime = 9L
-            deviceHeaderData.onClickAction = DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD
-            deviceHeaderData.type = USERMESSAGE_TYPE_ERROR
-            deviceHeaderData.message = getString(R.string.DMA_PropertyDataLoadingIncomplete)
-            
-            this.showNotificationHeaderAndPostMessage(deviceHeaderData)
+        when(error) {
+            BLE_COMPLEX_STATE_LOOP_FINAL_FAILED -> {
+                // notify user
+                val deviceHeaderData = DeviceInfoHeaderData()
+                deviceHeaderData.displayTime = 9L
+                deviceHeaderData.onClickAction = DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD
+                deviceHeaderData.type = USERMESSAGE_TYPE_ERROR
+                deviceHeaderData.message = getString(R.string.DMA_PropertyDataLoadingIncomplete)
+        
+                this.showNotificationHeaderAndPostMessage(deviceHeaderData)
+            }
+            BLE_UI_ADAPTER_GENERATION_FAIL -> {
+                ApplicationProperty.bluetoothConnectionManager.clear()
+                finish()
+            }
+            else -> {
+                Log.e("DeviceMainActivity", "onPropertyError: unexpected error. Error-ID: $error")
+                (applicationContext as ApplicationProperty).logControl("E: DeviceMainPage: unexpected error. Error-ID: $error")
+            }
         }
     }
     
@@ -1826,294 +1774,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                 }
             }
         }
-
-            /*
-
-            when(elementToRender.elementType) {
-                UNDEFINED_ELEMENT -> {
-                    // should not happen
-                    // set the text for the element
-                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                        .apply {
-                            //visibility = View.VISIBLE
-                            text = activityContext.getString(R.string.DMA_ErrorElementText)
-                            textSize = 16F
-                            setTypeface(typeface, Typeface.BOLD)
-                        }
-                }
-                GROUP_ELEMENT -> {
-                    // This is a Group-Element. Visible Elements: Image, Textview. Background: group element background
-                    // The image and the textview are visible by default, so nothing must be set to visible.
-
-                    // set group-header background
-                    rootContentHolder.background = AppCompatResources.getDrawable(
-                        activityContext,
-                        R.drawable.property_list_group_header_element_background
-                    )
-                    // set the image for the element
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage)
-                        .apply {
-                            setBackgroundResource(
-                                resourceIdForImageId(elementToRender.imageID)
-                            )
-                        }
-                    // set the text for the element
-                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                        .apply {
-                            //visibility = View.VISIBLE
-                            text = elementToRender.elementText
-                            textSize = 18F
-                            setTypeface(typeface, Typeface.BOLD)
-                        }
-                }
-                PROPERTY_ELEMENT -> {
-                    // this is a property element
-
-                    // if this is a navigatable property, show the nav-arrow
-                    if (elementToRender.canNavigateForward) {
-                        holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility =
-                            View.VISIBLE
-                    }
-
-                    // set the background appropriate to the group-status
-                    if (!elementToRender.isGroupMember) {
-                        // this is a single property element
-                        rootContentHolder.background =
-                            AppCompatResources.getDrawable(
-                                activityContext,
-                                R.drawable.single_property_list_element_background
-                            )
-                    } else {
-                        // the element is part of a group, check if this is the last element in the group
-                        // check the next item
-                        if (elementToRender.isLastInGroup) {
-                            rootContentHolder.background =
-                                AppCompatResources.getDrawable(
-                                    activityContext,
-                                    R.drawable.inside_group_property_last_list_element_background
-                                )
-                        } else {
-                            rootContentHolder.background =
-                                AppCompatResources.getDrawable(
-                                    activityContext,
-                                    R.drawable.inside_group_property_list_element_background
-                                )
-                        }
-                    }
-
-                    // set the appropriate image for the imageID
-                    holder.linearLayout.findViewById<ImageView>(R.id.devicePropertyIdentificationImage)
-                        .apply {
-                            setBackgroundResource(
-                                resourceIdForImageId(elementToRender.imageID)
-                            )
-                        }
-
-                    // TODO: hide the image-view if the imageID is not set or show default???
-
-                    // set the appropriate elements for the type of the property:
-                    when (elementToRender.propertyType) {
-                        -1 -> return // must be error
-                        0 -> return // must be error
-                        PROPERTY_TYPE_BUTTON -> {
-
-                            // check if dual description is required
-                            val dualDescription = checkForDualDescriptor(elementToRender.elementText)
-
-                            if(dualDescription.isDual){
-                                val textView =
-                                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                                textView.text = dualDescription.elementText
-                            }
-
-                            // apply to the button
-                            holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
-                                // show the button
-                                visibility = View.VISIBLE
-                                // set the text of the button
-                                text = if(dualDescription.isDual){
-                                    dualDescription.actionText
-                                } else {
-                                    elementToRender.elementText
-                                }
-                                // set the onClick handler
-                                setOnClickListener {
-                                    itemClickListener.onPropertyElementButtonClick(
-                                        elementToRender.internalElementIndex,
-                                        elementToRender
-                                    )
-                                }
-                            }
-                        }
-                        PROPERTY_TYPE_SWITCH -> {
-                            // get the switch
-                            val switch =
-                                holder.linearLayout.findViewById<SwitchCompat>(R.id.elementSwitch)
-                            // show the switch
-                            switch.visibility = View.VISIBLE
-                            // set the onClick handler
-                            switch.setOnClickListener {
-                                itemClickListener.onPropertyElementSwitchClick(
-                                    elementToRender.internalElementIndex,
-                                    elementToRender,
-                                    switch
-                                )
-                            }
-                            switch.isChecked = elementToRender.simplePropertyState > 0
-
-                            // show the text-view
-                            val textView =
-                                holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-//                            textView.visibility = View.VISIBLE
-                            // set the text
-                            textView.text = elementToRender.elementText
-                        }
-                        PROPERTY_TYPE_LEVEL_SELECTOR -> {
-                            // TODO: show this in a popup!!!
-                            // show seek-bar layout container
-                            //holder.linearLayout.findViewById<LinearLayout>(R.id.seekBarContainer).visibility = View.VISIBLE
-                            // set the handler for the seekBar
-                            //elementToRender.handler = callingActivity
-
-
-                            // test!!!!
-                            /*holder.linearLayout.findViewById<SeekBar>(R.id.elementSeekBar).apply {
-                                this.setOnSeekBarChangeListener(elementToRender)
-                                this.progress =
-                                    get8BitValueAsPercent(elementToRender.simplePropertyState)
-                            }*/
-
-                            // TODO: show the button and display the value as button-text!
-
-
-                            // show the property text-view
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                                .apply {
-                                    //visibility = View.VISIBLE
-                                    // set the text
-                                    text = elementToRender.elementText
-                                }
-                            // show the level in the button
-                            val percentageLevelPropertyGenerator =
-                                PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
-
-                            // TODO: add the possibility for the user to display other values than percentage values!?
-
-                            // show the level text-view
-                            holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
-                                visibility = View.VISIBLE
-                                text = percentageLevelPropertyGenerator.percentageString
-
-                                setOnClickListener {
-                                    itemClickListener.onPropertyLevelSelectButtonClick(
-                                        elementToRender.internalElementIndex,
-                                        elementToRender
-                                    )
-                                }
-
-                                //setTextColor(percentageLevelPropertyGenerator.colorID)
-
-                            }
-
-                        }
-                        PROPERTY_TYPE_OPTION_SELECTOR -> {
-
-                            val optionSelectorStrings =
-                                decryptOptionSelectorString(elementToRender.elementText)
-
-                            // NOTE: the first string is the element description!
-
-                            if (optionSelectorStrings.isNotEmpty()) {
-
-                                val textView =
-                                    holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                                textView.text = optionSelectorStrings.elementAt(0)
-
-                                // remove the first element, since this is the descriptor-text
-                                optionSelectorStrings.removeAt(0)
-
-                                // apply to the button
-                                holder.linearLayout.findViewById<Button>(R.id.elementButton).apply {
-                                    // show the button
-                                    visibility = View.VISIBLE
-
-                                    // set the text of the button (if valid)
-                                    if (elementToRender.simplePropertyState < optionSelectorStrings.size) {
-                                        text =
-                                            optionSelectorStrings.elementAt(elementToRender.simplePropertyState)
-
-                                        // set the onClick handler
-                                        setOnClickListener {
-                                            itemClickListener.onPropertyOptionSelectButtonClick(
-                                                elementToRender.globalIndex,
-                                                elementToRender
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        PROPERTY_TYPE_LEVEL_INDICATOR -> {
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                                .apply {
-                                    // set visibility
-                                    //visibility = View.VISIBLE
-                                    // set the text
-                                    text = elementToRender.elementText
-                                }
-
-                            // show a level indication e.g. "96%"
-                            val percentageLevelPropertyGenerator =
-                                PercentageLevelPropertyGenerator(elementToRender.simplePropertyState)
-
-                            holder.linearLayout.findViewById<TextView>(R.id.levelIndicationTextView)
-                                .apply {
-                                    visibility = View.VISIBLE
-                                    text = percentageLevelPropertyGenerator.percentageString
-                                    setTextColor(percentageLevelPropertyGenerator.colorID)
-                                }
-                        }
-                        PROPERTY_TYPE_SIMPLE_TEXT_DISPLAY -> {
-
-                            // TODO: integrate textcolor???
-
-                            // show the textView
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                                .apply {
-                                    //visibility = View.VISIBLE
-                                    // set the text
-                                    text = elementToRender.elementText
-                                }
-                        }
-                        else -> {
-                            // must be complex type!
-
-                            // set handler
-                            holder.linearLayout.setOnClickListener {
-                                itemClickListener.onNavigatableElementClick(
-                                    position,
-                                    elementToRender
-                                )
-                            }
-
-                            // show the textView
-                            holder.linearLayout.findViewById<TextView>(R.id.devicePropertyNameTextView)
-                                .apply {
-                                    //visibility = View.VISIBLE
-                                    // set the text
-                                    text = elementToRender.elementText
-                                }
-                            // show the navigate arrow
-                            holder.linearLayout.findViewById<ImageView>(R.id.forwardImage).visibility =
-                                View.VISIBLE
-                        }
-                    }
-                }
-            }
-            // bind it!
-            //holder.bind(elementToRender, itemClickListener, position)
-        }*/
-
+        
         override fun getItemCount(): Int {
             return devicePropertyAdapter.size
         }
@@ -2125,9 +1786,5 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         override fun getItemViewType(position: Int): Int {
             return position
         }
-
-//        fun getElementAt(index: Int) : DevicePropertyListContentInformation{
-//            return devicePropertyAdapter.elementAt(index)
-//        }
     }
 }

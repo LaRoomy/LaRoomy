@@ -13,6 +13,9 @@ const val CHANGE_SUCCESS = 0
 const val PROFILE_NAME_ALREADY_EXIST = 1
 const val UUID_FORMAT_INVALID = 2
 const val INVALID_INDEX = 3
+const val UUID_SERVICE_INVALID = 4
+const val UUID_RX_CHAR_INVALID = 5
+const val UUID_TX_CHAR_INVALID = 6
 
 const val FIRST_USERPROFILE_INDEX = 3
 
@@ -135,20 +138,21 @@ class UUIDManager(private var appContext: Context) {
         return if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
             INVALID_INDEX
         } else {
-            if(checkUUIDFormat(profile.serviceUUID.toString())
-                && checkUUIDFormat(profile.rxCharacteristicUUID.toString())
-                && checkUUIDFormat(profile.txCharacteristicUUID.toString())){
-
-                this.uUIDProfileList[index].profileName = profile.profileName
-                this.uUIDProfileList[index].useSingleCharacteristic = profile.useSingleCharacteristic
-                this.uUIDProfileList[index].serviceUUID = profile.serviceUUID
-                this.uUIDProfileList[index].rxCharacteristicUUID = profile.rxCharacteristicUUID
-                this.uUIDProfileList[index].txCharacteristicUUID = profile.txCharacteristicUUID
-
-                this.saveUserProfiles()
-                CHANGE_SUCCESS
-            } else {
-                UUID_FORMAT_INVALID
+            return when {
+                !checkUUIDFormat(profile.serviceUUID.toString()) -> UUID_SERVICE_INVALID
+                !checkUUIDFormat(profile.rxCharacteristicUUID.toString()) -> UUID_RX_CHAR_INVALID
+                !checkUUIDFormat(profile.txCharacteristicUUID.toString()) -> UUID_TX_CHAR_INVALID
+                else -> {
+                    this.uUIDProfileList[index].profileName = profile.profileName
+                    this.uUIDProfileList[index].useSingleCharacteristic =
+                        profile.useSingleCharacteristic
+                    this.uUIDProfileList[index].serviceUUID = profile.serviceUUID
+                    this.uUIDProfileList[index].rxCharacteristicUUID = profile.rxCharacteristicUUID
+                    this.uUIDProfileList[index].txCharacteristicUUID = profile.txCharacteristicUUID
+            
+                    this.saveUserProfiles()
+                    CHANGE_SUCCESS
+                }
             }
         }
     }
@@ -183,26 +187,22 @@ class UUIDManager(private var appContext: Context) {
                 }
             }
             // then check the uuid-format
-            if (!checkUUIDFormat(profile.serviceUUID.toString())
-                || !checkUUIDFormat(profile.rxCharacteristicUUID.toString())
-                || !checkUUIDFormat(profile.txCharacteristicUUID.toString())) {
-                return UUID_FORMAT_INVALID
+            return when {
+                !checkUUIDFormat(profile.serviceUUID.toString()) -> UUID_SERVICE_INVALID
+                !checkUUIDFormat(profile.rxCharacteristicUUID.toString()) -> UUID_RX_CHAR_INVALID
+                !checkUUIDFormat(profile.txCharacteristicUUID.toString()) -> UUID_TX_CHAR_INVALID
+                else -> {
+                    // everything is ok, so add the profile
+                    this.uUIDProfileList.add(profile)
+                    // write the new profile-list to file
+                    this.saveUserProfiles()
+        
+                    ADD_SUCCESS
+                }
             }
-
-
-            //TODO: format the hyphen!!!
-
-            
-            // everything is ok, so add the profile
-            this.uUIDProfileList.add(profile)
-            // write the new profile-list to file
-            this.saveUserProfiles()
-
-            return ADD_SUCCESS
         } catch(e: Exception){
             return UUID_FORMAT_INVALID
         }
-
     }
 
     private fun saveUserProfiles(){

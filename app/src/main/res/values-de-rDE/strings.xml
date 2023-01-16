@@ -341,6 +341,11 @@
     <string name="EditUUIDProfileActivityButtonTextDiscard">Verwerfen</string>
     <string name="EditUUIDProfileActivityIsStaticProfileNotification">Dies ist ein statisches Profil. Änderungen haben keine Auswirkungen. Erstellen Sie ein neues Profil um eigene UUIDs zu definieren.</string>
     <string name="EditUUIDProfileActivityInvalidUUIDNotification">Ungültiges UUID-Format.</string>
+
+    <string name="EditUUIDProfileActivityInvalidServiceUUIDNotification">Ungültiges Service UUID-Format.</string>
+    <string name="EditUUIDProfileActivityInvalidRxCharUUIDNotification">Ungültiges RX Characteristic UUID-Format.</string>
+    <string name="EditUUIDProfileActivityInvalidTxCharUUIDNotification">Ungültiges TX Characteristic UUID-Format.</string>
+
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profil-Name existiert bereits.</string>
     <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Separate Characteristic für RX und TX verwenden</string>
 
@@ -391,6 +396,7 @@
     <string name="Error_InvalidPropertyTypeForStandaloneMode">Ungültiger Geräte-Eigenschaften Typ für den Solo-Eigenschaften-Modus</string>
     <string name="Error_StandAlonePropertyModeError_NoData">Solo-Eigenschaften Fehler: keine Daten vorhanden.</string>
     <string name="Error_InvalidDeviceAddress">Geräte-Adresse ungültig.</string>
+    <string name="Error_UIAdapterGenerationFail">Fehler beim erstellen der Daten für die Benutzeroberfläche.</string>
 
 
     <!-- FileKeys: -->

@@ -251,8 +251,6 @@ class NavigatorControlActivity : AppCompatActivity(), BLEConnectionManager.BleEv
 
     private fun executeButtonCommand(Id: Int?, activate: Boolean){
 
-        // TODO: sometimes in a multi-touch condition, there is a command missing
-
         if(verboseLog){
             val buttonStr = when(Id){
                 R.id.navConNavigateDownButton -> "Down"

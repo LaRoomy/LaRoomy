@@ -540,9 +540,7 @@ class LineGraph : View {
 
             this.drawProcessActive = true
 
-
             try {
-
                 canvas.apply {
                     if (isRangeDataValid) {
                         // this must be done anyway and must be done at first, to set the axis-base-values for further usage
@@ -564,7 +562,6 @@ class LineGraph : View {
                         }
                     }
                 }
-
                 this.drawProcessActive = false
 
             } catch (e: Exception){

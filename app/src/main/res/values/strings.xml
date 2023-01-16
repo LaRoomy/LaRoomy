@@ -322,6 +322,12 @@
     <string name="EditUUIDProfileActivityButtonTextDiscard">Discard</string>
     <string name="EditUUIDProfileActivityIsStaticProfileNotification">This is a static profile. Changes will take no effect. Add a new profile to define your own UUIDs.</string>
     <string name="EditUUIDProfileActivityInvalidUUIDNotification">Invalid UUID-Format.</string>
+
+    <string name="EditUUIDProfileActivityInvalidServiceUUIDNotification">Invalid Service UUID-Format.</string>
+    <string name="EditUUIDProfileActivityInvalidRxCharUUIDNotification">Invalid RX Characteristic UUID-Format.</string>
+    <string name="EditUUIDProfileActivityInvalidTxCharUUIDNotification">Invalid TX Characteristic UUID-Format.</string>
+
+
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profile-Name already exist.</string>
     <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Use distinct characteristics for RX and TX</string>
 
@@ -392,6 +398,7 @@
     <string name="Error_InvalidPropertyTypeForStandaloneMode">Invalid Property-Type for the stand-alone mode.</string>
     <string name="Error_StandAlonePropertyModeError_NoData">Stand-alone mode error: no property data.</string>
     <string name="Error_InvalidDeviceAddress">Device address invalid.</string>
+    <string name="Error_UIAdapterGenerationFail">User Interface data generation error.</string>
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>

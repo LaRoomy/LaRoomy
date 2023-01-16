@@ -193,7 +193,7 @@ fun resourceIdForImageId(imageID: Int, elementType: Int, isPremiumVersion: Boole
             186 -> R.drawable.ic_186_users
             187 -> R.drawable.ic_187_conjunction
         
-            // TODO: implement all new image resources here...
+            // !! -> implement all new image resources here...
         
             else -> commonResourceID(elementType)
         }
@@ -395,7 +395,7 @@ fun resourceIdForDisabledImageId(imageID: Int, elementType: Int, isPremiumVersio
             186 -> R.drawable.ic_186_users_dis
             187 -> R.drawable.ic_187_conjunction_dis
         
-            // TODO: implement all new disabled image resources here...
+            // !! -> implement all new disabled image resources here...
         
             else -> commonDisabledResourceID(elementType)
         }

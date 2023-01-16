@@ -78,9 +78,6 @@ class AddDeviceActivity : AppCompatActivity(),
 
     private lateinit var backButton: AppCompatImageButton
 
-    private var listUpdateRequired = false
-//    private var imageRestoreRequired = false
-
     private lateinit var scanResultListView: RecyclerView
     private lateinit var scanResultListViewManager: RecyclerView.LayoutManager
     private lateinit var scanResultListAdapter: RecyclerView.Adapter<*>
@@ -89,7 +86,8 @@ class AddDeviceActivity : AppCompatActivity(),
     private lateinit var reloadButton: AppCompatImageButton
 
     private lateinit var bleDiscoveryManager: BLEDiscoveryManager
-
+    
+    private var listUpdateRequired = false
     private var bluetoothPermissionGranted = false
     private var bluetoothLocationPermissionGranted = false
     private var grantPermissionRequestDeclined = false
@@ -477,31 +475,6 @@ class AddDeviceActivity : AppCompatActivity(),
     }
 
     override fun onPermissionError() {
-
-        // TODO: do not finish if the BLUETOOTH_SCAN permission is not present - notify user instead and propose what he could do..
-
         finish()
     }
-
-
-//    fun onAddDeviceActivityGotoBluetoothButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-//
-//        findViewById<AppCompatImageView>(R.id.addDeviceActivityGotoBluetoothImageView).setImageResource(R.drawable.ic_settings_bluetooth_yellow_48dp)
-//        findViewById<AppCompatTextView>(R.id.addDeviceActivityGotoBluetoothTextView).setTextColor(getColor(R.color.yellowAccentColor))
-//        this.imageRestoreRequired = true
-//
-//        val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-//        startActivity(intent)
-//    }
-
-
-/*
-    fun onAddDeviceActivityDoNotShowAgainButtonClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        findViewById<AppCompatImageView>(R.id.addDeviceActivityDoNotShowAgainImageView).setImageResource(R.drawable.ic_block_yellow_48dp)
-        (applicationContext as ApplicationProperty).saveBooleanData(true, R.string.FileKey_AppSettings, R.string.DataKey_DoNotShowBondingHint)
-
-        findViewById<ConstraintLayout>(R.id.addDeviceActivityBondingHintContainer).visibility = View.GONE
-    }
-*/
-
 }
