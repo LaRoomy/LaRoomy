@@ -150,9 +150,11 @@ class PremiumManager(private val appContext: Context) {
             val calendar = Calendar.getInstance()
     
             // start date to object
-            val endDate = LocalDate.of(this.sYear, this.sMonth + 1, this.sDay)
+            val endDate = LocalDate.of(this.sYear, this.sMonth + 1, this.sDay).plusDays(30)
             // add 30 days to get the date where the period ends
-            endDate.plusDays(30)
+    
+            //endDate.plusDays(30)
+            
             // current date to object
             val curDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH))
             // determine if period is over

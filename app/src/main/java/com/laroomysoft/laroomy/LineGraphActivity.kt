@@ -407,7 +407,6 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
 
     override fun onFastDataPipeInvoked(propertyID: Int, data: String) {
         try {
-
             val lRange = this.lineGraph.getRange()
             val stringArray = ArrayList<String>()
             var addString = ""
@@ -546,8 +545,9 @@ class LineGraphActivity : AppCompatActivity(), BLEConnectionManager.BleEventCall
                 this.lineGraph.setRange(lRange)
                 this.lineGraph.lineGraphData = this.lineDataList
                 this.lineGraph.postInvalidate()
+                //this.lineGraph.invalidate()
             } else {
-                // the next draw should occur before the last wasn't finished - must be too fast for the view
+                // the next draw occurred before the last wasn't finished - must be too fast for the view
                 Log.e("LineGraphFastDataSetter", "LineGraph UI-Update Operation was skipped. Too much data.")
                 (applicationContext as ApplicationProperty).logControl("W: LineGraph UI-Update Operation was skipped due to update queue overflow.")
             }
