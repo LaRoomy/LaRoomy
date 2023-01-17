@@ -338,7 +338,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         }
                         // check if the the name must be truncated due to an image appendix and assign the result to the view
                         this.deviceTypeHeaderTextView.text =
-                            removeImageDefintionFromNameStringIfApplicable(
+                            removeImageDefinitionFromNameStringIfApplicable(
                                 deviceName,
                                 (applicationContext as ApplicationProperty).isPremiumAppVersion
                             )

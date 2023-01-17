@@ -392,7 +392,7 @@ fun loopTypeToString(loopType: Int) : String {
 }
 
 fun isLaroomyDevice(name: String) : Boolean {
-    return name.contains("laroomy", true)||(name.contains("lry", true))
+    return name.contains("laroomy", true)
 }
 
 fun checkDeviceNameForImageDefinition(deviceName: String) : Int {
@@ -413,7 +413,7 @@ fun checkDeviceNameForImageDefinition(deviceName: String) : Int {
     return -1
 }
 
-fun removeImageDefintionFromNameStringIfApplicable(name: String, isPremium: Boolean) : String {
+fun removeImageDefinitionFromNameStringIfApplicable(name: String, isPremium: Boolean) : String {
     if(isPremium){
         // check name string for the image definition
         val imageID = checkDeviceNameForImageDefinition(name)

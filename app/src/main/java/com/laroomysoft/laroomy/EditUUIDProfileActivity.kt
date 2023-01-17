@@ -2,6 +2,7 @@ package com.laroomysoft.laroomy
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.activity.OnBackPressedCallback
@@ -179,21 +180,48 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         val profile = UUIDProfile()
         profile.useSingleCharacteristic = !useDistCharCheckBox.isChecked
         profile.profileName = this.profileNameEditText.text.toString()
-        profile.serviceUUID = UUID.fromString(
-            this.convertToHyphenConformUUIDString(
-                this.serviceUUIDEditText.text.toString()
-            ))
-        profile.rxCharacteristicUUID = UUID.fromString(
-            this.convertToHyphenConformUUIDString(
-                this.rxCharacteristicUUIDEditText.text.toString()
-            ))
-        profile.txCharacteristicUUID = if (profile.useSingleCharacteristic) {
-            profile.rxCharacteristicUUID
-        } else {
-            UUID.fromString(
+        try {
+            profile.serviceUUID = UUID.fromString(
                 this.convertToHyphenConformUUIDString(
-                    this.txCharacteristicUUIDEditText.text.toString()
-                ))
+                    this.serviceUUIDEditText.text.toString()
+                )
+            )
+        } catch (e: java.lang.Exception){
+            if(verboseLog) {
+                Log.w("EditUUIDProfileActivity", "Exception while creating service UUID object: $e")
+            }
+            notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.errorLightColor)
+            return
+        }
+        try {
+            profile.rxCharacteristicUUID = UUID.fromString(
+                this.convertToHyphenConformUUIDString(
+                    this.rxCharacteristicUUIDEditText.text.toString()
+                )
+            )
+        } catch (e: java.lang.Exception){
+            if(verboseLog) {
+                Log.w("EditUUIDProfileActivity", "Exception while creating rx characteristic UUID object: $e")
+            }
+            notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.errorLightColor)
+            return
+        }
+        try {
+            profile.txCharacteristicUUID = if (profile.useSingleCharacteristic) {
+                profile.rxCharacteristicUUID
+            } else {
+                UUID.fromString(
+                    this.convertToHyphenConformUUIDString(
+                        this.txCharacteristicUUIDEditText.text.toString()
+                    )
+                )
+            }
+        } catch (e: java.lang.Exception){
+            if(verboseLog) {
+                Log.w("EditUUIDProfileActivity", "Exception while creating tx characteristic UUID object: $e")
+            }
+            notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.errorLightColor)
+            return
         }
 
         if(this.mode.startsWith("edit")){
@@ -206,19 +234,19 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                 CHANGE_SUCCESS -> finish()
                 UUID_SERVICE_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.errorLightColor)
                 }
                 UUID_RX_CHAR_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.errorLightColor)
                 }
                 UUID_TX_CHAR_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.errorLightColor)
                 }
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.errorLightColor)
                 }
             }
 
@@ -228,28 +256,28 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                 ADD_SUCCESS -> finish()
                 UUID_SERVICE_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.errorLightColor)
                 }
                 UUID_RX_CHAR_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.errorLightColor)
                 }
                 UUID_TX_CHAR_INVALID -> {
                     // notify user and do not finish
-                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.ErrorColor)
+                    notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.errorLightColor)
                 }
                 UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
                     notifyUser(
                         getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification),
-                        R.color.ErrorColor
+                        R.color.errorLightColor
                     )
                 }
                 PROFILE_NAME_ALREADY_EXIST -> {
                     // notify user and do not finish
                     notifyUser(
                         getString(R.string.EditUUIDProfileActivityProfileNameAlreadyExistNotification),
-                        R.color.ErrorColor
+                        R.color.errorLightColor
                     )
                 }
             }
@@ -269,6 +297,11 @@ class EditUUIDProfileActivity : AppCompatActivity() {
     }
     
     private fun  convertToHyphenConformUUIDString(uuid: String) : String {
+        
+        if(uuid.length != 36){
+            throw java.lang.IllegalArgumentException("UUID length invalid. Length was ${uuid.length}. Expected 36!")
+        }
+        
         var converted = ""
         uuid.forEachIndexed { index, c ->
             when(index){

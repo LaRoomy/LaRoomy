@@ -128,7 +128,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         // set the initial settings
         bindingSwitch.isChecked = ApplicationProperty.bluetoothConnectionManager.isBindingRequired
 
-        // change the UI if the binding-switch is on
+        // change the UI if the binding is enabled
         if(ApplicationProperty.bluetoothConnectionManager.isBindingRequired){
             shareBindingContainer.visibility = View.VISIBLE
 
@@ -152,7 +152,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             else -> notifyUser(getString(R.string.DeviceSettingsActivity_UserInfo_Disconnected), R.color.disconnectedTextColor)
         }
 
-        // set up event-handler for controls
+        // set up event-handler for the binding switch
         bindingSwitch.setOnCheckedChangeListener { _, isChecked ->
 
             // create/release device binding
@@ -169,7 +169,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding(passkey)
 
                     // show the share-button
-                    shareBindingContainer.visibility = View.VISIBLE
+                    //shareBindingContainer.visibility = View.VISIBLE
 
                     // schedule a timeout control for the response
                     this.pendingBindingTransmission = dbENABLE
@@ -533,6 +533,9 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     // save binding info
                     val bData = BindingData()
                     val bManager = BindingDataManager(applicationContext)
+                    
+                    // show the share button container
+                    shareBindingContainer.visibility = View.VISIBLE
     
                     ApplicationProperty.bluetoothConnectionManager.currentDevice?.apply {
                         if (ActivityCompat.checkSelfPermission(
@@ -584,8 +587,12 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     }
                 }
                 BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
+                    // this should not happen, if the connection is established with the correct binding key, the key must be correct at this point
+                    // ---
                     // reset the switch
                     bindingSwitch.isChecked = true
+                    // hide the share-button (for security reasons)
+                    shareBindingContainer.visibility = View.GONE
                     // notify user
                     notifyUserWithDelayedReset(
                         getString(R.string.DeviceSettingsActivity_ReleaseBindingFailedWrongPasskeyText),
