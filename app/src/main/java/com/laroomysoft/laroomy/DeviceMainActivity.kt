@@ -1706,7 +1706,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // set property image
             holder.linearLayout.findViewById<AppCompatImageView>(R.id.devicePropertyIdentificationImage)
                 .apply {
-                    setBackgroundResource(
+                    
+                    //setBackgroundResource(    TODO: was changed, check this!
+                    
+                    setImageResource(
                         elementToRender.imageResourceID
                     )
                 }
@@ -1721,7 +1724,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                         setTypeface(typeface, Typeface.BOLD)
                     } else {
                         this.textSize = 14F
-                        setTypeface(typeface, Typeface.NORMAL)
+                        setTypeface(null, Typeface.NORMAL)
                     }
                 }
 
