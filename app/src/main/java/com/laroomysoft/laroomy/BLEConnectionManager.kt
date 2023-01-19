@@ -3340,7 +3340,6 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             val insertAsLast = if(this.laRoomyDevicePropertyList.size == laRoomyDeviceProperty.propertyIndex){
                 this.laRoomyDevicePropertyList.add(laRoomyDeviceProperty)
                 true
-
             } else {
                 this.laRoomyDevicePropertyList.add(
                     laRoomyDeviceProperty.propertyIndex,
@@ -3377,6 +3376,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             // find the index to insert
             var uIIndexToInsert = -1
             if(insertAsLast){
+                
+                // TODO: test if this is executed!
+                
                 // if the element must be inserted on the end, it cannot be found by iterating through the array, so set it here
                 uIIndexToInsert = this.uIAdapterList.size
             } else {
@@ -3423,7 +3425,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     applicationProperty.uiAdapterInvalidatedOnPropertySubPage = true
                 } else {
                     // if this is a group member, and if it is the last in the group, the previous item is no longer the last in group, so it must be changed
-                    if (uIIndexToInsert > 0) {
+                    if (uIIndexToInsert > 0 && uIElementContentInformation.isGroupMember) {
+                        
+                        // TODO: test if this is executed
+                        
                         val previousElement =
                             this.uIAdapterList.elementAt(uIIndexToInsert - 1)
                         if (previousElement.isGroupMember && previousElement.isLastInGroup && (previousElement.elementType == PROPERTY_ELEMENT)) {
