@@ -3381,7 +3381,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                     if ((devicePropertyListContentInformation.internalElementIndex == laRoomyDeviceProperty.propertyIndex) && (devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)) {
                         uIIndexToInsert =
-                            if ((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)) {
+                            if ((index > 0) && (this.uIAdapterList.elementAt(index - 1).elementType == GROUP_ELEMENT)) {            // TODO: here is something wrong, cannot be true !!!!!!!!
                                 // if the shifted item is inside group, insert it before the group-header, but only if the new item is NOT part of this group
                                 if (uIElementContentInformation.isGroupMember && devicePropertyListContentInformation.isGroupMember
                                     && (laRoomyDeviceProperty.groupIndex == this.laRoomyDevicePropertyList.elementAt(
