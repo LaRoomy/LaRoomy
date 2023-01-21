@@ -3311,7 +3311,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // both can be -1, so make sure this is not the case
                 if(precedingElementGroupIndex > -1) {
                     // the new element must be a member of that group otherwise this would be an error
-                    if (laRoomyDeviceProperty.groupIndex != precedingElementGroupIndex) {
+                    if ((laRoomyDeviceProperty.groupIndex != precedingElementGroupIndex) || !laRoomyDeviceProperty.isGroupMember) {
                         Log.e(
                             "insertPropertyElement",
                             "Error: The element to insert at index ${laRoomyDeviceProperty.propertyIndex} must be a member of the group with index $tailingElementGroupIndex since preceding and tailing elements are part of that group. Auto-correction fixed this!"
@@ -3385,7 +3385,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 // if the shifted item is inside group, insert it before the group-header, but only if the new item is NOT part of this group
                                 if (uIElementContentInformation.isGroupMember && devicePropertyListContentInformation.isGroupMember
                                     && (laRoomyDeviceProperty.groupIndex == this.laRoomyDevicePropertyList.elementAt(
-                                        devicePropertyListContentInformation.internalElementIndex + 1 // NOTE: the uiAdapter is the old at this point, but the new item is already added to the internal property-list, so this value must be increased!
+                                        devicePropertyListContentInformation.internalElementIndex + 1
+                                        // NOTE: the uiAdapter is old and the new item is already added to the internal property-list, so this value must be increased!
                                     ).groupIndex)
                                 ) {
                                     // insert inside the group as a member
@@ -3443,7 +3444,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     }
 
     private fun removePropertyElement(pIndex: Int){
-        if(pIndex >= this.laRoomyDevicePropertyList.size){
+        if(pIndex >= this.laRoomyDevicePropertyList.size || pIndex < 0){
             // error out of bounds
             Log.e("removePropertyElement", "Error: invalid index for remove operation. Index was $pIndex. Property-Count is ${this.laRoomyDevicePropertyList.size}")
             applicationProperty.logControl("E: Invalid index for remove operation. Index was $pIndex. Property-Count is ${this.laRoomyDevicePropertyList.size}")
@@ -3588,7 +3589,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     val isOtherThanDeviceMain =
                         this.isOtherThanDeviceMainActivity()
 
-                    // delete UI-Element
+                    // delete group UI-Element
                     this.uIAdapterList.removeAt(uIIndexToDelete)
 
                     // trigger event or invalidate adapter, in relation to the open activity
@@ -3612,8 +3613,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     }
                     // delete the properties in UI-List
                     for (i in (uIIndexList.size - 1) downTo 0) {
-                        // delete element
-                        this.uIAdapterList.removeAt(i)
+                        // delete property element
+                        this.uIAdapterList.removeAt(uIIndexList.elementAt(i))
                         // only launch event if the receiver(deviceMainActivity) is open
                         if (!isOtherThanDeviceMain) {
                             this.propertyCallback.onUIAdaptableArrayItemRemoved(i)

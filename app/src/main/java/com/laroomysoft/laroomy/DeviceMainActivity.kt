@@ -555,124 +555,162 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
 
     @SuppressLint("InflateParams")
     override fun onPropertyOptionSelectButtonClick(index: Int) {
-
-        val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
-
-        if(verboseLog) {
-            Log.d(
-                "M:CB:onPropOptionSelClk",
-                "Property element was clicked. Element-Type is OPTION-SELECTOR at index: $index\n\nData is:\n" +
-                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
-                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
-            )
-        }
-        // return if popup is open
-        if(this.optionSelectorPopUpOpen){
-            return
-        }
-
-        // get the options array
-        val options =
-            decryptOptionSelectorString(devicePropertyListContentInformation.elementDescriptorText)
-
-        if(options.isEmpty()){
-            Log.e("decryptOptions", "Error on decrypting options for option-selector from property descriptor!")
-            return
-        }
-
-        // shade the background
-        this.devicePropertyListRecyclerView.alpha = 0.2f
-
-        // block the activation of background (list) elements during popup-lifecycle
-        this.optionSelectorPopUpOpen = true
-
-        val layoutInflater =
-            getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val popUpView =
-            layoutInflater.inflate(R.layout.device_main_option_selector_popup, null)
-        this.popUpWindow =
-            PopupWindow(
-                popUpView,
-                ConstraintLayout.LayoutParams.MATCH_PARENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                true
-            )
-
-        this.popUpWindow.setOnDismissListener {
-            devicePropertyListRecyclerView.alpha = 1f
-            optionSelectorPopUpOpen = false
-        }
-
-        this.popUpWindow.showAtLocation(this.devicePropertyListRecyclerView, Gravity.CENTER, 0, 0)
-
-        // set the appropriate image and option selection
-        this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.optionSelectorPopUpImageView).setImageResource(
-            resourceIdForImageId(devicePropertyListContentInformation.imageID, PROPERTY_ELEMENT, (applicationContext as ApplicationProperty).isPremiumAppVersion)
-        )
-
-        this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.optionSelectorPopUpTextView).text =
-            options.elementAt(0)
-
-        options.removeAt(0)
-
-        var strArray = arrayOf<String>()
-        options.forEach {
-            strArray += it
-        }
-
-        // set picker values
-        this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker)
-            .apply {
-                minValue = 0
-                maxValue = options.size - 1
-                displayedValues = strArray
-
-                if(devicePropertyListContentInformation.simplePropertyState < options.size) {
-                    value = devicePropertyListContentInformation.simplePropertyState
-                }
-
-                setOnValueChangedListener { _, _, newVal ->
+        
+        try {
     
-                    // update list element
-                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
-                        .apply {
-                            this.simplePropertyState = newVal
-                            this.update(devicePropertyListRecyclerView.context)
-                        }
-                    devicePropertyListViewAdapter.notifyItemChanged(index)
-                    
-                    // update internal simple state
-                    ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(
-                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
-                        newVal
+            val devicePropertyListContentInformation =
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+    
+            if (verboseLog) {
+                Log.d(
+                    "M:CB:onPropOptionSelClk",
+                    "Property element was clicked. Element-Type is OPTION-SELECTOR at index: $index\n\nData is:\n" +
+                            "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                            "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                            "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                            "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}"
+                )
+            }
+            // return if popup is open
+            if (this.optionSelectorPopUpOpen) {
+                return
+            }
+    
+            // get the options array
+            val options =
+                decryptOptionSelectorString(devicePropertyListContentInformation.elementDescriptorText)
+    
+            if (options.isEmpty()) {
+                Log.e(
+                    "decryptOptions",
+                    "Error on decrypting options for option-selector from property descriptor!"
+                )
+                (applicationContext as ApplicationProperty).logControl("E: Error on decrypting options for option-selector from property descriptor!")
+                return
+            } else {
+                if (options.size == 1) {
+                    Log.e(
+                        "optionSelectorPopup",
+                        "Error: no option strings for options selector. Popup creation discarded."
                     )
-                    
-                    // control successive transmissions
-                    if(!optionSelectUpdateData.isHandled){
-                        // only save the value, because there is a transmission pending
-                        optionSelectUpdateData.value = newVal
-                    } else {
-                        // if there is no transmission pending, send the data delayed
-                        optionSelectUpdateData.value = newVal
-                        optionSelectUpdateData.isHandled = false
-                        optionSelectUpdateData.eIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex
-    
-                        Executors.newSingleThreadScheduledExecutor().schedule(
-                            {
-                                ApplicationProperty.bluetoothConnectionManager.sendData(
-                                    makeSimplePropertyExecutionString(
-                                        optionSelectUpdateData.eIndex,
-                                        optionSelectUpdateData.value
-                                    )
-                                )
-                                optionSelectUpdateData.isHandled = true
-            
-                            }, 150, TimeUnit.MILLISECONDS)
-                    }
+                    (applicationContext as ApplicationProperty).logControl("E: Error: no option strings for option-selector. Popup creation discarded.")
+                    return
                 }
             }
+    
+            // shade the background
+            this.devicePropertyListRecyclerView.alpha = 0.2f
+    
+            // block the activation of background (list) elements during popup-lifecycle
+            this.optionSelectorPopUpOpen = true
+    
+            val layoutInflater =
+                getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val popUpView =
+                layoutInflater.inflate(R.layout.device_main_option_selector_popup, null)
+            this.popUpWindow =
+                PopupWindow(
+                    popUpView,
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    true
+                )
+    
+            this.popUpWindow.setOnDismissListener {
+                devicePropertyListRecyclerView.alpha = 1f
+                optionSelectorPopUpOpen = false
+            }
+    
+            this.popUpWindow.showAtLocation(
+                this.devicePropertyListRecyclerView,
+                Gravity.CENTER,
+                0,
+                0
+            )
+    
+            // set the appropriate image and option selection
+            this.popUpWindow.contentView.findViewById<AppCompatImageView>(R.id.optionSelectorPopUpImageView)
+                .setImageResource(
+                    resourceIdForImageId(
+                        devicePropertyListContentInformation.imageID,
+                        PROPERTY_ELEMENT,
+                        (applicationContext as ApplicationProperty).isPremiumAppVersion
+                    )
+                )
+    
+            this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.optionSelectorPopUpTextView).text =
+                options.elementAt(0)
+    
+            options.removeAt(0)
+    
+            var strArray = arrayOf<String>()
+            options.forEach {
+                strArray += it
+            }
+    
+            // set picker values
+            this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker)
+                .apply {
+                    minValue = 0
+                    maxValue = options.size - 1
+                    displayedValues = strArray
+            
+                    if (devicePropertyListContentInformation.simplePropertyState < options.size) {
+                        value = devicePropertyListContentInformation.simplePropertyState
+                    }
+            
+                    setOnValueChangedListener { _, _, newVal ->
+                
+                        // update list element
+                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+                            .apply {
+                                this.simplePropertyState = newVal
+                                this.update(devicePropertyListRecyclerView.context)
+                            }
+                        devicePropertyListViewAdapter.notifyItemChanged(index)
+                
+                        // update internal simple state
+                        ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(
+                            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                                index
+                            ).internalElementIndex,
+                            newVal
+                        )
+                
+                        // control successive transmissions
+                        if (!optionSelectUpdateData.isHandled) {
+                            // only save the value, because there is a transmission pending
+                            optionSelectUpdateData.value = newVal
+                        } else {
+                            // if there is no transmission pending, send the data delayed
+                            optionSelectUpdateData.value = newVal
+                            optionSelectUpdateData.isHandled = false
+                            optionSelectUpdateData.eIndex =
+                                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(
+                                    index
+                                ).internalElementIndex
+                    
+                            Executors.newSingleThreadScheduledExecutor().schedule(
+                                {
+                                    ApplicationProperty.bluetoothConnectionManager.sendData(
+                                        makeSimplePropertyExecutionString(
+                                            optionSelectUpdateData.eIndex,
+                                            optionSelectUpdateData.value
+                                        )
+                                    )
+                                    optionSelectUpdateData.isHandled = true
+                            
+                                }, 150, TimeUnit.MILLISECONDS
+                            )
+                        }
+                    }
+                }
+        } catch (e: java.lang.Exception){
+            Log.e("DeviceMainActivity", "onPropertyOptionSelectButtonClick Exception: $e")
+            if(this.optionSelectorPopUpOpen){
+                this.popUpWindow.dismiss()
+            }
+        }
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -697,76 +735,88 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         newValue: Int,
         changeType: Int
     ) {
-        if(verboseLog) {
-            val devicePropertyListContentInformation = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
-
-            Log.d(
-                "M:CB:onSeekBarChange",
-                "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
-                        "Type: ${devicePropertyListContentInformation.propertyType}\n" +
-                        "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
-                        "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
-                        "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
-                        "SeekBar specific values:\n" +
-                        "New Value: $newValue\n" +
-                        "Change-Type: ${
-                            when (changeType) {
-                                SEEK_BAR_START_TRACK -> "Start tracking"
-                                SEEK_BAR_PROGRESS_CHANGING -> "Tracking"
-                                SEEK_BAR_STOP_TRACK -> "Stop tracking"
-                                else -> "error"
-                            }
-                        }"
-            )
-        }
-
-        if(changeType == SEEK_BAR_PROGRESS_CHANGING){
-            // calculate bit-value
-            val bitValue =
-                percentTo8Bit(newValue)
-
-            // update list element
-            ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
-                .apply {
-                    this.simplePropertyState = bitValue
-                    this.update(devicePropertyListRecyclerView.context)
-                }
-            this.devicePropertyListViewAdapter.notifyItemChanged(index)
-            
-            // update internal simple state
-            ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(
-                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
-                bitValue
-            )
-
-            if(levelSelectorPopUpOpen){
-                val seekBarText =  "$newValue%"
-                // set the seekbar and textview properties
-                this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text = seekBarText
-                this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).progress = newValue
+        try {
+            if (verboseLog) {
+                val devicePropertyListContentInformation =
+                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+        
+                Log.d(
+                    "M:CB:onSeekBarChange",
+                    "Property element was clicked. Element-Type is SEEKBAR at index: $index\n\nData is:\n" +
+                            "Type: ${devicePropertyListContentInformation.propertyType}\n" +
+                            "Element-Text: ${devicePropertyListContentInformation.elementText}\n" +
+                            "Property-Index: ${devicePropertyListContentInformation.internalElementIndex}\n" +
+                            "UI-Element-Index: ${devicePropertyListContentInformation.globalIndex}\n\n" +
+                            "SeekBar specific values:\n" +
+                            "New Value: $newValue\n" +
+                            "Change-Type: ${
+                                when (changeType) {
+                                    SEEK_BAR_START_TRACK -> "Start tracking"
+                                    SEEK_BAR_PROGRESS_CHANGING -> "Tracking"
+                                    SEEK_BAR_STOP_TRACK -> "Stop tracking"
+                                    else -> "error"
+                                }
+                            }"
+                )
             }
+    
+            if (changeType == SEEK_BAR_PROGRESS_CHANGING) {
+                // calculate bit-value
+                val bitValue =
+                    percentTo8Bit(newValue)
+        
+                // update list element
+                ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index)
+                    .apply {
+                        this.simplePropertyState = bitValue
+                        this.update(devicePropertyListRecyclerView.context)
+                    }
+                this.devicePropertyListViewAdapter.notifyItemChanged(index)
+        
+                // update internal simple state
+                ApplicationProperty.bluetoothConnectionManager.updateInternalSimplePropertyState(
+                    ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex,
+                    bitValue
+                )
+        
+                if (levelSelectorPopUpOpen) {
+                    val seekBarText = "$newValue%"
+                    // set the seekbar and textview properties
+                    this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text =
+                        seekBarText
+                    this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).progress =
+                        newValue
+                }
+        
+                // handle successive transmission
+                if (!this.slideUpdateData.isHandled) {
+                    // only save the value, because there is a transmission pending
+                    this.slideUpdateData.value = bitValue
+                } else {
+                    // if there is no transmission pending, send the data delayed
+                    this.slideUpdateData.value = bitValue
+                    this.slideUpdateData.isHandled = false
+                    this.slideUpdateData.eIndex =
+                        ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex
             
-            // handle successive transmission
-            if(!this.slideUpdateData.isHandled){
-                // only save the value, because there is a transmission pending
-                this.slideUpdateData.value = bitValue
-            } else {
-                // if there is no transmission pending, send the data delayed
-                this.slideUpdateData.value = bitValue
-                this.slideUpdateData.isHandled = false
-                this.slideUpdateData.eIndex = ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(index).internalElementIndex
-                
-                Executors.newSingleThreadScheduledExecutor().schedule(
-                    {
-                        ApplicationProperty.bluetoothConnectionManager.sendData(
-                            makeSimplePropertyExecutionString(
-                                slideUpdateData.eIndex,
-                                slideUpdateData.value
+                    Executors.newSingleThreadScheduledExecutor().schedule(
+                        {
+                            ApplicationProperty.bluetoothConnectionManager.sendData(
+                                makeSimplePropertyExecutionString(
+                                    slideUpdateData.eIndex,
+                                    slideUpdateData.value
+                                )
                             )
-                        )
-                        slideUpdateData.isHandled = true
-                        
-                    }, 150, TimeUnit.MILLISECONDS)
+                            slideUpdateData.isHandled = true
+                    
+                        }, 150, TimeUnit.MILLISECONDS
+                    )
+                }
+            }
+        } catch (e: java.lang.Exception){
+            Log.e("DeviceMainActivity", "onSeekBarPositionChange Exception: $e")
+            if(levelSelectorPopUpOpen){
+                this.popUpWindow.dismiss()
             }
         }
     }
@@ -1529,13 +1579,45 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
                         }
                         PROPERTY_TYPE_LEVEL_SELECTOR -> {
+                            // update item
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
+                            // update popup if open
+                            if(this.levelSelectorPopUpOpen){
+                                try {
+                                    val percentageLevelPropertyGenerator =
+                                        PercentageLevelPropertyGenerator(newState)
+                                    this.popUpWindow.contentView.findViewById<AppCompatTextView>(R.id.levelSelectorPopUpTextView).text =
+                                        percentageLevelPropertyGenerator.percentageString
+    
+                                    // set seekbar properties
+                                    this.popUpWindow.contentView.findViewById<SeekBar>(R.id.levelSelectorPopUpSeekbar).apply {
+                                        this.setOnSeekBarChangeListener(null)
+                                        this.progress = percentageLevelPropertyGenerator.percentageValue
+                                        this.setOnSeekBarChangeListener(this@DeviceMainActivity)
+                                    }
+                                } catch(e: java.lang.Exception){
+                                    Log.e("LevelSelectorUpdate", "Error while updating level selector popup: ${e.message}")
+                                    (applicationContext as ApplicationProperty).logControl(("E: Error while updating level selector popup: ${e.message}"))
+                                }
+                            }
                         }
                         PROPERTY_TYPE_LEVEL_INDICATOR -> {
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
                         }
                         PROPERTY_TYPE_OPTION_SELECTOR -> {
+                            // update item
                             devicePropertyListViewAdapter.notifyItemChanged(UIAdapterElementIndex)
+                            // update popup if open
+                            if(this.optionSelectorPopUpOpen){
+                                try {
+                                    this.popUpWindow.contentView.findViewById<NumberPicker>(R.id.optionSelectorPopUpNumberPicker).apply {
+                                        value = newState
+                                    }
+                                } catch(e: java.lang.Exception){
+                                    Log.e("OptionSelectorUpdate", "Error while updating option selector popup: ${e.message}")
+                                    (applicationContext as ApplicationProperty).logControl(("E: Error while updating option selector popup: ${e.message}"))
+                                }
+                            }
                         }
                         else -> {
                             if(verboseLog){
@@ -1633,15 +1715,16 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         private val devicePropertyAdapter: ArrayList<DevicePropertyListContentInformation>,
         private val itemClickListener: OnPropertyClickListener
     ) : RecyclerView.Adapter<DevicePropertyListAdapter.DPLViewHolder>() {
-
+    
         class DPLViewHolder(
             val linearLayout: LinearLayout,
             private val listener: OnPropertyClickListener
-            )
-            : RecyclerView.ViewHolder(linearLayout) {
-                private var pType = -1
-                private val elementButton: AppCompatButton = linearLayout.findViewById(R.id.elementButton)
-                private val elementSwitch: SwitchCompat = linearLayout.findViewById(R.id.elementSwitch)
+        ) : RecyclerView.ViewHolder(linearLayout) {
+            private var pType = -1
+            private val elementButton: AppCompatButton = linearLayout.findViewById(R.id.elementButton)
+            private val elementSwitch: SwitchCompat = linearLayout.findViewById(R.id.elementSwitch)
+            var suppressOnClickEvent = false
+            
 
             init {
                 elementButton.setOnClickListener {
@@ -1662,7 +1745,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     }
                 }
                 elementSwitch.setOnCheckedChangeListener { _, b ->
-                    if(pType == PROPERTY_TYPE_SWITCH){
+                    if(pType == PROPERTY_TYPE_SWITCH && !this.suppressOnClickEvent){
                         listener.onPropertyElementSwitchClick(bindingAdapterPosition, b)
                     }
                 }
@@ -1687,6 +1770,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
         }
 
         override fun onBindViewHolder(holder: DPLViewHolder, position: Int) {
+            
+            holder.suppressOnClickEvent = true
 
             // get regarding element
             val elementToRender = devicePropertyAdapter.elementAt(position)
@@ -1698,11 +1783,7 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             }
 
             // enable the listener for the regarding property type
-            holder.activateListenerFromType(elementToRender.propertyType)   // TODO: move on the end of this method
-            
-            // TODO: add method deactivate to clear the listener while setting the views???
-            // TODO: only the switch is the problem, remove listener on the beginning of the method and set it again on the end?
-            // TODO: or set simple boolean param in DPLViewHolder to suppress switch event?
+            holder.activateListenerFromType(elementToRender.propertyType)   // maybe move on the end of this method?
 
             // set background
             holder.linearLayout.background = elementToRender.backgroundDrawable
@@ -1777,6 +1858,8 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     }
                 }
             }
+            
+            holder.suppressOnClickEvent = false
         }
         
         override fun getItemCount(): Int {
