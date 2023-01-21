@@ -1698,7 +1698,11 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             }
 
             // enable the listener for the regarding property type
-            holder.activateListenerFromType(elementToRender.propertyType)
+            holder.activateListenerFromType(elementToRender.propertyType)   // TODO: move on the end of this method
+            
+            // TODO: add method deactivate to clear the listener while setting the views???
+            // TODO: only the switch is the problem, remove listener on the beginning of the method and set it again on the end?
+            // TODO: or set simple boolean param in DPLViewHolder to suppress switch event?
 
             // set background
             holder.linearLayout.background = elementToRender.backgroundDrawable
@@ -1706,9 +1710,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
             // set property image
             holder.linearLayout.findViewById<AppCompatImageView>(R.id.devicePropertyIdentificationImage)
                 .apply {
-                    
-                    //setBackgroundResource(    TODO: was changed, check this!
-                    
                     setImageResource(
                         elementToRender.imageResourceID
                     )
