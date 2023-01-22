@@ -539,7 +539,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 Log.d("M:CB:CharChanged", "Characteristic changed. String-Value: $data")
             }
             applicationProperty.logControl("I: Characteristic changed: $data")
-        
+    
             try {
                 if (!dispatchTransmission(data)) {
                     callback.onDataReceived(data)
@@ -714,18 +714,40 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // check if the fragmentation is complete
                 val dataSize =
                     a2CharHexValueToIntValue(fragmentTransmissionData.transmissionString[4], fragmentTransmissionData.transmissionString[5])
+                
+                // check for inconsistent utf-8 character **************************************************
+                var inconsistentCharacterCount = 0
+                
+                fragmentTransmissionData.transmissionString.forEach {
+                    if(it.code > 126){
+                        inconsistentCharacterCount++
+                    }
+                }
+                // check if there are inconsistent character
+                if(inconsistentCharacterCount > 0){
+                    if(verboseLog){
+                        Log.w("FragmentedData", "Inconsistent character detected. Data must be utf-8 encoded!")
+                    }
+                    applicationProperty.logControl("W: Inconsistent character detected. Data must be utf-8 encoded!")
+                }
+                // *****************************************************************************************
 
                 if(verboseLog){
                     Log.d("readFragmentTransMsn", "New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
-                    Log.d("readFragmentTransMsn", "New fragment added. DataSize is: ${dataSize - 1} | User-data length is: ${fragmentTransmissionData.transmissionString.length - 8}")
+                    Log.d("readFragmentTransMsn", "New fragment added. DataSize is: ${dataSize - 1} | User-data length is: ${(fragmentTransmissionData.transmissionString.length - 8) + inconsistentCharacterCount}")
                 }
                 applicationProperty.logControl("I: New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
 
                 // NOTE: the carriage-return delimiter is missing in the fragment assembly, but is calculated in the transmission size, so the dataSize must be decreased by 1 for comparison
-                if ((fragmentTransmissionData.transmissionString.length - 8) >= (dataSize - 1)) {
+                if (((fragmentTransmissionData.transmissionString.length - 8) + inconsistentCharacterCount) >= (dataSize - 1)) {
                     // data size reached -> must be complete
-                    fragmentTransmissionData.transmissionString += '\r'
-                    dispatchFragmentedTransmission(fragmentTransmissionData.transmissionString)
+                    if(inconsistentCharacterCount > 0){
+                        val tString = "${overrideNonUTF8BasedCharacterInString(fragmentTransmissionData.transmissionString, '?')}\r"
+                        dispatchFragmentedTransmission(tString)
+                    } else {
+                        fragmentTransmissionData.transmissionString += '\r'
+                        dispatchFragmentedTransmission(fragmentTransmissionData.transmissionString)
+                    }
                     indexToRemove = index
                 }
                 handled = true
@@ -2152,15 +2174,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // the page is open, so add the new data over the complex property state update, but only put the new string in the object
                 // this is a temporary object to forward to the property callback
                 val eventObject = ComplexPropertyState()
-
-                if(textListPresenterState.textListBackgroundStack.isEmpty()){
-                    // the array is empty so this must have been a clear stack transmission
-                    eventObject.valueOne = 0
-                } else {
-                    eventObject.valueOne = 2
-                    eventObject.strValue = textListPresenterState.textListBackgroundStack.last()
+                
+                when(data.elementAt(9)){
+                    '0' -> {
+                        // update control param transmission
+                        eventObject.valueOne = 0
+                    }
+                    '1' -> {
+                        // add element transmission
+                        eventObject.valueOne = 1
+                        eventObject.strValue = textListPresenterState.textListBackgroundStack.last()
+                    }
+                    '2' -> {
+                        // clear stack transmission
+                        eventObject.valueOne = 2
+                    }
                 }
-
                 this.propertyCallback.onComplexPropertyStateChanged(uiIndex, eventObject)
             }
         }
@@ -3461,6 +3490,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // necessary information
                 val isGroupMember = this.laRoomyDevicePropertyList.elementAt(pIndex).isGroupMember
                 var isLastInGroup = false
+                
+                // check if the property to delete belongs to the current opened property sub page, if so, schedule a back-navigation
+                val finalNavigateBack = pIndex == this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
 
                 // delete property element
                 this.laRoomyDevicePropertyList.removeAt(pIndex)
@@ -3535,6 +3567,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                         devicePropertyListContentInformation.globalIndex = index
                     }
+                    // force a back navigation on a property sub page if applicable
+                    if(finalNavigateBack){
+                        this.propertyCallback.onRemoteBackNavigationRequested()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("removePropertyElement", "Exception: $e")
@@ -3588,6 +3624,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     // get indication if this occurred on deviceMainActivity or not
                     val isOtherThanDeviceMain =
                         this.isOtherThanDeviceMainActivity()
+                    
+                    // save the current opened property page index (if this is not device-main)
+                    val currentPropPageSubIndex = when {
+                        !isOtherThanDeviceMain -> -1
+                        else -> this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex()
+                    }
 
                     // delete group UI-Element
                     this.uIAdapterList.removeAt(uIIndexToDelete)
@@ -3632,16 +3674,29 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             newInternalIndex++
                         }
                     }
+                    var finalNavigateBack = false
 
                     // delete the properties in the prop-list
                     if (propListIndexes.isNotEmpty()) {
                         for (i in (propListIndexes.size - 1) downTo 0) {
-                            this.laRoomyDevicePropertyList.removeAt(i)
+                            // remove property element
+                            this.laRoomyDevicePropertyList.removeAt(propListIndexes.elementAt(i))
+                            // update device info
+                            this.bleDeviceData.propertyCount--
+                            // if the current property sub-page belongs to a deleted property, it must be closed
+                            if(propListIndexes.elementAt(i) == currentPropPageSubIndex){
+                                finalNavigateBack = true
+                            }
                         }
                         // reorder the indexes
                         this.laRoomyDevicePropertyList.forEachIndexed { index, laRoomyDeviceProperty ->
                             laRoomyDeviceProperty.propertyIndex = index
                         }
+                    }
+                    
+                    // close a deleted property if applicable
+                    if(finalNavigateBack){
+                        this.propertyCallback.onRemoteBackNavigationRequested()
                     }
                 }
             } catch (e: Exception) {

@@ -336,8 +336,8 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         super.onConnectionStateChanged(state)
         if(verboseLog) {
             Log.d(
-                "StringInterrogator:CSC",
-                "Connection state changed in String Interrogator Activity. New Connection state is: $state"
+                "TextListPresenter:CSC",
+                "Connection state changed in TextListPresenter Activity. New Connection state is: $state"
             )
         }
         if(state){
@@ -436,14 +436,14 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         try {
             if (UIAdapterElementIndex == this.relatedUIAdapterIndex) {
                 when (newState.valueOne) {
-                    0 -> {
+                    2 -> {
                         // clear the list
                         runOnUiThread {
                             this.textList.clear()
                             this.textPresenterListAdapter.notifyDataSetChanged()
                         }
                     }
-                    2 -> {
+                    1 -> {
                         // add a new item
                         if (newState.strValue.isNotEmpty()) {
                             runOnUiThread {

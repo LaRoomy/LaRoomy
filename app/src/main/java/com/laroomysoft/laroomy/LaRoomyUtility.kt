@@ -391,6 +391,31 @@ fun loopTypeToString(loopType: Int) : String {
     }
 }
 
+fun overrideNonUTF8BasedCharacterInString(nonUtf: String, placeHolderChar: Char) : String {
+    var utf8String = ""
+    nonUtf.forEach {
+        utf8String += if(it.code < 127){
+            it
+        } else {
+            placeHolderChar
+        }
+    }
+    return utf8String
+}
+
+fun unicodeStringToAsciiConformString(uniString: String) : String {
+    var asciiString = ""
+    uniString.forEach {
+        if(it.code > 126){
+            // non ascii -> transform !
+            asciiString += "\\u${aUnsigned16bitValueTo4CharHexValue(it.code.toUShort())}"
+        } else {
+            asciiString += it
+        }
+    }
+    return asciiString
+}
+
 fun isLaroomyDevice(name: String) : Boolean {
     return name.contains("laroomy", true)
 }
@@ -556,7 +581,19 @@ fun aSigned16bitValueTo4CharHexValue(bVal: Short): String {
         2 -> "00$hexString"
         3 -> "0$hexString"
         4 -> hexString
-        else -> "over"
+        else -> "ovfl"
+    }
+}
+
+fun aUnsigned16bitValueTo4CharHexValue(bVal: UShort): String {
+    val hexString =
+        Integer.toHexString(bVal.toInt())
+    return when (hexString.length) {
+        1 -> "000$hexString"
+        2 -> "00$hexString"
+        3 -> "0$hexString"
+        4 -> hexString
+        else -> "ovfl"
     }
 }
 

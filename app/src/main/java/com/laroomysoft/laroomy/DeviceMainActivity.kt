@@ -1500,9 +1500,6 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onUIAdaptableArrayItemInserted(index: Int) {
-
-        // TODO: if this is a new group or inserted at the end of the group, make sure to redraw other impacted items to keep the visual state
-
         runOnUiThread {
             devicePropertyListViewAdapter.notifyItemInserted(index)
             //devicePropertyListViewAdapter.notifyItemRangeChanged(index, ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size - index)
@@ -1518,32 +1515,9 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
     }
 
     override fun onUIAdaptableArrayItemRemoved(index: Int) {
-
-        // TODO: if this is the last of a group or other case which impacts the visual state of other items, make sure to redraw them!
-
-        // - remove the item from the list in this class
-        // - redraw the element before and after the element
-        // - bring the internal element indexes of the ui-list in the correct order (use the list in bleManager)
-
-        //this.propertyList.removeAt(index)
-
-        //this.propertyList.clear()
-        //this.propertyList = ApplicationProperty.bluetoothConnectionManager.uIAdapterList
-
-
-        // TODO: update the all indexes (global + internal) in the propertyList or use the uIAdapter direct!?
-
         runOnUiThread {
             devicePropertyListViewAdapter.notifyItemRemoved(index)
-            //devicePropertyListViewAdapter.notifyDataSetChanged()
-
-
-
-            //devicePropertyListViewAdapter.notifyItemChanged(index)
-
-            //for(i in index until this.propertyList.size){
             devicePropertyListViewAdapter.notifyItemRangeChanged(index, ApplicationProperty.bluetoothConnectionManager.uIAdapterList.size)
-            //}
         }
     }
 

@@ -885,10 +885,12 @@ class BarGraphState : IComplexPropertySubTypeProtocolClass() {
                                 if ((s[dataIndex] == ':') && (s[dataIndex + 1] == ':')) {
                                     if (!isUpdateMode) {
                                         // initial mode
-                                        this.barNames.add(barNameString)
+                                        this.barNames.add(
+                                            unescapeUTF8String(barNameString)
+                                        )
                                     } else {
                                         // must be update mode, do not add, replace it
-                                        this.barNames[barIndex] = barNameString
+                                        this.barNames[barIndex] = unescapeUTF8String(barNameString)
                                     }
                                     nextValidIndex = dataIndex + 2
                                     break
@@ -1351,49 +1353,49 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
                     this.buttonDescriptor = if (it.parameterValue == "_") {
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 "F1" -> {
                     this.fieldOneDescriptor = if(it.parameterValue == "_"){
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 "F2" -> {
                     this.fieldTwoDescriptor = if(it.parameterValue == "_"){
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 "H1" -> {
                     this.fieldOneHint = if(it.parameterValue == "_"){
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 "H2" -> {
                     this.fieldTwoHint = if(it.parameterValue == "_"){
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 "C1" -> {
                     this.fieldOneContent = if(it.parameterValue == "_"){
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 "C2" -> {
                     this.fieldTwoContent = if(it.parameterValue == "_"){
                         ""
                     } else {
-                        it.parameterValue
+                        unescapeUTF8String(it.parameterValue)
                     }
                 }
                 else -> {
@@ -1451,13 +1453,13 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
         var stringInterrogatorExecutionData = ""
 
         stringInterrogatorExecutionData += if(this.fieldOneContent.isNotEmpty()){
-            "C1::${this.fieldOneContent};;"
+            "C1::${unicodeStringToAsciiConformString(this.fieldOneContent)};;"
         } else {
             "C1::_;;"
         }
 
         stringInterrogatorExecutionData += if(this.fieldTwoContent.isNotEmpty()){
-            "C2::${this.fieldTwoContent};;"
+            "C2::${unicodeStringToAsciiConformString(this.fieldTwoContent)};;"
         } else {
             "C2::_;;"
         }
@@ -1563,7 +1565,10 @@ class TextListPresenterState : IComplexPropertySubTypeProtocolClass() {
                                 "N"
                             }
                         }
-                        textToAdd += data.removeRange(0, 11)
+                        textToAdd += unescapeUTF8String(
+                            data.removeRange(0, 11)
+                        )
+                        
                         this.textListBackgroundStack.add(textToAdd)
 
                         if(this.textListBackgroundStack.size > 200){
