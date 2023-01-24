@@ -18,6 +18,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.addTextChangedListener
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -41,6 +42,9 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     private lateinit var confirmButton: AppCompatButton
     private lateinit var deviceSettingsButton: AppCompatImageButton
 
+    private var acceptNonAscii = false
+    private var firstTextWasInvalid = false
+    private var secondTextWasInvalid = false
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
     private var navigateBackOnButtonPress = false
@@ -112,11 +116,44 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         this.confirmButton = findViewById(R.id.stringInterrogatorPositiveButton)
         this.fieldOneDescriptor = findViewById(R.id.stringInterrogatorFieldOneDescriptor)
         this.fieldTwoDescriptor = findViewById(R.id.stringInterrogatorFieldTwoDescriptor)
-        this.fieldOneInputText = findViewById(R.id.stringInterrogatorFieldOneInput)
-        this.fieldTwoInputText = findViewById(R.id.stringInterrogatorFieldTwoInput)
         this.fieldOneContainer = findViewById(R.id.stringInterrogatorFieldOneContainer)
         this.fieldTwoContainer = findViewById(R.id.stringInterrogatorFieldTwoContainer)
-
+    
+        this.fieldOneInputText = findViewById<AppCompatEditText?>(R.id.stringInterrogatorFieldOneInput).apply {
+            addTextChangedListener {
+                if(!acceptNonAscii){
+                    if(checkStringForNonAsciiCharacters(it.toString())){
+                        firstTextWasInvalid = true
+                        // notify user
+                        notifyUser(getString(R.string.StringInterrogatorActivity_InvalidAsciiInputMessage_FieldOne), R.color.warningLightColor)
+                    } else {
+                        if(firstTextWasInvalid){
+                            firstTextWasInvalid = false
+                            // reset notification area
+                            notifyUser("", R.color.normalTextColor)
+                        }
+                    }
+                }
+            }
+        }
+        this.fieldTwoInputText = findViewById<AppCompatEditText?>(R.id.stringInterrogatorFieldTwoInput).apply {
+            addTextChangedListener {
+                if(!acceptNonAscii){
+                    if(checkStringForNonAsciiCharacters(it.toString())){
+                        secondTextWasInvalid = true
+                        // notify user
+                        notifyUser(getString(R.string.StringInterrogatorActivity_InvalidAsciiInputMessage_FieldTwo), R.color.warningLightColor)
+                    } else {
+                        if(secondTextWasInvalid){
+                            secondTextWasInvalid = false
+                            // reset notification area
+                            notifyUser("", R.color.normalTextColor)
+                        }
+                    }
+                }
+            }
+        }
+        
         // add confirm button onClick listener
         this.confirmButton.setOnClickListener {
             if(this.validateUserInput()) {
@@ -124,22 +161,22 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
                     AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
                 it.startAnimation(buttonAnimation)
     
-                this.collectDataAndSendCommand()
-    
-                if (navigateBackOnButtonPress) {
-                    if(isStandAlonePropertyMode){
-                        // make sure to hide the soft keyboard
-                        val imm =
-                            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                        imm.hideSoftInputFromWindow(this.fieldTwoInputText.windowToken, 0)
-                        // navigate back with a delay
-                        Executors.newSingleThreadScheduledExecutor().schedule({
+                if(this.collectDataAndSendCommand()) {
+                    if (navigateBackOnButtonPress) {
+                        if (isStandAlonePropertyMode) {
+                            // make sure to hide the soft keyboard
+                            val imm =
+                                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            imm.hideSoftInputFromWindow(this.fieldTwoInputText.windowToken, 0)
+                            // navigate back with a delay
+                            Executors.newSingleThreadScheduledExecutor().schedule({
+                                handleBackEvent()
+                            }, 600, TimeUnit.MILLISECONDS)
+                        } else {
+                            (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired =
+                                true
                             handleBackEvent()
-                        }, 600, TimeUnit.MILLISECONDS)
-                    } else {
-                        (applicationContext as ApplicationProperty).delayedNavigationNotificationRequired =
-                            true
-                        handleBackEvent()
+                        }
                     }
                 }
             } else {
@@ -327,6 +364,9 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
     }
 
     private fun setCurrentViewStateFromComplexPropertyState(stringInterrogatorState: StringInterrogatorState){
+        // set char acceptance
+        this.acceptNonAscii = stringInterrogatorState.acceptNonAsciiCharacters
+        // UI config
         runOnUiThread {
             // save action type on button press
             this.navigateBackOnButtonPress = stringInterrogatorState.navigateBackOnButtonPress
@@ -431,14 +471,24 @@ class StringInterrogatorActivity : AppCompatActivity(), BLEConnectionManager.Ble
         }
     }
 
-    private fun collectDataAndSendCommand(){
-        val stringInterrogatorState = StringInterrogatorState()
-        stringInterrogatorState.fieldOneContent = this.fieldOneInputText.text.toString()
-        stringInterrogatorState.fieldTwoContent = this.fieldTwoInputText.text.toString()
-
-        ApplicationProperty.bluetoothConnectionManager.sendData(
-            stringInterrogatorState.toExecutionString(this.relatedElementIndex)
-        )
+    private fun collectDataAndSendCommand() : Boolean{
+        val fieldOneCont = this.fieldOneInputText.text.toString()
+        val fieldTwoCont = this.fieldTwoInputText.text.toString()
+    
+        return if(!this.acceptNonAscii && (checkStringForNonAsciiCharacters(fieldOneCont) || checkStringForNonAsciiCharacters(fieldTwoCont))){
+            // input invalid -> notify user
+            notifyUser(getString(R.string.StringInterrogatorActivity_InputIsNotAsciiConform), R.color.warningLightColor)
+            false
+        } else {
+            val stringInterrogatorState = StringInterrogatorState()
+            stringInterrogatorState.fieldOneContent = fieldOneCont
+            stringInterrogatorState.fieldTwoContent = fieldTwoCont
+    
+            ApplicationProperty.bluetoothConnectionManager.sendData(
+                stringInterrogatorState.toExecutionString(this.relatedElementIndex)
+            )
+            true
+        }
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

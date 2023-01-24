@@ -30,11 +30,17 @@ import java.util.concurrent.TimeUnit
 
 class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
     
-    val filterForDefault = 1
-    val filterForInfo = 2
-    val filterForWarning = 3
-    val filterForError = 4
-
+    private val filterForDefault = 1
+    private val filterForInfo = 2
+    private val filterForWarning = 3
+    private val filterForError = 4
+    
+    private var defaultFilter = false
+    private var infoFilter = false
+    private var warningFilter = false
+    private var errorFilter = false
+    
+    
     private var mustReconnect = false
     private var relatedElementIndex = -1
     private var relatedUIAdapterIndex = -1
@@ -57,7 +63,9 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private lateinit var deleteButtonAnimation: AnimatedVectorDrawable
     private lateinit var filterListButtonAnimation: AnimatedVectorDrawable
 
-    private var textList = ArrayList<String>()
+    private var normalTextList = ArrayList<String>()
+    private var filteredTextList = ArrayList<String>()
+    private lateinit var filteredTextListPresenterAdapter: RecyclerView.Adapter<*>
 
     private var expectedConnectionLoss = false
     private var propertyStateUpdateRequired = false
@@ -139,7 +147,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 
                 // clear the list + notify
                 runOnUiThread {
-                    textList.clear()
+                    normalTextList.clear()
                     textPresenterListAdapter.notifyDataSetChanged()
                 }
         
@@ -162,7 +170,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 
                 // format the list
                 var listBuffer = ""
-                textList.forEach {
+                normalTextList.forEach {
                     listBuffer += when(it.elementAt(0)) {
                         'I' -> "INFO: "
                         'W' -> "WARNING: "
@@ -201,16 +209,16 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
             ApplicationProperty.bluetoothConnectionManager.uIAdapterList.elementAt(this.relatedUIAdapterIndex).complexPropertyState
         )
 
-        this.textList = textListPresenterState.textListBackgroundStack
-        this.textPresenterListAdapter = TextPresenterListAdapter(this.textList)
+        this.normalTextList = textListPresenterState.textListBackgroundStack
+        this.textPresenterListAdapter = TextPresenterListAdapter(this.normalTextList)
         this.textPresenterListLayoutManager = LinearLayoutManager(this)
 
         this.textPresenterList.apply {
             setHasFixedSize(true)
             adapter = textPresenterListAdapter
             layoutManager = textPresenterListLayoutManager
+            scrollToPosition(normalTextList.size - 1)
         }
-
     }
     
     private fun handleBackEvent(){
@@ -362,17 +370,14 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
         }
     }
     
+    @SuppressLint("InflateParams")
     private fun showFilterPopUp(){
         if(!filterPopUpIsOpen){
             // set recycler alpha down
             this.textPresenterList.alpha = 0.2f
-            
-            // TODO: mark popup as open and release the param in onDismiss() !!!
     
-            val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    
-            val popUpView =
-                layoutInflater.inflate(R.layout.text_list_presenter_filter_popup, this.textPresenterList)// TODO: maybe pass null
+            (getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).apply {
+                layoutInflater.inflate(R.layout.text_list_presenter_filter_popup, null)
                     .apply {
                         popUpWindow =
                             PopupWindow(
@@ -381,10 +386,10 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                                 true
                             ).apply {
-                                
+                    
                                 // mark the popup as open
                                 filterPopUpIsOpen = true
-                                
+                    
                                 // reset params if popup is dismissed
                                 setOnDismissListener {
                                     filterPopUpIsOpen = false
@@ -392,59 +397,61 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                                 }
                                 // show the popup
                                 showAtLocation(textPresenterList, Gravity.CENTER, 0, 0)
-                                
+                    
                                 // set apply button listener
-                                this.contentView.findViewById<AppCompatButton>(R.id.textListPresenterFilterPopUpApplyButton).apply {
-                                    setOnClickListener {
-                                        
-                                        val fList = ArrayList<Int>()
-                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Default).apply {
-                                            if(isChecked){
-                                                fList.add(filterForDefault)
-                                            }
-                                        }
-                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Info).apply {
-                                            if(isChecked){
-                                                fList.add(filterForInfo)
-                                            }
-                                        }
-                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Warning).apply {
-                                            if(isChecked){
-                                                fList.add(filterForWarning)
-                                            }
-                                        }
-                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Error).apply {
-                                            if(isChecked){
-                                                fList.add(filterForError)
-                                            }
-                                        }
-                                        // apply filter
-                                        filterElements(fList)
-                                        
-    
-                                        // TODO: maybe delay that ???
-                                        popUpWindow.dismiss()
-                                    }
-                                }
+                                this.contentView.findViewById<AppCompatButton>(R.id.textListPresenterFilterPopUpApplyButton)
+                                    .apply {
+                                        setOnClickListener {
                                 
-                                // set cancel button listener
-                                this.contentView.findViewById<AppCompatButton>(R.id.textListPresenterFilterPopUpCancelButton).apply {
-                                    setOnClickListener {
-                                        popUpWindow.dismiss()
+                                            val fList = ArrayList<Int>()
+                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Default)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForDefault)
+                                                    }
+                                                }
+                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Info)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForInfo)
+                                                    }
+                                                }
+                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Warning)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForWarning)
+                                                    }
+                                                }
+                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Error)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForError)
+                                                    }
+                                                }
+                                            
+                                            // apply filter
+                                            filterElements(fList)
+                                            
+                                            // dismiss popup
+                                            popUpWindow.dismiss()
+                                        }
                                     }
-                                }
+                    
+                                // set cancel button listener
+                                this.contentView.findViewById<AppCompatButton>(R.id.textListPresenterFilterPopUpCancelButton)
+                                    .apply {
+                                        setOnClickListener {
+                                            popUpWindow.dismiss()
+                                        }
+                                    }
                             }
                     }
+            }
         }
     }
     
     private fun filterElements(filterList: ArrayList<Int>){
-        
-        var defaultFilter = false
-        var infoFilter = false
-        var warningFilter = false
-        var errorFilter = false
-        
+        // apply params from users radio-button selection
         filterList.forEach {
             when(it){
                 filterForDefault -> defaultFilter = true
@@ -453,16 +460,68 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 filterForError -> errorFilter = true
             }
         }
-        
+        // check if filtering is necessary
+        if(this.defaultFilter || this.infoFilter || this.warningFilter || this.errorFilter){
+            if(this.defaultFilter && this.infoFilter && this.warningFilter && this.errorFilter){
+                // if all is selected we need no filter, so do nothing
+                return
+            } else {
+                this.filterActive = true
+            }
+        } else {
+            // do nothing if no filter is selected
+            return
+        }
+        // clear before use
+        this.filteredTextList.clear()
+    
         // apply filter rules
+        this.normalTextList.forEach {
+            when(it.elementAt(0)){
+                'N' -> {
+                    if(this.defaultFilter){
+                        this.filteredTextList.add(it)
+                    }
+                }
+                'I' -> {
+                    if(this.infoFilter){
+                        this.filteredTextList.add(it)
+                    }
+                }
+                'W' -> {
+                    if(this.warningFilter){
+                        this.filteredTextList.add(it)
+                    }
+                }
+                'E' -> {
+                    if(this.errorFilter) {
+                        this.filteredTextList.add(it)
+                    }
+                }
+            }
+        }
+        
+        // set the filtered adapter to the recycler
+        this.filteredTextListPresenterAdapter = TextPresenterListAdapter(this.filteredTextList)
+        this.textPresenterList.adapter = this.filteredTextListPresenterAdapter
         
         // set release filter image to filter-button
         this.filterListButton.setImageResource(R.drawable.ic_filter_list_off_36dp)
-    
     }
     
     private fun releaseFilter(){
         // set the normal adapter
+        this.textPresenterListAdapter = TextPresenterListAdapter(this.normalTextList)
+        this.textPresenterList.adapter = this.textPresenterListAdapter
+        
+        // reset params
+        this.defaultFilter = false
+        this.infoFilter = false
+        this.warningFilter = false
+        this.errorFilter = false
+        
+        this.filterActive = false
+        this.filteredTextList.clear()
         
         // normalize the filter-button image
         this.filterListButton.setImageResource(R.drawable.ic_filter_list_36dp)
@@ -575,7 +634,7 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                     2 -> {
                         // clear the list
                         runOnUiThread {
-                            this.textList.clear()
+                            this.normalTextList.clear()
                             this.textPresenterListAdapter.notifyDataSetChanged()
                         }
                     }
@@ -583,9 +642,44 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                         // add a new item
                         if (newState.strValue.isNotEmpty()) {
                             runOnUiThread {
-                                this.textList.add(newState.strValue)
-                                this.textPresenterListAdapter.notifyItemInserted(this.textList.size - 1)
-                                this.textPresenterList.scrollToPosition(this.textList.size - 1)
+                                this.normalTextList.add(newState.strValue)
+                                if(this.filterActive) {
+                                    var notifyInsertion = false
+    
+                                    when(newState.strValue.elementAt(0)){
+                                        'N' -> {
+                                            if(this.defaultFilter){
+                                                this.filteredTextList.add(newState.strValue)
+                                                notifyInsertion = true
+                                            }
+                                        }
+                                        'I' -> {
+                                            if(this.infoFilter){
+                                                this.filteredTextList.add(newState.strValue)
+                                                notifyInsertion = true
+                                            }
+                                        }
+                                        'W' -> {
+                                            if(this.warningFilter){
+                                                this.filteredTextList.add(newState.strValue)
+                                                notifyInsertion = true
+                                            }
+                                        }
+                                        'E' -> {
+                                            if(this.errorFilter) {
+                                                this.filteredTextList.add(newState.strValue)
+                                                notifyInsertion = true
+                                            }
+                                        }
+                                    }
+                                    if(notifyInsertion){
+                                        this.filteredTextListPresenterAdapter.notifyItemInserted(this.filteredTextList.size - 1)
+                                        this.textPresenterList.scrollToPosition(this.filteredTextList.size - 1)
+                                    }
+                                } else {
+                                    this.textPresenterListAdapter.notifyItemInserted(this.normalTextList.size - 1)
+                                    this.textPresenterList.scrollToPosition(this.normalTextList.size - 1)
+                                }
                             }
                         }
                     }
@@ -666,8 +760,8 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 "N$message"
             }
         }
-        this.textList.add(notiString)
-        this.textPresenterListAdapter.notifyItemInserted(this.textList.size - 1)
+        this.normalTextList.add(notiString)
+        this.textPresenterListAdapter.notifyItemInserted(this.normalTextList.size - 1)
     }
 
     class TextPresenterListAdapter(private val textPresenterList: ArrayList<String>)

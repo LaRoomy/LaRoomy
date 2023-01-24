@@ -80,6 +80,10 @@
     <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Field 2</string>
     <string name="StringInterrogatorActivity_ButtonPlaceholderText">Submit</string>
     <string name="StringInterrogatorActivity_InvalidInputMessage">The entered text is invalid. It must not contain a double semicolon (;;) and must not contain only of an underscore (_).</string>
+    <string name="StringInterrogatorActivity_InvalidAsciiInputMessage_FieldOne">Field one contains invalid characters.</string>
+    <string name="StringInterrogatorActivity_InvalidAsciiInputMessage_FieldTwo">Field two contains invalid characters.</string>
+    <string name="StringInterrogatorActivity_InputIsNotAsciiConform">The entered text is invalid. Only ASCII characters are allowed.</string>
+
 
     <string name="TextListPresenter_HeaderText">Text List Presenter</string>
     <string name="TextListPresenter_FilterPopUpHeaderText">Filter</string>

@@ -86,34 +86,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/deviceMainActivityDiscardDeviceButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/DeviceTypeHeaderImageButtonDescription"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:onClick="onDiscardDeviceButtonClick"
-                    android:src="@drawable/cross_white24"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/deviceMainActivityDeviceSettingsButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/DeviceReConnectImageButtonDescription"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:onClick="onDeviceSettingsButtonClick"
-                    android:src="@drawable/settings_white_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-        -->
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View

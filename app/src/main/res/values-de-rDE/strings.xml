@@ -85,6 +85,10 @@
     <string name="StringInterrogatorActivity_FieldTwoDescriptorPlaceholder">Feld 2</string>
     <string name="StringInterrogatorActivity_ButtonPlaceholderText">Absenden</string>
     <string name="StringInterrogatorActivity_InvalidInputMessage">Der eingegebene Text ist ungültig. Der Text darf kein doppeltes Semikolon (;;) enthalten und darf nicht nur aus einem Unterstrich bestehen (_).</string>
+    <string name="StringInterrogatorActivity_InvalidAsciiInputMessage_FieldOne">Feld 1 enthält ungültige Zeichen.</string>
+    <string name="StringInterrogatorActivity_InvalidAsciiInputMessage_FieldTwo">Feld 2 enthält ungültige Zeichen.</string>
+    <string name="StringInterrogatorActivity_InputIsNotAsciiConform">Der eingegebene Text is ungültig. Nur ASCII Zeichen sind erlaubt.</string>
+
 
 
     <string name="TextListPresenter_HeaderText">Textliste</string>

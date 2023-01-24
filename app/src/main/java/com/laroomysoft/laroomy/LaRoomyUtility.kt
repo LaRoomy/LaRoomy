@@ -391,6 +391,15 @@ fun loopTypeToString(loopType: Int) : String {
     }
 }
 
+fun checkStringForNonAsciiCharacters(string: String) : Boolean {
+    string.forEach {
+        if(it.code > 126){
+            return true
+        }
+    }
+    return false
+}
+
 fun overrideNonUTF8BasedCharacterInString(nonUtf: String, placeHolderChar: Char) : String {
     var utf8String = ""
     nonUtf.forEach {

@@ -1259,6 +1259,7 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
     var fieldTwoInputType = -1
 
     var navigateBackOnButtonPress = false
+    var acceptNonAsciiCharacters = false
 
     override fun isValid(): Boolean {
         return (fieldOneInputType != -1)&&(fieldTwoInputType != -1)
@@ -1271,6 +1272,7 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
         this.fieldOneInputType = complexPropertyState.valueThree
         this.fieldTwoInputType = complexPropertyState.valueFour
         this.navigateBackOnButtonPress = complexPropertyState.valueFive == 1
+        this.acceptNonAsciiCharacters = complexPropertyState.floatValue == 1f
         this.fromComplexPropertyString(complexPropertyState.strValue)
     }
 
@@ -1294,6 +1296,11 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
             1
         } else {
             0
+        }
+        cState.floatValue = if(this.acceptNonAsciiCharacters){
+            1f
+        } else {
+            0f
         }
 
         val oneParamElement = OneParamElement()
@@ -1436,9 +1443,9 @@ class StringInterrogatorState: IComplexPropertySubTypeProtocolClass(){
             this.fieldTwoInputType = data[10].toString().toInt()
             // button behavior
             this.navigateBackOnButtonPress = data[11] != '0'
-
-            // data[12] is reserved for future use !
-
+            // accept non-ascii
+            this.acceptNonAsciiCharacters = data[12] != '0'
+            
             // string definition data
             val pureData = data.removeRange(0, 13)
             this.fromComplexPropertyString(pureData)
