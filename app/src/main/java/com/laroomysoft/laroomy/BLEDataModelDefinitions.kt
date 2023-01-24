@@ -1860,7 +1860,7 @@ class DevicePropertyListContentInformation(val elementType: Int) {
                             this.elementText = dd.elementText
                         } else {
                             this.elementText = this.elementDescriptorText
-                            this.elementSubText = "<- ->"
+                            this.elementSubText = ""
                         }
                     }
                     PROPERTY_TYPE_SWITCH -> {

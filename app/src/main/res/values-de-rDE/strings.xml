@@ -88,6 +88,14 @@
 
 
     <string name="TextListPresenter_HeaderText">Textliste</string>
+    <string name="TextListPresenter_FilterPopUpHeaderText">Filter</string>
+    <string name="TextListPresenter_FilterUserHintText">Elemente nach Typ filtern:</string>
+    <string name="TextListPresenter_FilterElementDefault">Default</string>
+    <string name="TextListPresenter_FilterElementInfo">Information</string>
+    <string name="TextListPresenter_FilterElementWarning">Warnung</string>
+    <string name="TextListPresenter_FilterElementError">Fehler</string>
+    <string name="TextListPresenter_FilterActionButtonApply">Anwenden</string>
+    <string name="TextListPresenter_FilterActionButtonCancel">Abbrechen</string>
 
 
     <string name="UnlockCtrl_HeaderText">Entsperren</string>

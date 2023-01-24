@@ -82,6 +82,14 @@
     <string name="StringInterrogatorActivity_InvalidInputMessage">The entered text is invalid. It must not contain a double semicolon (;;) and must not contain only of an underscore (_).</string>
 
     <string name="TextListPresenter_HeaderText">Text List Presenter</string>
+    <string name="TextListPresenter_FilterPopUpHeaderText">Filter</string>
+    <string name="TextListPresenter_FilterUserHintText">Filter elements by type:</string>
+    <string name="TextListPresenter_FilterElementDefault">Default</string>
+    <string name="TextListPresenter_FilterElementInfo">Information</string>
+    <string name="TextListPresenter_FilterElementWarning">Warning</string>
+    <string name="TextListPresenter_FilterElementError">Error</string>
+    <string name="TextListPresenter_FilterActionButtonApply">Apply</string>
+    <string name="TextListPresenter_FilterActionButtonCancel">Cancel</string>
 
 
     <string name="UnlockCtrl_HeaderText">Unlock Control</string>

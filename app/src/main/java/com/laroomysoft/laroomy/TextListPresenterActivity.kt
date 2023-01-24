@@ -6,17 +6,22 @@ import android.content.Intent
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.RadioButton
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.lang.Exception
@@ -24,24 +29,33 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallback, BLEConnectionManager.PropertyCallback {
+    
+    val filterForDefault = 1
+    val filterForInfo = 2
+    val filterForWarning = 3
+    val filterForError = 4
 
     private var mustReconnect = false
     private var relatedElementIndex = -1
     private var relatedUIAdapterIndex = -1
     private var isStandAlonePropertyMode = COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE
+    
+    private lateinit var popUpWindow: PopupWindow
 
     private lateinit var headerTextView: AppCompatTextView
     private lateinit var backButton: AppCompatImageButton
     private lateinit var clearListButton: AppCompatImageButton
     private lateinit var exportListButton: AppCompatImageButton
     private lateinit var deviceSettingsButton: AppCompatImageButton
-
+    private lateinit var filterListButton: AppCompatImageButton
+    
     private lateinit var textPresenterList: RecyclerView
     private lateinit var textPresenterListAdapter: RecyclerView.Adapter<*>
     private lateinit var textPresenterListLayoutManager: RecyclerView.LayoutManager
     
     private lateinit var exportButtonAnimation: AnimatedVectorDrawable
     private lateinit var deleteButtonAnimation: AnimatedVectorDrawable
+    private lateinit var filterListButtonAnimation: AnimatedVectorDrawable
 
     private var textList = ArrayList<String>()
 
@@ -49,6 +63,8 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
     private var propertyStateUpdateRequired = false
     private var preventOnPauseExecutionInStandAloneMode = false
     private var buttonNormalizationRequired = false
+    private var filterActive = false
+    private var filterPopUpIsOpen = false
     
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -163,6 +179,20 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 }
                 val shareIntent = Intent.createChooser(sendIntent, "Export")
                 startActivity(shareIntent)
+            }
+        }
+        
+        // get filter button and add functionality
+        this.filterListButton = findViewById<AppCompatImageButton?>(R.id.textListPresenterFilterListButton).apply {
+            filterListButtonAnimation = background as AnimatedVectorDrawable
+            
+            setOnClickListener {
+                filterListButtonAnimation.start()
+                if(filterActive){
+                    releaseFilter()
+                } else {
+                    showFilterPopUp()
+                }
             }
         }
 
@@ -330,6 +360,112 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
             dialog.create()
             dialog.show()
         }
+    }
+    
+    private fun showFilterPopUp(){
+        if(!filterPopUpIsOpen){
+            // set recycler alpha down
+            this.textPresenterList.alpha = 0.2f
+            
+            // TODO: mark popup as open and release the param in onDismiss() !!!
+    
+            val layoutInflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    
+            val popUpView =
+                layoutInflater.inflate(R.layout.text_list_presenter_filter_popup, this.textPresenterList)// TODO: maybe pass null
+                    .apply {
+                        popUpWindow =
+                            PopupWindow(
+                                this,
+                                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                true
+                            ).apply {
+                                
+                                // mark the popup as open
+                                filterPopUpIsOpen = true
+                                
+                                // reset params if popup is dismissed
+                                setOnDismissListener {
+                                    filterPopUpIsOpen = false
+                                    textPresenterList.alpha = 1f
+                                }
+                                // show the popup
+                                showAtLocation(textPresenterList, Gravity.CENTER, 0, 0)
+                                
+                                // set apply button listener
+                                this.contentView.findViewById<AppCompatButton>(R.id.textListPresenterFilterPopUpApplyButton).apply {
+                                    setOnClickListener {
+                                        
+                                        val fList = ArrayList<Int>()
+                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Default).apply {
+                                            if(isChecked){
+                                                fList.add(filterForDefault)
+                                            }
+                                        }
+                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Info).apply {
+                                            if(isChecked){
+                                                fList.add(filterForInfo)
+                                            }
+                                        }
+                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Warning).apply {
+                                            if(isChecked){
+                                                fList.add(filterForWarning)
+                                            }
+                                        }
+                                        contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Error).apply {
+                                            if(isChecked){
+                                                fList.add(filterForError)
+                                            }
+                                        }
+                                        // apply filter
+                                        filterElements(fList)
+                                        
+    
+                                        // TODO: maybe delay that ???
+                                        popUpWindow.dismiss()
+                                    }
+                                }
+                                
+                                // set cancel button listener
+                                this.contentView.findViewById<AppCompatButton>(R.id.textListPresenterFilterPopUpCancelButton).apply {
+                                    setOnClickListener {
+                                        popUpWindow.dismiss()
+                                    }
+                                }
+                            }
+                    }
+        }
+    }
+    
+    private fun filterElements(filterList: ArrayList<Int>){
+        
+        var defaultFilter = false
+        var infoFilter = false
+        var warningFilter = false
+        var errorFilter = false
+        
+        filterList.forEach {
+            when(it){
+                filterForDefault -> defaultFilter = true
+                filterForInfo -> infoFilter = true
+                filterForWarning -> warningFilter = true
+                filterForError -> errorFilter = true
+            }
+        }
+        
+        // apply filter rules
+        
+        // set release filter image to filter-button
+        this.filterListButton.setImageResource(R.drawable.ic_filter_list_off_36dp)
+    
+    }
+    
+    private fun releaseFilter(){
+        // set the normal adapter
+        
+        // normalize the filter-button image
+        this.filterListButton.setImageResource(R.drawable.ic_filter_list_36dp)
     }
 
     override fun onConnectionStateChanged(state: Boolean) {

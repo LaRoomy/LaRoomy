@@ -31,6 +31,7 @@
 
     <!-- Default Control Colors ************************************************************** -->
     <color name="generalButtonBackgroundColor">#FF666666</color>
+    <color name="generalOtherContrastButtonBackgroundColor">#FF888888</color>
     <color name="separatorColor">#777777</color>
     <color name="complexPropertyPanelBackgroundColor">#FF222222</color>
     <!-- ************************************************************************************* -->
@@ -120,6 +121,10 @@
     <!-- Navigator Control Activity ********************************************************** -->
     <color name="navigator_normal_arrow_color">#FFFFFFFF</color>
     <color name="navigator_pressed_arrow_color">#FF00C1F1</color>
+    <!-- ************************************************************************************* -->
+
+    <!-- TextListPresenter Activity ********************************************************** -->
+    <color name="text_list_presenter_popup_background_color">#FF505050</color>
     <!-- ************************************************************************************* -->
 
     <!-- barGraph colors -->

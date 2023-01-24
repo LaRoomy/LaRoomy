@@ -105,6 +105,22 @@
         >
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/textListPresenterFilterListButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/image_button_circle_pulse"
+            android:contentDescription="@string/TextListPresenterExportButtonLabel"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:src="@drawable/ic_filter_list_36dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="DuplicateSpeakableTextCheck" />
+
+
+        <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="48dp"
@@ -118,7 +134,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/textListPresenterClearListButton"
             />
-
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="wrap_content"
