@@ -28,48 +28,52 @@
         app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpUserHintTextView"
         >
 
-        <RadioButton
-            android:id="@+id/textListPresenterFilterPopUpRadioButton_Default"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/textListPresenterFilterPopUpCheckBox_Default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:text="@string/TextListPresenter_FilterElementDefault"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioButton
-            android:id="@+id/textListPresenterFilterPopUpRadioButton_Info"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/textListPresenterFilterPopUpCheckBox_Info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:layout_marginTop="5dp"
             android:text="@string/TextListPresenter_FilterElementInfo"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpRadioButton_Default" />
+            app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpCheckBox_Default" />
 
-        <RadioButton
-            android:id="@+id/textListPresenterFilterPopUpRadioButton_Warning"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/textListPresenterFilterPopUpCheckBox_Warning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:layout_marginTop="5dp"
             android:text="@string/TextListPresenter_FilterElementWarning"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpRadioButton_Info" />
+            app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpCheckBox_Info" />
 
-        <RadioButton
-            android:id="@+id/textListPresenterFilterPopUpRadioButton_Error"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/textListPresenterFilterPopUpCheckBox_Error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:layout_marginTop="5dp"
             android:text="@string/TextListPresenter_FilterElementError"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpRadioButton_Warning" />
+            app:layout_constraintTop_toBottomOf="@+id/textListPresenterFilterPopUpCheckBox_Warning" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -122,9 +123,17 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.linearLayout.findViewById<AppCompatTextView>(R.id.profileListItemProfileNameTextView).text =
-                profileList.elementAt(position).profileName
-
+            val element =
+                profileList.elementAt(position)
+            
+            holder.linearLayout.findViewById<AppCompatTextView>(R.id.profileListItemProfileNameTextView).apply {
+                text = element.profileName
+            }
+            if(!element.isLocked){
+                holder.linearLayout.findViewById<AppCompatImageView>(R.id.profileListItemProfileImage).apply {
+                    setImageResource(R.drawable.link_inclined_36dp)
+                }
+            }
             holder.bind(profileList.elementAt(position), itemClickListener)
         }
 

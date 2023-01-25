@@ -29,38 +29,41 @@
         app:layout_constraintTop_toBottomOf="@+id/viewLogFilterPopUpUserHintTextView"
         >
 
-        <RadioButton
-            android:id="@+id/viewLogFilterPopUpRadioButton_Info"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/viewLogFilterPopUpCheckBox_Info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:layout_marginTop="5dp"
             android:text="@string/ViewLogFilterPopUp_FilterElementInfo"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioButton
-            android:id="@+id/viewLogFilterPopUpRadioButton_Warning"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/viewLogFilterPopUpCheckBox_Warning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:layout_marginTop="5dp"
             android:text="@string/ViewLogFilterPopUp_FilterElementWarning"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewLogFilterPopUpRadioButton_Info" />
+            app:layout_constraintTop_toBottomOf="@+id/viewLogFilterPopUpCheckBox_Info" />
 
-        <RadioButton
-            android:id="@+id/viewLogFilterPopUpRadioButton_Error"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/viewLogFilterPopUpCheckBox_Error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="150dp"
             android:layout_marginTop="5dp"
             android:text="@string/ViewLogFilterPopUp_FilterElementError"
+            style="@android:style/Widget.DeviceDefault.Light.CompoundButton.RadioButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewLogFilterPopUpRadioButton_Warning" />
+            app:layout_constraintTop_toBottomOf="@+id/viewLogFilterPopUpCheckBox_Warning" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -22,8 +22,27 @@ const val FIRST_USERPROFILE_INDEX = 3
 const val UUID_File_UserProfiles = "uuidUserProfiles"
 
 class UUIDProfile{
+    fun clear() {
+        this.profileName = ""
+        this.useSingleCharacteristic = false
+        this.serviceUUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+        this.rxCharacteristicUUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+        this.txCharacteristicUUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+        this.isLocked = false
+    }
+    
+    fun fromOther(other: UUIDProfile){
+        this.profileName = other.profileName
+        this.useSingleCharacteristic = other.useSingleCharacteristic
+        this.serviceUUID = other.serviceUUID
+        this.rxCharacteristicUUID = other.rxCharacteristicUUID
+        this.txCharacteristicUUID = other.txCharacteristicUUID
+        this.isLocked = other.isLocked
+    }
+    
     var profileName = ""
     var useSingleCharacteristic = false
+    var isLocked = false
     var serviceUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
     var rxCharacteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
     var txCharacteristicUUID: UUID = UUID.fromString("00000000-0000-1000-8000-00805F9B34FB")
@@ -59,18 +78,21 @@ class UUIDManager(private var appContext: Context) {
         hmXXProfile.serviceUUID = hmModulesServiceUUID
         hmXXProfile.useSingleCharacteristic = true
         hmXXProfile.rxCharacteristicUUID = hmModulesCharacteristicUUID
+        hmXXProfile.isLocked = true
         
         val rn48xxProfile = UUIDProfile()
         rn48xxProfile.profileName = "RN48xx Modules (Microchip)"
         rn48xxProfile.serviceUUID = rn4870TransparentUartServiceUUID
         rn48xxProfile.rxCharacteristicUUID = rxRN4870CharacteristicUUID
         rn48xxProfile.txCharacteristicUUID = txRN4870CharacteristicUUID
+        rn48xxProfile.isLocked = true
         
         val commonAccessProfile = UUIDProfile()
         commonAccessProfile.profileName = "Common Access Profile"
         commonAccessProfile.serviceUUID = commonAppAccessServiceUUID
         commonAccessProfile.rxCharacteristicUUID = rxCommonAppAccessCharacteristicUUID
         commonAccessProfile.txCharacteristicUUID = txCommonAppAccessCharacteristicUUID
+        commonAccessProfile.isLocked = true
 
         this.add(commonAccessProfile)
         this.add(rn48xxProfile)
@@ -299,7 +321,7 @@ class UUIDManager(private var appContext: Context) {
         var serviceUUIDRead = false
         var useSingleCharValueRead = false
         var characteristicUUIDRead = false
-
+    
         val profile = UUIDProfile()
 
         try {
@@ -325,7 +347,6 @@ class UUIDManager(private var appContext: Context) {
                         }
                         profile.serviceUUID = UUID.fromString(line)
                         serviceUUIDRead = true
-
                     }
                     'C' -> {
                         it.forEachIndexed { index, c ->
@@ -335,7 +356,6 @@ class UUIDManager(private var appContext: Context) {
                         }
                         profile.rxCharacteristicUUID = UUID.fromString(line)
                         characteristicUUIDRead = true
-
                     }
                     'D' -> {
                         it.forEachIndexed { index, c ->
@@ -345,7 +365,6 @@ class UUIDManager(private var appContext: Context) {
                         }
                         profile.txCharacteristicUUID = UUID.fromString(line)
                         characteristicUUIDRead = true
-        
                     }
                     'U' -> {
                         it.forEachIndexed { index, c ->
@@ -358,14 +377,15 @@ class UUIDManager(private var appContext: Context) {
                             else -> true
                         }
                         useSingleCharValueRead = true
-        
                     }
                     else -> {
                         // must be the end !
                     }
                 }
                 if (nameRead && serviceUUIDRead && characteristicUUIDRead && useSingleCharValueRead) {
-                    profileList.add(profile)
+                    val pToAdd = UUIDProfile()
+                    pToAdd.fromOther(profile)
+                    profileList.add(pToAdd)
                     nameRead = false
                     serviceUUIDRead = false
                     useSingleCharValueRead = false

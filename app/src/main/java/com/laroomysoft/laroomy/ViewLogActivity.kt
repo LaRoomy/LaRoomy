@@ -1,17 +1,21 @@
 package com.laroomysoft.laroomy
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -183,12 +187,150 @@ class ViewLogActivity : AppCompatActivity() {
         }
     }
     
-    fun showFilterPopUp(){
-    
+    @SuppressLint("InflateParams")
+    private fun showFilterPopUp(){
+        if(!filterPopUpIsOpen){
+            // set recycler alpha down
+            this.logDataListView.alpha = 0.2f
+        
+            (getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).apply {
+                layoutInflater.inflate(R.layout.view_log_filter_popup, null)
+                    .apply {
+                        popUpWindow =
+                            PopupWindow(
+                                this,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                true
+                            ).apply {
+                            
+                                // mark the popup as open
+                                filterPopUpIsOpen = true
+                            
+                                // reset params if popup is dismissed
+                                setOnDismissListener {
+                                    filterPopUpIsOpen = false
+                                    logDataListView.alpha = 1f
+                                }
+                                // show the popup
+                                showAtLocation(logDataListView, Gravity.CENTER, 0, 0)
+                            
+                                // set apply button listener
+                                this.contentView.findViewById<AppCompatButton>(R.id.viewLogFilterPopUpApplyButton)
+                                    .apply {
+                                        setOnClickListener {
+                                        
+                                            val fList = ArrayList<Int>()
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.viewLogFilterPopUpCheckBox_Info)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForInfo)
+                                                    }
+                                                }
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.viewLogFilterPopUpCheckBox_Warning)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForWarning)
+                                                    }
+                                                }
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.viewLogFilterPopUpCheckBox_Error)
+                                                .apply {
+                                                    if (isChecked) {
+                                                        fList.add(filterForError)
+                                                    }
+                                                }
+                                        
+                                            // apply filter
+                                            filterElements(fList)
+                                        
+                                            // dismiss popup
+                                            popUpWindow.dismiss()
+                                        }
+                                    }
+                            
+                                // set cancel button listener
+                                this.contentView.findViewById<AppCompatButton>(R.id.viewLogFilterPopUpCancelButton)
+                                    .apply {
+                                        setOnClickListener {
+                                            popUpWindow.dismiss()
+                                        }
+                                    }
+                            }
+                    }
+            }
+        }
     }
     
-    fun releaseFilter(){
+    private fun filterElements(filterList: ArrayList<Int>){
+        // apply params from users radio-button selection
+        filterList.forEach {
+            when(it){
+                filterForInfo -> infoFilter = true
+                filterForWarning -> warningFilter = true
+                filterForError -> errorFilter = true
+            }
+        }
+        // check if filtering is necessary
+        if(this.infoFilter || this.warningFilter || this.errorFilter){
+            if(this.infoFilter && this.warningFilter && this.errorFilter){
+                // if all is selected we need no filter, so do nothing
+                return
+            } else {
+                this.filterActive = true
+            }
+        } else {
+            // do nothing if no filter is selected
+            return
+        }
+        // clear before use
+        this.filteredLogList.clear()
     
+        // apply filter rules
+        (applicationContext as ApplicationProperty).connectionLog.forEach {
+            when (it.elementAt(0)) {
+                'I' -> {
+                    if (this.infoFilter) {
+                        this.filteredLogList.add(it)
+                    }
+                }
+                'W' -> {
+                    if (this.warningFilter) {
+                        this.filteredLogList.add(it)
+                    }
+                }
+                'E' -> {
+                    if (this.errorFilter) {
+                        this.filteredLogList.add(it)
+                    }
+                }
+            }
+        }
+    
+        // set the filtered adapter to the recycler
+        this.filteredLogListAdapter =
+            LogDataListAdapter(this.filteredLogList)
+        this.logDataListView.adapter = this.filteredLogListAdapter
+    
+        // set release filter image to filter-button
+        this.filterButton.setImageResource(R.drawable.ic_filter_list_off_36dp)
+    }
+    
+    private fun releaseFilter(){
+        // set the normal adapter
+        this.logDataListAdapter =
+            LogDataListAdapter((applicationContext as ApplicationProperty).connectionLog)
+        this.logDataListView.adapter = this.logDataListAdapter
+    
+        // reset params
+        this.infoFilter = false
+        this.warningFilter = false
+        this.errorFilter = false
+    
+        this.filterActive = false
+        this.filteredLogList.clear()
+    
+        // normalize the filter-button image
+        this.filterButton.setImageResource(R.drawable.ic_filter_list_36dp)
     }
 
     private fun notifyUser(message: String, colorID: Int){

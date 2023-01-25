@@ -13,14 +13,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.PopupWindow
-import android.widget.RadioButton
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -145,6 +141,11 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 // animate
                 deleteButtonAnimation.start()
                 
+                // if filter is active, release it
+                if(filterActive){
+                    releaseFilter()
+                }
+                
                 // clear the list + notify
                 runOnUiThread {
                     normalTextList.clear()
@@ -170,14 +171,26 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                 
                 // format the list
                 var listBuffer = ""
-                normalTextList.forEach {
-                    listBuffer += when(it.elementAt(0)) {
-                        'I' -> "INFO: "
-                        'W' -> "WARNING: "
-                        'E' -> "ERROR: "
-                        else -> "NORMAL: "
+                if(filterActive){
+                    filteredTextList.forEach {
+                        listBuffer += when (it.elementAt(0)) {
+                            'I' -> "INFO: "
+                            'W' -> "WARNING: "
+                            'E' -> "ERROR: "
+                            else -> "NORMAL: "
+                        }
+                        listBuffer += "${it.removeRange(0, 1)}\r\n"
                     }
-                    listBuffer += "${it.removeRange(0, 1)}\r\n"
+                } else {
+                    normalTextList.forEach {
+                        listBuffer += when (it.elementAt(0)) {
+                            'I' -> "INFO: "
+                            'W' -> "WARNING: "
+                            'E' -> "ERROR: "
+                            else -> "NORMAL: "
+                        }
+                        listBuffer += "${it.removeRange(0, 1)}\r\n"
+                    }
                 }
                 // export
                 val sendIntent: Intent = Intent().apply {
@@ -379,10 +392,11 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
             (getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).apply {
                 layoutInflater.inflate(R.layout.text_list_presenter_filter_popup, null)
                     .apply {
+                        
                         popUpWindow =
                             PopupWindow(
                                 this,
-                                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                                ConstraintLayout.LayoutParams.WRAP_CONTENT,
                                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                                 true
                             ).apply {
@@ -404,25 +418,25 @@ class TextListPresenterActivity : AppCompatActivity(), BLEConnectionManager.BleE
                                         setOnClickListener {
                                 
                                             val fList = ArrayList<Int>()
-                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Default)
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.textListPresenterFilterPopUpCheckBox_Default)
                                                 .apply {
                                                     if (isChecked) {
                                                         fList.add(filterForDefault)
                                                     }
                                                 }
-                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Info)
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.textListPresenterFilterPopUpCheckBox_Info)
                                                 .apply {
                                                     if (isChecked) {
                                                         fList.add(filterForInfo)
                                                     }
                                                 }
-                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Warning)
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.textListPresenterFilterPopUpCheckBox_Warning)
                                                 .apply {
                                                     if (isChecked) {
                                                         fList.add(filterForWarning)
                                                     }
                                                 }
-                                            contentView.findViewById<RadioButton>(R.id.textListPresenterFilterPopUpRadioButton_Error)
+                                            contentView.findViewById<AppCompatCheckBox>(R.id.textListPresenterFilterPopUpCheckBox_Error)
                                                 .apply {
                                                     if (isChecked) {
                                                         fList.add(filterForError)
