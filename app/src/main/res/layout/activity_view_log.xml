@@ -105,7 +105,7 @@
             android:minWidth="48dp"
             android:minHeight="48dp"
             android:padding="8dp"
-            android:src="@android:drawable/arrow_up_float"
+            android:src="@drawable/ic_arrow_drop_up_36dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -134,7 +134,7 @@
             android:minWidth="48dp"
             android:minHeight="48dp"
             android:padding="8dp"
-            android:src="@android:drawable/arrow_down_float"
+            android:src="@drawable/ic_arrow_drop_down_36dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/viewLogActivityToolPanelFirstSeparator"
             app:layout_constraintTop_toTopOf="parent" />
@@ -155,8 +155,37 @@
         <androidx.appcompat.widget.AppCompatImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/viewLogActivityFilterListButton"
+            android:src="@drawable/ic_filter_list_36dp"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@string/ViewLogFilterButtonLabel"
+            android:background="@drawable/image_button_circle_pulse"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/viewLogActivityToolPanelFourthSeparator"
+            />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:id="@+id/viewLogActivityToolPanelFourthSeparator"
+            android:background="@color/viewLogActivityToolPanelSeparatorColor"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/viewLogActivityExportImageButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/viewLogActivityExportImageButton"
-            android:src="@android:drawable/ic_menu_share"
+            android:src="@drawable/ic_share_36dp"
             android:minWidth="48dp"
             android:minHeight="48dp"
             android:layout_marginEnd="10dp"

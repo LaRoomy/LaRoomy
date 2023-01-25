@@ -37,6 +37,7 @@ const val BLE_COMPLEX_STATE_LOOP_FINAL_FAILED = 10
 const val BLE_INVALID_DEVICE_ADDRESS = 11
 const val BLE_INVALID_LAST_DEVICE_ADDRESS = 12
 const val BLE_UI_ADAPTER_GENERATION_FAIL = 13
+const val BLE_SERVICE_DISCOVERY_FAIL = 14
 
 const val BLE_MSC_EVENT_ID_RESUME_CONNECTION_STARTED = 101
 
@@ -517,8 +518,10 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
             }
         } catch(e: Exception){
-            Log.e("M:CB:onServicesDisc", "Exception occurred while discovering services: $e")
-            applicationProperty.logControl("E: $e")
+            Log.e("M:CB:onServicesDisc", "Exception occurred while discovering services and/or characteristics: $e")
+            applicationProperty.logControl("E: Exception occurred while discovering services and/or characteristics: $e")
+            applicationProperty.logControl("E: This could be due to invalid service or characteristic UUIDs. Make sure to define the correct UUIDs for RX and TX (if used). Note that rx and tx are swapped on the remote device.")
+            callback.onConnectionError(BLE_SERVICE_DISCOVERY_FAIL)
         }
     }
     

@@ -331,6 +331,13 @@
     <string name="ViewLogActivity_HeaderText">Verbindungs-Protokoll</string>
     <string name="ViewLogActivity_NotificationNoLogDataAvailable">Keine Protokolldaten vorhanden</string>
     <string name="ViewLogActivity_NotificationLoggingIsDisabled">Log erstellen is deaktiviert</string>
+    <string name="ViewLogFilterPopUp_FilterUserHintText">Elemente nach Typ filtern:</string>
+    <string name="ViewLogFilterPopUp_FilterElementInfo">Information</string>
+    <string name="ViewLogFilterPopUp_FilterElementWarning">Warnung</string>
+    <string name="ViewLogFilterPopUp_FilterElementError">Fehler</string>
+    <string name="ViewLogFilterPopUp_FilterActionButtonApply">Anwenden</string>
+    <string name="ViewLogFilterPopUp_FilterActionButtonCancel">Abbrechen</string>
+
 
     <string name="DataSharingActivity_GoToMainButtonText">Zurück zur App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Geräte-Bindung erfolgreich gespeichert.</string>
@@ -409,6 +416,7 @@
     <string name="Error_StandAlonePropertyModeError_NoData">Solo-Eigenschaften Fehler: keine Daten vorhanden.</string>
     <string name="Error_InvalidDeviceAddress">Geräte-Adresse ungültig.</string>
     <string name="Error_UIAdapterGenerationFail">Fehler beim erstellen der Daten für die Benutzeroberfläche.</string>
+    <string name="Error_BLEServiceDiscoveryFail">Service und/oder Characteristic Discovery fehlgeschlagen.</string>
 
 
     <!-- FileKeys: -->

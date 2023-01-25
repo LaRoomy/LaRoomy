@@ -106,9 +106,9 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
 
         class ViewHolder(val linearLayout: LinearLayout) : RecyclerView.ViewHolder(linearLayout) {
 
-            fun bind(data: UUIDProfile, listener: OnUUIDProfileListItemClickListener, position: Int){
+            fun bind(data: UUIDProfile, listener: OnUUIDProfileListItemClickListener){
                 itemView.setOnClickListener{
-                    listener.onItemClicked(position, data)
+                    listener.onItemClicked(bindingAdapterPosition, data)
                 }
             }
         }
@@ -125,7 +125,7 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
             holder.linearLayout.findViewById<AppCompatTextView>(R.id.profileListItemProfileNameTextView).text =
                 profileList.elementAt(position).profileName
 
-            holder.bind(profileList.elementAt(position), itemClickListener, position)
+            holder.bind(profileList.elementAt(position), itemClickListener)
         }
 
         override fun getItemCount(): Int {

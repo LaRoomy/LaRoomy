@@ -6,7 +6,7 @@
         android:right="5dp"
         android:top="5dp">
         <shape>
-            <solid android:color="@color/text_list_presenter_popup_background_color" />
+            <solid android:color="@color/view_log_activity_filter_popup_background_color" />
             <corners android:radius="10dp" />
             <padding
                 android:bottom="0dp"

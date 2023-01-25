@@ -384,15 +384,6 @@ class UUIDManager(private var appContext: Context) {
         }
     }
 
-//    private fun bufferFromFile() : String {
-//        var buffer: String
-//
-//        appContext.openFileInput(UUID_File_UserProfiles).bufferedReader().use {
-//            buffer = it.readText()
-//        }
-//        return buffer
-//    }
-
     private fun bufferFromFile() : ArrayList<String> {
 
         val lineList = ArrayList<String>()
@@ -405,6 +396,9 @@ class UUIDManager(private var appContext: Context) {
             }
         } catch (fne: FileNotFoundException) {
             // that's ok!
+            if(verboseLog) {
+                Log.d("UUIDManager", "bufferFromFile: $fne")
+            }
         }
         return lineList
     }

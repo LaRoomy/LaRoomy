@@ -312,6 +312,13 @@
     <string name="ViewLogActivity_HeaderText">Connection Log</string>
     <string name="ViewLogActivity_NotificationNoLogDataAvailable">No Log-Data available</string>
     <string name="ViewLogActivity_NotificationLoggingIsDisabled">Log creation is disabled</string>
+    <string name="ViewLogFilterPopUp_FilterUserHintText">Filter elements by type:</string>
+    <string name="ViewLogFilterPopUp_FilterElementInfo">Information</string>
+    <string name="ViewLogFilterPopUp_FilterElementWarning">Warning</string>
+    <string name="ViewLogFilterPopUp_FilterElementError">Error</string>
+    <string name="ViewLogFilterPopUp_FilterActionButtonApply">Apply</string>
+    <string name="ViewLogFilterPopUp_FilterActionButtonCancel">Cancel</string>
+
 
     <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Binding Data successful saved.</string>
@@ -392,6 +399,7 @@
     <string name="ViewLogActivityScrollDownButtonLabel" translatable="false">Scroll to the bottom</string>
     <string name="ViewLogActivityExportButtonLabel" translatable="false">Export the log</string>
     <string name="TextListPresenterExportButtonLabel" translatable="false">Export the text list</string>
+    <string name="ViewLogFilterButtonLabel" translatable="false">Filter the list</string>
 
     <!-- Activity Labels -->
     <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
@@ -411,6 +419,7 @@
     <string name="Error_StandAlonePropertyModeError_NoData">Stand-alone mode error: no property data.</string>
     <string name="Error_InvalidDeviceAddress">Device address invalid.</string>
     <string name="Error_UIAdapterGenerationFail">User Interface data generation error.</string>
+    <string name="Error_BLEServiceDiscoveryFail">Service and/or characteristic discovery failed.</string>
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>

@@ -105,6 +105,7 @@
     <!-- View Log Activity ******************************************************************* -->
     <color name="viewLogActivityToolPanelBackgroundColor">#ee777777</color>
     <color name="viewLogActivityToolPanelSeparatorColor">#FF888888</color>
+    <color name="view_log_activity_filter_popup_background_color">#FFDDDDDD</color>
     <!-- ************************************************************************************* -->
 
     <!-- Add Device Activity ***************************************************************** -->

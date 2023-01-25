@@ -415,6 +415,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             BLE_INVALID_LAST_DEVICE_ADDRESS -> {
                 getString(R.string.Error_InvalidDeviceAddress)
             }
+            BLE_SERVICE_DISCOVERY_FAIL -> {
+                getString(R.string.Error_BLEServiceDiscoveryFail)
+            }
             else -> {
                 getString(R.string.Error_UnknownError)
             }
