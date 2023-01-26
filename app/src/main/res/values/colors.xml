@@ -53,6 +53,7 @@
     <color name="mainActivityPopUpFlyoutBackgroundColor">#FFDDDDDD</color>
     <color name="pop_up_flyout_separator_background">#FF909090</color>
     <color name="mainActivityPopUpMenuItemSelectedColor">#FF909090</color>
+    <color name="main_activity_action_banner_background_color">#FFBBBBCC</color>
     <!-- ************************************************************************************* -->
 
     <!-- Device Main Activity **************************************************************** -->
