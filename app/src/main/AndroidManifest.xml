@@ -41,6 +41,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".PremiumInfoActivity"
+            android:exported="false" />
+        <activity
             android:name=".BindingManagerActivity"
             android:exported="false">
             <meta-data

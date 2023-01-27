@@ -16,6 +16,10 @@
     <string name="MA_BluetoothPermissionMissionHintText">Die Verbindung über Bluetooth ist die Basisfunktion dieser App. Aus diesem Grund wird die Erlaubnis zum Zugriff und zur Verbindung mit Bluetooth-Geräten benötigt. Hier tippen um die Erlaubnis zu gewähren.</string>
 
     <string name="MainActivity_ActionBannerText_TestPeriodActive">Sie befinden sich in einem 30 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App</string>
+    <string name="MainActivity_ActionBannerText_UnpaidVersion">Sie benutzen diese App mit eingeschränktem Funktionsumfang. Schalten Sie die Premium Funktionen frei um das volle Potential der App zu nutzen.</string>
+    <string name="MainActivity_ActionBanner_MoreInfoButtonText">Weitere Infos</string>
+    <string name="MainActivity_ActionBanner_DoNotShowAgainButtonText">Ausblenden</string>
+    <string name="MainActivity_ActionBanner_ButtonTextPurchase">Freischalten</string>
 
 
 

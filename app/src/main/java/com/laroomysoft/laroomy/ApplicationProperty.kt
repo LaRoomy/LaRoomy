@@ -98,7 +98,6 @@ class ApplicationProperty : Application() {
     var propertyInvalidatedOnSubPage = false
     var closeDeviceRequested = false
     
-    
     val isPremiumAppVersion
     get() = this.premiumManager.isPremiumAppVersion
 
@@ -122,13 +121,6 @@ class ApplicationProperty : Application() {
         systemLanguage = resources.configuration.locales.get(0).language // returns the app language in iso 639-1 format
 
         eventLogEnabled = this.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_EnableLog)
-        
-        // TODO: check for the paid version of the app
-        // TODO: remove this, the premium manager can do this
-        //this.isPremiumAppVersion = true
-
-        // add the initial placeholder value
-        //this.connectionLog.add(getString(R.string.ConnectionLog_NoContent))
     }
     
     fun onResume(){

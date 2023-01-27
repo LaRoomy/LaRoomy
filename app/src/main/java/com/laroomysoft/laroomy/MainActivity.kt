@@ -40,6 +40,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     private val mainActivityNormalState = 0
     private val mainActivityBluetoothNotEnabledState = 1
     private val mainActivityBluetoothPermissionMissingState = 2
+    
+    private val appProperty
+    get() = (this.applicationContext as ApplicationProperty)
 
     private var availableDevices = ArrayList<LaRoomyDevicePresentationModel>()
     get() {
@@ -93,6 +96,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
     private lateinit var noContentImageView: AppCompatImageView
     private lateinit var noContentTextView: AppCompatTextView
     private lateinit var popUpWindow: PopupWindow
+    private lateinit var moreInfoLink: AppCompatTextView
+    private lateinit var hideLink: AppCompatTextView
+    private lateinit var actionBanner: ConstraintLayout
+    private lateinit var actionTextView: AppCompatTextView
+    private lateinit var actionBannerImage: AppCompatImageView
 
     private var addButtonNormalizationRequired = false
     private var preventListSelection = false
@@ -136,7 +144,23 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         this.noContentContainer = findViewById(R.id.mainActivityNoContentContainer)
         this.noContentImageView = findViewById(R.id.mainActivityNoContentImageView)
         this.noContentTextView = findViewById(R.id.mainActivityNoContentTextView)
-    
+        this.actionBanner = findViewById(R.id.mainActivityPremiumActionBanner)
+        this.actionTextView = findViewById(R.id.mainActivityPremiumBannerActionTextView)
+        this.actionBannerImage = findViewById(R.id.mainActivityPremiumActionBannerImage)
+        
+        // add more info link listener
+        this.moreInfoLink = findViewById<AppCompatTextView?>(R.id.mainActivityPremiumActionBannerMoreInfoLink).apply {
+            setOnClickListener {
+                onActionBannerMoreInfoLinkClicked()
+            }
+        }
+        // add hide link listener
+        this.hideLink = findViewById<AppCompatTextView?>(R.id.mainActivityPremiumActionBannerHideLink).apply {
+            setOnClickListener {
+                onActionBannerHideLinkClicked()
+            }
+        }
+        
         // save UI Mode to application property
         (applicationContext as ApplicationProperty).isNightMode =
             when (this.addDeviceButton.context.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
@@ -323,7 +347,10 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 false
             this.availableDevicesViewAdapter.notifyItemInserted(this.availableDevices.size - 1)
         }
-
+    
+        // show / hide the action banner and set the content based on the current premium status (testVersion/unPaid/Premium)
+        this.controlActionBannerVisibleState()
+    
         // reset the selection in the recyclerView
         this.resetSelectionInDeviceListView()
     }
@@ -346,6 +373,70 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             
             // set param for auto-connect function
             (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+        }
+    }
+    
+    private fun onActionBannerMoreInfoLinkClicked(){
+        // this link is always the same and opens the more info page
+        val intent = Intent(this@MainActivity, PremiumInfoActivity::class.java)
+        startActivity(intent)
+    }
+    
+    private fun onActionBannerHideLinkClicked(){
+        if(this.appProperty.premiumManager.isTestPeriodActive){
+            // when the hide link is clicked while the test-period is active, the user wants to hide the banner
+            this.actionBanner.apply {
+                // hide the banner
+                visibility = View.GONE
+            }
+            // save the users choice (the banner is not shown again before the test-period is over)
+            this.appProperty.saveBooleanData(true, R.string.FileKey_PremVersion, R.string.DataKey_HideMainActivityTestBanner)
+        } else {
+            // the link is clicked in a non-purchased app-state, so this is the PURCHASE button
+            // -> start the app store billing process
+            
+            // TODO: implement the billing process here
+        }
+    }
+    
+    private fun controlActionBannerVisibleState(){
+        this.actionBanner.apply {
+            if(appProperty.premiumManager.userHasPurchased){
+                // the user has purchased, so hide the banner and do nothing else
+                this.visibility = View.GONE
+            } else {
+                // the user has not purchased, so this must be unpaid or test version
+                if ((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive) {
+                    // test period is active
+                    if (!(applicationContext as ApplicationProperty).loadBooleanData(
+                            R.string.FileKey_PremVersion,
+                            R.string.DataKey_HideMainActivityTestBanner,
+                            false
+                        )
+                    ) {
+                        // the user has NOT pressed hide in a previous execution
+                        // so show the banner
+                        this.visibility = View.VISIBLE
+                    }
+                    // else : user has pressed hide, so hide the banner until the period is over
+                } else {
+                    // must be unpaid version
+                    // >> change hide button text to 'purchase'
+                    hideLink.apply {
+                        text = getString(R.string.MainActivity_ActionBanner_ButtonTextPurchase)
+                    }
+                    // change action text
+                    actionTextView.apply {
+                        text = getString(R.string.MainActivity_ActionBannerText_UnpaidVersion)
+                    }
+                    // change action image
+                    actionBannerImage.apply {
+                        setImageResource(R.drawable.ic_no_premium_48dp)
+                    }
+                    // show banner
+                    this.visibility = View.VISIBLE
+                }
+            }
         }
     }
 

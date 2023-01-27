@@ -110,9 +110,11 @@ class AppSettingsActivity : AppCompatActivity() {
                 visibility = View.GONE
             } else {
                 setOnClickListener {
-                    // TODO: handle on more info click !
-                    
-                    Log.d("SetupActivity", "More Info Link clicked !!!")
+                    if(verboseLog) {
+                        Log.d("SetupActivity", "More Info Link clicked !!!")
+                    }
+                    val intent = Intent(this@AppSettingsActivity, PremiumInfoActivity::class.java)
+                    startActivity(intent)
                 }
             }
         }
@@ -121,7 +123,8 @@ class AppSettingsActivity : AppCompatActivity() {
                 visibility = View.GONE
             } else {
                 setOnClickListener {
-                    // TODO: handle on restore purchase click !
+                    
+                    // TODO: handle on restore purchase click ! Call the billing API
     
                     Log.d("SetupActivity", "Restore purchase Link clicked !!!")
                 }
@@ -132,7 +135,7 @@ class AppSettingsActivity : AppCompatActivity() {
                 visibility = View.GONE
             } else {
                 setOnClickListener {
-                    // TODO: handle purchase !!!
+                    // TODO: handle purchase !!! -> Call the billing API
     
                     Log.d("SetupActivity", "Unlock Premium Link clicked !!!")
                 }
