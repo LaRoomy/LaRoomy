@@ -15,7 +15,7 @@
     <string name="MA_BluetoothPermissionMissionHintText">The base functionality of this App is to connect to bluetooth devices. Therefore it needs your permission to access bluetooth devices on this phone and connect to it. Tap here to grant the permission.</string>
 
     <string name="MainActivity_ActionBannerText_TestPeriodActive">You are in a 30 days test period with full access to all app capabilities</string>
-    <string name="MainActivity_ActionBannerText_UnpaidVersion">You are using this app with restricted capabilities. Unlock premium features to unleash the full potential.</string>
+    <string name="MainActivity_ActionBannerText_UnpaidVersion">You are using this app with restricted capabilities. Become a premium app user to unleash the full potential.</string>
     <string name="MainActivity_ActionBanner_MoreInfoButtonText">More Info</string>
     <string name="MainActivity_ActionBanner_DoNotShowAgainButtonText">Hide</string>
     <string name="MainActivity_ActionBanner_ButtonTextPurchase">Unlock Premium</string>
@@ -347,12 +347,9 @@
     <string name="EditUUIDProfileActivityButtonTextDiscard">Discard</string>
     <string name="EditUUIDProfileActivityIsStaticProfileNotification">This is a static profile. Changes will take no effect. Add a new profile to define your own UUIDs.</string>
     <string name="EditUUIDProfileActivityInvalidUUIDNotification">Invalid UUID-Format.</string>
-
     <string name="EditUUIDProfileActivityInvalidServiceUUIDNotification">Invalid Service UUID-Format.</string>
     <string name="EditUUIDProfileActivityInvalidRxCharUUIDNotification">Invalid RX Characteristic UUID-Format.</string>
     <string name="EditUUIDProfileActivityInvalidTxCharUUIDNotification">Invalid TX Characteristic UUID-Format.</string>
-
-
     <string name="EditUUIDProfileActivityProfileNameAlreadyExistNotification">Profile-Name already exist.</string>
     <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Use distinct characteristics for RX and TX</string>
 
@@ -369,6 +366,10 @@
     <string name="AddDeviceActivityMissingPermissionMessageT2Text">What you now can do:</string>
     <string name="AddDeviceActivityMissingPermissionResolutionText1">1. Go to settings and enable the missing permission for this app.</string>
     <string name="AddDeviceActivityMissingPermissionResolutionText2">2. If your device could be paired, go to settings and pair it. It will then appear in the list below.</string>
+
+    <string name="PremiumInfoActivity_LaRoomyBrandingText">LaRoomy</string>
+    <string name="PremiumInfoActivity_ActionHeaderText">Become a Premium User and unlock all App-Capabilities.</string>
+    <string name="PremiumInfoActivity_ActionSubText">By purchasing the premium-status once, all functions will be unlocked. App development and maintenance is a time-consuming and pricey matter. With your purchase you help to keep this project active.</string>
 
 
     <!-- content descriptions and labels -->

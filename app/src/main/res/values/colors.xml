@@ -28,6 +28,7 @@
     <color name="connectingTextColor">#FF4A4704</color>
     <color name="clickableTextColor">#15677C</color>
     <color name="max_contrast_text_color">#FF000000</color>
+    <color name="important_text_color">#FF000000</color>
     <!-- ************************************************************************************* -->
 
     <!-- Default Control Colors ************************************************************** -->
@@ -44,6 +45,8 @@
     <color name="mode_accent_color">#FF16354D</color>
     <color name="pureWhite">#FF000000</color>
     <color name="swipe_to_delete_item_color">#FFDE0A00</color>
+    <color name="laroomy_symbol_blue_color">#FFA6BEE3</color>
+    <color name="laroomy_symbol_yellow_color">#FFFDDF66</color>
     <!-- ************************************************************************************* -->
 
     <!-- Main Activity *********************************************************************** -->
@@ -131,6 +134,11 @@
 
     <!-- TextListPresenter Activity ********************************************************** -->
     <color name="text_list_presenter_popup_background_color">#FFDDDDDD</color>
+    <!-- ************************************************************************************* -->
+
+    <!-- PremiumInfo Activity **************************************************************** -->
+    <color name="premium_info_activity_container_background">#FFCCCCCC</color>
+    <color name="premium_info_activity_laroomy_branding_text_color">#FF000066</color>
     <!-- ************************************************************************************* -->
 
 
