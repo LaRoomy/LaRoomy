@@ -34,6 +34,7 @@
     <!-- Default Control Colors ************************************************************** -->
     <color name="generalButtonBackgroundColor">#FFDDDDDD</color>
     <color name="generalOtherContrastButtonBackgroundColor">#FFBBBBBB</color>
+    <color name="generalImportantButtonBackgroundColor">#FFCCCCFF</color>
     <color name="separatorColor">#777777</color>
     <color name="complexPropertyPanelBackgroundColor">#FFCCCCCC</color>
     <!-- ************************************************************************************* -->

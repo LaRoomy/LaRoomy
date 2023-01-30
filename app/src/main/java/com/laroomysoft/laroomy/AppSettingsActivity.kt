@@ -30,6 +30,7 @@ class AppSettingsActivity : AppCompatActivity() {
     private lateinit var bindingManagerButton: ConstraintLayout
     private lateinit var designSelectionButton: ConstraintLayout
     private lateinit var popUpWindow: PopupWindow
+    private lateinit var enableLoggingHintTextView: AppCompatTextView
     
     private lateinit var currentPremiumStatusTextView: AppCompatTextView
     private lateinit var premiumStatusHintTextView: AppCompatTextView
@@ -239,27 +240,40 @@ class AppSettingsActivity : AppCompatActivity() {
                     )
                 this.isChecked = state
     
-                // set the visual state of the log nav button regarding to the state value
-                setShowLogButtonState(state)
+                if((applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion) {
+                    // set the visual state of the log nav button regarding to the state value
+                    setShowLogButtonState(state)
     
-                setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+                    setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
         
-                    (applicationContext as ApplicationProperty).saveBooleanData(
-                        b,
-                        R.string.FileKey_AppSettings,
-                        R.string.DataKey_EnableLog
-                    )
-                    setShowLogButtonState(b)
+                        (applicationContext as ApplicationProperty).saveBooleanData(
+                            b,
+                            R.string.FileKey_AppSettings,
+                            R.string.DataKey_EnableLog
+                        )
+                        setShowLogButtonState(b)
         
-                    (applicationContext as ApplicationProperty).eventLogEnabled = b
+                        (applicationContext as ApplicationProperty).eventLogEnabled = b
         
-                    // delete log data if the switch is set to off state
-                    if(!b) {
-                        (applicationContext as ApplicationProperty).logRecordingTime = ""
-                        (applicationContext as ApplicationProperty).connectionLog.clear()
+                        // delete log data if the switch is set to off state
+                        if (!b) {
+                            (applicationContext as ApplicationProperty).logRecordingTime = ""
+                            (applicationContext as ApplicationProperty).connectionLog.clear()
+                        }
                     }
+                } else {
+                    // its not premium disable switch and nav button
+                    setShowLogButtonState(false)
+                    this.isEnabled = false
                 }
             }
+        
+        this.enableLoggingHintTextView = findViewById<AppCompatTextView?>(R.id.setupActivityEnableLoggingHintTextView).apply {
+            if(!(applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion){
+                setTextColor(getColor(R.color.important_text_color))
+                text = getString(R.string.SetupActivity_LoggingSwitchPremiumHint)
+            }
+        }
         
         this.keepScreenActiveSwitchCompat =
             findViewById<SwitchCompat>(R.id.setupActivityKeepScreenActiveSwitch).apply {
@@ -283,6 +297,12 @@ class AppSettingsActivity : AppCompatActivity() {
     
     override fun onResume() {
         super.onResume()
+        
+        // TODO: if a purchase occurred on the premium page and was invoked from this page, the back-navigation to this must check if a purchase occurred and set the UI in relation to it
+        // TODO: normalize enableLoggingSwitchHint (textColor + text)
+        // TODO: enable showLog nav-button (only if the logging switch is on)
+        // TODO: enable the logging switch!
+        // TODO: hide the lower premium section and set the status to purchased
 
         if (this.buttonNormalizationRequired) {
             // normalize uuidManager-Button

@@ -222,6 +222,7 @@
     <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Weitere Informationen</string>
     <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Kauf wiederherstellen</string>
     <string name="SetupActivity_PremiumAppActionLinkUnlockPremium">Premium Funktionen freischalten</string>
+    <string name="SetupActivity_LoggingSwitchPremiumHint">Diese Funktion ist nur für Premium Benutzer verfügbar.</string>
 
 
 
@@ -386,9 +387,20 @@
     <string name="AddDeviceActivityMissingPermissionResolutionText2">2. Wenn das Gerät gekoppelt werden kann, dann kann die Kopplung über die Bluetooth-Einstellungen hergestellt werden. Das Gerät erscheint dann unten in der Liste.</string>
 
     <string name="PremiumInfoActivity_LaRoomyBrandingText">LaRoomy</string>
-    <string name="PremiumInfoActivity_ActionHeaderText">Werde Premium Benutzer und schalte alle Funktionen der App frei.</string>
-    <string name="PremiumInfoActivity_ActionSubText">Durch den einmaligen Erwerb des Premium-Status werden alle Funktionen freigeschaltet. App Entwicklung und Instandhaltung ist kostspielig und zeitaufwändig. Mit deinem Kauf trägst du dazu bei dieses Projekt aktiv zu halten.</string>
-
+    <string name="PremiumInfoActivity_ActionHeaderText">Werde Premium Benutzer und schalte alle Funktionen der App frei:</string>
+    <string name="PremiumInfoActivity_ActionSubText">Durch den einmaligen Erwerb des Premium-Status werden alle Funktionen für immer freigeschaltet. App Entwicklung und Instandhaltung ist kostspielig und zeitaufwändig. Mit deinem Kauf trägst du dazu bei dieses Projekt aktiv zu halten.</string>
+    <string name="PremiumInfoActivity_AdvantageOneText">Unbegrenzte Geräte-Anzahl</string>
+    <string name="PremiumInfoActivity_AdvantageTwoText">Zugriff auf alle Geräte-Eigenschaften</string>
+    <string name="PremiumInfoActivity_AdvantageThreeText">Icons für Geräte und Geräte-Eigenschaften</string>
+    <string name="PremiumInfoActivity_AdvantageFourText">Verbindungsprotokoll Erstellung</string>
+    <string name="PremiumInfoActivity_AdvantageFiveText">Benutzerdefinierte UUID Profile</string>
+    <string name="PremiumInfoActivity_ActionButtonText">Premium Status freischalten</string>
+    <string name="PremiumInfoActivity_NonPremiumHeaderText">Ohne Premium Status ist die Funktionalität der App eingeschränkt:</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementOneText">Es können maximal zwei Geräte hinzugefügt werden</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementTwoText">Nur einfache Geräteeigenschaften können verwendet werden</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementThreeText">Icons für Geräte und Eigenschaften werden nicht angezeigt</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementFourText">Verbindungsprotokoll kann nicht erstellt werden</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementFiveText">Es können keine UUID Profile hinzugefügt werden</string>
 
 
 

@@ -468,7 +468,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 R.string.DataKey_EnableLog
             )
         ) {
-            R.layout.main_activity_popup_flyout
+            if(appProperty.premiumManager.isPremiumAppVersion) {
+                R.layout.main_activity_popup_flyout
+            } else {
+                R.layout.main_activity_popup_without_log_flyout
+            }
         } else {
             R.layout.main_activity_popup_without_log_flyout
         }

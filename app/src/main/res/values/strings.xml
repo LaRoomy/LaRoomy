@@ -212,6 +212,7 @@
     <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Get more information</string>
     <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Restore Purchase</string>
     <string name="SetupActivity_PremiumAppActionLinkUnlockPremium">Unlock Premium Capabilities</string>
+    <string name="SetupActivity_LoggingSwitchPremiumHint">This function is only available in premium status.</string>
 
 
     <string name="BindingManagerActivity_HeaderText">Manage Binding-Data</string>
@@ -368,8 +369,20 @@
     <string name="AddDeviceActivityMissingPermissionResolutionText2">2. If your device could be paired, go to settings and pair it. It will then appear in the list below.</string>
 
     <string name="PremiumInfoActivity_LaRoomyBrandingText">LaRoomy</string>
-    <string name="PremiumInfoActivity_ActionHeaderText">Become a Premium User and unlock all App-Capabilities.</string>
-    <string name="PremiumInfoActivity_ActionSubText">By purchasing the premium-status once, all functions will be unlocked. App development and maintenance is a time-consuming and pricey matter. With your purchase you help to keep this project active.</string>
+    <string name="PremiumInfoActivity_ActionHeaderText">Become a Premium User and unlock all App-Capabilities:</string>
+    <string name="PremiumInfoActivity_ActionSubText">By purchasing the premium-status once, all functions will be unlocked forever. App development and maintenance is a time-consuming and pricey matter. With your purchase you help to keep this project active.</string>
+    <string name="PremiumInfoActivity_AdvantageOneText">Unlimited number of Devices</string>
+    <string name="PremiumInfoActivity_AdvantageTwoText">Access to all Device Properties</string>
+    <string name="PremiumInfoActivity_AdvantageThreeText">Images for devices and Device Properties</string>
+    <string name="PremiumInfoActivity_AdvantageFourText">Connection log creation</string>
+    <string name="PremiumInfoActivity_AdvantageFiveText">Custom UUID Profiles</string>
+    <string name="PremiumInfoActivity_ActionButtonText">Unlock Premium Status</string>
+    <string name="PremiumInfoActivity_NonPremiumHeaderText">When used in non premium condition, the app runs with the following limitations:</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementOneText">Only two devices can be added to the device-list at the same time</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementTwoText">Complex-Type Device Properties cannot be used</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementThreeText">Device and Property Icons will not be shown</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementFourText">Connection Log cannot be created</string>
+    <string name="PremiumInfoActivity_NonPremiumListElementFiveText">Only predefined UUID profiles can be used</string>
 
 
     <!-- content descriptions and labels -->
