@@ -52,7 +52,6 @@
             android:minHeight="48dp"
             android:minWidth="48dp"
             android:layout_marginEnd="10dp"
-            android:onClick="onAddUUIDProfileButtonClick"
             android:src="@drawable/ic_add_36dp"
             android:background="@color/transparentViewColor"
             android:contentDescription="@string/ManageUUIDProfileActivityAddButtonContentDescription"
@@ -87,7 +86,46 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-
     />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/uuidProfileActivityNoPremiumBanner"
+        android:minHeight="80dp"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:background="@drawable/manage_uuid_profiles_activity_action_banner_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/uuidProfileActivityNoPremiumBannerImageView"
+            android:src="@drawable/ic_info_48dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/UUIDProfileActivity_NoPremiumHint"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/uuidProfileActivityNoPremiumBannerImageView"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

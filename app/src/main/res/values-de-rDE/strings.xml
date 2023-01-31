@@ -333,6 +333,7 @@
     <string name="AppHelpActivity_Topic_AppReset_P2">Beim zurücksetzen des Standard-Bindungsschlüssels ist Vorsicht geboten. Wenn dieser zurückgesetzt wird, dann wird ein neuer interner Schlüssel generiert. Sollten eventuelle nicht gelöste Bindungen zu Geräten bestehen, dann wird der Verbindungsprozess mit diesen Geräten fehlschlagen.</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
+    <string name="UUIDProfileActivity_NoPremiumHint">Nur Premium Benutzer können neue Profile erstellen oder vorhandene Profile ändern.</string>
 
     <string name="ViewLogActivity_HeaderText">Verbindungs-Protokoll</string>
     <string name="ViewLogActivity_NotificationNoLogDataAvailable">Keine Protokolldaten vorhanden</string>

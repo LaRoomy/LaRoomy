@@ -315,6 +315,7 @@
     <string name="AppHelpActivity_Topic_AppReset_P2">Be careful when resetting the default binding key. If it is reset, a new internal key will be generated. If there are existing bindings to devices which require the old key, the connection process with these devices will fail.</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
+    <string name="UUIDProfileActivity_NoPremiumHint">Only Premium users can create new profiles or modify existing profiles.</string>
 
     <string name="ViewLogActivity_HeaderText">Connection Log</string>
     <string name="ViewLogActivity_NotificationNoLogDataAvailable">No Log-Data available</string>

@@ -21,7 +21,7 @@
 
     <!-- Text Colors ************************************************************************* -->
     <color name="normalTextColor">#FF000000</color>
-    <color name="disabledTextColor">#FF555555</color>
+    <color name="disabledTextColor">#FF888888</color>
     <color name="selectedTextColor">#FF16354D</color>
     <color name="disconnectedTextColor">#FFBB3333</color>
     <color name="connectedTextColor">#FF057304</color>
@@ -122,6 +122,8 @@
     <color name="uuidListSelectedItemColor">#FFCCCCCC</color>
     <color name="manage_uuids_list_element_background_color">#FFCCCCCC</color>
     <color name="manage_uuids_list_element_selected_background_color">#FFBBBBBB</color>
+    <color name="manage_uuid_profiles_action_banner_background_color">#FFCCCCDD</color>
+    <color name="manage_uuid_profiles_list_element_disabled_text_color">#FF999999</color>
     <!-- ************************************************************************************* -->
 
     <!-- Manage Binding Data Activity ******************************************************** -->

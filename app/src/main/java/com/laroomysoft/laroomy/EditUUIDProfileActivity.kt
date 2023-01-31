@@ -86,7 +86,7 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                     if (strIndex.isNotEmpty())
                         elementIndex = strIndex.toInt()
 
-                    if(elementIndex < FIRST_USERPROFILE_INDEX){
+                    if(elementIndex < UUID_MANAGER_FIRST_USERPROFILE_INDEX){
                         // if the index is lower than 2 -> mark all as readonly and notify user
                         saveButton.isEnabled = false
                         deleteButton.isEnabled = false
@@ -231,20 +231,20 @@ class EditUUIDProfileActivity : AppCompatActivity() {
                 profile
             )
             when(result){
-                CHANGE_SUCCESS -> finish()
-                UUID_SERVICE_INVALID -> {
+                UUID_MANGER_CHANGE_SUCCESS -> finish()
+                UUID_MANAGER_UUID_SERVICE_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.errorLightColor)
                 }
-                UUID_RX_CHAR_INVALID -> {
+                UUID_MANAGER_UUID_RX_CHAR_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.errorLightColor)
                 }
-                UUID_TX_CHAR_INVALID -> {
+                UUID_MANAGER_UUID_TX_CHAR_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.errorLightColor)
                 }
-                UUID_FORMAT_INVALID -> {
+                UUID_MANAGER_UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification), R.color.errorLightColor)
                 }
@@ -253,27 +253,27 @@ class EditUUIDProfileActivity : AppCompatActivity() {
         } else {
             //  this must be a new-action
             when ((applicationContext as ApplicationProperty).uuidManager.addNewProfile(profile)) {
-                ADD_SUCCESS -> finish()
-                UUID_SERVICE_INVALID -> {
+                UUID_MANAGER_ADD_SUCCESS -> finish()
+                UUID_MANAGER_UUID_SERVICE_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidServiceUUIDNotification), R.color.errorLightColor)
                 }
-                UUID_RX_CHAR_INVALID -> {
+                UUID_MANAGER_UUID_RX_CHAR_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidRxCharUUIDNotification), R.color.errorLightColor)
                 }
-                UUID_TX_CHAR_INVALID -> {
+                UUID_MANAGER_UUID_TX_CHAR_INVALID -> {
                     // notify user and do not finish
                     notifyUser(getString(R.string.EditUUIDProfileActivityInvalidTxCharUUIDNotification), R.color.errorLightColor)
                 }
-                UUID_FORMAT_INVALID -> {
+                UUID_MANAGER_UUID_FORMAT_INVALID -> {
                     // notify user and do not finish
                     notifyUser(
                         getString(R.string.EditUUIDProfileActivityInvalidUUIDNotification),
                         R.color.errorLightColor
                     )
                 }
-                PROFILE_NAME_ALREADY_EXIST -> {
+                UUID_MANAGER_PROFILE_NAME_ALREADY_EXIST -> {
                     // notify user and do not finish
                     notifyUser(
                         getString(R.string.EditUUIDProfileActivityProfileNameAlreadyExistNotification),

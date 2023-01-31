@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
         // init recycler view
         this.availableDevicesViewManager = LinearLayoutManager(this)
-        this.availableDevicesViewAdapter = AvailableDevicesListAdapter(this.availableDevices, this)
+        this.availableDevicesViewAdapter = AvailableDevicesListAdapter(this.availableDevices, this, this.appProperty)
         this.availableDevicesRecyclerView =
             findViewById<RecyclerView>(R.id.AvailableDevicesListView)
                 .apply {
@@ -359,6 +359,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         if(verboseLog){
             Log.d("MainActivity", "List Element Clicked at index: $index with name: ${data.name} and address: ${data.address}")
         }
+        
+        // TODO: implement onClick - no premium, index higher than 1 condition !!
+        
         if(!preventListSelection) {
             setItemColors(
                 index,
@@ -643,7 +646,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     class AvailableDevicesListAdapter(
         private val laRoomyDevListAdapter : ArrayList<LaRoomyDevicePresentationModel>,
-        private val deviceListItemClickListener: OnDeviceListItemClickListener
+        private val deviceListItemClickListener: OnDeviceListItemClickListener,
+        private val appProp: ApplicationProperty
     ) : RecyclerView.Adapter<AvailableDevicesListAdapter.DSLRViewHolder>() {
 
         class DSLRViewHolder(val constraintLayout: ConstraintLayout) :
@@ -666,12 +670,30 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
 
         override fun onBindViewHolder(holder: DSLRViewHolder, position: Int) {
+            
+            
+            val premiumCondition = (position < 2) || appProp.premiumManager.isPremiumAppVersion
+            
+            
             // set the device-name
-            holder.constraintLayout.findViewById<TextView>(R.id.deviceNameTextView).text = laRoomyDevListAdapter[position].name
+            holder.constraintLayout.findViewById<AppCompatTextView>(R.id.deviceNameTextView).apply {
+                text = laRoomyDevListAdapter.elementAt(position).name
+                if(!premiumCondition){
+                    setTextColor(appProp.getColor(R.color.disabledTextColor))
+                }
+            }
+            
             // set the appropriate image for the device type
-            holder.constraintLayout.findViewById<ImageView>(R.id.myDevicesListElementImageView).setImageResource(laRoomyDevListAdapter[position].image)
+            
+            holder.constraintLayout.findViewById<AppCompatImageView>(R.id.myDevicesListElementImageView).apply {
+                if(premiumCondition) {
+                    setImageResource(laRoomyDevListAdapter.elementAt(position).image)
+                } else {
+                    setImageResource(R.drawable.ic_181_bluetooth_dis)
+                }
+            }
     
-            holder.bind(laRoomyDevListAdapter[position], deviceListItemClickListener)
+            holder.bind(laRoomyDevListAdapter.elementAt(position), deviceListItemClickListener)
         }
 
         override fun getItemCount(): Int {

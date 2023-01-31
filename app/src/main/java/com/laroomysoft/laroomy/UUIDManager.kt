@@ -8,18 +8,16 @@ import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
-const val ADD_SUCCESS = 0
-const val CHANGE_SUCCESS = 0
-const val PROFILE_NAME_ALREADY_EXIST = 1
-const val UUID_FORMAT_INVALID = 2
-const val INVALID_INDEX = 3
-const val UUID_SERVICE_INVALID = 4
-const val UUID_RX_CHAR_INVALID = 5
-const val UUID_TX_CHAR_INVALID = 6
+const val UUID_MANAGER_ADD_SUCCESS = 0
+const val UUID_MANGER_CHANGE_SUCCESS = 0
+const val UUID_MANAGER_PROFILE_NAME_ALREADY_EXIST = 1
+const val UUID_MANAGER_UUID_FORMAT_INVALID = 2
+const val UUID_MANAGER_INVALID_INDEX = 3
+const val UUID_MANAGER_UUID_SERVICE_INVALID = 4
+const val UUID_MANAGER_UUID_RX_CHAR_INVALID = 5
+const val UUID_MANAGER_UUID_TX_CHAR_INVALID = 6
 
-const val FIRST_USERPROFILE_INDEX = 3
-
-const val UUID_File_UserProfiles = "uuidUserProfiles"
+const val UUID_MANAGER_FIRST_USERPROFILE_INDEX = 3
 
 class UUIDProfile{
     fun clear() {
@@ -49,6 +47,8 @@ class UUIDProfile{
 }
 
 class UUIDManager(private var appContext: Context) {
+    
+    private val uUIDFileUserProfiles = "uuidUserProfiles"
 
     private val rn4870TransparentUartServiceUUID: UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455")
     private val rxRN4870CharacteristicUUID: UUID = UUID.fromString("49535343-1e4d-4bd9-ba61-23c647249616")
@@ -118,7 +118,7 @@ class UUIDManager(private var appContext: Context) {
 
     fun clearAllUserProfiles(){
 
-        if(this.uUIDProfileList.size > FIRST_USERPROFILE_INDEX)
+        if(this.uUIDProfileList.size > UUID_MANAGER_FIRST_USERPROFILE_INDEX)
         {
             // clear the list
             this.uUIDProfileList.clear()
@@ -149,7 +149,7 @@ class UUIDManager(private var appContext: Context) {
                 this.add(hmXXProfile)
             }
             // delete the file
-            File(appContext.filesDir, UUID_File_UserProfiles).apply {
+            File(appContext.filesDir, uUIDFileUserProfiles).apply {
                 delete()
             }
         }
@@ -157,13 +157,13 @@ class UUIDManager(private var appContext: Context) {
 
     fun changeExistingProfile(index: Int, profile: UUIDProfile) : Int {
 
-        return if(index < FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
-            INVALID_INDEX
+        return if(index < UUID_MANAGER_FIRST_USERPROFILE_INDEX && index >= this.uUIDProfileList.size){
+            UUID_MANAGER_INVALID_INDEX
         } else {
             return when {
-                !checkUUIDFormat(profile.serviceUUID.toString()) -> UUID_SERVICE_INVALID
-                !checkUUIDFormat(profile.rxCharacteristicUUID.toString()) -> UUID_RX_CHAR_INVALID
-                !checkUUIDFormat(profile.txCharacteristicUUID.toString()) -> UUID_TX_CHAR_INVALID
+                !checkUUIDFormat(profile.serviceUUID.toString()) -> UUID_MANAGER_UUID_SERVICE_INVALID
+                !checkUUIDFormat(profile.rxCharacteristicUUID.toString()) -> UUID_MANAGER_UUID_RX_CHAR_INVALID
+                !checkUUIDFormat(profile.txCharacteristicUUID.toString()) -> UUID_MANAGER_UUID_TX_CHAR_INVALID
                 else -> {
                     this.uUIDProfileList[index].profileName = profile.profileName
                     this.uUIDProfileList[index].useSingleCharacteristic =
@@ -173,7 +173,7 @@ class UUIDManager(private var appContext: Context) {
                     this.uUIDProfileList[index].txCharacteristicUUID = profile.txCharacteristicUUID
             
                     this.saveUserProfiles()
-                    CHANGE_SUCCESS
+                    UUID_MANGER_CHANGE_SUCCESS
                 }
             }
         }
@@ -183,14 +183,14 @@ class UUIDManager(private var appContext: Context) {
 
         if((index > -1) && (index < uUIDProfileList.size)){
 
-            if(index >= FIRST_USERPROFILE_INDEX){
+            if(index >= UUID_MANAGER_FIRST_USERPROFILE_INDEX){
 
                 this.uUIDProfileList.removeAt(index)
 
-                if(this.uUIDProfileList.size <= FIRST_USERPROFILE_INDEX)
+                if(this.uUIDProfileList.size <= UUID_MANAGER_FIRST_USERPROFILE_INDEX)
                 {
                     // delete the file
-                    File(appContext.filesDir, UUID_File_UserProfiles).apply {
+                    File(appContext.filesDir, uUIDFileUserProfiles).apply {
                         delete()
                     }
                 } else {
@@ -205,36 +205,36 @@ class UUIDManager(private var appContext: Context) {
             // first check if the name already exists
             for (uuidProfile in this.uUIDProfileList) {
                 if (uuidProfile.profileName == profile.profileName) {
-                    return PROFILE_NAME_ALREADY_EXIST
+                    return UUID_MANAGER_PROFILE_NAME_ALREADY_EXIST
                 }
             }
             // then check the uuid-format
             return when {
-                !checkUUIDFormat(profile.serviceUUID.toString()) -> UUID_SERVICE_INVALID
-                !checkUUIDFormat(profile.rxCharacteristicUUID.toString()) -> UUID_RX_CHAR_INVALID
-                !checkUUIDFormat(profile.txCharacteristicUUID.toString()) -> UUID_TX_CHAR_INVALID
+                !checkUUIDFormat(profile.serviceUUID.toString()) -> UUID_MANAGER_UUID_SERVICE_INVALID
+                !checkUUIDFormat(profile.rxCharacteristicUUID.toString()) -> UUID_MANAGER_UUID_RX_CHAR_INVALID
+                !checkUUIDFormat(profile.txCharacteristicUUID.toString()) -> UUID_MANAGER_UUID_TX_CHAR_INVALID
                 else -> {
                     // everything is ok, so add the profile
                     this.uUIDProfileList.add(profile)
                     // write the new profile-list to file
                     this.saveUserProfiles()
         
-                    ADD_SUCCESS
+                    UUID_MANAGER_ADD_SUCCESS
                 }
             }
         } catch(e: Exception){
-            return UUID_FORMAT_INVALID
+            return UUID_MANAGER_UUID_FORMAT_INVALID
         }
     }
 
     private fun saveUserProfiles(){
         // only save the user-defined profiles
-        if(this.uUIDProfileList.size > FIRST_USERPROFILE_INDEX){
+        if(this.uUIDProfileList.size > UUID_MANAGER_FIRST_USERPROFILE_INDEX){
 
             val pList = ArrayList<UUIDProfile>()
 
             this.uUIDProfileList.forEachIndexed { index, uuidProfile ->
-                if(index >= FIRST_USERPROFILE_INDEX){
+                if(index >= UUID_MANAGER_FIRST_USERPROFILE_INDEX){
                     pList.add(uuidProfile)
                 }
             }
@@ -399,7 +399,7 @@ class UUIDManager(private var appContext: Context) {
     }
 
     private fun bufferToFile(buffer: String){
-        appContext.openFileOutput(UUID_File_UserProfiles, Context.MODE_PRIVATE).use {
+        appContext.openFileOutput(uUIDFileUserProfiles, Context.MODE_PRIVATE).use {
             it.write(buffer.toByteArray())
         }
     }
@@ -409,7 +409,7 @@ class UUIDManager(private var appContext: Context) {
         val lineList = ArrayList<String>()
 
         try {
-            appContext.openFileInput(UUID_File_UserProfiles).bufferedReader().use { bReader ->
+            appContext.openFileInput(uUIDFileUserProfiles).bufferedReader().use { bReader ->
                 bReader.forEachLine {
                     lineList.add(it)
                 }
