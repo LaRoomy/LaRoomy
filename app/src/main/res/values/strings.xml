@@ -28,7 +28,7 @@
     <!-- check if this is really necessary??? -->
     <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
 
-    <string name="CA_BindingPasskeyRejected">Wrong binding-passkey: connection rejected</string>
+    <string name="CA_BindingPasskeyRejected">Invalid binding-passkey: connection rejected</string>
     <string name="CA_BindingNotActivated">Binding required but not activated in App-Settings</string>
     <string name="CA_TimeoutForConnection">Timeout: Device not reachable</string>
     <string name="CA_ErrorDeviceListIndexInvalid">Invalid Device-List index</string>
@@ -36,6 +36,7 @@
     <string name="CA_InitTimeoutOccurred">Timeout: Remote device not responding</string>
     <string name="CA_TransmissionTimeoutOccurred">Transmission timeout: Remote device not responding</string>
     <string name="CA_FirstTimeoutSecondTryout">Cannot connect to device. Trying again..</string>
+    <string name="LoadingActivity_NoPremiumStandAloneNotAllowed">The requested device property is a premium feature. Connection process will be aborted.</string>
 
     <string name="DMA_ConnectionStatus_disconnected">disconnected</string>
     <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">disconnected - trying to reconnect</string>

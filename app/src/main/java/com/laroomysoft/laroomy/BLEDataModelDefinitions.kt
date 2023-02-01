@@ -1791,6 +1791,12 @@ class DevicePropertyListContentInformation(val elementType: Int) {
     // NOTE: when creating an object, do only set the descriptor, the elementText will be set automatically
 
     fun update(context: Context){
+        // at very first - check if this is non-premium and disable all complex types
+        if(!(context.applicationContext as ApplicationProperty).isPremiumAppVersion){
+            if((this.elementType == PROPERTY_ELEMENT)&&(this.propertyType >= COMPLEX_PROPERTY_START_INDEX)){
+                this.isEnabled = false
+            }
+        }
         // at first set the right image resource id
         this.imageResourceID = if(this.isEnabled) {
             resourceIdForImageId(this.imageID, this.elementType, (context.applicationContext as ApplicationProperty).isPremiumAppVersion)
@@ -2077,7 +2083,7 @@ class LaRoomyDeviceProperty {
     var groupIndex = -1
     var imageID = -1
     var propertyState = -1
-    var flags = -1
+    private var flags = -1
     var complexPropertyState = ComplexPropertyState()
     var isEnabled = true
 

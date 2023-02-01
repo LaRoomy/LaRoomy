@@ -37,6 +37,8 @@
     <string name="CA_InitTimeoutOccurred">Zeitüberschreitung während der Initialisierung: Gerät antwortet nicht</string>
     <string name="CA_TransmissionTimeoutOccurred">Zeitüberschreitung während der Übertragung: Gerät antwortet nicht</string>
     <string name="CA_FirstTimeoutSecondTryout">Verbindung kann nicht hergestellt werden. Erneuter Versuch..</string>
+    <string name="LoadingActivity_NoPremiumStandAloneNotAllowed">Dieses Gerät nutzt Geräte-Eigenschaften die nur als Premium Benutzer verfügbar sind.</string>
+
 
 
     <string name="DMA_ConnectionStatus_disconnected">getrennt</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="common_textSize_normalText">16sp</dimen>
+    <!--<dimen name="common_textSize_normalText">16sp</dimen>-->
 
 
     <!-- Information-Activity -->

@@ -469,10 +469,22 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
     }
     
     override fun onStandAlonePropertyModePreparationComplete() {
-        // hide the loading indicator
-        runOnUiThread {
-            this.spinKitView.visibility = View.INVISIBLE
+        
+        // check for premium since the standalone mode uses complex properties, and they only for premium users
+        if(!(applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion){
+            // non premium > notify user
+            runOnUiThread {
+                this.spinKitView.visibility = View.GONE
+            }
+            this.setMessageText(R.color.important_text_color, getString(R.string.LoadingActivity_NoPremiumStandAloneNotAllowed))
+            return
+        } else {
+            // hide the loading indicator
+            runOnUiThread {
+                this.spinKitView.visibility = View.INVISIBLE
+            }
         }
+        
         // prevent the normal onPause execution (otherwise a disconnection would occur)
         this.preventNormalOnPauseExecution = true
         

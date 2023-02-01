@@ -114,7 +114,7 @@ class DevicePropertyCacheData {
     }
 }
 
-class PropertyCacheManager(val appContext: Context) {
+class PropertyCacheManager(private val appContext: Context) {
 
     fun savePCacheData(devicePropertyCacheData: DevicePropertyCacheData, macAddress: String) {
         if (macAddress.isNotEmpty()) {

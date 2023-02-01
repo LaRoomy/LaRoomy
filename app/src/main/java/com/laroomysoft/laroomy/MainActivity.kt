@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -359,23 +360,29 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         if(verboseLog){
             Log.d("MainActivity", "List Element Clicked at index: $index with name: ${data.name} and address: ${data.address}")
         }
+        // check non-premium condition
+        if(!appProperty.premiumManager.isPremiumAppVersion && index > NON_PREMIUM_MAX_DEVICE_LIST_INDEX){
+            // the user has not purchased and test period is over
+            // so bounce the premium banner and do nothing else
+            val bannerAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+            this.actionBanner.startAnimation(bannerAnimation)
+        } else {
+            // normal execution
+            if (!preventListSelection) {
+                setItemColors(
+                    index,
+                    R.color.max_contrast_text_color,
+                    R.drawable.my_devices_list_element_selected_background
+                )
         
-        // TODO: implement onClick - no premium, index higher than 1 condition !!
+                val intent =
+                    Intent(this@MainActivity, LoadingActivity::class.java)
+                intent.putExtra("DeviceListIndex", index)
+                startActivity(intent)
         
-        if(!preventListSelection) {
-            setItemColors(
-                index,
-                R.color.max_contrast_text_color,
-                R.drawable.my_devices_list_element_selected_background
-            )
-
-            val intent =
-                Intent(this@MainActivity, LoadingActivity::class.java)
-            intent.putExtra("DeviceListIndex", index)
-            startActivity(intent)
-            
-            // set param for auto-connect function
-            (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+                // set param for auto-connect function
+                (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+            }
         }
     }
     
@@ -671,9 +678,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
         override fun onBindViewHolder(holder: DSLRViewHolder, position: Int) {
             
-            
-            val premiumCondition = (position < 2) || appProp.premiumManager.isPremiumAppVersion
-            
+            val premiumCondition =
+                (position <= NON_PREMIUM_MAX_DEVICE_LIST_INDEX) || appProp.premiumManager.isPremiumAppVersion
             
             // set the device-name
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.deviceNameTextView).apply {
@@ -684,7 +690,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             }
             
             // set the appropriate image for the device type
-            
             holder.constraintLayout.findViewById<AppCompatImageView>(R.id.myDevicesListElementImageView).apply {
                 if(premiumCondition) {
                     setImageResource(laRoomyDevListAdapter.elementAt(position).image)
@@ -692,7 +697,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                     setImageResource(R.drawable.ic_181_bluetooth_dis)
                 }
             }
-    
             holder.bind(laRoomyDevListAdapter.elementAt(position), deviceListItemClickListener)
         }
 

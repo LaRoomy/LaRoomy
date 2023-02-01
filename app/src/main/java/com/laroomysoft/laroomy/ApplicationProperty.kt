@@ -74,6 +74,9 @@ const val TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT:Long = 1000
 const val DEV_HEADER_CLICK_ACTION_NONE = 0
 const val DEV_HEADER_CLICK_ACTION_COMPLEX_RELOAD = 1
 
+// max values
+const val NON_PREMIUM_MAX_DEVICE_LIST_INDEX = 1
+
 class ApplicationProperty : Application() {
 
     companion object {
