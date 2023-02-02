@@ -47,6 +47,7 @@ class PremiumManager(private val appContext: Context) {
     
                 // first usage: mark the test period as started
                 appProperty.saveBooleanData(true, R.string.FileKey_PremVersion, R.string.DataKey_TestPeriodStarted)
+                
                 this.isTestPeriodActive = true
                 
                 // get the current date

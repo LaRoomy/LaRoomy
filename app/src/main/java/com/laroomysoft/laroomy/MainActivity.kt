@@ -580,7 +580,19 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     private fun resetSelectionInDeviceListView(){
         for(x in 0 until this.availableDevices.size){
-            setItemColors(x, R.color.max_contrast_text_color, R.drawable.my_devices_list_element_background)
+            if(appProperty.premiumManager.isPremiumAppVersion || x < 2) {
+                setItemColors(
+                    x,
+                    R.color.max_contrast_text_color,
+                    R.drawable.my_devices_list_element_background
+                )
+            } else {
+                setItemColors(
+                    x,
+                    R.color.disabledTextColor,
+                    R.drawable.my_devices_list_element_background
+                )
+            }
         }
     }
     
@@ -686,6 +698,8 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 text = laRoomyDevListAdapter.elementAt(position).name
                 if(!premiumCondition){
                     setTextColor(appProp.getColor(R.color.disabledTextColor))
+                } else {
+                    setTextColor(appProp.getColor(R.color.max_contrast_text_color))
                 }
             }
             
