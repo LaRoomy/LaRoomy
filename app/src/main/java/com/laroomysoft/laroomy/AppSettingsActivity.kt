@@ -514,12 +514,15 @@ class AppSettingsActivity : AppCompatActivity() {
     }
     
     private fun onShowLogButtonClick(view: View) {
-        if (this.enableLogSwitch.isChecked) {
+        // the show log button is only clickable if the enable-log switch is checked and in a premium condition (purchased or testPeriod)
+        if (this.enableLogSwitch.isChecked && (applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion) {
+            // indicate button down
             (view as ConstraintLayout).apply {
                 setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
             }
+            // schedule normalization
             this.buttonNormalizationRequired = true
-            
+            // invoke ViewLogActivity
             val intent = Intent(this@AppSettingsActivity, ViewLogActivity::class.java)
             intent.putExtra("wasInvokedFromSettingsActivity", true)
             startActivity(intent)
@@ -531,22 +534,26 @@ class AppSettingsActivity : AppCompatActivity() {
     }
     
     private fun onBindingManagerButtonClick(view: View){
+        // indicate button down
         (view as ConstraintLayout).apply {
             setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
         }
+        // schedule normalization
         this.buttonNormalizationRequired = true
-        
+        // invoke BindingManagerActivity
         val intent = Intent(this@AppSettingsActivity, BindingManagerActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
     }
 
     private fun onResetDataButtonClick(view: View) {
+        // indicate button down
         (view as ConstraintLayout).apply {
             setBackgroundColor(getColor(R.color.setupActivityButtonPressedBackground))
         }
+        // schedule normalization
         this.buttonNormalizationRequired = true
-
+        // invoke ResetAppActivity
         val intent = Intent(this@AppSettingsActivity, ResetAppDataActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)

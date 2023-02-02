@@ -26,7 +26,7 @@
     <color name="disconnectedTextColor">#FFBB3333</color>
     <color name="connectedTextColor">#FF057304</color>
     <color name="connectingTextColor">#FF4A4704</color>
-    <color name="clickableTextColor">#15677C</color>
+    <color name="clickableTextColor">#15447C</color>
     <color name="max_contrast_text_color">#FF000000</color>
     <color name="important_text_color">#FF000000</color>
     <!-- ************************************************************************************* -->
@@ -73,7 +73,7 @@
 
     <!-- Settings Activity ****************************************************************** -->
     <color name="setupActivityButtonNormalBackground">#FFCCCCCC</color>
-    <color name="setupActivityButtonDisabledBackground">#FF888888</color>
+    <color name="setupActivityButtonDisabledBackground">#FFBBBBBB</color>
     <color name="setupActivityButtonPressedBackground">#FFBBBBBB</color>
     <color name="setup_activity_popup_background_color">#FFDDDDDD</color>
     <!-- ************************************************************************************* -->

@@ -183,12 +183,20 @@ class ManageUUIDProfilesActivity : AppCompatActivity(), OnUUIDProfileListItemCli
                         }
                 }
             } else {
-                // is not premium, if the user has not purchased, set item to non-premium state
-                if(position >= firstUserProfileIndex){
-                    holder.linearLayout.findViewById<AppCompatTextView>(R.id.profileListItemProfileNameTextView)
-                        .apply {
+                // is not premium, if the user has not purchased, set item to non-premium state except this is a static profile
+                val isUserProfile = (position >= firstUserProfileIndex)
+    
+                holder.linearLayout.findViewById<AppCompatTextView>(R.id.profileListItemProfileNameTextView)
+                    .apply {
+                        // if this is a user profile -> set disabled text color
+                        if (isUserProfile) {
                             setTextColor(this.context.getColor(R.color.disabledTextColor))
                         }
+                        // set item text always
+                        text = element.profileName
+                    }
+                // if this is a user profile -> set disabled image
+                if(isUserProfile) {
                     holder.linearLayout.findViewById<AppCompatImageView>(R.id.profileListItemProfileImage)
                         .apply {
                             setImageResource(R.drawable.link_inclined_disabled_36dp)

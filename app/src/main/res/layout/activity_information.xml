@@ -259,6 +259,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
+                    android:maxWidth="600dp"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
                     android:text="@string/InfoActivity_PrivacyPolicy_Text"
@@ -299,6 +300,7 @@
                     android:id="@+id/infoActivityICUContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -358,6 +360,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
+                    android:maxWidth="600dp"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
                     android:text="@string/InfoActivity_PP_LogDataText"
@@ -397,6 +400,7 @@
                     android:id="@+id/infoActivityLinksToOtherSitesContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -438,6 +442,7 @@
                     android:id="@+id/infoActivityChangesContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -479,6 +484,7 @@
                     android:id="@+id/infoActivityContactUsContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -564,6 +570,7 @@
                     android:id="@+id/infoActivityTermsOfServiceContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -581,6 +588,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:minHeight="48dp"
                     android:onClick="onGooglePlayServiceLinkClick"
                     android:text="@string/InfoActivity_PP_ThirdPartyServiceLink_one"
                     android:textColor="@color/clickableTextColor"
@@ -593,6 +601,7 @@
                     android:id="@+id/infoActivityTermsOfServiceContent2TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -635,6 +644,7 @@
                     android:id="@+id/infoActivityTermsOfServiceChangesContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -676,6 +686,7 @@
                     android:id="@+id/infoActivityTermsOfServiceContactContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="4dp"
                     android:paddingStart="20dp"
@@ -727,9 +738,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:paddingBottom="15dp"
-
                 android:visibility="gone"
-
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsHeaderTextView">
@@ -737,6 +746,7 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="600dp"
                     android:id="@+id/infoActivityCreditsStartText"
                     android:text="@string/InfoActivity_CR_StartText"
                     android:textAlignment="center"
@@ -818,17 +828,18 @@
                     app:layout_constraintEnd_toEndOf="parent"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/infoActivityCreditsQuadFlaskLinkTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minHeight="48dp"
-                    android:id="@+id/infoActivityCreditsQuadFlaskLinkTextView"
-                    android:text="@string/InfoActivity_CR_ColorPicker_ActionLinkText"
                     android:gravity="center_vertical"
-                    android:textColor="@color/clickableTextColor"
+                    android:minHeight="48dp"
                     android:onClick="onQuadFlaskLinkClick"
-                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsQuadFlaskThanksText"
+                    android:text="@string/InfoActivity_CR_ColorPicker_ActionLinkText"
+                    android:textColor="@color/clickableTextColor"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsQuadFlaskThanksText"
+                    tools:ignore="DuplicateSpeakableTextCheck" />
 
                 <View
                     android:layout_width="match_parent"
@@ -1025,6 +1036,7 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxWidth="600dp"
                         android:id="@+id/infoActivityDisclaimerText"
                         android:text="@string/InfoActivity_Disclaimer_Text"
                         android:textAlignment="center"

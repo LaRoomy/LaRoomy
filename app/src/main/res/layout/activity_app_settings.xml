@@ -107,9 +107,11 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/setupActivityPremiumAppUserStatusTextView"
                     android:text="@string/SetupActivity_PremiumAppUserStatus_TestPeriod"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="15dp"
                     android:layout_marginEnd="10dp"
                     android:textSize="18sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     app:layout_constraintStart_toEndOf="@+id/setupActivityPremiumAppUserStatusDescriptorView"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -250,17 +252,19 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/setupActivityAutoConnectHintTextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
+            android:maxWidth="600dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_AutoConnectHint"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityAutoConnectContainer"
-            tools:ignore="TextContrastCheck,VisualLintLongText" />
+            tools:ignore="TextContrastCheck" />
 
         <View
             android:id="@+id/setupActivityFirstSeparatorView"
@@ -358,17 +362,19 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/setupActivitySavePropertiesHintTextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
+            android:maxWidth="600dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_SavePropertiesHint"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivitySavePropertiesContainer"
-            tools:ignore="TextContrastCheck,VisualLintLongText" />
+            tools:ignore="TextContrastCheck" />
 
         <View
             android:id="@+id/setupActivitySecondSeparatorView"
@@ -464,13 +470,15 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/setupActivityEnableLoggingHintTextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
+            android:maxWidth="600dp"
             android:alpha="0.5"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="@string/SetupActivity_EnableLoggingHint"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityEnableLoggingContainer"
