@@ -36,41 +36,109 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                     "onCreate in DataSharingActivity executed. Data decrypted: Mac Address: $macReformatted   PassKey: $passKeyDecrypted"
                 )
             }
-
-            if((applicationContext as ApplicationProperty).getCurrentUsedPasskey() == passKeyDecrypted){
-                // the executor of the sharing link is the originator, so do not save the passkey as shared passkey, since it equals the main-key
-                if(verboseLog){
-                    Log.w("KeySharing", "The shared passkey was not saved, because it equals the key in use")
+            
+            // TODO: clean up
+    
+            if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
+                // check a passkey exists for the mac address, if so, override it, otherwise skip
+                val bindingManager = BindingDataManager(applicationContext)
+                val bindingDataSet = bindingManager.lookUpForBindingData(macReformatted)
+                var save = false
+    
+                if (bindingDataSet.passKey == ERROR_NOTFOUND) {
+                    // there was no binding data saved before, so save it as sharing receiver
+                    save = true
+                } else {
+                    // binding data was found for this mac address, so check if originator
+                    if (bindingDataSet.generatedAsOriginator) {
+                        // the invoked sharing link was generated on this specific device
+                        // overriding it makes no sense because there remains no originator to release the binding
+                        // so do nothing, but log and notify user
+                        if (verboseLog) {
+                            Log.w(
+                                "KeySharing",
+                                "The shared passkey was not saved, because it already exists with originator privileges"
+                            )
+                        }
+                        (applicationContext as ApplicationProperty).logControl("W: The shared passkey was NOT saved, because it already exists with originator privileges.")
+                        // notify user
+                        notifyUser(
+                            getString(R.string.DataSharingActivity_Message_YouAreOriginator),
+                            R.color.normalTextColor
+                        )
+                    } else {
+                        // there was already data saved for this mac address, but the key could be new, so check
+                        if (bindingDataSet.passKey != passKeyDecrypted) {
+                            // the passkey defers, so update
+                            save = true
+                        } else {
+                            // notify user
+                            notifyUser(
+                                getString(R.string.DataSharingActivity_Message_DataAlreadySaved),
+                                R.color.normalTextColor
+                            )
+                        }
+                    }
                 }
-                (applicationContext as ApplicationProperty).logControl("W: The shared passkey was NOT saved, because it equals the key in use.")
-                // notify user
-                notifyUser(getString(R.string.DataSharingActivity_Message_YouAreOriginator), R.color.normalTextColor)
-            } else {
-
-                if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
-                    // data valid: save the data
+                // save if required:
+                if (save) {
                     val bindingData = BindingData()
                     bindingData.macAddress = macReformatted
                     bindingData.passKey = passKeyDecrypted
                     bindingData.generatedAsOriginator = false
-                    
-                    val bindingPairManager = BindingDataManager(applicationContext)
-                    bindingPairManager.addOrUpdate(bindingData)
-                    
+                    bindingManager.addOrUpdate(bindingData)
                     // notify user
                     notifyUser(
                         getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),
                         R.color.normalTextColor
                     )
-
-                } else {
-                    // error: notify user
-                    notifyUser(
-                        getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat),
-                        R.color.ErrorColor
-                    )
                 }
+            } else {
+                // invalid data error: notify user
+                notifyUser(
+                    getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat),
+                    R.color.ErrorColor
+                )
             }
+        
+    
+    
+    
+        // old: TODO clean up or so..
+//            if((applicationContext as ApplicationProperty).getCurrentUsedPasskey() == passKeyDecrypted){
+//                // the executor of the sharing link is the originator, so do not save the passkey as shared passkey, since it equals the main-key
+//                if(verboseLog){
+//                    Log.w("KeySharing", "The shared passkey was not saved, because it equals the key in use")
+//                }
+//                (applicationContext as ApplicationProperty).logControl("W: The shared passkey was NOT saved, because it equals the key in use.")
+//                // notify user
+//                notifyUser(getString(R.string.DataSharingActivity_Message_YouAreOriginator), R.color.normalTextColor)
+//            } else {
+//
+//                if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
+//                    // data valid: save the data
+//                    val bindingData = BindingData()
+//                    bindingData.macAddress = macReformatted
+//                    bindingData.passKey = passKeyDecrypted
+//                    bindingData.generatedAsOriginator = false
+//
+//                    //val bindingPairManager = BindingDataManager(applicationContext)
+//                    bindingManager.addOrUpdate(bindingData)
+//
+//                    // notify user
+//                    notifyUser(
+//                        getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),
+//                        R.color.normalTextColor
+//                    )
+//
+//                } else {
+//                    // error: notify user
+//                    notifyUser(
+//                        getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat),
+//                        R.color.ErrorColor
+//                    )
+//                }
+        
         }
     }
 

@@ -208,10 +208,11 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         itemTouchHelper.attachToRecyclerView(availableDevicesRecyclerView)
 
         // save a default passkey if no one is saved (this should only be executed once per installation)
-        if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey) == ERROR_NOTFOUND){
-            val defaultKey = createRandomPasskey(10)
-            (applicationContext as ApplicationProperty).saveStringData(defaultKey, R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
-        }
+        // TODO: clean up
+//        if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey) == ERROR_NOTFOUND){
+//            val defaultKey = createRandomPasskey(10)
+//            (applicationContext as ApplicationProperty).saveStringData(defaultKey, R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
+//        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -580,7 +581,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
 
     private fun resetSelectionInDeviceListView(){
         for(x in 0 until this.availableDevices.size){
-            if(appProperty.premiumManager.isPremiumAppVersion || x < 2) {
+            if(appProperty.premiumManager.isPremiumAppVersion || x <= NON_PREMIUM_MAX_DEVICE_LIST_INDEX) {
                 setItemColors(
                     x,
                     R.color.max_contrast_text_color,

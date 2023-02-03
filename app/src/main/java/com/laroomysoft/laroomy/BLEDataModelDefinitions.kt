@@ -2059,6 +2059,7 @@ class BLEDeviceData {
     var propertyCount = 0
     var groupCount = 0
     var passKeyTypeUsed = PASSKEY_TYPE_NONE
+    var pendingEnablePassKey = ""
 
     fun clear() {
         isBindingRequired = false
@@ -2071,6 +2072,7 @@ class BLEDeviceData {
         propertyCount = 0
         groupCount = 0
         passKeyTypeUsed = PASSKEY_TYPE_NONE
+        pendingEnablePassKey = ""
     }
 }
 

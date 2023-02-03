@@ -98,11 +98,7 @@ class BindingManagerActivity : AppCompatActivity() {
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.bindingDataListElementBindingTypeTextView).apply {
                 text = when(element.generatedAsOriginator){
                     true -> {
-                        if((holder.constraintLayout.context.applicationContext as ApplicationProperty).getCurrentUsedPasskey() == element.passKey){
-                            holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeAsOriginator)
-                        } else {
-                            holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeDeprecatedOriginator)
-                        }
+                        holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeAsOriginator)
                     }
                     else -> {
                         holder.constraintLayout.context.getString(R.string.BindingManagerActivity_BindingTypeAsSharingReceiver)

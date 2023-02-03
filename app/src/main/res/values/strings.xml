@@ -313,7 +313,10 @@
 
     <string name="AppHelpActivity_Topic_AppReset_HeaderText">Reset settings and data</string>
     <string name="AppHelpActivity_Topic_AppReset_P1">All settings and local saved data can be partially or complete deleted. To do that, go to \'Settings > Reset App\' and select the data you want to reset or delete.</string>
-    <string name="AppHelpActivity_Topic_AppReset_P2">Be careful when resetting the default binding key. If it is reset, a new internal key will be generated. If there are existing bindings to devices which require the old key, the connection process with these devices will fail.</string>
+    <string name="AppHelpActivity_Topic_AppReset_P2">Binding data is a special case and is not covered. To delete all or single binding datasets, the binding manager must be used. See the \"Device-Binding\" section for more info.</string>
+
+    <string name="AppHelpActivtiy_Topic_FurtherInformation_HeaderText">Further Information</string>
+    <string name="AppHelpActivtiy_Topic_FurtherInformation_P1">To get more information, visit the LaRoomy app website:</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
     <string name="UUIDProfileActivity_NoPremiumHint">Only Premium users can create new profiles or modify existing profiles.</string>
@@ -332,6 +335,7 @@
     <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Binding Data successful saved.</string>
     <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Error: Invalid data format.</string>
+    <string name="DataSharingActivity_Message_DataAlreadySaved">The binding data was already saved.</string>
     <string name="DataSharingActivity_Message_YouAreOriginator">You are the originator of the device binding. Implementing the key as a sharing receiver is not necessary.</string>
 
     <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profile</string>
@@ -453,8 +457,6 @@
     <!-- DataKeys: -->
     <string name="DataKey_LastSuccessfulConnectedDeviceAddress" translatable="false">lastSuccessfulConnectedDeviceAddress</string>
     <string name="DataKey_AutoConnect" translatable="false">autoConnectValue</string>
-    <string name="DataKey_DefaultRandomBindingPasskey" translatable="false">bindingPasskey</string>
-    <string name="DataKey_CustomBindingPasskey" translatable="false">customBindingPasskey</string>
     <string name="DataKey_SaveProperties" translatable="false">saveProperties</string>
     <string name="DataKey_EnableLog" translatable="false">enableLogging</string>
     <string name="DataKey_BindingPairStartKey" translatable="false">bindingPairStartKey</string>

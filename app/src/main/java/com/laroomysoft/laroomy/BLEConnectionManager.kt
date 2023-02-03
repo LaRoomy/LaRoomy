@@ -1420,7 +1420,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             applicationProperty.logControl("I: Binding is required. Searching the appropriate key for the mac address")
 
                             // binding is required, so send the binding request
-                            sendBindingRequest()
+                            sendBindingAuthenticationRequest()
                         }
                         else -> {
                             // no binding is required, so notify the subscriber of the callback
@@ -1569,6 +1569,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                                 )
                             }
                         }
+                        bleDeviceData.pendingEnablePassKey = ""
                     } else {
                         // enable binding success
                         if(verboseLog){
@@ -1579,6 +1580,22 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         this.propertyCallback.onBindingResponse(
                             BINDING_RESPONSE_BINDING_SUCCESS
                         )
+    
+                        // save binding info
+                        val bData = BindingData()
+                        val bManager = BindingDataManager(applicationProperty.applicationContext)
+                        
+                        this.currentDevice?.apply {
+                            bData.deviceName = this.name
+                            bData.macAddress = this.address
+                            bData.passKey = bleDeviceData.pendingEnablePassKey
+                            bData.generatedAsOriginator = true
+                            // save the binding dataset
+                            bManager.addOrUpdate(bData)
+                        }
+                        bleDeviceData.pendingEnablePassKey = ""
+                        this.bleDeviceData.isBindingRequired = true
+                        this.bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_NORM
                     }
                     return true
                 }
@@ -1618,6 +1635,14 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         this.propertyCallback.onBindingResponse(
                             BINDING_RESPONSE_RELEASE_BINDING_SUCCESS
                         )
+    
+                        // remove binding data
+                        val bData = BindingData()
+                        val bManager = BindingDataManager(applicationProperty.applicationContext)
+                        
+                        // here only the mac address is necessary
+                        bData.macAddress = this.currentDevice?.address ?: ""
+                        bManager.removeElement(bData)
                     }
                     return true
                 }
@@ -3062,32 +3087,38 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData(requestString)
     }
 
-    private fun sendBindingRequest(){
+    private fun sendBindingAuthenticationRequest(){
+        
+        // TODO: clean up
 
         val passKey: String
 
-        // at first look for a shared key for the device
+        // at first look key for the device
         val bindingPairManager = BindingDataManager(applicationProperty.applicationContext)
         val bindingData = bindingPairManager.lookUpForBindingData(this.currentDevice?.address ?: "")
 
-        // if a shared binding key for the mac address exists, the key is preferred,
-        // because a key from a sharing link will only be saved if it defers from the main key
+        // outdated: if a shared binding key for the mac address exists, the key is preferred,
+        // outdated: because a key from a sharing link will only be saved if it defers from the main key
 
+        // get the passkey
         passKey = if (bindingData.passKey.isNotEmpty() && (bindingData.passKey != ERROR_NOTFOUND)) {
-
-            bleDeviceData.passKeyTypeUsed = if(bindingData.generatedAsOriginator){
+    
+            bleDeviceData.passKeyTypeUsed = if (bindingData.generatedAsOriginator) {
                 PASSKEY_TYPE_NORM
             } else {
                 PASSKEY_TYPE_SHARED
             }
             bindingData.passKey
         } else {
-            bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_NORM
-            (applicationProperty.loadSavedStringData(
-                R.string.FileKey_AppSettings,
-                R.string.DataKey_DefaultRandomBindingPasskey
-            ))
+            ERROR_NOTFOUND
         }
+        //} else {
+//            bleDeviceData.passKeyTypeUsed = PASSKEY_TYPE_NORM
+//            (applicationProperty.loadSavedStringData(
+//                R.string.FileKey_AppSettings,
+//                R.string.DataKey_DefaultRandomBindingPasskey
+//            ))
+        //}
         if(passKey == ERROR_NOTFOUND){
             // critical error (should not happen)
             this.callback.onConnectionError(BLE_UNEXPECTED_CRITICAL_BINDING_KEY_MISSING)
@@ -3133,24 +3164,50 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.sendData(this.factoryResetCommand)
     }
 
-    fun enableDeviceBinding(passKey: String){
-        // build enable binding string
-        var bindingString = "6100"
-        bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
-        bindingString += "001$passKey\r"
-        // send it
-        this.sendData(bindingString)
-        this.bleDeviceData.isBindingRequired = true
+    fun enableDeviceBinding(){
+        
+        // TODO: clean up
+        
+//        // get passkey for this device
+//        val bManager = BindingDataManager(applicationProperty.applicationContext)
+//        val bData = this.currentDevice?.let { bManager.lookUpForBindingData(it.address) }
+//        if(bData != null) {
+        
+        val passKey = createRandomPasskey(10)
+        
+        this.bleDeviceData.pendingEnablePassKey = passKey
+        
+            // build enable binding string
+            var bindingString = "6100"
+            bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
+            bindingString += "001$passKey\r"
+            // send it
+            this.sendData(bindingString)
+        
+            //this.bleDeviceData.isBindingRequired = true
+        
+//        } else {
+//            Log.e("BLEConnectionManager", "Error: >enableDeviceBinding< : currentDevice was null")
+//            applicationProperty.logControl("E: Error enable device binding : currentDevice object or address was invalid")
+//        }
     }
 
-    fun releaseDeviceBinding(passKey: String){
-        // build release binding string
-        var bindingString = "6000"
-        bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
-        bindingString += "000$passKey\r"
-        // send it
-        this.sendData(bindingString)
-        this.bleDeviceData.isBindingRequired = false
+    fun releaseDeviceBinding(){
+        // get passkey for this device
+        val bManager = BindingDataManager(applicationProperty.applicationContext)
+        val bData = this.currentDevice?.let { bManager.lookUpForBindingData(it.address) }
+        if(bData != null) {
+            // build release binding string
+            var bindingString = "6000"
+            bindingString += a8bitValueTo2CharHexValue(bData.passKey.length + 2)
+            bindingString += "000${bData.passKey}\r"
+            // send it
+            this.sendData(bindingString)
+            this.bleDeviceData.isBindingRequired = false
+        } else {
+            Log.e("BLEConnectionManager", "Error: >releaseDeviceBinding< : currentDevice was null")
+            applicationProperty.logControl("E: Error while releasing device binding : currentDevice object or address was invalid")
+        }
     }
     
     fun updateInternalSimplePropertyState(internalIndex: Int, state: Int){

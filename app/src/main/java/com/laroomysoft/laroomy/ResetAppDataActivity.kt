@@ -17,9 +17,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
     private lateinit var selectAllCheckBox: AppCompatCheckBox
     private lateinit var resetAppSettingsCheckBox: AppCompatCheckBox
-    private lateinit var resetBindingDataCheckBox: AppCompatCheckBox
     private lateinit var resetUUIDProfilesCheckBox: AppCompatCheckBox
-    private lateinit var resetDefaultBindingKeyCheckBox: AppCompatCheckBox
     private lateinit var resetPropertyCacheCheckBox: AppCompatCheckBox
 
     private lateinit var notificationTextView: AppCompatTextView
@@ -53,15 +51,9 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
         this.resetAppSettingsCheckBox = findViewById(R.id.resetAppActivityResetAppSettingsCheckBox)
         this.resetAppSettingsCheckBox.setOnCheckedChangeListener(this)
-
-        this.resetBindingDataCheckBox = findViewById(R.id.resetAppActivityResetBindingDataCheckBox)
-        this.resetBindingDataCheckBox.setOnCheckedChangeListener(this)
-
+        
         this.resetUUIDProfilesCheckBox = findViewById(R.id.resetAppActivityResetUUIDProfilesCheckBox)
         this.resetUUIDProfilesCheckBox.setOnCheckedChangeListener(this)
-
-        this.resetDefaultBindingKeyCheckBox = findViewById(R.id.resetAppActivityResetDefaultBindingKeyCheckBox)
-        this.resetDefaultBindingKeyCheckBox.setOnCheckedChangeListener(this)
 
         this.resetPropertyCacheCheckBox = findViewById(R.id.resetAppActivityResetPropertyCacheCheckBox)
         this.resetPropertyCacheCheckBox.setOnCheckedChangeListener(this)
@@ -77,15 +69,11 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
 
                     if (p1) {
                         this.resetAppSettingsCheckBox.isChecked = true
-                        this.resetBindingDataCheckBox.isChecked = true
                         this.resetUUIDProfilesCheckBox.isChecked = true
-                        this.resetDefaultBindingKeyCheckBox.isChecked = true
                         this.resetPropertyCacheCheckBox.isChecked = true
                     } else {
                         this.resetAppSettingsCheckBox.isChecked = false
-                        this.resetBindingDataCheckBox.isChecked = false
                         this.resetUUIDProfilesCheckBox.isChecked = false
-                        this.resetDefaultBindingKeyCheckBox.isChecked = false
                         this.resetPropertyCacheCheckBox.isChecked = false
                     }
                 } else {
@@ -93,9 +81,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
                 }
             }
             else -> {
-                if (this.resetDefaultBindingKeyCheckBox.isChecked
-                    && this.resetAppSettingsCheckBox.isChecked
-                    && this.resetBindingDataCheckBox.isChecked
+                if (this.resetAppSettingsCheckBox.isChecked
                     && this.resetUUIDProfilesCheckBox.isChecked
                     && this.resetPropertyCacheCheckBox.isChecked) {
 
@@ -137,7 +123,7 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
         val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
         view.startAnimation(buttonAnimation)
 
-        if(this.resetAppSettingsCheckBox.isChecked || this.resetBindingDataCheckBox.isChecked || this.resetUUIDProfilesCheckBox.isChecked || this.resetDefaultBindingKeyCheckBox.isChecked || this.resetPropertyCacheCheckBox.isChecked) {
+        if(this.resetAppSettingsCheckBox.isChecked || this.resetUUIDProfilesCheckBox.isChecked || this.resetPropertyCacheCheckBox.isChecked) {
             val dialog = AlertDialog.Builder(this)
             dialog.setTitle(getString(R.string.ResetAppActivity_DialogTitle))
             dialog.setMessage(getString(R.string.ResetAppActivity_DialogMessage))
@@ -163,25 +149,12 @@ class ResetAppDataActivity : AppCompatActivity(), CompoundButton.OnCheckedChange
             (applicationContext as ApplicationProperty).deleteFileWithFileKey(R.string.FileKey_AppSettings)
             (applicationContext as ApplicationProperty).appSettingsResetDone = true
         }
-        if(this.resetBindingDataCheckBox.isChecked){
-            // if there are another future binding-data, clear it here!
-            val bindingPairManager = BindingDataManager(this.applicationContext)
-            bindingPairManager.clearAll()
-        }
         if(this.resetUUIDProfilesCheckBox.isChecked){
             try {
                 (applicationContext as ApplicationProperty).uuidManager.clearAllUserProfiles()
 
             } catch(ue: UninitializedPropertyAccessException){
                 Log.e("M:ResetData", "Reset error: UUIDManager not initialized")
-            }
-        }
-        if(this.resetDefaultBindingKeyCheckBox.isChecked){
-            val newKey = createRandomPasskey(COMMON_PASSKEY_LENGTH)
-            if(newKey.isNotEmpty()){
-                (applicationContext as ApplicationProperty).saveStringData(newKey, R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
-            } else {
-                Log.e("M:ResetData", "Reset error: generating random passkey failed.")
             }
         }
         if(this.resetPropertyCacheCheckBox.isChecked){

@@ -332,7 +332,11 @@
 
     <string name="AppHelpActivity_Topic_AppReset_HeaderText">App-Daten löschen</string>
     <string name="AppHelpActivity_Topic_AppReset_P1">Einstellungen und lokal gespeicherte Daten können ganz oder teilweise gelöscht werden. Unter \'Einstellungen > App zurücksetzen\' können die zu löschenden Elemente ausgewählt werden.</string>
-    <string name="AppHelpActivity_Topic_AppReset_P2">Beim zurücksetzen des Standard-Bindungsschlüssels ist Vorsicht geboten. Wenn dieser zurückgesetzt wird, dann wird ein neuer interner Schlüssel generiert. Sollten eventuelle nicht gelöste Bindungen zu Geräten bestehen, dann wird der Verbindungsprozess mit diesen Geräten fehlschlagen.</string>
+    <string name="AppHelpActivity_Topic_AppReset_P2">Bindungsbezogene Daten bilden einen Sonderfall. Um alle oder einzelne Bindungs-Datensätze zu löschen muss der Bindungdaten-Manager verwendet werden. Weitere Informationen finden Sie unter dem Punkt \"Geräte Bindung\".</string>
+
+    <string name="AppHelpActivtiy_Topic_FurtherInformation_HeaderText">Weitere Informationen</string>
+    <string name="AppHelpActivtiy_Topic_FurtherInformation_P1">Mehr Informationen finden Sie auf der LaRoomy Website:</string>
+
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
     <string name="UUIDProfileActivity_NoPremiumHint">Nur Premium Benutzer können neue Profile erstellen oder vorhandene Profile ändern.</string>
@@ -351,6 +355,7 @@
     <string name="DataSharingActivity_GoToMainButtonText">Zurück zur App</string>
     <string name="DataSharingActivity_BindingDataSuccessfulSet">Geräte-Bindung erfolgreich gespeichert.</string>
     <string name="DataSharingActivity_Error_BindingDataInvalidFormat">Fehler: Ungültiges Daten-Format.</string>
+    <string name="DataSharingActivity_Message_DataAlreadySaved">Die Bindungsdaten waren bereits gepeichert.</string>
     <string name="DataSharingActivity_Message_YouAreOriginator">Sie sind der Inhaber der Gerätebindung. Den Bindungsschlüssel als Empfänger einer geteilten Gerätebindung zu speichern ist nicht notwendig.</string>
 
     <string name="EditUUIDProfileActivityHeaderPlaceholderText">UUID Profil</string>

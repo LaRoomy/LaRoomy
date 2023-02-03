@@ -148,7 +148,9 @@ class BindingDataManager(private val appContext: Context) {
                 return it
             }
         }
-        return BindingData()
+        val bData = BindingData()
+        bData.passKey = ERROR_NOTFOUND
+        return bData
     }
 
     private fun save() {
