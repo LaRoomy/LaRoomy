@@ -206,13 +206,6 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         // attach the swipe handler to the recycler view
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(availableDevicesRecyclerView)
-
-        // save a default passkey if no one is saved (this should only be executed once per installation)
-        // TODO: clean up
-//        if((applicationContext as ApplicationProperty).loadSavedStringData(R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey) == ERROR_NOTFOUND){
-//            val defaultKey = createRandomPasskey(10)
-//            (applicationContext as ApplicationProperty).saveStringData(defaultKey, R.string.FileKey_AppSettings, R.string.DataKey_DefaultRandomBindingPasskey)
-//        }
     }
 
     override fun onNewIntent(intent: Intent?) {

@@ -86,6 +86,7 @@
     <!-- RGB Selector Activity *************************************************************** -->
     <color name="rgb_selector_selected_button_color">#444444</color>
     <color name="rgb_selector_normal_button_color">#FF222222</color>
+    <color name="rgb_selector_unselected_button_text_color">#FF888888</color>
     <!-- ************************************************************************************* -->
 
     <!-- Unlock Control Activity ************************************************************* -->

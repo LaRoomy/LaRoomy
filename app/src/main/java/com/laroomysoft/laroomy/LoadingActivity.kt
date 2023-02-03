@@ -418,6 +418,9 @@ class LoadingActivity : AppCompatActivity(), BLEConnectionManager.BleEventCallba
             BLE_SERVICE_DISCOVERY_FAIL -> {
                 getString(R.string.Error_BLEServiceDiscoveryFail)
             }
+            BLE_NO_PASSKEY_FOR_MAC_ADDRESS ->{
+                getString(R.string.Error_NoPasskeyForDeviceFound)
+            }
             else -> {
                 getString(R.string.Error_UnknownError)
             }

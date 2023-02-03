@@ -446,6 +446,7 @@
     <string name="Error_InvalidDeviceAddress">Device address invalid.</string>
     <string name="Error_UIAdapterGenerationFail">User Interface data generation error.</string>
     <string name="Error_BLEServiceDiscoveryFail">Service and/or characteristic discovery failed.</string>
+    <string name="Error_NoPasskeyForDeviceFound">The device requires a binding passkey, but no saved passkey was found.</string>
 
     <!-- FileKeys: -->
     <string name="FileKey_BLEManagerData" translatable="false">fileKeyBluetoothManagerData</string>
@@ -488,6 +489,7 @@
     <string name="ConnectionLog_NoContent">Nothing to show..</string>
     <string name="TextResourceErrorState" translatable="false">Resource::Error</string>
     <string name="TextListPresenterListElementPlaceholderText">List Element</string>
+    <string name="VeryLongViewTestString" translatable="false">This is a very long string. It is used to test the visual appearance of a textView when large text is displayed. Important is the max width of the textView and the margin or padding on the start and end of the view.</string>
 
 
 </resources>

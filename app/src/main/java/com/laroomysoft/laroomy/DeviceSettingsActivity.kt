@@ -149,23 +149,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
         bindingSwitch.setOnCheckedChangeListener { _, isChecked ->
 
             // create/release device binding
-            
-            // TODO: clean up...
-            
-    
-//            val passkey =
-//                (applicationContext as ApplicationProperty).loadSavedStringData(
-//                    R.string.FileKey_AppSettings,
-//                    R.string.DataKey_DefaultRandomBindingPasskey
-//                )
-
             when(isChecked){
                 true -> {
                     // enable the device binding
                     ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding()
-
-                    // show the share-button
-                    //shareBindingContainer.visibility = View.VISIBLE
 
                     // schedule a timeout control for the response
                     this.pendingBindingTransmission = dbENABLE
@@ -189,9 +176,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 else -> {
                     // release the device binding
                     ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding()
-
-                    // update the hint for the user
-                    //bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHint)
 
                     // hide the share-button
                     shareBindingContainer.visibility = View.GONE
@@ -505,9 +489,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
             // look for a rejected/error/success setting notification
             when (responseID) {
                 BINDING_RESPONSE_BINDING_NOT_SUPPORTED -> {
-                    // update the hint for the user
-                    //bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
-            
                     // hide the share-button
                     shareBindingContainer.visibility = View.GONE
             
@@ -527,35 +508,10 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                         R.color.successLightColor
                     )
                     
-                    // save binding info
-//                    val bData = BindingData()
-//                    val bManager = BindingDataManager(applicationContext)
-                    
-                    // TODO: clean up
-                    
                     // show the share button container
                     shareBindingContainer.visibility = View.VISIBLE
-    
-//                    ApplicationProperty.bluetoothConnectionManager.currentDevice?.apply {
-//                        if (ActivityCompat.checkSelfPermission(
-//                                this@DeviceSettingsActivity,
-//                                Manifest.permission.BLUETOOTH_CONNECT
-//                            ) == PackageManager.PERMISSION_GRANTED
-//                        ) {
-//                            bData.deviceName = this.name
-//                            bData.macAddress = this.address
-//                            bData.passKey = (applicationContext as ApplicationProperty).getCurrentUsedPasskey()
-//                            bData.generatedAsOriginator = true
-//                            bManager.addOrUpdate(bData)
-//                        }
-//                    }
-                    
-                    //bData.deviceName = dev.name ?: ""
                 }
                 BINDING_RESPONSE_BINDING_ERROR -> {
-                    // update the hint for the user
-                    // TODO: clean up
-                    //bindingHintTextView.text = getString(R.string.DeviceSettingsActivity_BindingPurposeHintForEnable)
                     // reset the switch
                     bindingSwitch.isChecked = false
                     //notify user
@@ -570,24 +526,6 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                         getString(R.string.DeviceSettingsActivity_ReleaseBindingSuccessText),
                         R.color.successLightColor
                     )
-                    
-                    // TODO: clean up
-                    
-                    // remove binding data
-//                    val bData = BindingData()
-//                    val bManager = BindingDataManager(applicationContext)
-    
-//                    ApplicationProperty.bluetoothConnectionManager.currentDevice?.apply {
-//                        if (ActivityCompat.checkSelfPermission(
-//                                this@DeviceSettingsActivity,
-//                                Manifest.permission.BLUETOOTH_CONNECT
-//                            ) == PackageManager.PERMISSION_GRANTED
-//                        ) {
-//                            // here only the mac address is necessary
-//                            bData.macAddress = this.address
-//                            bManager.removeElement(bData)
-//                        }
-//                    }
                 }
                 BINDING_RESPONSE_RELEASE_BINDING_FAILED_WRONG_PASSKEY -> {
                     // this should not happen, if the connection is established with the correct binding key, the key must be correct at this point
@@ -622,23 +560,15 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
         // make sure there is a connected device
         if(ApplicationProperty.bluetoothConnectionManager.isConnected){
-        
-//              TODO: clean up
-//            // get passKey
-//            val passKey =
-//                (applicationContext as ApplicationProperty).loadSavedStringData(
-//                    R.string.FileKey_AppSettings,
-//                    R.string.DataKey_DefaultRandomBindingPasskey
-//                )
 
-            // get mac-address
+            // get mac-address - Note: mac is the correct format to retrieve the saved data
             val mac = ApplicationProperty.bluetoothConnectionManager.currentDevice?.address
             val macAddress = macAddressToEncryptString(mac ?: "")
             
             if(macAddress.isNotEmpty()) {
                 // get passkey for this address
                 val bManager = BindingDataManager(this.applicationContext)
-                val bData = bManager.lookUpForBindingData(macAddress)
+                val bData = bManager.lookUpForBindingData(mac ?: "")
                 
                 if(bData.passKey != ERROR_NOTFOUND) {
                     

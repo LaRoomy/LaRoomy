@@ -149,14 +149,6 @@ class ApplicationProperty : Application() {
             this.connectionLog.add(message)
         }
     }
-    
-//    fun getCurrentUsedPasskey(): String {
-    // TODO: clean up
-//        return this.loadSavedStringData(
-//            R.string.FileKey_AppSettings,
-//            R.string.DataKey_DefaultRandomBindingPasskey
-//        )
-//    }
 
     fun loadSavedStringData(fileKeyID: Int, dataKeyID: Int) : String {
 

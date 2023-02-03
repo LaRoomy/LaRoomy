@@ -36,8 +36,6 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                     "onCreate in DataSharingActivity executed. Data decrypted: Mac Address: $macReformatted   PassKey: $passKeyDecrypted"
                 )
             }
-            
-            // TODO: clean up
     
             if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
                 // check a passkey exists for the mac address, if so, override it, otherwise skip
@@ -100,45 +98,6 @@ class DataSharingReceiverActivity : AppCompatActivity() {
                     R.color.ErrorColor
                 )
             }
-        
-    
-    
-    
-        // old: TODO clean up or so..
-//            if((applicationContext as ApplicationProperty).getCurrentUsedPasskey() == passKeyDecrypted){
-//                // the executor of the sharing link is the originator, so do not save the passkey as shared passkey, since it equals the main-key
-//                if(verboseLog){
-//                    Log.w("KeySharing", "The shared passkey was not saved, because it equals the key in use")
-//                }
-//                (applicationContext as ApplicationProperty).logControl("W: The shared passkey was NOT saved, because it equals the key in use.")
-//                // notify user
-//                notifyUser(getString(R.string.DataSharingActivity_Message_YouAreOriginator), R.color.normalTextColor)
-//            } else {
-//
-//                if ((macReformatted != ERROR_INVALID_PARAMETER) && (passKeyDecrypted.isNotEmpty())) {
-//                    // data valid: save the data
-//                    val bindingData = BindingData()
-//                    bindingData.macAddress = macReformatted
-//                    bindingData.passKey = passKeyDecrypted
-//                    bindingData.generatedAsOriginator = false
-//
-//                    //val bindingPairManager = BindingDataManager(applicationContext)
-//                    bindingManager.addOrUpdate(bindingData)
-//
-//                    // notify user
-//                    notifyUser(
-//                        getString(R.string.DataSharingActivity_BindingDataSuccessfulSet),
-//                        R.color.normalTextColor
-//                    )
-//
-//                } else {
-//                    // error: notify user
-//                    notifyUser(
-//                        getString(R.string.DataSharingActivity_Error_BindingDataInvalidFormat),
-//                        R.color.ErrorColor
-//                    )
-//                }
-        
         }
     }
 

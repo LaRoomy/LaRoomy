@@ -8,7 +8,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="50dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/tfsHeaderContainer"
@@ -78,7 +79,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tfsHeaderContainer" />
-
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/tfsFrameViewerContainer"
@@ -188,6 +188,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:textAlignment="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintWidth_max="540dp"
             app:layout_constraintTop_toBottomOf="@id/tfsFrameViewerContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
