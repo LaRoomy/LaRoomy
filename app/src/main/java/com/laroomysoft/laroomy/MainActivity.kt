@@ -691,9 +691,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
             holder.constraintLayout.findViewById<AppCompatTextView>(R.id.deviceNameTextView).apply {
                 text = laRoomyDevListAdapter.elementAt(position).name
                 if(!premiumCondition){
-                    setTextColor(appProp.getColor(R.color.disabledTextColor))
+                    setTextColor(holder.constraintLayout.context.getColor(R.color.disabledTextColor))
                 } else {
-                    setTextColor(appProp.getColor(R.color.max_contrast_text_color))
+                    setTextColor(holder.constraintLayout.context.getColor(R.color.max_contrast_text_color))
                 }
             }
             

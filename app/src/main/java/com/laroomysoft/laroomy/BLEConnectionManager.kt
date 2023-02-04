@@ -3937,11 +3937,15 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
     
     private fun handleForcedBackNavigation(){
         if(this.isOtherThanDeviceMainActivity()){
-            if (verboseLog) {
-                Log.e("ForcedBackNavigation", "Unexpected: Forced back navigation was requested during a stand-alone-property session. Notification will be forwarded, but should have no effect.")
+            if(this.bleDeviceData.isStandAlonePropertyMode) {
+                if (verboseLog) {
+                    Log.e(
+                        "ForcedBackNavigation",
+                        "Unexpected: Forced back navigation was requested during a stand-alone-property session. Notification will be forwarded, but should have no effect."
+                    )
+                }
+                applicationProperty.logControl("W: Unexpected: Forced back navigation was requested during a stand-alone-property session. Notification will be forwarded, but should have no effect. To navigate back in stand-alone mode: close the device.")
             }
-            applicationProperty.logControl("W: Unexpected: Forced back navigation was requested during a stand-alone-property session. Notification will be forwarded, but should have no effect. To navigate back in stand-alone mode: close the device.")
-            
             this.propertyCallback.onRemoteBackNavigationRequested()
         } else {
             if(verboseLog){
