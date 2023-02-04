@@ -13,23 +13,33 @@ class AppHelpActivity : AppCompatActivity() {
 
     // connect device topic
 
+    private lateinit var theConceptShortExplainedItem: ConstraintLayout
     private lateinit var theConceptShortExplainedContentContainer: ConstraintLayout
     private lateinit var theConceptShortExplainedImageView: AppCompatImageView
 
+    private lateinit var connectDeviceItem: ConstraintLayout
     private lateinit var connectDeviceContentContainer: ConstraintLayout
     private lateinit var connectDeviceExpandImageView: AppCompatImageView
 
+    private lateinit var deviceBindingItem: ConstraintLayout
     private lateinit var deviceBindingContentContainer: ConstraintLayout
     private lateinit var deviceBindingExpandImageView: AppCompatImageView
 
+    private lateinit var connectionProcessItem: ConstraintLayout
     private lateinit var connectionProcessContentContainer: ConstraintLayout
     private lateinit var connectionProcessImageView: AppCompatImageView
 
+    private lateinit var uuidProfilesItem: ConstraintLayout
     private lateinit var uuidProfileContentContainer: ConstraintLayout
     private lateinit var uuidProfileImageView: AppCompatImageView
 
+    private lateinit var appResetItem: ConstraintLayout
     private lateinit var appResetContentContainer: ConstraintLayout
     private lateinit var appResetImageView: AppCompatImageView
+    
+    private lateinit var furtherInfoItem: ConstraintLayout
+    private lateinit var furtherInfoContentContainer: ConstraintLayout
+    private lateinit var furtherInfoImageView: AppCompatImageView
 
     private lateinit var backButton: AppCompatImageButton
 
@@ -54,23 +64,61 @@ class AppHelpActivity : AppCompatActivity() {
 
         // connect device topic elements
 
+        this.theConceptShortExplainedItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityTheConceptShortExplainedContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
         this.theConceptShortExplainedContentContainer = findViewById(R.id.appHelpActivityTheConceptShortExplainedContentContainer)
         this.theConceptShortExplainedImageView = findViewById(R.id.appHelpActivityTheConceptShortExplainedImageView)
 
+        this.connectDeviceItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityConnectDeviceContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
         this.connectDeviceExpandImageView = findViewById(R.id.appHelpActivityConnectDeviceExpandImageView)
         this.connectDeviceContentContainer = findViewById(R.id.appHelpActivityConnectDeviceContentContainer)
 
+        this.deviceBindingItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityDeviceBindingContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
         this.deviceBindingExpandImageView = findViewById(R.id.appHelpActivityDeviceBindingExpandImageView)
         this.deviceBindingContentContainer = findViewById(R.id.appHelpActivityDeviceBindingContentContainer)
 
+        this.connectionProcessItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityConnectionProcessContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
         this.connectionProcessContentContainer = findViewById(R.id.appHelpActivityConnectionProcessContentContainer)
         this.connectionProcessImageView = findViewById(R.id.appHelpActivityConnectionProcessImageView)
 
+        this.uuidProfilesItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityUUIDProfilesContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
         this.uuidProfileContentContainer = findViewById(R.id.appHelpActivityUUIDProfilesContentContainer)
         this.uuidProfileImageView = findViewById(R.id.appHelpActivityUUIDProfilesImageView)
 
+        this.appResetItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityAppResetContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
         this.appResetContentContainer = findViewById(R.id.appHelpActivityAppResetContentContainer)
         this.appResetImageView = findViewById(R.id.appHelpActivityAppResetImageView)
+        
+        this.furtherInfoItem = findViewById<ConstraintLayout?>(R.id.appHelpActivityFurtherInfoContainer).apply {
+            setOnClickListener {
+                onTopicClick(it)
+            }
+        }
+        this.furtherInfoContentContainer = findViewById(R.id.appHelpActivityFurtherInfoContentContainer)
+        this.furtherInfoImageView = findViewById(R.id.appHelpActivityFurtherInfoImageView)
     }
     
     private fun handleBackEvent(){
@@ -147,6 +195,18 @@ class AppHelpActivity : AppCompatActivity() {
                     else -> {
                         appResetContentContainer.visibility = View.GONE
                         appResetImageView.setImageResource(R.drawable.ic_expand_arrow_right_32dp)
+                    }
+                }
+            }
+            R.id.appHelpActivityFurtherInfoContainer -> {
+                when(furtherInfoContentContainer.visibility){
+                    View.GONE -> {
+                        furtherInfoContentContainer.visibility = View.VISIBLE
+                        furtherInfoImageView.setImageResource(R.drawable.ic_expand_arrow_down_32dp)
+                    }
+                    else -> {
+                        furtherInfoContentContainer.visibility = View.GONE
+                        furtherInfoImageView.setImageResource(R.drawable.ic_expand_arrow_right_32dp)
                     }
                 }
             }

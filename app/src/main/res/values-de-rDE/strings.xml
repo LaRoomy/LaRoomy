@@ -334,7 +334,7 @@
     <string name="AppHelpActivity_Topic_AppReset_P1">Einstellungen und lokal gespeicherte Daten können ganz oder teilweise gelöscht werden. Unter \'Einstellungen > App zurücksetzen\' können die zu löschenden Elemente ausgewählt werden.</string>
     <string name="AppHelpActivity_Topic_AppReset_P2">Bindungsbezogene Daten bilden einen Sonderfall. Um alle oder einzelne Bindungs-Datensätze zu löschen muss der Bindungdaten-Manager verwendet werden. Weitere Informationen finden Sie unter dem Punkt \"Geräte Bindung\".</string>
 
-    <string name="AppHelpActivtiy_Topic_FurtherInformation_HeaderText">Weitere Informationen</string>
+    <string name="AppHelpActivity_Topic_FurtherInformation_HeaderText">Weitere Informationen</string>
     <string name="AppHelpActivtiy_Topic_FurtherInformation_P1">Mehr Informationen finden Sie auf der LaRoomy Website:</string>
 
 
