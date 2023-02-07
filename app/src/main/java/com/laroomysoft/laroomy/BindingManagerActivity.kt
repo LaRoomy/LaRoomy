@@ -73,6 +73,7 @@ class BindingManagerActivity : AppCompatActivity() {
                         // only show the dialog if the user is the originator of the device binding
                         // if the user is sharing-receiver, abstain from showing the dialog, but if the user is originator, only he can release the device binding
                         if (element.generatedAsOriginator) {
+                            var resetItem = true
                             // start dialog
                             val dialog = AlertDialog.Builder(this@BindingManagerActivity)
                             dialog.setMessage(getString(R.string.BindingManagerActviity_ConfirmDelete_AsOriginator))
@@ -80,19 +81,23 @@ class BindingManagerActivity : AppCompatActivity() {
                                 (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(
                                     pos
                                 )
+                                resetItem = false
                                 dialogInterface.dismiss()
                             }
                             dialog.setNegativeButton(getString(R.string.GeneralString_Cancel)) { dialogInterface: DialogInterface, _: Int ->
+                                // reset the item state if it remains in the list
                                 dialogInterface.dismiss()
                             }
-                            
-                            // TODO: this is only a test...
-                            
+                            dialog.setOnDismissListener {
+                                if(resetItem){
+                                    bindingDataElementListAdapter.notifyItemChanged(pos)
+                                }
+                            }
                             dialog.setTitle(element.deviceName)
                             dialog.setIcon(
                                 AppCompatResources.getDrawable(
                                     bindingDataElementListView.context,
-                                    R.drawable.ic_82_delete
+                                    R.drawable.ic_delete_36dp
                                 )
                             )
                             dialog.create()
