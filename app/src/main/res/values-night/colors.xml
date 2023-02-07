@@ -124,7 +124,7 @@
     <!-- ************************************************************************************* -->
 
     <!-- Manage Binding Data Activity ******************************************************** -->
-    <color name="manageBindingDataActivityContainerBackgroundColor">#DD202020</color>
+    <color name="manageBindingDataActivityContainerBackgroundColor">#DD111111</color>
     <!-- ************************************************************************************* -->
 
     <!-- Navigator Control Activity ********************************************************** -->

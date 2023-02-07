@@ -90,12 +90,13 @@
             android:padding="10dp"
             android:textAlignment="center"
             android:background="@drawable/manage_binding_data_activity_container_background"
+            android:maxWidth="600dp"
+            android:textColor="@color/important_text_color"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

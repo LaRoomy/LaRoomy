@@ -795,7 +795,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/AppHelpActivtiy_Topic_FurtherInformation_P1"
+                android:text="@string/AppHelpActivity_Topic_FurtherInformation_P1"
                 android:textSize="@dimen/helpActivity_textSizeHelpTopicSubText"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

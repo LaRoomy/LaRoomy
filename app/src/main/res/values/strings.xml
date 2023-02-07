@@ -126,6 +126,7 @@
     <string name="GeneralMessage_connectingFailed">Connection failed:</string>
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Cancel</string>
+    <string name="GeneralString_Delete">Delete</string>
     <string name="GeneralString_UnexpectedConnectionLossMessage">The connection was interrupted. Reconnect?</string>
     <string name="GeneralString_ConnectionLossDialogTitle">Connection Error</string>
 
@@ -223,7 +224,8 @@
     <string name="BindingManagerActivity_ListElementDeviceName">Device-Name:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac-Address:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Binding-Type:</string>
-    <string name="BindingManagerActivity_UserHint">Swipe left to delete a data set. Be careful: if binding is activated on a specific device, the connection may be fail. Make sure to release binding before deleting the appropriate data set.</string>
+    <string name="BindingManagerActivity_UserHint">Swipe left to delete a data set. Be careful: if binding is activated on a specific device, the connection will be fail. Make sure to release binding before deleting the appropriate data set.</string>
+    <string name="BindingManagerActviity_ConfirmDelete_AsOriginator">Please confirm the delete operation. You are the originator of the device binding. If the device binding is not released, the connection to the device may fail.</string>
 
     <string name="ResetAppActivity_HeaderText">Reset Data</string>
     <string name="ResetAppActivity_SelectDataActionText">Select the data you want to reset:</string>
@@ -316,7 +318,7 @@
     <string name="AppHelpActivity_Topic_AppReset_P2">Binding data is a special case and is not covered. To delete all or single binding datasets, the binding manager must be used. See the \"Device-Binding\" section for more info.</string>
 
     <string name="AppHelpActivity_Topic_FurtherInformation_HeaderText">Further Information</string>
-    <string name="AppHelpActivtiy_Topic_FurtherInformation_P1">To get more information, visit the LaRoomy app website:</string>
+    <string name="AppHelpActivity_Topic_FurtherInformation_P1">To get more information, visit the LaRoomy app website:</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
     <string name="UUIDProfileActivity_NoPremiumHint">Only Premium users can create new profiles or modify existing profiles.</string>

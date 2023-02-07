@@ -128,7 +128,7 @@
     <!-- ************************************************************************************* -->
 
     <!-- Manage Binding Data Activity ******************************************************** -->
-    <color name="manageBindingDataActivityContainerBackgroundColor">#DD808080</color>
+    <color name="manageBindingDataActivityContainerBackgroundColor">#DD8080a0</color>
     <!-- ************************************************************************************* -->
 
     <!-- Navigator Control Activity ********************************************************** -->

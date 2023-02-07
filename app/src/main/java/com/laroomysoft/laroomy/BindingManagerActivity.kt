@@ -1,10 +1,14 @@
 package com.laroomysoft.laroomy
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -58,8 +62,50 @@ class BindingManagerActivity : AppCompatActivity() {
         // add swipe to delete callback
         val swipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val pos = viewHolder.absoluteAdapterPosition
-                (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(pos)
+                try {
+                    // get position to delete
+                    val pos = viewHolder.absoluteAdapterPosition
+                    // get the element at that position
+                    val element =
+                        (bindingDataElementListAdapter as BindingDataElementListAdapter).getAt(pos)
+                    // only proceed if the data is valid
+                    if (element.passKey.isNotEmpty()) {
+                        // only show the dialog if the user is the originator of the device binding
+                        // if the user is sharing-receiver, abstain from showing the dialog, but if the user is originator, only he can release the device binding
+                        if (element.generatedAsOriginator) {
+                            // start dialog
+                            val dialog = AlertDialog.Builder(this@BindingManagerActivity)
+                            dialog.setMessage(getString(R.string.BindingManagerActviity_ConfirmDelete_AsOriginator))
+                            dialog.setPositiveButton(getString(R.string.GeneralString_Delete)) { dialogInterface: DialogInterface, _: Int ->
+                                (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(
+                                    pos
+                                )
+                                dialogInterface.dismiss()
+                            }
+                            dialog.setNegativeButton(getString(R.string.GeneralString_Cancel)) { dialogInterface: DialogInterface, _: Int ->
+                                dialogInterface.dismiss()
+                            }
+                            
+                            // TODO: this is only a test...
+                            
+                            dialog.setTitle(element.deviceName)
+                            dialog.setIcon(
+                                AppCompatResources.getDrawable(
+                                    bindingDataElementListView.context,
+                                    R.drawable.ic_82_delete
+                                )
+                            )
+                            dialog.create()
+                            dialog.show()
+                        } else {
+                            (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(
+                                pos
+                            )
+                        }
+                    }
+                } catch (e: java.lang.Exception){
+                    Log.e("BindingManagerActivity", "onSwipe: error: $e")
+                }
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
@@ -116,6 +162,14 @@ class BindingManagerActivity : AppCompatActivity() {
             val element = bindingDataManager.bindingDataList.elementAt(position)
             bindingDataManager.removeElement(element)
             notifyItemRemoved(position)
+        }
+        
+        fun getAt(position: Int) : BindingData {
+            return if(position < bindingDataManager.bindingDataList.size) {
+                bindingDataManager.bindingDataList.elementAt(position)
+            } else {
+                BindingData()
+            }
         }
     }
 }

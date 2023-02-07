@@ -137,6 +137,8 @@
     <string name="GeneralString_Cancel">Abbrechen</string>
     <string name="GeneralString_UnexpectedConnectionLossMessage">Die Verbindung wurde unerwartet unterbrochen. Erneut versuchen?</string>
     <string name="GeneralString_ConnectionLossDialogTitle">Verbindungsfehler</string>
+    <string name="GeneralString_Delete">Löschen</string>
+
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamische Fernsteuerung</string>
@@ -238,7 +240,8 @@
     <string name="BindingManagerActivity_ListElementDeviceName">Gerätename:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac Adresse:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Bindungstyp:</string>
-    <string name="BindingManagerActivity_UserHint">Nach links wischen löscht einen Datensatz. Aber Vorsicht: Wenn die Bindung für das Gerät aktiviert ist, ist die Verbindung eventuell nicht mehr möglich. Die Bindung sollte gelöst werden bevor ein Datensatz gelöscht wird.</string>
+    <string name="BindingManagerActivity_UserHint">Nach links wischen löscht einen Datensatz. Aber Vorsicht: Wenn die Geräte-Bindung aktiviert ist, ist die Verbindung nicht mehr möglich. Die Bindung muss gelöst werden bevor ein Datensatz gelöscht wird.</string>
+    <string name="BindingManagerActviity_ConfirmDelete_AsOriginator">Bitte bestätige das Entfernen der Bindungsdaten. Du bist der Urheber der Geräte Bindung. Wenn die Geräte Bindung nicht gelöst wurde, wird die Verbindung zum Gerät fehlschlagen.</string>
 
 
 
@@ -335,7 +338,7 @@
     <string name="AppHelpActivity_Topic_AppReset_P2">Bindungsbezogene Daten bilden einen Sonderfall. Um alle oder einzelne Bindungs-Datensätze zu löschen muss der Bindungdaten-Manager verwendet werden. Weitere Informationen finden Sie unter dem Punkt \"Geräte Bindung\".</string>
 
     <string name="AppHelpActivity_Topic_FurtherInformation_HeaderText">Weitere Informationen</string>
-    <string name="AppHelpActivtiy_Topic_FurtherInformation_P1">Mehr Informationen finden Sie auf der LaRoomy Website:</string>
+    <string name="AppHelpActivity_Topic_FurtherInformation_P1">Mehr Informationen finden Sie auf der LaRoomy Website:</string>
 
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profile</string>
