@@ -3771,6 +3771,9 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             this.uIAdapterList.forEachIndexed { index, devicePropertyListContentInformation ->
                 if((devicePropertyListContentInformation.internalElementIndex == propertyIndex)&&(devicePropertyListContentInformation.elementType == PROPERTY_ELEMENT)){
                     devicePropertyListContentInformation.isEnabled = enable
+                    
+                    // TODO: update ??? that's it!
+                    devicePropertyListContentInformation.update(applicationProperty.applicationContext)// TODO: appContext is not suitable
 
                     // launch event if device main page is open or mark as changed for later update
                     if(this.propertyCallback.getCurrentOpenComplexPropPagePropertyIndex() != -1){
