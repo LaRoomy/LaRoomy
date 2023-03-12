@@ -1776,10 +1776,10 @@ class DeviceMainActivity : AppCompatActivity(), BLEConnectionManager.PropertyCal
                     this.text = elementToRender.elementText
                     this.setTextColor(elementToRender.textColorResource)
                     if(elementToRender.elementType == GROUP_ELEMENT){
-                        this.textSize = 18F
+                        this.textSize = 20F
                         setTypeface(typeface, Typeface.BOLD)
                     } else {
-                        this.textSize = 14F
+                        this.textSize = 16F
                         setTypeface(null, Typeface.NORMAL)
                     }
                 }
