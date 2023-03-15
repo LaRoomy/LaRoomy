@@ -715,9 +715,13 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // add the user-data
                 fragmentTransmissionData.transmissionString += tData
 
-                // check if the fragmentation is complete
+                // get fragmented transmission progress indication info
                 val dataSize =
                     a2CharHexValueToIntValue(fragmentTransmissionData.transmissionString[4], fragmentTransmissionData.transmissionString[5])
+                val isOversize =
+                    fragmentTransmissionData.transmissionString[7] == '5'
+                val isLastOversizeElement =
+                    data[7] == '7'
                 
                 // check for inconsistent utf-8 character **************************************************
                 var inconsistentCharacterCount = 0
@@ -736,23 +740,65 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 }
                 // *****************************************************************************************
 
+                // progress log
                 if(verboseLog){
-                    Log.d("readFragmentTransMsn", "New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
-                    Log.d("readFragmentTransMsn", "New fragment added. DataSize is: ${dataSize - 1} | User-data length is: ${(fragmentTransmissionData.transmissionString.length - 8) + inconsistentCharacterCount}")
+                    Log.d(
+                        "readFragmentTransMsn",
+                        "New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}"
+                    )
+                    if(isOversize){
+                        Log.w(
+                            "readFragmentTransMsn",
+                            "New fragment added. Transmission-Length is OVERSIZE !! - Last element: $isLastOversizeElement"
+                        )
+                    } else {
+                        Log.d(
+                            "readFragmentTransMsn",
+                            "New fragment added. DataSize is: ${dataSize - 1} | User-data length is: ${(fragmentTransmissionData.transmissionString.length - 8) + inconsistentCharacterCount}"
+                        )
+                    }
                 }
                 applicationProperty.logControl("I: New fragment added. Data is now: ${fragmentTransmissionData.transmissionString}")
-
-                // NOTE: the carriage-return delimiter is missing in the fragment assembly, but is calculated in the transmission size, so the dataSize must be decreased by 1 for comparison
-                if (((fragmentTransmissionData.transmissionString.length - 8) + inconsistentCharacterCount) >= (dataSize - 1)) {
-                    // data size reached -> must be complete
-                    if(inconsistentCharacterCount > 0){
-                        val tString = "${overrideNonUTF8BasedCharacterInString(fragmentTransmissionData.transmissionString, '?')}\r"
-                        dispatchFragmentedTransmission(tString)
-                    } else {
-                        fragmentTransmissionData.transmissionString += '\r'
-                        dispatchFragmentedTransmission(fragmentTransmissionData.transmissionString)
+                
+                // check for complete fragmented transmission:
+                if(!isOversize) {
+                    // this is the normal length checkup for a complete transmission
+                    // ----------------------------------------------------------------------
+                    // NOTE: the carriage-return delimiter is missing in the fragment assembly, but is calculated in the transmission size, so the dataSize must be decreased by 1 for comparison
+                    if (((fragmentTransmissionData.transmissionString.length - 8) + inconsistentCharacterCount) >= (dataSize - 1)) {
+                        // data size reached -> must be complete
+                        if (inconsistentCharacterCount > 0) {
+                            val tString = "${
+                                overrideNonUTF8BasedCharacterInString(
+                                    fragmentTransmissionData.transmissionString,
+                                    '?'
+                                )
+                            }\r"
+                            dispatchFragmentedTransmission(tString)
+                        } else {
+                            fragmentTransmissionData.transmissionString += '\r'
+                            dispatchFragmentedTransmission(fragmentTransmissionData.transmissionString)
+                        }
+                        indexToRemove = index
                     }
-                    indexToRemove = index
+                } else {
+                    // this is the completeness checkup for an oversize transmission
+                    if(isLastOversizeElement){
+                        // fragmented transmission is complete
+                        if (inconsistentCharacterCount > 0) {
+                            val tString = "${
+                                overrideNonUTF8BasedCharacterInString(
+                                    fragmentTransmissionData.transmissionString,
+                                    '?'
+                                )
+                            }\r"
+                            dispatchFragmentedTransmission(tString)
+                        } else {
+                            fragmentTransmissionData.transmissionString += '\r'
+                            dispatchFragmentedTransmission(fragmentTransmissionData.transmissionString)
+                        }
+                        indexToRemove = index
+                    }
                 }
                 handled = true
             }
