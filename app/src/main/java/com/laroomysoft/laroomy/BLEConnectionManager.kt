@@ -700,7 +700,12 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         }
         applicationProperty.logControl("I: Transmission fragment received. Data was: $data")
 
-        val header = data.removeRange(8, data.length)
+        val header = when {
+            (data[7] == '7') -> {
+                "${data.removeRange(7, data.length)}5"
+            }
+            else -> data.removeRange(8, data.length)
+        }
         var handled = false
         var indexToRemove = -1
 
@@ -719,7 +724,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 val dataSize =
                     a2CharHexValueToIntValue(fragmentTransmissionData.transmissionString[4], fragmentTransmissionData.transmissionString[5])
                 val isOversize =
-                    fragmentTransmissionData.transmissionString[7] == '5'
+                    data[7] == '5' || data[7] == '7'
                 val isLastOversizeElement =
                     data[7] == '7'
                 
@@ -749,7 +754,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                     if(isOversize){
                         Log.w(
                             "readFragmentTransMsn",
-                            "New fragment added. Transmission-Length is OVERSIZE !! - Last element: $isLastOversizeElement"
+                            "New fragment added. Transmission-Length is OVERSIZE !! - Is last element? : $isLastOversizeElement"
                         )
                     } else {
                         Log.d(
