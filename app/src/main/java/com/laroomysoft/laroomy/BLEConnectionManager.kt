@@ -3227,7 +3227,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         // build enable binding string
         var bindingString = "6100"
         bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
-        bindingString += "001$passKey\r"
+        bindingString += "0010$passKey\r"
         // send it
         this.sendData(bindingString)
     }
