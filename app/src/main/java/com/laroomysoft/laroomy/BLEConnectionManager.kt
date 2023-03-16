@@ -1643,7 +1643,11 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                         val bManager = BindingDataManager(applicationProperty.applicationContext)
                         
                         this.currentDevice?.apply {
-                            bData.deviceName = this.name
+                            try {
+                                bData.deviceName = this.name
+                            } catch(e: Exception){
+                                bData.deviceName = ""
+                            }
                             bData.macAddress = this.address
                             bData.passKey = bleDeviceData.pendingEnablePassKey
                             bData.generatedAsOriginator = true

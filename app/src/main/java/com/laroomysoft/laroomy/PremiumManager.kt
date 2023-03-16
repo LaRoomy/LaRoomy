@@ -29,8 +29,10 @@ class PremiumManager(private val appContext: Context) {
             Log.d("PremiumManager", "CHECK APP PURCHASE STATUS!")
         }
         // check if the app is already purchased
-        val hasPurchased =
-            appProperty.loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_PurchaseDoneByUser, false)
+        
+        // TODO: normalize !!!! remove true and set the checkup !!!!!!!!
+        val hasPurchased = true
+            //appProperty.loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_PurchaseDoneByUser, false)
         
         if(!hasPurchased){
             if(verboseLog){
