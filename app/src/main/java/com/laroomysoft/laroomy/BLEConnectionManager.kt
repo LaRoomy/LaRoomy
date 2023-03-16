@@ -1425,7 +1425,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             return false
         }
 
-        // check if the length of the transmission is valid (the payload size for the init response is 7 bytes)
+        // check if the length of the transmission is valid
         if((payLoadDataSize < 7)||(data.length < 14)){
             //invalid data size
             if(verboseLog){
@@ -3189,7 +3189,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             } else {
                 bindingRequestString += hexString
             }
-            bindingRequestString += "002$passKey\r"
+            bindingRequestString += "0020$passKey\r"
 
             // send the request
             sendData(bindingRequestString)
