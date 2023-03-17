@@ -417,7 +417,7 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                     transitionSelectorContainer.visibility = View.GONE
 
                     this.currentMode = RGB_MODE_SINGLE_COLOR
-                    this.currentColorTransitionProgram = 0
+                    // this.currentColorTransitionProgram = 0 -> don't do this ! It resets the current program selection !
                 }
                 RGB_MODE_TRANSITION -> {
                     transButton.setBackgroundResource(R.drawable.rgb_selector_mode_button_right_selected)
