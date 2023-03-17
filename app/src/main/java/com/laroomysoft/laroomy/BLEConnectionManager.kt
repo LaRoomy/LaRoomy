@@ -1481,6 +1481,8 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                             callback.onInitializationSuccessful()
                         }
                     }
+                } else {
+                    this.bleDeviceData.isBindingRequired = (data[13] == '1')
                 }
                 
                 // check if single property mode is requested
@@ -3184,7 +3186,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         } else {
             // at first, build the request-string
             var bindingRequestString = "6100"
-            val dataSize = 2 + passKey.length
+            val dataSize = 3 + passKey.length
             val hexString = Integer.toHexString(dataSize)
 
             if(hexString.length == 1){
@@ -3230,7 +3232,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         this.bleDeviceData.pendingEnablePassKey = passKey
         // build enable binding string
         var bindingString = "6100"
-        bindingString += a8bitValueTo2CharHexValue(passKey.length + 2)
+        bindingString += a8bitValueTo2CharHexValue(passKey.length + 3)
         bindingString += "0010$passKey\r"
         // send it
         this.sendData(bindingString)
