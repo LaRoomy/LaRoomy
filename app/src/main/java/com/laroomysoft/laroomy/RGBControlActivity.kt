@@ -548,8 +548,10 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 this.onOffSwitch.isChecked = this.onOffState
 
             // 2. Transition-Type
-            if (!rgbSelectorState.hardTransitionFlag != this.transitionSwitch.isChecked)
+            if (!rgbSelectorState.hardTransitionFlag != this.transitionSwitch.isChecked) {
                 this.transitionSwitch.isChecked = !rgbSelectorState.hardTransitionFlag
+            }
+            this.currentHardTransitionFlagValue = !this.transitionSwitch.isChecked
 
             // 3. ColorPicker view-color
             val actualColor =
@@ -576,8 +578,11 @@ class RGBControlActivity : AppCompatActivity(), BLEConnectionManager.BleEventCal
                 }
             } else {
                 // must be single color mode
-                if (this.currentMode != RGB_MODE_SINGLE_COLOR)
+                if (this.currentMode != RGB_MODE_SINGLE_COLOR) {
                     setPageSelectorModeState(RGB_MODE_SINGLE_COLOR)
+                }
+                this.currentColorTransitionProgram = rgbSelectorState.colorTransitionValue
+                this.programSpeedSeekBar.progress = 0
             }
         }
     }
