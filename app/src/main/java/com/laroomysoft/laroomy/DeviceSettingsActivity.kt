@@ -43,6 +43,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
     private var propertyStateUpdateRequired = false
     private var preventOnPauseExecutionInStandAloneMode = false
     private var currentSignalStrength = 0
+    private var doubleExecPreventer = false
     
     private val isStandAlonePropertyMode
     get() = ApplicationProperty.bluetoothConnectionManager.isStandAlonePropertyMode
@@ -147,56 +148,65 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
 
         // set up event-handler for the binding switch
         bindingSwitch.setOnCheckedChangeListener { _, isChecked ->
-
-            // create/release device binding
-            when(isChecked){
-                true -> {
-                    // enable the device binding
-                    ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding()
-
-                    // schedule a timeout control for the response
-                    this.pendingBindingTransmission = dbENABLE
+            if(doubleExecPreventer){
+                doubleExecPreventer = false
+            } else {
+                // create/release device binding
+                when (isChecked) {
+                    true -> {
+                        // enable the device binding
+                        ApplicationProperty.bluetoothConnectionManager.enableDeviceBinding()
+            
+                        // schedule a timeout control for the response
+                        this.pendingBindingTransmission = dbENABLE
+            
+                        Executors.newSingleThreadScheduledExecutor().schedule({
+                            if (pendingBindingTransmission == dbENABLE) {
+                                pendingBindingTransmission = dbNONE
                     
-                    Executors.newSingleThreadScheduledExecutor().schedule({
-                        if(pendingBindingTransmission == dbENABLE){
-                            pendingBindingTransmission = dbNONE
-
-                            if(verboseLog){
-                                Log.d("EnableDeviceBinding", "Unexpected Timeout for enable response.")
+                                if (verboseLog) {
+                                    Log.d(
+                                        "EnableDeviceBinding",
+                                        "Unexpected Timeout for enable response."
+                                    )
+                                }
+                                (applicationContext as ApplicationProperty).logControl("W: Unexpected Timeout for enable response.")
+                    
+                                notifyUser(
+                                    getString(R.string.DeviceSettingsActivity_BindingNotConfirmed),
+                                    R.color.warningLightColor
+                                )
                             }
-                            (applicationContext as ApplicationProperty).logControl("W: Unexpected Timeout for enable response.")
-
-                            notifyUser(
-                                getString(R.string.DeviceSettingsActivity_BindingNotConfirmed),
-                                R.color.warningLightColor
-                            )
-                        }
-                    }, 2000, TimeUnit.MILLISECONDS)
-                }
-                else -> {
-                    // release the device binding
-                    ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding()
-
-                    // hide the share-button
-                    shareBindingContainer.visibility = View.GONE
-
-                    // schedule a timeout control for the response
-                    this.pendingBindingTransmission = dbRELEASE
-                    Executors.newSingleThreadScheduledExecutor().schedule({
-                        if(pendingBindingTransmission == dbRELEASE){
-                            pendingBindingTransmission = dbNONE
-
-                            if(verboseLog){
-                                Log.d("ReleaseDeviceBinding", "Unexpected Timeout for release response.")
+                        }, 2000, TimeUnit.MILLISECONDS)
+                    }
+                    else -> {
+                        // release the device binding
+                        ApplicationProperty.bluetoothConnectionManager.releaseDeviceBinding()
+            
+                        // hide the share-button
+                        shareBindingContainer.visibility = View.GONE
+            
+                        // schedule a timeout control for the response
+                        this.pendingBindingTransmission = dbRELEASE
+                        Executors.newSingleThreadScheduledExecutor().schedule({
+                            if (pendingBindingTransmission == dbRELEASE) {
+                                pendingBindingTransmission = dbNONE
+                    
+                                if (verboseLog) {
+                                    Log.d(
+                                        "ReleaseDeviceBinding",
+                                        "Unexpected Timeout for release response."
+                                    )
+                                }
+                                (applicationContext as ApplicationProperty).logControl("W: Unexpected Timeout for release response.")
+                    
+                                notifyUser(
+                                    getString(R.string.DeviceSettingsActivity_ReleaseNotConfirmed),
+                                    R.color.warningLightColor
+                                )
                             }
-                            (applicationContext as ApplicationProperty).logControl("W: Unexpected Timeout for release response.")
-
-                            notifyUser(
-                                getString(R.string.DeviceSettingsActivity_ReleaseNotConfirmed),
-                                R.color.warningLightColor
-                            )
-                        }
-                    }, 2000, TimeUnit.MILLISECONDS)
+                        }, 2000, TimeUnit.MILLISECONDS)
+                    }
                 }
             }
         }
@@ -493,6 +503,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     shareBindingContainer.visibility = View.GONE
             
                     // reset the switch
+                    doubleExecPreventer = true
                     bindingSwitch.isChecked = false
             
                     // notify user
@@ -513,6 +524,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 }
                 BINDING_RESPONSE_BINDING_ERROR -> {
                     // reset the switch
+                    doubleExecPreventer = true
                     bindingSwitch.isChecked = false
                     //notify user
                     notifyUserWithDelayedReset(
@@ -531,6 +543,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                     // this should not happen, if the connection is established with the correct binding key, the key must be correct at this point
                     // ---
                     // reset the switch
+                    doubleExecPreventer = true
                     bindingSwitch.isChecked = true
                     // hide the share-button (for security reasons)
                     shareBindingContainer.visibility = View.GONE
@@ -542,6 +555,7 @@ class DeviceSettingsActivity : AppCompatActivity(), BLEConnectionManager.BleEven
                 }
                 BINDING_RESPONSE_RELEASE_BINDING_FAILED_UNKNOWN_ERROR -> {
                     // reset the switch
+                    doubleExecPreventer = true
                     bindingSwitch.isChecked = true
                     // notify user
                     notifyUserWithDelayedReset(
