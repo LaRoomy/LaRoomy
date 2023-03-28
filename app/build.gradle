@@ -51,4 +51,5 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'com.ramotion.fluidslider:fluid-slider:0.3.1'
     implementation("com.android.billingclient:billing-ktx:$billing_version")
+    implementation 'com.google.guava:guava:24.1-jre'
 }
