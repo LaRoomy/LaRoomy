@@ -76,7 +76,7 @@ class BindingManagerActivity : AppCompatActivity() {
                             var resetItem = true
                             // start dialog
                             val dialog = AlertDialog.Builder(this@BindingManagerActivity)
-                            dialog.setMessage(getString(R.string.BindingManagerActviity_ConfirmDelete_AsOriginator))
+                            dialog.setMessage(getString(R.string.BindingManagerActivity_ConfirmDelete_AsOriginator))
                             dialog.setPositiveButton(getString(R.string.GeneralString_Delete)) { dialogInterface: DialogInterface, _: Int ->
                                 (bindingDataElementListAdapter as BindingDataElementListAdapter).removeAt(
                                     pos

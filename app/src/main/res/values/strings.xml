@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">LaRoomy</string>
-    <string name="app_version">App-Version 2.1.0</string>
+    <string name="app_version">App-Version 1.1.0</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Devices</string>
     <string name="MA_NoAvailableDevices">No devices found. Please make sure the device is bonded to the system.</string>
@@ -134,12 +134,14 @@
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamic Remote Control</string>
     <string name="InfoActivity_AppVersionEntry">App-Version </string>
-    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2022 Hans Philipp Zimmermann</string>
+    <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2023 Hans Philipp Zimmermann</string>
     <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">All rights reserved</string>
 
     <string name="InfoActivity_ImprintAndContact">Imprint &amp; Contact</string>
-
+    <string name="InfoActivity_ImprintName" translatable="false">Hans Philipp Zimmermann</string>
+    <string name="InfoActivity_ImprintAddressOne" translatable="false">33415 Verl-Kaunitz</string>
+    <string name="InfoActivity_ImprintAddressTwo" translatable="false">Nordrhein-Westfalen, Germany</string>
     <string name="InfoActivity_MailTo">info@laroomy.de</string>
 
     <string name="InfoActivity_PrivacyPolicyHeader">Privacy Policy</string>
@@ -174,6 +176,10 @@
     <string name="InfoActivity_CR_FluidSlider_RamotionBackLinkText">www.Ramotion.com</string>
 
     <string name="InfoActivity_RS_HeaderText">Documentation &amp; Resources</string>
+    <string name="InfoActivity_RS_WebsiteText">A detailed description of the app and legal resources can be found on the LaRoomy-App website:</string>
+    <string name="InfoActivity_RS_WebsiteLink" translatable="false">www.laroomy.com</string>
+    <string name="InfoActivity_RS_ApiText">Information to the remote framework, implementation guidelines and protocol documentation can be found on the LaRoomy Api Website:</string>
+    <string name="InfoActivity_RS_ApiLink" translatable="false">api.laroomy.com</string>
     <string name="InfoActivity_Disclaimer_HeaderText">Disclaimer</string>
     <string name="InfoActivity_Disclaimer_Text">The author of this program is not liable for damages to software or hardware or property damage resulting from the use of the program. The author reserves the right not to be responsible for the topicality, correctness, completeness or quality of the provided application. Liability claims against the author, which relate to damages of material or ideal kind, caused by the use of the presented application, are fundamentally excluded, as long as the author has no proven intentional or grossly negligent fault.</string>
 
@@ -223,7 +229,7 @@
     <string name="BindingManagerActivity_ListElementMacAddress">Mac-Address:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Binding-Type:</string>
     <string name="BindingManagerActivity_UserHint">Swipe left to delete a data set. Be careful: if binding is activated on a specific device, the connection will be fail. Make sure to release binding before deleting the appropriate data set.</string>
-    <string name="BindingManagerActviity_ConfirmDelete_AsOriginator">Please confirm the delete operation. You are the originator of the device binding. If the device binding is not released, the connection to the device may fail.</string>
+    <string name="BindingManagerActivity_ConfirmDelete_AsOriginator">Please confirm the delete operation. You are the originator of the device binding. If the device binding is not released, the connection to the device may fail.</string>
 
     <string name="ResetAppActivity_HeaderText">Reset Data</string>
     <string name="ResetAppActivity_SelectDataActionText">Select the data you want to reset:</string>
@@ -317,6 +323,7 @@
 
     <string name="AppHelpActivity_Topic_FurtherInformation_HeaderText">Further Information</string>
     <string name="AppHelpActivity_Topic_FurtherInformation_P1">To get more information, visit the LaRoomy app website:</string>
+    <string name="AppHelpActivity_Topic_FurtherInformation_WebsiteLink" translatable="false">www.laroomy.com</string>
 
     <string name="UUIDProfileActivity_HeaderText">UUID Profiles</string>
     <string name="UUIDProfileActivity_NoPremiumHint">Only Premium users can create new profiles or modify existing profiles.</string>

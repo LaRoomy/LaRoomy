@@ -185,6 +185,9 @@
     <string name="InfoActivity_CR_FluidSlider_RamotionBackLinkText">www.Ramotion.com</string>
 
     <string name="InfoActivity_RS_HeaderText">Dokumentation &amp; Ressourcen</string>
+    <string name="InfoActivity_RS_WebsiteText">Eine genaue Beschreibung der App und rechtliche Informationen können auf der LaRoomy-App Website nachgelesen werden:</string>
+    <string name="InfoActivity_RS_ApiText">Informationen zum Remote-Framework, Richtlinien zur Implementierung und eine genaue Beschreibung des Übertragungsprotokols sind auf der LaRoomy Api Website verfügbar:</string>
+
 
     <string name="InfoActivity_Disclaimer_HeaderText">Haftungsausschluss</string>
     <string name="InfoActivity_Disclaimer_Text">Der Autor dieser Anwendung haftet nicht für Schäden an Software oder Hardware oder Sachschäden, die auf die Verwendung der Anwendung zurückzuführen ist. Der Autor übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Anwendung. Haftungsansprüche gegen den Autor, die sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung der dargebotenen Anwendung verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Autors kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt.</string>
@@ -241,7 +244,7 @@
     <string name="BindingManagerActivity_ListElementMacAddress">Mac Adresse:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Bindungstyp:</string>
     <string name="BindingManagerActivity_UserHint">Nach links wischen löscht einen Datensatz. Aber Vorsicht: Wenn die Geräte-Bindung aktiviert ist, ist die Verbindung nicht mehr möglich. Die Bindung muss gelöst werden bevor ein Datensatz gelöscht wird.</string>
-    <string name="BindingManagerActviity_ConfirmDelete_AsOriginator">Bitte bestätige das Entfernen der Bindungsdaten. Du bist der Urheber der Geräte Bindung. Wenn die Geräte Bindung nicht gelöst wurde, wird die Verbindung zum Gerät fehlschlagen.</string>
+    <string name="BindingManagerActivity_ConfirmDelete_AsOriginator">Bitte bestätige das Entfernen der Bindungsdaten. Du bist der Urheber der Geräte Bindung. Wenn die Geräte Bindung nicht gelöst wurde, wird die Verbindung zum Gerät fehlschlagen.</string>
 
 
 

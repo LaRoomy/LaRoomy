@@ -125,7 +125,7 @@ class AppHelpActivity : AppCompatActivity() {
         finish()
     }
     
-    fun onTopicClick(view: View){
+    private fun onTopicClick(view: View){
 
         when(view.id){
             R.id.appHelpActivityTheConceptShortExplainedContainer -> {

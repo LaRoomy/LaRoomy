@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class InformationActivity : AppCompatActivity() {
@@ -19,6 +20,8 @@ class InformationActivity : AppCompatActivity() {
     private lateinit var docuAndResourcesSubContainer: ConstraintLayout
     private lateinit var imprintAndContactSubContainer: ConstraintLayout
     private lateinit var disclaimerSubContainer: ConstraintLayout
+    private lateinit var webSiteLinkTextView: AppCompatTextView
+    private lateinit var apiSiteLinkTextView: AppCompatTextView
 
     lateinit var backButton: AppCompatImageButton
 
@@ -34,22 +37,29 @@ class InformationActivity : AppCompatActivity() {
         this.disclaimerSubContainer = findViewById(R.id.infoActivityDisclaimerSubContainer)
 
         // add back button functionality
-        this.backButton = findViewById(R.id.infoActivityBackButton)
-        this.backButton.setOnClickListener {
-            finish()
+        this.backButton = findViewById<AppCompatImageButton?>(R.id.infoActivityBackButton).apply {
+            setOnClickListener {
+                finish()
+            }
         }
-
-//        val pInfo =
-//            packageManager.getPackageInfo(packageName, 0)
-//
-//        @Suppress("DEPRECATION") val versionString = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-//            "${getString(R.string.InfoActivity_AppVersionEntry)} ${pInfo.longVersionCode}"
-//        } else {
-//            "${getString(R.string.InfoActivity_AppVersionEntry)} ${pInfo.versionCode}"
-//        }
-//
-//        versionTextView = findViewById(R.id.infoActivityAppVersionTextView)
-//        versionTextView.text = versionString
+        
+        // add website link functionality
+        this.webSiteLinkTextView = findViewById<AppCompatTextView?>(R.id.infoActivityDocuWebsiteLinkTextView).apply {
+            setOnClickListener {
+                val openUrl = Intent(ACTION_VIEW)
+                openUrl.data = Uri.parse("https://www.laroomy.com/")
+                startActivity(openUrl)
+            }
+        }
+        
+        // add api website link functionality
+        this.apiSiteLinkTextView = findViewById<AppCompatTextView?>(R.id.infoActivityDocuApiLinkTextView).apply {
+            setOnClickListener {
+                val openUrl = Intent(ACTION_VIEW)
+                openUrl.data = Uri.parse("https://api.laroomy.com/")
+                startActivity(openUrl)
+            }
+        }
     }
 
     fun onMailToLinkClick(@Suppress("UNUSED_PARAMETER") view: View){

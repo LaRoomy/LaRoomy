@@ -158,6 +158,39 @@
                 app:layout_constraintTop_toBottomOf="@id/infoActivityImprintAndContactHeaderTextView">
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityImprintNameTextView"
+                    android:text="@string/InfoActivity_ImprintName"
+                    android:textColor="@color/info_activity_text_color"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityImprintAddressOneTextView"
+                    android:text="@string/InfoActivity_ImprintAddressOne"
+                    android:textColor="@color/info_activity_text_color"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityImprintNameTextView"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityImprintAddressTwoTextView"
+                    android:text="@string/InfoActivity_ImprintAddressTwo"
+                    android:textColor="@color/info_activity_text_color"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityImprintAddressOneTextView"
+                    />
+
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/infoActivityMailToTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -170,46 +203,7 @@
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <!--
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/infoActivityCreditsStartText"
-                                    android:text="@string/InfoActivity_CR_StartText"
-                                    android:textAlignment="center"
-                                    android:textColor="@color/goldAccentColor"
-                                    app:layout_constraintTop_toTopOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                                <androidx.appcompat.widget.AppCompatTextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/infoActivityCreditsThanksText"
-                                    android:text="@string/InfoActivity_CR_ThankYouHeaderText"
-                                    android:textAlignment="center"
-                                    android:textColor="@color/goldAccentColor"
-                                    android:layout_marginTop="20dp"
-                                    android:textStyle="bold"
-                                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsStartText"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                                <View
-                                    android:layout_width="match_parent"
-                                    android:layout_height="1dp"
-                                    android:id="@+id/infoActivityCreditsFirstSeparator"
-                                    android:background="@color/separatorColor"
-                                    android:layout_marginTop="15dp"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThanksText"
-                                    />
-                -->
-
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityImprintAddressTwoTextView" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -949,44 +943,72 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/infoActivityDocuAndResourcesHeaderTextView">
 
-<!--
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/infoActivityCreditsStartText"
-                    android:text="@string/InfoActivity_CR_StartText"
+                    android:id="@+id/infoActivityDocuAndResWebsiteText"
+                    android:textColor="@color/info_activity_text_color"
+                    android:text="@string/InfoActivity_RS_WebsiteText"
                     android:textAlignment="center"
-                    android:textColor="@color/goldAccentColor"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/infoActivityDocuWebsiteLinkTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/infoActivityCreditsThanksText"
-                    android:text="@string/InfoActivity_CR_ThankYouHeaderText"
-                    android:textAlignment="center"
-                    android:textColor="@color/goldAccentColor"
-                    android:layout_marginTop="20dp"
-                    android:textStyle="bold"
-                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsStartText"
+                    android:layout_marginTop="1dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:text="@string/InfoActivity_RS_WebsiteLink"
+                    android:textColor="@color/clickableTextColor"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityDocuAndResWebsiteText" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:id="@+id/infoActivityCreditsFirstSeparator"
+                    android:id="@+id/infoActivityDocuFirstSeparator"
                     android:background="@color/separatorColor"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="5dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/infoActivityCreditsThanksText"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityDocuWebsiteLinkTextView"
                     />
--->
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/infoActivityDocuAndResApiTextView"
+                    android:textColor="@color/info_activity_text_color"
+                    android:text="@string/InfoActivity_RS_ApiText"
+                    android:textAlignment="center"
+                    android:layout_marginTop="10dp"
+                    android:maxWidth="600dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityDocuFirstSeparator"
+                    />
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/infoActivityDocuApiLinkTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:text="@string/InfoActivity_RS_ApiLink"
+                    android:textColor="@color/clickableTextColor"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoActivityDocuAndResApiTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
