@@ -1,5 +1,7 @@
 package com.laroomysoft.laroomy
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,6 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class AppHelpActivity : AppCompatActivity() {
@@ -40,6 +43,7 @@ class AppHelpActivity : AppCompatActivity() {
     private lateinit var furtherInfoItem: ConstraintLayout
     private lateinit var furtherInfoContentContainer: ConstraintLayout
     private lateinit var furtherInfoImageView: AppCompatImageView
+    private lateinit var furtherInfoWebsiteLink: AppCompatTextView
 
     private lateinit var backButton: AppCompatImageButton
 
@@ -59,6 +63,15 @@ class AppHelpActivity : AppCompatActivity() {
         this.backButton = findViewById<AppCompatImageButton?>(R.id.appHelpActivityBackButton).apply {
             setOnClickListener {
                 handleBackEvent()
+            }
+        }
+        
+        // add website link functionality
+        this.furtherInfoWebsiteLink = findViewById<AppCompatTextView?>(R.id.appHelpActivityFurtherInfoWebsiteLink).apply {
+            setOnClickListener {
+                val openUrl = Intent(Intent.ACTION_VIEW)
+                openUrl.data = Uri.parse("https://www.laroomy.com/")
+                startActivity(openUrl)
             }
         }
 

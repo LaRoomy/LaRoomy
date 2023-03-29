@@ -40,14 +40,14 @@
     <!-- ************************************************************************************* -->
 
     <!-- Decoration and Helper Colors ******************************************************** -->
-    <color name="normalOutlineColor">#FFFFFF</color>
+    <!--<color name="normalOutlineColor">#FFFFFF</color>-->
     <color name="transparentColor">#00000000</color>
     <color name="transparentViewColor">#00FFFFFF</color>
     <color name="mode_accent_color">#FF16354D</color>
     <color name="pureWhite">#FF000000</color>
     <color name="swipe_to_delete_item_color">#FFDE0A00</color>
-    <color name="laroomy_symbol_blue_color">#FFA6BEE3</color>
-    <color name="laroomy_symbol_yellow_color">#FFFDDF66</color>
+    <!--<color name="laroomy_symbol_blue_color">#FFA6BEE3</color>
+    <color name="laroomy_symbol_yellow_color">#FFFDDF66</color>-->
     <!-- ************************************************************************************* -->
 
     <!-- Main Activity *********************************************************************** -->
@@ -56,7 +56,7 @@
 
     <color name="mainActivityPopUpFlyoutBackgroundColor">#FFDDDDDD</color>
     <color name="pop_up_flyout_separator_background">#FF909090</color>
-    <color name="mainActivityPopUpMenuItemSelectedColor">#FF909090</color>
+    <!--<color name="mainActivityPopUpMenuItemSelectedColor">#FF909090</color>-->
     <color name="main_activity_action_banner_background_color">#FFCCCCDD</color>
     <!-- ************************************************************************************* -->
 
@@ -120,11 +120,11 @@
     <!-- ************************************************************************************* -->
 
     <!-- Manage and Edit UUID Activity ******************************************************* -->
-    <color name="uuidListSelectedItemColor">#FFCCCCCC</color>
+    <!--<color name="uuidListSelectedItemColor">#FFCCCCCC</color>-->
     <color name="manage_uuids_list_element_background_color">#FFCCCCCC</color>
     <color name="manage_uuids_list_element_selected_background_color">#FFBBBBBB</color>
     <color name="manage_uuid_profiles_action_banner_background_color">#FFCCCCDD</color>
-    <color name="manage_uuid_profiles_list_element_disabled_text_color">#FF999999</color>
+    <!--<color name="manage_uuid_profiles_list_element_disabled_text_color">#FF999999</color>-->
     <!-- ************************************************************************************* -->
 
     <!-- Manage Binding Data Activity ******************************************************** -->

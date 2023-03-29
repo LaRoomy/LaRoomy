@@ -118,7 +118,6 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_arrow_toright_sq38px"
                     android:layout_marginStart="5dp"
-                    android:id="@+id/fromImageView"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/fromTextView"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -161,7 +160,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_arrow_toleft_sq38px"
-                    android:id="@+id/toImageView"
                     android:layout_marginStart="10dp"
                     app:layout_constraintStart_toEndOf="@id/toTextView"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -46,7 +46,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/deviceMainActivityPopUpElement_DiscardDeviceTextView"
             android:text="@string/DMA_PopUpMenuText_DiscardDevice"
             android:textSize="18sp"
             android:layout_marginStart="20dp"
@@ -150,7 +149,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/deviceMainActivityPopUpElement_ReloadPropertiesTextView"
             android:text="@string/DMA_PopUpMenuText_ReloadProperties"
             android:textSize="18sp"
             android:layout_marginStart="20dp"
@@ -179,7 +177,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:id="@+id/deviceMainActivityPopUpElement_SettingsContainer"
         android:orientation="horizontal"
         android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
@@ -204,7 +201,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mainActivityPopUpElement_SettingsTextView"
             android:text="@string/DMA_PopUpMenuText_DeviceSettings"
             android:textSize="18sp"
             android:layout_marginStart="20dp"

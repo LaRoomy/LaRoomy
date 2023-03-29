@@ -7,7 +7,7 @@ android {
     kotlinOptions { jvmTarget = "1.8" }
 
     defaultConfig {
-        applicationId "com.example.laroomy"
+        applicationId "com.laroomysoft.laroomy"
         minSdkVersion 29
         targetSdkVersion 33
         versionCode 1

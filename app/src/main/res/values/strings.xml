@@ -3,12 +3,10 @@
     <string name="app_version">App-Version 1.1.0</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Devices</string>
-    <string name="MA_NoAvailableDevices">No devices found. Please make sure the device is bonded to the system.</string>
     <string name="MA_PopUp_SettingsTitle">Settings</string>
     <string name="MA_PopUp_InformationTitle">App-Info</string>
     <string name="MA_PopUp_HelpTitle">Help Topics</string>
     <string name="MA_PopUp_ShowLogTitle">Show Log</string>
-    <string name="MA_PopUp_ReloadList">Reload List</string>
     <string name="MA_UserNotificationDialogTitle">Notification</string>
     <string name="MA_NoContentUserHintText">Nothing to show.\nAdd your first device.</string>
     <string name="MA_BluetoothNotEnabledHintText">The base functionality of this App is to connect to bluetooth devices. Therefore bluetooth must be enabled. Tap here to enable bluetooth.</string>
@@ -21,15 +19,12 @@
     <string name="MainActivity_ActionBanner_ButtonTextPurchase">Unlock Premium</string>
 
     <string name="CA_Connecting">Connecting..</string>
-    <string name="CA_Connected">Connected</string>
     <string name="CA_Initialize">Initialize..</string>
     <string name="CA_LoadingProperties">Loading Properties..</string>
 
     <!-- check if this is really necessary??? -->
-    <string name="CA_AuthSuccess">Authentication success - Checking Device Properties</string>
 
     <string name="CA_BindingPasskeyRejected">Invalid binding-passkey: connection rejected</string>
-    <string name="CA_BindingNotActivated">Binding required but not activated in App-Settings</string>
     <string name="CA_TimeoutForConnection">Timeout: Device not reachable</string>
     <string name="CA_ErrorDeviceListIndexInvalid">Invalid Device-List index</string>
     <string name="CA_ErrorDeviceAddressAccessException">Critical error. Index out of bounds.</string>
@@ -42,10 +37,7 @@
     <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">disconnected - trying to reconnect</string>
     <string name="DMA_ConnectionStatus_connected">connected</string>
     <string name="DMA_Ready">Ready</string>
-    <string name="DMA_DeviceConnectionSuspended">Connection suspended</string>
     <string name="DMA_LoadingPropertiesUserInfo">Loading Properties..</string>
-    <string name="DMA_NoConnection">No connection</string>
-    <string name="DMA_ErrorElementText">error:type !</string>
     <string name="DMA_PopUpMenuText_DeviceSettings">Device Settings</string>
     <string name="DMA_PopUpMenuText_DiscardDevice">Close Device</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Reload Properties</string>
@@ -65,10 +57,6 @@
     <string name="ELS_OnOff">On / Off</string>
 
     <string name="STS_HeaderText">Time Selector</string>
-    <string name="STS_Hours">Hours</string>
-    <string name="STS_Minutes">Minutes</string>
-    <string name="STS_Seconds">Seconds</string>
-    <string name="STS_TimePlaceholder">00 : 00</string>
 
     <string name="NavCon_HeaderText">Navigator</string>
 
@@ -93,7 +81,6 @@
 
 
     <string name="TextListPresenter_HeaderText">Text List Presenter</string>
-    <string name="TextListPresenter_FilterPopUpHeaderText">Filter</string>
     <string name="TextListPresenter_FilterUserHintText">Filter elements by type:</string>
     <string name="TextListPresenter_FilterElementDefault">Default</string>
     <string name="TextListPresenter_FilterElementInfo">Information</string>
@@ -107,8 +94,6 @@
     <string name="UnlockCtrl_ConditionText_Locked">Locked</string>
     <string name="UnlockCtrl_ConditionText_Unlocked">Unlocked</string>
     <string name="UnlockCtrl_PinEntryText">PIN:</string>
-    <string name="UnlockCtrl_ButtonText_Show">Show</string>
-    <string name="UnlockCtrl_ButtonText_Hide">Hide</string>
     <string name="UnlockCtrl_PopupHeaderText">Change Pin</string>
     <string name="UnlockCtrl_PopupCurrentPinDescriptorText">Current Pin:</string>
     <string name="UnlockCtrl_PopupNewPinDescriptorText">New Pin:</string>
@@ -123,7 +108,6 @@
     <string name="GeneralMessage_reconnected">Device reconnected</string>
     <string name="GeneralMessage_connectionSuspended">Connection suspended</string>
     <string name="GeneralMessage_resumingConnection">Resuming connection - please wait</string>
-    <string name="GeneralMessage_connectingFailed">Connection failed:</string>
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Cancel</string>
     <string name="GeneralString_Delete">Delete</string>
@@ -133,9 +117,7 @@
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamic Remote Control</string>
-    <string name="InfoActivity_AppVersionEntry">App-Version </string>
     <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2023 Hans Philipp Zimmermann</string>
-    <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">All rights reserved</string>
 
     <string name="InfoActivity_ImprintAndContact">Imprint &amp; Contact</string>
@@ -186,18 +168,12 @@
     <string name="SetupActivity_Header">Settings</string>
     <string name="SetupActivity_AutoConnectElementText">Auto-Connect</string>
     <string name="SetupActivity_AutoConnectHint">If auto-connect is set up, the app will try to connect to the last device on startup. If only one device is available, the app connects automatically to this device.</string>
-    <string name="SetupActivity_CustomBindingCodeElementText">Use custom binding key</string>
-    <string name="SetupActivity_CustomBindingCodeHint">By default a random generated binding-code is used. To use your own key, set it up here.</string>
-    <string name="SetupActivity_BindingCodeDescriptor">Binding-Code</string>
     <string name="SetupActivity_SavePropertiesElementText">Save Device-Properties</string>
     <string name="SetupActivity_SavePropertiesHint">If activated, the device-properties for the connected remote device will be saved. This results in a faster connection performance.</string>
     <string name="SetupActivity_UUIDManagerButtonText">Manage UUID-Profiles</string>
     <string name="SetupActivity_EnableLoggingElementText">Enable Connection Log</string>
     <string name="SetupActivity_EnableLoggingHint">All transmission-data and connection-events will be saved to a temporary cache. This may reduce the performance in the connection process but could be helpful for troubleshooting or during the development process of the remote device.</string>
     <string name="SetupActivity_ShowLogButtonText">Show Log</string>
-    <string name="SetupActivity_PassKeyMustNotBeEmpty">Binding Code cannot be empty.</string>
-    <string name="SetupActivity_PassKeyMaxIs10Character">The maximum length of the binding-code is 10 character.</string>
-    <string name="SetupActivity_PassKeyContainsInvalidCharacter">The binding-code contains invalid character.</string>
     <string name="SetupActivity_ResetDataButtonText">Reset App Data</string>
     <string name="SetupActivity_KeepScreenActiveElementText">Keep screen active</string>
     <string name="SetupActivity_KeepScreenActiveHint">Prevents the device from falling in sleep-mode when the remote device is connected.</string>
@@ -207,7 +183,6 @@
     <string name="SetupActivity_Design_Dark">Dark</string>
     <string name="SetupActivity_Design_SystemDefault">System Default</string>
     <string name="SetupActivity_DesignSelectionPopUpHeaderText">Design Selection</string>
-    <string name="SetupActivity_PremiumHeaderText">Premium</string>
     <string name="SetupActivity_PremiumAppUserStatusDescriptorText">Premium Status:</string>
     <string name="SetupActivity_PremiumAppUserStatus_NotPurchased">Limited Functionality</string>
     <string name="SetupActivity_PremiumAppUserStatus_Purchased">Full Access</string>
@@ -223,7 +198,6 @@
 
     <string name="BindingManagerActivity_HeaderText">Manage Binding-Data</string>
     <string name="BindingManagerActivity_BindingTypeAsOriginator">Origin</string>
-    <string name="BindingManagerActivity_BindingTypeDeprecatedOriginator">Origin (Key deprecated)</string>
     <string name="BindingManagerActivity_BindingTypeAsSharingReceiver">Shared Key</string>
     <string name="BindingManagerActivity_ListElementDeviceName">Device-Name:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac-Address:</string>
@@ -235,13 +209,9 @@
     <string name="ResetAppActivity_SelectDataActionText">Select the data you want to reset:</string>
     <string name="ResetAppActivity_SelectAllCheckBoxText">Select all</string>
     <string name="ResetAppActivity_ResetAppSettingsCheckBoxText">App Settings</string>
-    <string name="ResetAppActivity_ResetBindingDataCheckBoxText">Binding Data</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxText">UUID Profiles</string>
-    <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxText">Default Binding Key</string>
     <string name="ResetAppActivity_ResetAppSettingsCheckBoxHint">The common app settings will be set to default.</string>
-    <string name="ResetAppActivity_ResetBindingDataCheckBoxHint">All data regarding the device-binding will be deleted. Including the shared binding data.</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxHint">All UUID-Profiles will be deleted. Except the static profiles.</string>
-    <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxHint">A new custom Binding-Key will be generated. Be careful if there are remote devices which require the current Key.</string>
     <string name="ResetAppActivity_ResetPropertyCacheCheckboxText">Property Cache</string>
     <string name="ResetAppActivity_ResetPropertyCacheCheckboxHint">The saved properties for all devices will be cleared.</string>
     <string name="ResetAppActivity_CancelButtonText">Cancel</string>
@@ -335,8 +305,6 @@
     <string name="ViewLogFilterPopUp_FilterElementInfo">Information</string>
     <string name="ViewLogFilterPopUp_FilterElementWarning">Warning</string>
     <string name="ViewLogFilterPopUp_FilterElementError">Error</string>
-    <string name="ViewLogFilterPopUp_FilterActionButtonApply">Apply</string>
-    <string name="ViewLogFilterPopUp_FilterActionButtonCancel">Cancel</string>
 
 
     <string name="DataSharingActivity_GoToMainButtonText">Back to App</string>
@@ -368,9 +336,6 @@
     <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Use distinct characteristics for RX and TX</string>
 
     <string name="AddDeviceActivityHeaderText">Add new Device</string>
-    <string name="AddDeviceActivityBondingHintText">Devices must be paired to show up in the list. Go to Bluetooth settings to pair a device.</string>
-    <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Settings</string>
-    <string name="AddDeviceActivityDoNotShowAgainButtonText">Do not show again</string>
     <string name="AddDeviceActivityScanResultHeaderText">Available</string>
     <string name="AddDeviceActivityPairedDevicesHeaderText">Paired</string>
     <string name="AddDeviceActivityPermissionRationaleText">To scan for Bluetooth-Devices the location permission is required. This is an Android system requirement. Actually this app is not using the location in any case. Grant permission?</string>
@@ -401,14 +366,8 @@
     <!-- content descriptions and labels -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
-    <string name="DeviceTypeHeaderImageButtonDescription">Remove the device and select a new device</string>
-    <string name="DeviceInfoSubHeaderImageDescription">Image for the additional device info</string>
     <string name="DevicePropertyListElementImageDescription">Image for the appropriate device property</string>
     <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>
-    <string name="DeviceReConnectImageButtonDescription">ImageButton to open the device-settings</string>
-    <string name="BackImageButtonDescription">Button with the purpose to navigate back to the deviceMainActivity</string>
-    <string name="InformationImageDescription">Button to open the info-activity</string>
-    <string name="SettingsImageDescription">Button to open the main-settings-activity</string>
     <string name="MainActivityHamburgerButtonContentDescription" translatable="false">Open the main menu to go to sub-pages</string>
     <string name="ManageUUIDProfileActivityAddButtonContentDescription" translatable="false">Add a new uuid profile</string>
     <string name="NavigatorControlActivityOkButtonContentDescription" translatable="false">Send an OK command to the remote device</string>
@@ -421,7 +380,6 @@
     <string name="AddDeviceListElementContentDescription" translatable="false">Adds the device to the known devices</string>
     <string name="GeneralBackButtonLabel" translatable="false">Goes back to previous activity</string>
     <string name="ComplexSubPageDeviceSettingsButtonLabel" translatable="false">Open the device settings</string>
-    <string name="GeneralForwardButtonLabel" translatable="false">Navigates to the next activity</string>
     <string name="GeneralClearButtonContentDescription" translatable="false">Clear the content</string>
     <string name="GeneralReloadButtonContentDescription" translatable="false">Reload the Content</string>
     <string name="GeneralCloseButtonLabel" translatable="false">Close the element</string>
@@ -435,12 +393,9 @@
     <string name="ViewLogFilterButtonLabel" translatable="false">Filter the list</string>
 
     <!-- Activity Labels -->
-    <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
     <string name="DeviceMainActivity">Activity to show the primary properties of the device</string>
     <!-- Errors -->
-    <string name="Error_ConnectionFailed_NoDevice">No valid device found</string>
-    <string name="Error_SavedBindingKeyIsEmpty">Binding Key loading failed. Key was empty.</string>
     <string name="Error_ResumeFailedDeviceNotReachable">Resuming connection failed: Device not reachable.</string>
     <string name="Error_ResumeFailedNoDevice">Resuming connection failed: No device.</string>
     <string name="Error_UnexpectedBindingKeyMissing">Unexpected error: Internal binding key is missing.</string>
@@ -482,21 +437,17 @@
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
     <string name="ConnectedDevicePlaceholderName">Device Name</string>
-    <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
     <string name="LevelIndicationTextPlaceholder">100%</string>
-    <string name="PropertySubPagePlaceholder">This is a property Page</string>
-    <string name="RGBPageColorSelectionInformation">Selected Color: </string>
-    <string name="info_activity_placeholder">Info Activity</string>
-    <string name="app_settings">App-Settings</string>
-    <string name="binding_code_placeholder">h5G+s%gt</string>
-    <string name="pinCodePlaceholder">*****</string>
     <string name="uuidProfileListPlaceholder" translatable="false">Profile Element</string>
     <string name="UUIDFormatHint" translatable="false">0000ffff–0000-1000-8000-00805f9b34fb</string>
     <string name="UUIDDefaultFill" translatable="false">00000000-0000-1000-8000-00805f9b34fb</string>
-    <string name="ConnectionLog_NoContent">Nothing to show..</string>
     <string name="TextResourceErrorState" translatable="false">Resource::Error</string>
     <string name="TextListPresenterListElementPlaceholderText">List Element</string>
-    <string name="VeryLongViewTestString" translatable="false">This is a very long string. It is used to test the visual appearance of a textView when large text is displayed. Important is the max width of the textView and the margin or padding on the start and end of the view.</string>
 
+    <!-- currently unused:
+
+    <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
+    <string name="VeryLongViewTestString" translatable="false">This is a very long string. It is used to test the visual appearance of a textView when large text is displayed. Important is the max width of the textView and the margin or padding on the start and end of the view.</string>
+    -->
 
 </resources>

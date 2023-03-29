@@ -98,7 +98,7 @@ class AddedDevices(private val appContext: Context) {
         }
     }
 
-    fun remove(macAddress: String){
+    private fun remove(macAddress: String){
 
         var indexToRemove = -1
 

@@ -32,7 +32,6 @@
             />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/bindingManagerActivityHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/BindingManagerActivity_HeaderText"
@@ -74,7 +73,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bindingManagerActivityUserHintContainer"
         android:layout_marginBottom="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
@@ -85,7 +83,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/bindingManagerActivityUserHintTextView"
             android:text="@string/BindingManagerActivity_UserHint"
             android:padding="10dp"
             android:textAlignment="center"

@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/mainActivityPopUpFlyoutRootContainer"
     android:background="@drawable/main_activity_popup_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -47,7 +46,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mainActivityPopUpElement_InfoTextView"
             android:text="@string/MA_PopUp_InformationTitle"
             android:textSize="18sp"
             android:layout_marginStart="20dp"
@@ -98,7 +96,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mainActivityPopUpElement_HelpTextView"
             android:text="@string/MA_PopUp_HelpTitle"
             android:textSize="18sp"
             android:layout_marginStart="20dp"
@@ -149,7 +146,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mainActivityPopUpElement_ShowLogTextView"
             android:text="@string/MA_PopUp_ShowLogTitle"
             android:textSize="18sp"
             android:layout_marginStart="20dp"
@@ -203,7 +199,6 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mainActivityPopUpElement_SettingsTextView"
             android:text="@string/MA_PopUp_SettingsTitle"
             android:textSize="18sp"
             android:layout_marginStart="20dp"

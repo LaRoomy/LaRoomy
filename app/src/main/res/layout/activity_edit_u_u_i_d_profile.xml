@@ -268,7 +268,6 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/editUUIDActivityHelpTextView"
                 android:textColor="@color/mode_accent_color"
                 android:textSize="12sp"
                 android:text="@string/EditUUIDProfileActivityHelpText"
@@ -284,7 +283,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/editUUIDActivityButtonContainer"
             android:layout_marginTop="20dp"
             android:paddingBottom="50dp"
             android:orientation="horizontal"

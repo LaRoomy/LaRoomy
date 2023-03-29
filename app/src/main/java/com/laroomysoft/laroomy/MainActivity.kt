@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -17,7 +16,6 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
@@ -524,6 +522,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
     }
 
+    /*
     private fun notifyUser(message: String){
         val dialog = AlertDialog.Builder(this)
         dialog.setMessage(message)
@@ -535,6 +534,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         dialog.create()
         dialog.show()
     }
+    */
     
     private fun setUIState(state: Int){
         when(state){

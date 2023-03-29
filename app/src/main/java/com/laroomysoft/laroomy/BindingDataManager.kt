@@ -121,7 +121,7 @@ class BindingDataManager(private val appContext: Context) {
         }
     }
     
-    fun clearAll() {
+    private fun clearAll() {
         val sharedPref =
             appContext.getSharedPreferences(
                 appContext.getString(R.string.FileKey_BindingPairs),

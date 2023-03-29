@@ -44,7 +44,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/infoActivityHeaderTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/InfoActivity_HeaderText"
@@ -191,7 +190,6 @@
                     />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/infoActivityMailToTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
@@ -475,7 +473,6 @@
                     app:layout_constraintTop_toBottomOf="@id/infoActivityEightSeparator" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/infoActivityContactUsContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxWidth="600dp"
@@ -677,7 +674,6 @@
                     app:layout_constraintTop_toBottomOf="@id/infoActivityTwelfthSeparator" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/infoActivityTermsOfServiceContactContentTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxWidth="600dp"
@@ -876,7 +872,6 @@
                     android:layout_height="wrap_content"
                     android:minHeight="48dp"
                     android:textSize="18sp"
-                    android:id="@+id/infoActivityCreditsRamotionBackLink"
                     android:text="@string/InfoActivity_CR_FluidSlider_RamotionBackLinkText"
                     android:gravity="center_vertical"
                     android:textColor="@color/clickableTextColor"
@@ -1014,7 +1009,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/infoActivityDisclaimerContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -1059,7 +1053,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxWidth="600dp"
-                        android:id="@+id/infoActivityDisclaimerText"
                         android:text="@string/InfoActivity_Disclaimer_Text"
                         android:textAlignment="center"
                         android:textColor="@color/info_activity_text_color"

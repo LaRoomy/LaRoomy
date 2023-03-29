@@ -36,7 +36,6 @@
                 />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/resetAppActivityHeaderTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ResetAppActivity_HeaderText"
@@ -168,7 +167,6 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/resetAppActivityResetPropertyCacheHintTextView"
                 android:text="@string/ResetAppActivity_ResetPropertyCacheCheckboxHint"
                 android:layout_marginStart="30dp"
                 app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetPropertyCacheCheckBox"
@@ -206,7 +204,6 @@
             >
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/resetAppActivityCancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/general_rounded_button_background"
@@ -224,7 +221,6 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/resetAppActivityResetButton"
                 android:textSize="18sp"
                 android:text="@string/ResetAppActivity_ResetButtonText"
                 android:background="@drawable/general_rounded_button_background"

@@ -6,7 +6,7 @@ import android.util.Log
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-const val COMMON_PASSKEY_LENGTH = 10
+//const val COMMON_PASSKEY_LENGTH = 10
 
 const val passKeyCharacter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
 
@@ -694,6 +694,7 @@ fun createRandomPasskey(keyLength: Int): String {
     return randomPasskey
 }
 
+/*
 fun isCharAcceptedInPassKey(c: Char) : Boolean {
     passKeyCharacter.forEach {
         if(it == c){
@@ -702,7 +703,9 @@ fun isCharAcceptedInPassKey(c: Char) : Boolean {
     }
     return false
 }
+ */
 
+/*
 fun validatePassKey(key: String) : Boolean{
     key.forEach {
         if(!isCharAcceptedInPassKey(it)){
@@ -711,7 +714,7 @@ fun validatePassKey(key: String) : Boolean{
     }
     return true
 }
-
+*/
 
 class PercentageLevelPropertyGenerator(E8bit_level: Int){
 

@@ -1758,7 +1758,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
         applicationProperty.logControl("I: Property Listing requested -> Lookup if loading from cache is permitted.")
 
         if(this.bleDeviceData.hasCachingPermission){
-            if(applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+            if(applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, false)){
 
                 val propertyData =
                     PropertyCacheManager(applicationProperty.applicationContext)
@@ -1893,7 +1893,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
                 // no groups, finalize the retrieval!
 
                 // save data to cache if permitted
-                if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+                if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, false)){
 
                     if(verboseLog){
                         Log.d("sendNextPropRQ", "Data caching is permitted. Saving property-data to cache.")
@@ -1973,7 +1973,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
             applicationProperty.logControl("I: Final group count reached. Group-count is: ${this.bleDeviceData.groupCount}")
 
             // save data to cache if permitted
-            if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+            if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, false)){
 
                 val devicePropertyCacheData = DevicePropertyCacheData()
                 devicePropertyCacheData.generate(this.laRoomyDevicePropertyList, this.laRoomyPropertyGroupList)
@@ -2745,7 +2745,7 @@ class BLEConnectionManager(private val applicationProperty: ApplicationProperty)
 
     private fun savePropertyDataToCacheIfPermitted(){
         // save data to cache if permitted
-        if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, true)){
+        if(this.bleDeviceData.hasCachingPermission && applicationProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_SaveProperties, false)){
 
             if(verboseLog){
                 Log.d("SavePDataToCache", "Caching is permitted: Saving property and group data to cache.")

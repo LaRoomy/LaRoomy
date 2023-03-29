@@ -4,12 +4,10 @@
     <string name="app_version">App-Version 2.1.0</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Geräte</string>
-    <string name="MA_NoAvailableDevices">Keine Geräte gefunden. Bitte stellen Sie sicher dass das Gerät mit dem System gekoppelt ist.</string>
     <string name="MA_PopUp_SettingsTitle">Einstellungen</string>
     <string name="MA_PopUp_InformationTitle">App-Info</string>
     <string name="MA_PopUp_HelpTitle">Hilfe Themen</string>
     <string name="MA_PopUp_ShowLogTitle">Protokoll anzeigen</string>
-    <string name="MA_PopUp_ReloadList">Liste aktualisieren</string>
     <string name="MA_UserNotificationDialogTitle">Benachrichtigung</string>
     <string name="MA_NoContentUserHintText">Hier ist es einsam.\nFüge das erste Gerät hinzu.</string>
     <string name="MA_BluetoothNotEnabledHintText">Die Verbindung über Bluetooth ist die Basisfunktion dieser App. Aus diesem Grund muss Bluetooth aktiviert sein. Hier tippen um Bluetooth zu aktivieren.</string>
@@ -25,11 +23,8 @@
 
 
     <string name="CA_Connecting">Verbinde..</string>
-    <string name="CA_Connected">Verbunden</string>
     <string name="CA_Initialize">Initialisiere..</string>
-    <string name="CA_AuthSuccess">Authentifikation erfolgreich - Suche nach Geräte-Eigenschaften</string>
     <string name="CA_BindingPasskeyRejected">Falscher Bindungs-Code: Verbindung abgelehnt</string>
-    <string name="CA_BindingNotActivated">Geräte-Bindung ist erforderlich, aber deaktiviert in App-Einstellungen</string>
     <string name="CA_TimeoutForConnection">Zeitüberschreitung - Gerät nicht erreichbar</string>
     <string name="CA_LoadingProperties">Geräte-Eigenschaften werden geladen..</string>
     <string name="CA_ErrorDeviceListIndexInvalid">Ungültiger Geräte-Index</string>
@@ -45,10 +40,7 @@
     <string name="DMA_ConnectionStatus_disconnected_tryToReconnect">getrennt - wird erneut versucht</string>
     <string name="DMA_ConnectionStatus_connected">verbunden</string>
     <string name="DMA_Ready">Bereit</string>
-    <string name="DMA_DeviceConnectionSuspended">Verbindung unterbrochen</string>
     <string name="DMA_LoadingPropertiesUserInfo">Lade Eigenschaften..</string>
-    <string name="DMA_NoConnection">Keine Verbindung</string>
-    <string name="DMA_ErrorElementText">error:type !</string>
     <string name="DMA_PopUpMenuText_DeviceSettings">Gerät-Einstellungen</string>
     <string name="DMA_PopUpMenuText_DiscardDevice">Gerät schließen</string>
     <string name="DMA_PopUpMenuText_ReloadProperties">Eigenschaften neu laden</string>
@@ -70,10 +62,6 @@
     <string name="ELS_OnOff">An / Aus</string>
 
     <string name="STS_HeaderText">Zeit Auswahl</string>
-    <string name="STS_Hours">Stunden</string>
-    <string name="STS_Minutes">Minuten</string>
-    <string name="STS_Seconds">Sekunden</string>
-    <string name="STS_TimePlaceholder">00 : 00</string>
 
     <string name="NavCon_HeaderText">Navigator</string>
 
@@ -99,7 +87,6 @@
 
 
     <string name="TextListPresenter_HeaderText">Textliste</string>
-    <string name="TextListPresenter_FilterPopUpHeaderText">Filter</string>
     <string name="TextListPresenter_FilterUserHintText">Elemente nach Typ filtern:</string>
     <string name="TextListPresenter_FilterElementDefault">Default</string>
     <string name="TextListPresenter_FilterElementInfo">Information</string>
@@ -113,8 +100,6 @@
     <string name="UnlockCtrl_ConditionText_Locked">Verriegelt</string>
     <string name="UnlockCtrl_ConditionText_Unlocked">Entriegelt</string>
     <string name="UnlockCtrl_PinEntryText">PIN:</string>
-    <string name="UnlockCtrl_ButtonText_Show">Anzeigen</string>
-    <string name="UnlockCtrl_ButtonText_Hide">Verbergen</string>
     <string name="UnlockCtrl_PopupHeaderText">Pin ändern</string>
     <string name="UnlockCtrl_PopupCurrentPinDescriptorText">Aktuelle Pin:</string>
     <string name="UnlockCtrl_PopupNewPinDescriptorText">Neue Pin:</string>
@@ -131,7 +116,6 @@
     <string name="GeneralMessage_reconnected">Verbindung wiederhergestellt</string>
     <string name="GeneralMessage_connectionSuspended">Verbindung unterbrochen</string>
     <string name="GeneralMessage_resumingConnection">Verbindung wird wiederhergestellt..</string>
-    <string name="GeneralMessage_connectingFailed">Verbindung fehlgeschlagen:</string>
 
     <string name="GeneralString_OK">OK</string>
     <string name="GeneralString_Cancel">Abbrechen</string>
@@ -142,9 +126,7 @@
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
     <string name="InfoActivity_AppDescription">Dynamische Fernsteuerung</string>
-    <string name="InfoActivity_AppVersionEntry">App-Version </string>
     <string name="InfoActivity_CopyrightLaroomySoft">&#169; 2022 Hans Philipp Zimmermann</string>
-    <string name="InfoActivity_CEOHansZimmermann">CEO Hans Philipp Zimmermann</string>
     <string name="InfoActivity_AllRightsReserved">Alle Rechte vorbehalten</string>
 
     <string name="InfoActivity_ImprintAndContact">Impressum &amp; Kontakt</string>
@@ -197,18 +179,12 @@
     <string name="SetupActivity_Header">Einstellungen</string>
     <string name="SetupActivity_AutoConnectElementText">Automatisch verbinden</string>
     <string name="SetupActivity_AutoConnectHint">Wenn diese Einstellung aktiviert ist, dann wird die App versuchen eine Verbindung zum letzten erfolgreich verbundenen Gerät herzustellen. Wenn nur ein Gerät verfügbar ist, dann wird dieses automatisch verbunden.</string>
-    <string name="SetupActivity_CustomBindingCodeElementText">Benutzerdefinierten Bindungs-Key verwenden</string>
-    <string name="SetupActivity_CustomBindingCodeHint">Standardmäßig wird ein zufällig generierter Schlüssel verwendet. Dieser kann hier geändert werden.</string>
-    <string name="SetupActivity_BindingCodeDescriptor">Bindungs-Code</string>
     <string name="SetupActivity_SavePropertiesElementText">Geräte-Eigenschaften speichern</string>
     <string name="SetupActivity_SavePropertiesHint">Die Geräte-Eigenschaften werden für das entsprechende Gerät gespeichert. Die zum Verbinden benötigte Zeit wird dadurch reduziert.</string>
     <string name="SetupActivity_UUIDManagerButtonText">UUID Profile verwalten</string>
     <string name="SetupActivity_EnableLoggingElementText">Verbindungsprotokoll erstellen</string>
     <string name="SetupActivity_EnableLoggingHint">Es wird ein temporäres Übertragungs-Protokoll erstellt. Unter Umständen führt das zu einer Beeinträchtigung der Performance, kann aber bei der Fehlersuche oder der Entwicklung des Endgerätes hilfreich sein.</string>
     <string name="SetupActivity_ShowLogButtonText">Protokoll anzeigen</string>
-    <string name="SetupActivity_PassKeyMustNotBeEmpty">Schlüssel darf nicht leer sein.</string>
-    <string name="SetupActivity_PassKeyMaxIs10Character">Schlüssel darf maximal 10 Zeichen enthalten.</string>
-    <string name="SetupActivity_PassKeyContainsInvalidCharacter">Schlüssel enthält ungültige Zeichen.</string>
     <string name="SetupActivity_ResetDataButtonText">App zurücksetzen</string>
     <string name="SetupActivity_KeepScreenActiveElementText">Bildschirm aktiv halten</string>
     <string name="SetupActivity_KeepScreenActiveHint">Verhindert den Stromsparmodus wenn das Gerät verbunden ist.</string>
@@ -218,7 +194,6 @@
     <string name="SetupActivity_Design_Dark">Dunkel</string>
     <string name="SetupActivity_Design_SystemDefault">Systemstandard</string>
     <string name="SetupActivity_DesignSelectionPopUpHeaderText">Design auswählen</string>
-    <string name="SetupActivity_PremiumHeaderText">Premium</string>
     <string name="SetupActivity_PremiumAppUserStatusDescriptorText">Premium Status:</string>
     <string name="SetupActivity_PremiumAppUserStatus_NotPurchased">Eingeschränkte Funktion</string>
     <string name="SetupActivity_PremiumAppUserStatus_Purchased">Vollzugriff</string>
@@ -238,12 +213,11 @@
 
     <string name="BindingManagerActivity_HeaderText">Bindungsdaten verwalten</string>
     <string name="BindingManagerActivity_BindingTypeAsOriginator">Urheber</string>
-    <string name="BindingManagerActivity_BindingTypeDeprecatedOriginator">Urheber (Schlüssel veraltet)</string>
     <string name="BindingManagerActivity_BindingTypeAsSharingReceiver">Geteilter Schlüssel</string>
     <string name="BindingManagerActivity_ListElementDeviceName">Gerätename:</string>
     <string name="BindingManagerActivity_ListElementMacAddress">Mac Adresse:</string>
     <string name="BindingManagerActivity_ListElementBindingType">Bindungstyp:</string>
-    <string name="BindingManagerActivity_UserHint">Nach links wischen löscht einen Datensatz. Aber Vorsicht: Wenn die Geräte-Bindung aktiviert ist, ist die Verbindung nicht mehr möglich. Die Bindung muss gelöst werden bevor ein Datensatz gelöscht wird.</string>
+    <string name="BindingManagerActivity_UserHint">Nach links wischen löscht einen Datensatz. Aber Vorsicht: Wenn die Geräte-Bindung aktiviert ist, ist die Verbindung nicht mehr möglich. Die Bindung muss gelöst werden bevor ein Datensatz entfernt wird.</string>
     <string name="BindingManagerActivity_ConfirmDelete_AsOriginator">Bitte bestätige das Entfernen der Bindungsdaten. Du bist der Urheber der Geräte Bindung. Wenn die Geräte Bindung nicht gelöst wurde, wird die Verbindung zum Gerät fehlschlagen.</string>
 
 
@@ -252,13 +226,9 @@
     <string name="ResetAppActivity_SelectDataActionText">Daten auswählen:</string>
     <string name="ResetAppActivity_SelectAllCheckBoxText">Alle auswählen</string>
     <string name="ResetAppActivity_ResetAppSettingsCheckBoxText">App Einstellungen</string>
-    <string name="ResetAppActivity_ResetBindingDataCheckBoxText">Bindungsdaten</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxText">UUID Profile</string>
-    <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxText">Standard Bindungs-Schlüssel</string>
     <string name="ResetAppActivity_ResetAppSettingsCheckBoxHint">Die allgemeinen Einstellungen werden auf Standardwerte zurückgesetzt.</string>
-    <string name="ResetAppActivity_ResetBindingDataCheckBoxHint">Alle Daten bezüglich der Geräte-Bindung werden gelöscht. Inklusive der geteilen Bindungsdaten.</string>
     <string name="ResetAppActivity_ResetUUIDProfilesCheckBoxHint">Alle UUID-Profile werden gelöscht. Statische Profile bleiben erhalten.</string>
-    <string name="ResetAppActivity_ResetDefaultBindingKeyCheckBoxHint">Es wird ein neuer Zufalls-Schlüssel generiert. Vorsicht mit dieser Reset-Option wenn Geräte den aktuellen Bindungs-Schlüssel benötigen.</string>
     <string name="ResetAppActivity_ResetPropertyCacheCheckboxText">Gespeicherte Geräte-Eigenschaften</string>
     <string name="ResetAppActivity_ResetPropertyCacheCheckboxHint">Der Zwischenspeicher für Geräte-Eigenschaften wird bereinigt.</string>
     <string name="ResetAppActivity_CancelButtonText">Abbrechen</string>
@@ -354,8 +324,6 @@
     <string name="ViewLogFilterPopUp_FilterElementInfo">Information</string>
     <string name="ViewLogFilterPopUp_FilterElementWarning">Warnung</string>
     <string name="ViewLogFilterPopUp_FilterElementError">Fehler</string>
-    <string name="ViewLogFilterPopUp_FilterActionButtonApply">Anwenden</string>
-    <string name="ViewLogFilterPopUp_FilterActionButtonCancel">Abbrechen</string>
 
 
     <string name="DataSharingActivity_GoToMainButtonText">Zurück zur App</string>
@@ -387,9 +355,6 @@
     <string name="EditUUIDProfileActivityUseDistinctCharacteristicsCheckBoxText">Separate Characteristic für RX und TX verwenden</string>
 
     <string name="AddDeviceActivityHeaderText">Neues Gerät hinzufügen</string>
-    <string name="AddDeviceActivityBondingHintText">Nur gekoppelte Geräte werden in der Liste angezeigt. Geräte können über die Bluetooth Einstellungen gekoppelt werden.</string>
-    <string name="AddDeviceActivityGotoBluetoothSettingsButtonText">Bluetooth Einstellungen</string>
-    <string name="AddDeviceActivityDoNotShowAgainButtonText">Nicht mehr anzeigen</string>
     <string name="AddDeviceActivityScanResultHeaderText">Verfügbar</string>
     <string name="AddDeviceActivityPairedDevicesHeaderText">Gekoppelt</string>
     <string name="AddDeviceActivityPermissionRationaleText">Um einen Bluetooth-Scan durchzuführen ist die Standort Berechtigung erforderlich. Diese Bedingung ist vom System vorgegeben. Der Standort wird weder abgerufen noch verwendet. Berechtigung gewähren?</string>
@@ -421,21 +386,12 @@
     <!-- Image content descriptions -->
     <string name="AvailableDeviceListImageDescription">Image for the appropriate device identification</string>
     <string name="DeviceTypeHeaderImageDescription">Image for the appropriate device</string>
-    <string name="DeviceTypeHeaderImageButtonDescription">Remove the device and select a new device</string>
-    <string name="DeviceInfoSubHeaderImageDescription">Image for the additional device info</string>
     <string name="DevicePropertyListElementImageDescription">Image for the appropriate device property</string>
     <string name="NavigateForwardImageDescription">Image-Arrow to navigate forward</string>
-    <string name="DeviceReConnectImageButtonDescription">ImageButton to open the device-settings</string>
-    <string name="BackImageButtonDescription">Button with the purpose to navigate back to the deviceMainActivity</string>
-    <string name="InformationImageDescription">Button to open the info-activity</string>
-    <string name="SettingsImageDescription">Button to open the main-settings-activity</string>
     <!-- Labels -->
-    <string name="MainActivityLabel">Start-Activity of the LaRoomy App</string>
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>
     <string name="DeviceMainActivity">Activity to show the primary properties of the device</string>
     <!-- Errors -->
-    <string name="Error_ConnectionFailed_NoDevice">Kein gültiges Gerät gefunden</string>
-    <string name="Error_SavedBindingKeyIsEmpty">Verbindungsschlüssel konnte nicht geladen werden. Schlüssel war null.</string>
     <string name="Error_ResumeFailedDeviceNotReachable">Wiederherstellen der Verbindung fehlgeschlagen: Gerät nicht erreichbar.</string>
     <string name="Error_ResumeFailedNoDevice">Wiederherstellen der Verbindung fehlgeschlagen: Gerät nicht vorhanden.</string>
     <string name="Error_UnexpectedBindingKeyMissing">Unerwarteter Fehler: Interner Bindungsschlüssel fehlt.</string>
@@ -460,15 +416,7 @@
     <!-- Working elements -->
     <string name="UniversalPlaceholderName">This is a Placeholder</string>
     <string name="ConnectedDevicePlaceholderName">Gerät 001</string>
-    <string name="LaRoomyDevicePropertyNamePlaceholder">Device Property Placeholder</string>
     <string name="LevelIndicationTextPlaceholder">100%</string>
-    <string name="PropertySubPagePlaceholder">This is a property Page</string>
-    <string name="RGBPageColorSelectionInformation">Selected Color: </string>
-    <string name="info_activity_placeholder">Info Activity</string>
-    <string name="app_settings">App-Settings</string>
-    <string name="binding_code_placeholder">h5G+s%gt</string>
-    <string name="pinCodePlaceholder">*****</string>
-    <string name="ConnectionLog_NoContent">Keine Daten vorhanden..</string>
     <string name="TextListPresenterListElementPlaceholderText">Listen Element</string>
 
 

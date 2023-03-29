@@ -217,7 +217,7 @@ class AppSettingsActivity : AppCompatActivity() {
                     (applicationContext as ApplicationProperty).loadBooleanData(
                         R.string.FileKey_AppSettings,
                         R.string.DataKey_SaveProperties,
-                        true
+                        false
                     )
                 this.isChecked = state
     

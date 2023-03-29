@@ -31,7 +31,6 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/viewLogActivityHeaderTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ViewLogActivity_HeaderText"
@@ -85,7 +84,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/viewLogActivityToolPanelContainer"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
@@ -142,7 +140,6 @@
         <View
             android:layout_width="1dp"
             android:layout_height="0dp"
-            android:id="@+id/viewLogActivityToolPanelSecondSeparator"
             android:background="@color/viewLogActivityToolPanelSeparatorColor"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
