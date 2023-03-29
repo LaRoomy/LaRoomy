@@ -44,7 +44,7 @@ const val COMPLEX_PROPERTY_TYPE_ID_TEXT_LIST_PRESENTER = 17
 const val DEVICE_SETTINGS_ACTIVITY_ELEMENT_INDEX_DUMMY = 1025
 
 // change this to true to enable an internal verbose log output (this means not the user-log!)
-const val verboseLog = true
+const val verboseLog = false
 
 // default value
 const val COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE = false
@@ -237,6 +237,7 @@ class ApplicationProperty : Application() {
         }
     }
 
+    /*
     fun deleteData(fileKeyID: Int, dataKeyID: Int) {
         val sharedPref =
             getSharedPreferences(
@@ -250,6 +251,7 @@ class ApplicationProperty : Application() {
             commit()
         }
     }
+    */
 
     fun deleteFileWithFileKey(fileKeyID: Int){
         val sharedPref =
