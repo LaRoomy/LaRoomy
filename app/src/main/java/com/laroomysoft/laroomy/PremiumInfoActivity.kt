@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class PremiumInfoActivity : AppCompatActivity() {
     
@@ -32,12 +34,14 @@ class PremiumInfoActivity : AppCompatActivity() {
         // add unlock premium button functionality
         this.unlockPremiumButton = findViewById<AppCompatButton?>(R.id.premiumInfoActivityUnlockButton).apply {
             setOnClickListener {
-                // TODO: handle purchase -> call the billing api!
+                if((this@PremiumInfoActivity.applicationContext as ApplicationProperty).billingHelperCreated) {
+                    MainScope().launch {
+                        (this@PremiumInfoActivity.applicationContext as ApplicationProperty).billingProcessHelper.processPurchase()
+                    }
+                }
             }
         }
     }
-    
-    // TODO: check if a purchase occurred in onResume ?????
     
     private fun handleBackEvent(){
         finish()

@@ -11,6 +11,7 @@
     <string name="MA_NoContentUserHintText">Nothing to show.\nAdd your first device.</string>
     <string name="MA_BluetoothNotEnabledHintText">The base functionality of this App is to connect to bluetooth devices. Therefore bluetooth must be enabled. Tap here to enable bluetooth.</string>
     <string name="MA_BluetoothPermissionMissionHintText">The base functionality of this App is to connect to bluetooth devices. Therefore it needs your permission to access bluetooth devices on this phone and connect to it. Tap here to grant the permission.</string>
+    <string name="MA_PurchaseRestored">Your purchase was applied to this app installation.</string>
 
     <string name="MainActivity_ActionBannerText_TestPeriodActive">You are in a 30 days test period with full access to all app capabilities</string>
     <string name="MainActivity_ActionBannerText_UnpaidVersion">You are using this app with restricted capabilities. Become a premium app user to unleash the full potential.</string>
@@ -187,8 +188,10 @@
     <string name="SetupActivity_PremiumAppUserStatus_NotPurchased">Limited Functionality</string>
     <string name="SetupActivity_PremiumAppUserStatus_Purchased">Full Access</string>
     <string name="SetupActivity_PremiumAppUserStatus_TestPeriod">Test Period</string>
+    <string name="SetupActivity_PremiumAppUserStatus_PurchasePending">Purchase pending</string>
     <string name="SetupActivity_PremiumAppStatusHint_NotPurchased">The app is running with a restricted functionality.</string>
     <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">You are in a 30 days test period with full access to all app capabilities.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_PurchasePending">Your purchase request has been received, but has not yet been confirmed.</string>
     <string name="SetupActivity_PremiumAppStatusHint_TestEndIn">Remaining days:</string>
     <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Get more information</string>
     <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Restore Purchase</string>
@@ -430,6 +433,8 @@
     <string name="DataKey_TestPeriodStarted" translatable="false">testPeriodStarted</string>
     <string name="DataKey_FirstUseDate" translatable="false">firstUseDate</string>
     <string name="DataKey_HideMainActivityTestBanner" translatable="false">hideMainActivityTestBanner</string>
+    <string name="DataKey_PurchaseToken" translatable="false">9373fa26-fadb-4051-9349-c73f71b6f07d</string>
+    <string name="DataKey_OrderID" translatable="false">b7a83967-87ed-4652-83af-a01003cd77ed</string>
 
     <!-- Default values -->
     <string name="DefaultValue_DesignSelection" translatable="false">systemDefault</string>

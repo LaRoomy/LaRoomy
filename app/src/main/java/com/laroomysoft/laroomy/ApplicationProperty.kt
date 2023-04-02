@@ -65,7 +65,7 @@ const val ERROR_INVALID_FORMAT = "error - invalid format"
 const val ERROR_INVALID_PARAMETER = "error - invalid character"
 
 // links
-const val LAROOMY_WEBAPI_BASIS_LINK = "https://epl2-datatransmission.blogspot.com/p/redirect.html?"
+const val LAROOMY_WEBAPI_BASIS_LINK = "https://www.laroomy.com/p/redirect.html?"
 
 // times
 const val TIMEFRAME_PROPERTY_STATE_UPDATE_ON_RECONNECT:Long = 1000
@@ -100,6 +100,7 @@ class ApplicationProperty : Application() {
     var complexUpdateIndex = -1
     var propertyInvalidatedOnSubPage = false
     var closeDeviceRequested = false
+    var billingHelperCreated = false
     
     val isPremiumAppVersion
     get() = this.premiumManager.isPremiumAppVersion
@@ -107,6 +108,7 @@ class ApplicationProperty : Application() {
     lateinit var uuidManager: UUIDManager
     lateinit var addedDevices: AddedDevices
     lateinit var premiumManager: PremiumManager
+    lateinit var billingProcessHelper: BillingProcessHelper
 
     var connectionLog = ArrayList<String>()
     var logRecordingTime = ""

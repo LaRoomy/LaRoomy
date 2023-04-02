@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -16,6 +17,7 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
@@ -34,7 +36,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
+class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, BillingProcessHelper.BillingEventCallback {
 
     private val mainActivityNormalState = 0
     private val mainActivityBluetoothNotEnabledState = 1
@@ -135,6 +137,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         // init classes
         (applicationContext as ApplicationProperty).uuidManager = UUIDManager(applicationContext)
         (applicationContext as ApplicationProperty).addedDevices = AddedDevices(applicationContext)
+        
+        // init billing system
+        if(!(applicationContext as ApplicationProperty).billingHelperCreated) {
+            (applicationContext as ApplicationProperty).billingProcessHelper =
+                BillingProcessHelper(this)
+            (applicationContext as ApplicationProperty).billingHelperCreated = true
+        }
 
         // get UI Elements
         this.addDeviceButton = findViewById(R.id.mainActivityAddDeviceImageButton)
@@ -219,6 +228,18 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         if(verboseLog){
             Log.d("MA:onResume", "onResume executed in MainActivity")
         }
+        
+        // restore purchase if applicable
+        if(!appProperty.loadBooleanData(R.string.FileKey_PremVersion, R.string.DataKey_PurchaseDoneByUser, false)){
+            // only enter this scope if the app is not purchased
+            if(appProperty.billingHelperCreated){
+                // set the callback vector to receive the result
+                appProperty.billingProcessHelper.callback = this
+                // only access this scope if the billing helper exists
+                appProperty.billingProcessHelper.restorePurchase()
+            }
+        }
+        
         // update the global app params
         (applicationContext as ApplicationProperty).onResume()
         
@@ -522,7 +543,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         }
     }
 
-    /*
+    
     private fun notifyUser(message: String){
         val dialog = AlertDialog.Builder(this)
         dialog.setMessage(message)
@@ -534,7 +555,7 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
         dialog.create()
         dialog.show()
     }
-    */
+    
     
     private fun setUIState(state: Int){
         when(state){
@@ -808,5 +829,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener {
                 }
             }
         }
+    }
+    
+    override fun onPurchaseRestored() {
+        notifyUser(getString(R.string.MA_PurchaseRestored))
     }
 }

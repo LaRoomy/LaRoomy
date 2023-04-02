@@ -15,8 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.appcompat.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
-class AppSettingsActivity : AppCompatActivity() {
+class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEventCallback {
 
     private lateinit var rootContainer: ConstraintLayout
     private lateinit var autoConnectSwitch: SwitchCompat
@@ -67,32 +69,60 @@ class AppSettingsActivity : AppCompatActivity() {
         
         // get elements of premium section and configure it
         this.currentPremiumStatusTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserStatusTextView).apply {
-            text = when((applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion){
-                true -> {
-                    if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
-                        getString(R.string.SetupActivity_PremiumAppUserStatus_TestPeriod)
-                    } else {
-                        getString(R.string.SetupActivity_PremiumAppUserStatus_Purchased)
-                    }
-                } else -> {
-                    getString(R.string.SetupActivity_PremiumAppUserStatus_NotPurchased)
+            var textToSet = ""
+            var textSet = false
+            
+            if((applicationContext as ApplicationProperty).billingHelperCreated){
+                if((applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending){
+                    textToSet = getString(R.string.SetupActivity_PremiumAppUserStatus_PurchasePending)
+                    textSet = true
                 }
             }
+            if(!textSet) {
+                textToSet =
+                    when ((applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion) {
+                        true -> {
+                            if ((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive) {
+                                getString(R.string.SetupActivity_PremiumAppUserStatus_TestPeriod)
+                            } else {
+                                getString(R.string.SetupActivity_PremiumAppUserStatus_Purchased)
+                            }
+                        }
+                        else -> {
+                            getString(R.string.SetupActivity_PremiumAppUserStatus_NotPurchased)
+                        }
+                    }
+            }
+            text = textToSet
         }
         this.premiumStatusHintTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserStatusHintTextView).apply {
-            if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
-                // test period
-                text = getString(R.string.SetupActivity_PremiumAppStatusHint_TestPeriod)
-            } else {
-                if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
-                    // purchased
-                    visibility = View.GONE
-                } else {
-                    // not purchased
-                    text = getString(R.string.SetupActivity_PremiumAppStatusHint_NotPurchased)
+            var textToSet = ""
+            var textSet = false
+    
+            if((applicationContext as ApplicationProperty).billingHelperCreated){
+                if((applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending){
+                    textToSet = getString(R.string.SetupActivity_PremiumAppStatusHint_PurchasePending)
+                    textSet = true
                 }
             }
+            
+            if(!textSet) {
+                if ((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive) {
+                    // test period
+                    textToSet = getString(R.string.SetupActivity_PremiumAppStatusHint_TestPeriod)
+                } else {
+                    if ((applicationContext as ApplicationProperty).premiumManager.userHasPurchased) {
+                        // purchased
+                        visibility = View.GONE
+                    } else {
+                        // not purchased
+                        textToSet = getString(R.string.SetupActivity_PremiumAppStatusHint_NotPurchased)
+                    }
+                }
+            }
+            text = textToSet
         }
+        
         this.premiumTestPeriodRemainderTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserTestEndTextView).apply {
             if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
                 val strToSet = "$text  ${(applicationContext as ApplicationProperty).premiumManager.remainingTestPeriodDays}"
@@ -124,10 +154,13 @@ class AppSettingsActivity : AppCompatActivity() {
                 visibility = View.GONE
             } else {
                 setOnClickListener {
-                    
-                    // TODO: handle on restore purchase click ! Call the billing API
-    
-                    Log.d("SetupActivity", "Restore purchase Link clicked !!!")
+                    if(verboseLog) {
+                        Log.d("SetupActivity", "Restore purchase Link clicked !!!")
+                    }
+                    if((this@AppSettingsActivity.applicationContext as ApplicationProperty).billingHelperCreated) {
+                        (this@AppSettingsActivity.applicationContext as ApplicationProperty).billingProcessHelper.callback = this@AppSettingsActivity
+                        (this@AppSettingsActivity.applicationContext as ApplicationProperty).billingProcessHelper.restorePurchase()
+                    }
                 }
             }
         }
@@ -136,9 +169,15 @@ class AppSettingsActivity : AppCompatActivity() {
                 visibility = View.GONE
             } else {
                 setOnClickListener {
-                    // TODO: handle purchase !!! -> Call the billing API
-    
-                    Log.d("SetupActivity", "Unlock Premium Link clicked !!!")
+                    if(verboseLog){
+                        Log.d("SetupActivity", "Unlock Premium Link clicked !!!")
+                    }
+                    if((this@AppSettingsActivity.applicationContext as ApplicationProperty).billingHelperCreated) {
+                        (this@AppSettingsActivity.applicationContext as ApplicationProperty).billingProcessHelper.callback = this@AppSettingsActivity
+                        MainScope().launch {
+                            (this@AppSettingsActivity.applicationContext as ApplicationProperty).billingProcessHelper.processPurchase()
+                        }
+                    }
                 }
             }
         }
@@ -557,6 +596,18 @@ class AppSettingsActivity : AppCompatActivity() {
         val intent = Intent(this@AppSettingsActivity, ResetAppDataActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
+    }
+    
+    override fun onAppPurchasePending() {
+        this.recreate()
+    }
+    
+    override fun onAppPurchased() {
+        this.recreate()
+    }
+    
+    override fun onPurchaseRestored() {
+        this.recreate()
     }
 }
 

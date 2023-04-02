@@ -5,16 +5,19 @@ import android.util.Log
 import com.android.billingclient.api.*
 import kotlinx.coroutines.*
 
-class BillingProcessHelper private constructor(activity: Activity) : PurchasesUpdatedListener, BillingClientStateListener {
+class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, BillingClientStateListener {
     
     // product values
-    private val productID = "my_product_id"
+    private val productID = "5ghzf_34md9_51g3h_vb7rf_43fas"
     
     private var billingClient : BillingClient
     private var isReady = false
+    var purchaseIsPending = false
     private var pendingCall = PendingCalls.NONE
     private var routineScope: CoroutineScope
     private var cActivity: Activity
+    
+    var callback: BillingEventCallback? = null
     
     init {
         if(verboseLog){
@@ -35,6 +38,7 @@ class BillingProcessHelper private constructor(activity: Activity) : PurchasesUp
         billingClient.startConnection(this)
     }
     
+    /*
     fun terminate(){
         try {
             this.routineScope.cancel("Cancel Job")
@@ -42,6 +46,7 @@ class BillingProcessHelper private constructor(activity: Activity) : PurchasesUp
             Log.w("BillingProcessHelper", "BillingProcessHelper::terminate: error: no coroutine job was running")
         }
     }
+     */
     
     private enum class PendingCalls {
         NONE,
@@ -92,7 +97,7 @@ class BillingProcessHelper private constructor(activity: Activity) : PurchasesUp
                 // check if there were requests which have forced the connection to establish (in case of disconnection)
                 if(!checkForPendingCalls()){
                     // if there were no pending calls, try to restore purchases
-                    restorePurchases()
+                    restorePurchase()
                 }
             }
             else -> {
@@ -117,166 +122,263 @@ class BillingProcessHelper private constructor(activity: Activity) : PurchasesUp
     }
     
     suspend fun processPurchase() {
+        try {
+            // make sure there is a connection to google play, otherwise start connection first
+            if (!isReady) {
+                if (verboseLog) {
+                    Log.w(
+                        "BillingProcessHelper",
+                        "BillingProcessHelper::processPurchases: Billing client not connected. Trying to start connection.."
+                    )
+                }
         
-        // make sure there is a connection to google play, otherwise start connection first
-        if(!isReady){
-            if(verboseLog){
-                Log.w("BillingProcessHelper", "BillingProcessHelper::processPurchases: Billing client not connected. Trying to start connection..")
+                // save this action
+                pendingCall = PendingCalls.CALL_PROCESS_PURCHASES
+        
+                // start connection again
+                billingClient.startConnection(this)
+                // exit
+                return
             }
-            // start connection again
-            billingClient.startConnection(this)
-            // save this action
-            pendingCall = PendingCalls.CALL_PROCESS_PURCHASES
-            // exit
-            return
-        }
-        
-        if(verboseLog){
-            Log.d("BillingProcessHelper", "BillingProcessHelper::processPurchases: Retrieving product list")
-        }
-        
-        val productList =
-            ArrayList<QueryProductDetailsParams.Product>()
-        
-        productList.add(
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(productID)
-                .setProductType(BillingClient.ProductType.INAPP)
-                .build()
-        )
-        
-        val params =
-            QueryProductDetailsParams.newBuilder()
-        
-        params.setProductList(productList)
-        
-        // leverage queryProductDetails Kotlin extension function
-        val productDetailsResult = withContext(Dispatchers.IO) {
-            billingClient.queryProductDetails(params.build())
-        }
-        
-        // Process the result.
-        if(productDetailsResult.billingResult.responseCode == BillingClient.BillingResponseCode.OK){
-            launchPurchaseFlow(productDetailsResult)
-        } else {
-            Log.w(
-                "BillingProcessHelper",
-                "BillingProcessHelper::processPurchases: negative billing response code: ${productDetailsResult.billingResult.responseCode}, ${productDetailsResult.billingResult.debugMessage}"
+    
+            if (verboseLog) {
+                Log.d(
+                    "BillingProcessHelper",
+                    "BillingProcessHelper::processPurchases: Retrieving product list"
+                )
+            }
+    
+            val productList =
+                ArrayList<QueryProductDetailsParams.Product>()
+    
+            productList.add(
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(productID)
+                    .setProductType(BillingClient.ProductType.INAPP)
+                    .build()
             )
+    
+            val params =
+                QueryProductDetailsParams.newBuilder()
+    
+            params.setProductList(productList)
+    
+            // leverage queryProductDetails Kotlin extension function
+            val productDetailsResult = withContext(Dispatchers.IO) {
+                billingClient.queryProductDetails(params.build())
+            }
+    
+            // Process the result.
+            if (productDetailsResult.billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                launchPurchaseFlow(productDetailsResult)
+            } else {
+                if (verboseLog) {
+                    Log.w(
+                        "BillingProcessHelper",
+                        "BillingProcessHelper::processPurchases: negative billing response code: ${productDetailsResult.billingResult.responseCode}, ${productDetailsResult.billingResult.debugMessage}"
+                    )
+                }
+            }
+        } catch (e: java.lang.Exception){
+            if(verboseLog){
+                Log.e("BillingProcessHelper", "BillingProcessHelper::processPurchase: severe error: $e")
+            }
         }
     }
     
     private fun launchPurchaseFlow(productDetailsResult: ProductDetailsResult){
-        
-        if(verboseLog){
-            Log.d("BillingProcessHelper", "BillingProcessHelper::launchPurchaseFlow: Invoked")
-        }
-        
-        val productDetails =
-            productDetailsResult.productDetailsList?.elementAt(0)
+        try {
+            if (verboseLog) {
+                Log.d("BillingProcessHelper", "BillingProcessHelper::launchPurchaseFlow: Invoked")
+            }
     
-        if(productDetails != null) {
-            val productDetailsParamsList = listOf(
-                BillingFlowParams.ProductDetailsParams.newBuilder()
-                    // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
-                    .setProductDetails(productDetails)
-                    // to get an offer token, call ProductDetails.subscriptionOfferDetails()
-                    // for a list of offers that are available to the user
-                    //.setOfferToken(selectedOfferToken)
+            val productDetails =
+                productDetailsResult.productDetailsList?.elementAt(0)
+    
+            if (productDetails != null) {
+                val productDetailsParamsList = listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
+                        .setProductDetails(productDetails)
+                        // to get an offer token, call ProductDetails.subscriptionOfferDetails()
+                        // for a list of offers that are available to the user
+                        //.setOfferToken(selectedOfferToken)
+                        .build()
+                )
+        
+                val billingFlowParams = BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
                     .build()
-            )
-    
-            val billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build()
-    
-            // Launch the billing flow
-            val billingResult =
-                billingClient.launchBillingFlow(cActivity, billingFlowParams)
-            
-            when(billingResult.responseCode){
-                BillingClient.BillingResponseCode.OK -> {
-                    Log.d("BillingProcessHelper", "BillingProcessHelper::launchPurchaseFlow: Billing flow successful launched")
+        
+                // Launch the billing flow
+                val billingResult =
+                    billingClient.launchBillingFlow(cActivity, billingFlowParams)
+        
+                when (billingResult.responseCode) {
+                    BillingClient.BillingResponseCode.OK -> {
+                        if (verboseLog) {
+                            Log.d(
+                                "BillingProcessHelper",
+                                "BillingProcessHelper::launchPurchaseFlow: Billing flow successful launched"
+                            )
+                        }
+                    }
+                    else -> {
+                        // negative result
+                        if (verboseLog) {
+                            Log.e(
+                                "BillingProcessHelper",
+                                "BillingProcessHelper::launchPurchaseFlow: negative result: ${billingResult.responseCode}, ${billingResult.debugMessage}"
+                            )
+                        }
+                    }
                 }
-                else -> {
-                    // negative result
-                    Log.e(
-                        "BillingProcessHelper",
-                        "BillingProcessHelper::launchPurchaseFlow: negative result: ${billingResult.responseCode}, ${billingResult.debugMessage}"
-                    )
-                }
+            }
+        } catch (e: Exception){
+            if(verboseLog){
+                Log.e("BillingProcessHelper", "BillingProcessHelper::launchPurchaseFlow: severe error: $e")
             }
         }
     }
     
     private fun handlePurchase(purchase: Purchase) {
+        try {
+            // save purchase token
+            (this.cActivity.applicationContext as ApplicationProperty).saveStringData(
+                purchase.purchaseToken,
+                R.string.FileKey_PremVersion,
+                R.string.DataKey_PurchaseToken
+            )
     
-        // TODO: save purchase token and order ID
+            // save order ID
+            (this.cActivity.applicationContext as ApplicationProperty).saveStringData(
+                purchase.orderId,
+                R.string.FileKey_PremVersion,
+                R.string.DataKey_OrderID
+            )
+    
+            if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
         
-        if(purchase.purchaseState == Purchase.PurchaseState.PURCHASED){
-            
-            if(verboseLog){
-                Log.d("BillingProcessHelper", "BillingProcessHelper::handlePurchase: User has purchased!")
-            }
-            
-            // TODO: mark the app as purchased !!!
-            
-            // TODO: notify user !? Is maybe not necessary at this point.. ?
-            
-            if(!purchase.isAcknowledged){
-                val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                    .setPurchaseToken(purchase.purchaseToken)
+                if (verboseLog) {
+                    Log.d(
+                        "BillingProcessHelper",
+                        "BillingProcessHelper::handlePurchase: User has purchased!"
+                    )
+                }
+        
+                // mark the app as purchased
+                (this.cActivity.applicationContext as ApplicationProperty).saveBooleanData(
+                    true,
+                    R.string.FileKey_PremVersion,
+                    R.string.DataKey_PurchaseDoneByUser
+                )
                 
-                routineScope.launch {
-                    val ackPurchaseResult =
-                        billingClient.acknowledgePurchase(acknowledgePurchaseParams.build())
-    
-                    if(verboseLog){
-                        Log.d(
-                            "BillingProcessHelper",
-                            "BillingProcessHelper::handlePurchase: Purchase acknowledge response: ${ackPurchaseResult.responseCode}, ${ackPurchaseResult.debugMessage}"
-                        )
+                purchaseIsPending = false
+                
+                if(this.callback != null){
+                    this.callback?.onAppPurchased()
+                }
+        
+                if (!purchase.isAcknowledged) {
+                    val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+            
+                    routineScope.launch {
+                        val ackPurchaseResult =
+                            billingClient.acknowledgePurchase(acknowledgePurchaseParams.build())
+                
+                        if (verboseLog) {
+                            Log.d(
+                                "BillingProcessHelper",
+                                "BillingProcessHelper::handlePurchase: Purchase acknowledge response: ${ackPurchaseResult.responseCode}, ${ackPurchaseResult.debugMessage}"
+                            )
+                        }
+                    }
+                }
+            } else {
+                Log.d(
+                    "BillingProcessHelper",
+                    "BillingProcessHelper::handlePurchase invoked, but state is not purchased. State: ${purchase.purchaseState}"
+                )
+        
+                if (purchase.purchaseState == Purchase.PurchaseState.PENDING) {
+                    this.purchaseIsPending = true
+                    if(this.callback != null){
+                        this.callback?.onAppPurchasePending()
                     }
                 }
             }
-        } else {
-            Log.d("BillingProcessHelper", "BillingProcessHelper::handlePurchase invoked, but state is not purchased. State: ${purchase.purchaseState}")
-    
-            if(purchase.purchaseState == Purchase.PurchaseState.PENDING){
-                // TODO: set the premium section on settings activity to 'pending' state !!
+        } catch (e: java.lang.Exception){
+            if(verboseLog){
+                Log.e("BillingProcessHelper", "BillingProcessHelper::handlePurchase: severe error: $e")
             }
         }
     }
     
-    fun restorePurchases() { // TODO: do this in onResume !
-        if(verboseLog){
-            Log.d("BillingProcessHelper", "BillingProcessHelper::restorePurchase: invoked !")
-        }
-    
-        val params = QueryPurchasesParams.newBuilder()
-            .setProductType(BillingClient.ProductType.INAPP)
-
-        
-        routineScope.launch {
-            val purchasesResult =
-                billingClient.queryPurchasesAsync(params.build())
-            
-            if(verboseLog){
-                Log.d("BillingProcessHelper", "BillingProcessHelper::restorePurchases: purchase result: ${purchasesResult.billingResult.debugMessage}")
+    fun restorePurchase() {
+        try {
+            if (verboseLog) {
+                Log.d("BillingProcessHelper", "BillingProcessHelper::restorePurchase: invoked !")
             }
-            
-            purchasesResult.purchasesList.forEach {
-                if(it.purchaseState == Purchase.PurchaseState.PURCHASED){
-                    
-                    // TODO: save purchase token and order ID
-                    
-                    // TODO: mark the app as purchased !
-                    
-                    // TODO: notify user !
-                    
-                    return@forEach
+    
+            val params = QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+    
+    
+            routineScope.launch {
+                val purchasesResult =
+                    billingClient.queryPurchasesAsync(params.build())
+        
+                if (verboseLog) {
+                    Log.d(
+                        "BillingProcessHelper",
+                        "BillingProcessHelper::restorePurchases: purchase result: ${purchasesResult.billingResult.debugMessage}"
+                    )
+                }
+        
+                purchasesResult.purchasesList.forEach {
+                    if (it.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                
+                        // save purchase token
+                        (cActivity.applicationContext as ApplicationProperty).saveStringData(
+                            it.purchaseToken,
+                            R.string.FileKey_PremVersion,
+                            R.string.DataKey_PurchaseToken
+                        )
+                
+                        // save order ID
+                        (cActivity.applicationContext as ApplicationProperty).saveStringData(
+                            it.orderId,
+                            R.string.FileKey_PremVersion,
+                            R.string.DataKey_OrderID
+                        )
+    
+                        // mark the app as purchased
+                        (cActivity.applicationContext as ApplicationProperty).saveBooleanData(
+                            true,
+                            R.string.FileKey_PremVersion,
+                            R.string.DataKey_PurchaseDoneByUser
+                        )
+                        
+                        purchaseIsPending = false
+                
+                        if(callback != null){
+                            callback?.onPurchaseRestored()
+                        }
+                        return@forEach
+                    }
                 }
             }
+        } catch (e: Exception){
+            if(verboseLog){
+                Log.e("BillingProcessHelper", "BillingProcessHelper::restorePurchase: Severe error: $e")
+            }
         }
+    }
+    
+    interface BillingEventCallback: java.io.Serializable{
+        fun onAppPurchased(){}
+        fun onAppPurchasePending(){}
+        fun onPurchaseRestored(){}
     }
 }
