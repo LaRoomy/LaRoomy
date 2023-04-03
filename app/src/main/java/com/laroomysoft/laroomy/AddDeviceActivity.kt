@@ -194,8 +194,15 @@ class AddDeviceActivity : AppCompatActivity(),
                     false
                 } else {
                     // start the scan
-                    this.bleDiscoveryManager.startScan()
-                    true
+                    try {
+                        this.bleDiscoveryManager.startScan()
+                        true
+                    } catch (e: java.lang.Exception){
+                        if(verboseLog){
+                            Log.e("AddDeviceActivity", "AddDeviceActivity::onResume::startScan: severe error: $e")
+                        }
+                        false
+                    }
                 }
             }
         } else {

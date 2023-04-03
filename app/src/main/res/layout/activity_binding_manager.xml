@@ -64,6 +64,7 @@
         android:layout_marginStart="5dp"
         android:paddingBottom="110dp"
         android:clipToPadding="false"
+        android:contentDescription="@string/BindingDataSetListContentDescription"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

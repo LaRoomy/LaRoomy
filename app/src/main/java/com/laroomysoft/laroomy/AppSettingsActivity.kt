@@ -1,6 +1,7 @@
 package com.laroomysoft.laroomy
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import android.widget.CompoundButton
 import android.widget.PopupWindow
 import android.widget.RadioButton
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.appcompat.widget.*
@@ -42,9 +44,16 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
     private lateinit var premiumUnlockPurchaseLink: AppCompatTextView
     private lateinit var premiumImageView: AppCompatImageView
     
-
     private var buttonNormalizationRequired = false
     private var preventPopUpDoubleExecution = false
+    private var isCreationExecution = false
+    
+    private enum class PremiumSectionState {
+        TestPeriod,
+        Purchased,
+        Unpaid,
+        Pending
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +68,9 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
                 handleBackEvent()
             }
         })
+        
+        // indicate creation
+        this.isCreationExecution = true
 
         // get backButton and add functionality
         this.backButton = findViewById<AppCompatImageButton?>(R.id.setupActivityBackButton).apply {
@@ -137,7 +149,7 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
             }
         }
         this.premiumMoreInfoLink = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumActionLinkMoreInfoTextView).apply {
-            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased || (applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending){
                 visibility = View.GONE
             } else {
                 setOnClickListener {
@@ -150,7 +162,7 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
             }
         }
         this.premiumRestorePurchaseLink = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumActionLinkRestorePurchaseTextView).apply {
-            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased || (applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending){
                 visibility = View.GONE
             } else {
                 setOnClickListener {
@@ -165,7 +177,7 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
             }
         }
         this.premiumUnlockPurchaseLink = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumActionLinkUnlockPremiumTextView).apply {
-            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased){
+            if((applicationContext as ApplicationProperty).premiumManager.userHasPurchased || (applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending){
                 visibility = View.GONE
             } else {
                 setOnClickListener {
@@ -337,11 +349,33 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
     override fun onResume() {
         super.onResume()
         
-        // TODO: if a purchase occurred on the premium page and was invoked from this page, the back-navigation to this must check if a purchase occurred and set the UI in relation to it
-        // TODO: normalize enableLoggingSwitchHint (textColor + text)
-        // TODO: enable showLog nav-button (only if the logging switch is on)
-        // TODO: enable the logging switch!
-        // TODO: hide the lower premium section and set the status to purchased
+        if(isCreationExecution){
+            // if this is an execution after the creation of the activity, nothing must be done, because onCreate has done it
+            isCreationExecution = false
+        } else {
+            // this is a resume action, update the UI
+            var processed = false
+            if((applicationContext as ApplicationProperty).billingHelperCreated){
+                if((applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending){
+                    this.controlPremiumSectionState(PremiumSectionState.Pending)
+                    processed = true
+                }
+            }
+            if(!processed){
+                when ((applicationContext as ApplicationProperty).premiumManager.isPremiumAppVersion) {
+                    true -> {
+                        if ((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive) {
+                            this.controlPremiumSectionState(PremiumSectionState.TestPeriod)
+                        } else {
+                            this.controlPremiumSectionState(PremiumSectionState.Purchased)
+                        }
+                    }
+                    else -> {
+                        this.controlPremiumSectionState(PremiumSectionState.Unpaid)
+                    }
+                }
+            }
+        }
 
         if (this.buttonNormalizationRequired) {
             // normalize uuidManager-Button
@@ -399,33 +433,35 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
     }
     
     private fun setShowLogButtonState(logActive: Boolean) {
-        findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
-            when(logActive){
-                true -> {
-                    setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
-                }
-                else -> {
-                    setBackgroundColor(getColor(R.color.setupActivityButtonDisabledBackground))
-                }
-            }
-        }
-        findViewById<AppCompatTextView>(R.id.setupActivityShowLogButtonDescriptor).apply {
-            when(logActive){
-                true -> {
-                    setTextColor(getColor(R.color.colorTextPrimary))
-                }
-                else -> {
-                    setTextColor(getColor(R.color.disabledTextColor))
+        runOnUiThread {
+            findViewById<ConstraintLayout>(R.id.setupActivityShowLogButton).apply {
+                when (logActive) {
+                    true -> {
+                        setBackgroundColor(getColor(R.color.setupActivityButtonNormalBackground))
+                    }
+                    else -> {
+                        setBackgroundColor(getColor(R.color.setupActivityButtonDisabledBackground))
+                    }
                 }
             }
-        }
-        findViewById<AppCompatImageView>(R.id.setupActivityShowLogButtonImage).apply {
-            when(logActive){
-                true -> {
-                    setImageResource(R.drawable.ic_general_navigation_arrow_48dp)
+            findViewById<AppCompatTextView>(R.id.setupActivityShowLogButtonDescriptor).apply {
+                when (logActive) {
+                    true -> {
+                        setTextColor(getColor(R.color.colorTextPrimary))
+                    }
+                    else -> {
+                        setTextColor(getColor(R.color.disabledTextColor))
+                    }
                 }
-                else -> {
-                    setImageResource(R.drawable.ic_general_disable_navigation_arrow_48dp)
+            }
+            findViewById<AppCompatImageView>(R.id.setupActivityShowLogButtonImage).apply {
+                when (logActive) {
+                    true -> {
+                        setImageResource(R.drawable.ic_general_navigation_arrow_48dp)
+                    }
+                    else -> {
+                        setImageResource(R.drawable.ic_general_disable_navigation_arrow_48dp)
+                    }
                 }
             }
         }
@@ -598,16 +634,155 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
         overridePendingTransition(R.anim.start_activity_slide_animation_in, R.anim.start_activity_slide_animation_out)
     }
     
+    private fun controlPremiumSectionState(state: PremiumSectionState){
+        runOnUiThread {
+            when (state) {
+                PremiumSectionState.Unpaid -> {
+                    this.currentPremiumStatusTextView.apply {
+                        text = getString(R.string.SetupActivity_PremiumAppUserStatus_NotPurchased)
+                    }
+                    this.premiumStatusHintTextView.apply {
+                        text = getString(R.string.SetupActivity_PremiumAppStatusHint_NotPurchased)
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumTestPeriodRemainderTextView.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumMoreInfoLink.apply {
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumRestorePurchaseLink.apply {
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumUnlockPurchaseLink.apply {
+                        visibility = View.VISIBLE
+                    }
+                    this.enableLogSwitch.apply {
+                        isEnabled = false
+                        setShowLogButtonState(false)
+                    }
+                    this.enableLoggingHintTextView.apply {
+                        setTextColor(getColor(R.color.important_text_color))
+                        text = getString(R.string.SetupActivity_LoggingSwitchPremiumHint)
+                    }
+                }
+                PremiumSectionState.Pending -> {
+                    this.currentPremiumStatusTextView.apply {
+                        text =
+                            getString(R.string.SetupActivity_PremiumAppUserStatus_PurchasePending)
+                    }
+                    this.premiumStatusHintTextView.apply {
+                        text =
+                            getString(R.string.SetupActivity_PremiumAppStatusHint_PurchasePending)
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumTestPeriodRemainderTextView.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumMoreInfoLink.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumRestorePurchaseLink.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumUnlockPurchaseLink.apply {
+                        visibility = View.GONE
+                    }
+                }
+                PremiumSectionState.Purchased -> {
+                    this.currentPremiumStatusTextView.apply {
+                        text = getString(R.string.SetupActivity_PremiumAppUserStatus_Purchased)
+                    }
+                    this.premiumImageView.apply {
+                        setImageResource(R.drawable.ic_premium_purchased_36dp)
+                    }
+                    this.premiumStatusHintTextView.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumTestPeriodRemainderTextView.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumMoreInfoLink.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumRestorePurchaseLink.apply {
+                        visibility = View.GONE
+                    }
+                    this.premiumUnlockPurchaseLink.apply {
+                        visibility = View.GONE
+                    }
+                    this.enableLogSwitch.apply {
+                        isEnabled = true
+                        setShowLogButtonState(isChecked)
+                    }
+                    this.enableLoggingHintTextView.apply {
+                        setTextColor(getColor(R.color.colorTextPrimary))
+                        text = getString(R.string.SetupActivity_EnableLoggingHint)
+                    }
+                }
+                PremiumSectionState.TestPeriod -> {
+                    this.currentPremiumStatusTextView.apply {
+                        text = getString(R.string.SetupActivity_PremiumAppUserStatus_TestPeriod)
+                    }
+                    this.premiumStatusHintTextView.apply {
+                        text = getString(R.string.SetupActivity_PremiumAppStatusHint_TestPeriod)
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumTestPeriodRemainderTextView.apply {
+                        visibility = View.VISIBLE
+                        val strToSet =
+                            "$text  ${(applicationContext as ApplicationProperty).premiumManager.remainingTestPeriodDays}"
+                        text = strToSet
+                    }
+                    this.premiumMoreInfoLink.apply {
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumRestorePurchaseLink.apply {
+                        visibility = View.VISIBLE
+                    }
+                    this.premiumUnlockPurchaseLink.apply {
+                        visibility = View.VISIBLE
+                    }
+                    this.enableLogSwitch.apply {
+                        isEnabled = true
+                        setShowLogButtonState(isChecked)
+                    }
+                    this.enableLoggingHintTextView.apply {
+                        setTextColor(getColor(R.color.colorTextPrimary))
+                        text = getString(R.string.SetupActivity_EnableLoggingHint)
+                    }
+                }
+            }
+        }
+    }
+    
     override fun onAppPurchasePending() {
-        this.recreate()
+        //this.recreate()
+        this.controlPremiumSectionState(PremiumSectionState.Pending)
     }
     
     override fun onAppPurchased() {
-        this.recreate()
+        //this.recreate()
+        (applicationContext as ApplicationProperty).premiumManager.checkPremiumAppStatus()
+        this.controlPremiumSectionState(PremiumSectionState.Purchased)
     }
     
     override fun onPurchaseRestored() {
-        this.recreate()
+        //this.recreate()
+        (applicationContext as ApplicationProperty).premiumManager.checkPremiumAppStatus()
+        this.controlPremiumSectionState(PremiumSectionState.Purchased)
+    }
+    
+    override fun onNothingToRestore() {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setMessage(getString(R.string.SetupActivity_NothingToRestore))
+        dialog.setIcon(R.drawable.ic_announcement_36dp)
+        dialog.setTitle(R.string.GeneralString_Purchase)
+        dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+            dialogInterface.dismiss()
+        }
+        dialog.create()
+        dialog.show()
     }
 }
 

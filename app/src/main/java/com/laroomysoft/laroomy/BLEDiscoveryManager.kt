@@ -52,7 +52,27 @@ class BLEDiscoveryManager(private val appContext: Context, private val discovery
                 // report error
                 discoveryCallback.onPermissionError()
             } else {
-                if (!this.scanning) {
+                if(this.bluetoothLEScanner != null) {
+                    if (!this.scanning) {
+                        // schedule the stop of scanning
+                        Executors.newSingleThreadScheduledExecutor().schedule({
+                            // stop scan
+                            bluetoothLEScanner.stopScan(leScanCallback)
+                            scanning = false
+                            // report event
+                            discoveryCallback.onScanStopped()
+                        }, 10, TimeUnit.SECONDS)
+                        // start scan and set param
+                        this.bluetoothLEScanner.startScan(this.leScanCallback)
+                        this.scanning = true
+                        discoveryCallback.onScanStarted()
+                    }
+                }
+            }
+
+        } else {
+            if (!this.scanning) {
+                if (this.bluetoothLEScanner != null) {
                     // schedule the stop of scanning
                     Executors.newSingleThreadScheduledExecutor().schedule({
                         // stop scan
@@ -66,22 +86,6 @@ class BLEDiscoveryManager(private val appContext: Context, private val discovery
                     this.scanning = true
                     discoveryCallback.onScanStarted()
                 }
-            }
-
-        } else {
-            if (!this.scanning) {
-                // schedule the stop of scanning
-                Executors.newSingleThreadScheduledExecutor().schedule({
-                    // stop scan
-                    bluetoothLEScanner.stopScan(leScanCallback)
-                    scanning = false
-                    // report event
-                    discoveryCallback.onScanStopped()
-                }, 10, TimeUnit.SECONDS)
-                // start scan and set param
-                this.bluetoothLEScanner.startScan(this.leScanCallback)
-                this.scanning = true
-                discoveryCallback.onScanStarted()
             }
         }
     }

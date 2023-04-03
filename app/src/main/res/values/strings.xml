@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">LaRoomy</string>
-    <string name="app_version">App-Version 1.1.0</string>
+    <string name="app_version" translatable="false">App-Version 1.1.5</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Devices</string>
     <string name="MA_PopUp_SettingsTitle">Settings</string>
@@ -12,12 +12,14 @@
     <string name="MA_BluetoothNotEnabledHintText">The base functionality of this App is to connect to bluetooth devices. Therefore bluetooth must be enabled. Tap here to enable bluetooth.</string>
     <string name="MA_BluetoothPermissionMissionHintText">The base functionality of this App is to connect to bluetooth devices. Therefore it needs your permission to access bluetooth devices on this phone and connect to it. Tap here to grant the permission.</string>
     <string name="MA_PurchaseRestored">Your purchase was applied to this app installation.</string>
+    <string name="MA_PurchasePending">Your purchase request has been received, but has not yet been confirmed. Premium features will be available as soon as the purchase is confirmed.</string>
 
     <string name="MainActivity_ActionBannerText_TestPeriodActive">You are in a 30 days test period with full access to all app capabilities</string>
     <string name="MainActivity_ActionBannerText_UnpaidVersion">You are using this app with restricted capabilities. Become a premium app user to unleash the full potential.</string>
     <string name="MainActivity_ActionBanner_MoreInfoButtonText">More Info</string>
     <string name="MainActivity_ActionBanner_DoNotShowAgainButtonText">Hide</string>
     <string name="MainActivity_ActionBanner_ButtonTextPurchase">Unlock Premium</string>
+
 
     <string name="CA_Connecting">Connecting..</string>
     <string name="CA_Initialize">Initialize..</string>
@@ -114,6 +116,7 @@
     <string name="GeneralString_Delete">Delete</string>
     <string name="GeneralString_UnexpectedConnectionLossMessage">The connection was interrupted. Reconnect?</string>
     <string name="GeneralString_ConnectionLossDialogTitle">Connection Error</string>
+    <string name="GeneralString_Purchase">Purchase</string>
 
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
@@ -197,6 +200,7 @@
     <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Restore Purchase</string>
     <string name="SetupActivity_PremiumAppActionLinkUnlockPremium">Unlock Premium Capabilities</string>
     <string name="SetupActivity_LoggingSwitchPremiumHint">This function is only available in premium status.</string>
+    <string name="SetupActivity_NothingToRestore">There are no purchases to restore.</string>
 
 
     <string name="BindingManagerActivity_HeaderText">Manage Binding-Data</string>
@@ -394,6 +398,10 @@
     <string name="ViewLogActivityExportButtonLabel" translatable="false">Export the log</string>
     <string name="TextListPresenterExportButtonLabel" translatable="false">Export the text list</string>
     <string name="ViewLogFilterButtonLabel" translatable="false">Filter the list</string>
+    <string name="AddDeviceActivityAvailableDevicesContentDescription" translatable="false">Displays scan results and shows active devices</string>
+    <string name="AddDeviceActivityPairedDevicesContentDescription" translatable="false">Displays bluetooth devices that are paired with the system</string>
+    <string name="BindingDataSetListContentDescription" translatable="false">List of binding data to manage</string>
+    <string name="ViewLogActivityListContentDescription" translatable="false">List of log messages from the last connection session</string>
 
     <!-- Activity Labels -->
     <string name="LoadingActivityLabel">Activity shown during the initialization process</string>

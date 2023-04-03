@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LaRoomy</string>
-    <string name="app_version">App-Version 2.1.0</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Geräte</string>
     <string name="MA_PopUp_SettingsTitle">Einstellungen</string>
@@ -13,6 +12,7 @@
     <string name="MA_BluetoothNotEnabledHintText">Die Verbindung über Bluetooth ist die Basisfunktion dieser App. Aus diesem Grund muss Bluetooth aktiviert sein. Hier tippen um Bluetooth zu aktivieren.</string>
     <string name="MA_BluetoothPermissionMissionHintText">Die Verbindung über Bluetooth ist die Basisfunktion dieser App. Aus diesem Grund wird die Erlaubnis zum Zugriff und zur Verbindung mit Bluetooth-Geräten benötigt. Hier tippen um die Erlaubnis zu gewähren.</string>
     <string name="MA_PurchaseRestored">Dein Kauf wurde auf diese App-Installation angewendet</string>
+    <string name="MA_PurchasePending">Deine Kaufanforderung wurde empfangen aber noch nicht bestätigt. Premium Funktionen stehen zur Verfügung sobald der Kauf bestätigt wurde.</string>
 
 
     <string name="MainActivity_ActionBannerText_TestPeriodActive">Du befindest dich in einem 30 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App</string>
@@ -124,6 +124,8 @@
     <string name="GeneralString_UnexpectedConnectionLossMessage">Die Verbindung wurde unerwartet unterbrochen. Erneut versuchen?</string>
     <string name="GeneralString_ConnectionLossDialogTitle">Verbindungsfehler</string>
     <string name="GeneralString_Delete">Löschen</string>
+    <string name="GeneralString_Purchase">Kauf</string>
+
 
 
     <string name="InfoActivity_HeaderText">LaRoomy</string>
@@ -209,9 +211,7 @@
     <string name="SetupActivity_PremiumAppActionLinkRecoverPurchase">Kauf wiederherstellen</string>
     <string name="SetupActivity_PremiumAppActionLinkUnlockPremium">Premium Funktionen freischalten</string>
     <string name="SetupActivity_LoggingSwitchPremiumHint">Diese Funktion ist nur für Premium Benutzer verfügbar.</string>
-
-
-
+    <string name="SetupActivity_NothingToRestore">Es wurden keine Käufe gefunden die wiederhergestellt werden könnten.</string>
 
 
 

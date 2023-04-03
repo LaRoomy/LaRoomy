@@ -7,17 +7,19 @@ import kotlinx.coroutines.*
 
 class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, BillingClientStateListener {
     
-    // product values
+    // product value
     private val productID = "5ghzf_34md9_51g3h_vb7rf_43fas"
     
     private var billingClient : BillingClient
     private var isReady = false
-    var purchaseIsPending = false
     private var pendingCall = PendingCalls.NONE
     private var routineScope: CoroutineScope
     private var cActivity: Activity
     
     var callback: BillingEventCallback? = null
+    
+    var purchaseIsPending = false
+    var recentlyPurchased = false
     
     init {
         if(verboseLog){
@@ -68,6 +70,7 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
                         "BillingProcessHelper::onPurchasesUpdated: User cancelled purchase flow"
                     )
                 }
+                this.purchaseIsPending = false
             }
             else -> {
                 // Handle any other error codes.
@@ -75,6 +78,7 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
                     "BillingProcessHelper",
                     "BillingProcessHelper::onPurchasesUpdated: Unexpected error: ${billingResult.responseCode}, ${billingResult.debugMessage}"
                 )
+                this.purchaseIsPending = false
             }
         }
     }
@@ -274,6 +278,7 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
                 )
                 
                 purchaseIsPending = false
+                recentlyPurchased = true
                 
                 if(this.callback != null){
                     this.callback?.onAppPurchased()
@@ -306,6 +311,8 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
                     if(this.callback != null){
                         this.callback?.onAppPurchasePending()
                     }
+                } else {
+                    this.purchaseIsPending = false
                 }
             }
         } catch (e: java.lang.Exception){
@@ -324,7 +331,6 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
             val params = QueryPurchasesParams.newBuilder()
                 .setProductType(BillingClient.ProductType.INAPP)
     
-    
             routineScope.launch {
                 val purchasesResult =
                     billingClient.queryPurchasesAsync(params.build())
@@ -335,37 +341,52 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
                         "BillingProcessHelper::restorePurchases: purchase result: ${purchasesResult.billingResult.debugMessage}"
                     )
                 }
+                
+                var nothingToRestore = true
+                purchaseIsPending = false
         
                 purchasesResult.purchasesList.forEach {
-                    if (it.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                
-                        // save purchase token
-                        (cActivity.applicationContext as ApplicationProperty).saveStringData(
-                            it.purchaseToken,
-                            R.string.FileKey_PremVersion,
-                            R.string.DataKey_PurchaseToken
-                        )
-                
-                        // save order ID
-                        (cActivity.applicationContext as ApplicationProperty).saveStringData(
-                            it.orderId,
-                            R.string.FileKey_PremVersion,
-                            R.string.DataKey_OrderID
-                        )
-    
-                        // mark the app as purchased
-                        (cActivity.applicationContext as ApplicationProperty).saveBooleanData(
-                            true,
-                            R.string.FileKey_PremVersion,
-                            R.string.DataKey_PurchaseDoneByUser
-                        )
-                        
-                        purchaseIsPending = false
-                
-                        if(callback != null){
-                            callback?.onPurchaseRestored()
+                    when {
+                        (it.purchaseState == Purchase.PurchaseState.PURCHASED) -> {
+            
+                            // save purchase token
+                            (cActivity.applicationContext as ApplicationProperty).saveStringData(
+                                it.purchaseToken,
+                                R.string.FileKey_PremVersion,
+                                R.string.DataKey_PurchaseToken
+                            )
+            
+                            // save order ID
+                            (cActivity.applicationContext as ApplicationProperty).saveStringData(
+                                it.orderId,
+                                R.string.FileKey_PremVersion,
+                                R.string.DataKey_OrderID
+                            )
+            
+                            // mark the app as purchased
+                            (cActivity.applicationContext as ApplicationProperty).saveBooleanData(
+                                true,
+                                R.string.FileKey_PremVersion,
+                                R.string.DataKey_PurchaseDoneByUser
+                            )
+            
+                            purchaseIsPending = false
+                            nothingToRestore = false
+            
+                            if (callback != null) {
+                                callback?.onPurchaseRestored()
+                            }
+                            return@forEach
                         }
-                        return@forEach
+                        (it.purchaseState == Purchase.PurchaseState.PENDING) -> {
+                            purchaseIsPending = true
+                            return@forEach
+                        }
+                    }
+                }
+                if(nothingToRestore){
+                    if(callback != null){
+                        callback?.onNothingToRestore()
                     }
                 }
             }
@@ -380,5 +401,6 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
         fun onAppPurchased(){}
         fun onAppPurchasePending(){}
         fun onPurchaseRestored(){}
+        fun onNothingToRestore(){}
     }
 }

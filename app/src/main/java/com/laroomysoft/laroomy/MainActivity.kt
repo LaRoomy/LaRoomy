@@ -32,6 +32,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -364,9 +366,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
     
         // show / hide the action banner and set the content based on the current premium status (testVersion/unPaid/Premium)
         this.controlActionBannerVisibleState()
+        
+        // update the list items to premium if the user has purchased
+        this.updateRecyclerToPremiumIfApplicable()
     
         // reset the selection in the recyclerView
         this.resetSelectionInDeviceListView()
+        
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
@@ -416,9 +422,13 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
             this.appProperty.saveBooleanData(true, R.string.FileKey_PremVersion, R.string.DataKey_HideMainActivityTestBanner)
         } else {
             // the link is clicked in a non-purchased app-state, so this is the PURCHASE button
-            // -> start the app store billing process
-            
-            // TODO: implement the billing process here
+            // -> start the play store billing process
+            if(appProperty.billingHelperCreated){
+                appProperty.billingProcessHelper.callback = this
+                MainScope().launch {
+                    appProperty.billingProcessHelper.processPurchase()
+                }
+            }
         }
     }
     
@@ -831,7 +841,38 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
         }
     }
     
+    private fun updateRecyclerToPremiumIfApplicable(){
+        try {
+            if (appProperty.billingHelperCreated) {
+                if (appProperty.billingProcessHelper.recentlyPurchased) {
+                    this.availableDevicesViewAdapter.apply {
+                        if (itemCount > 2) {
+                            notifyItemRangeChanged(2, itemCount)
+                        }
+                    }
+                }
+            }
+        } catch (e: java.lang.Exception){
+            if(verboseLog){
+                Log.e("MainActivity", "MainActivity::updateRecyclerToPremiumIfApplicable: severe error: $e")
+            }
+        }
+    }
+    
     override fun onPurchaseRestored() {
+        appProperty.premiumManager.checkPremiumAppStatus()
         notifyUser(getString(R.string.MA_PurchaseRestored))
+        updateRecyclerToPremiumIfApplicable()
+        controlActionBannerVisibleState()
+    }
+    
+    override fun onAppPurchasePending() {
+        notifyUser(getString(R.string.MA_PurchasePending))
+    }
+    
+    override fun onAppPurchased() {
+        appProperty.premiumManager.checkPremiumAppStatus()
+        updateRecyclerToPremiumIfApplicable()
+        controlActionBannerVisibleState()
     }
 }

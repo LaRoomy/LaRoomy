@@ -126,6 +126,7 @@
             android:layout_margin="10dp"
             android:paddingBottom="40dp"
             android:clipToPadding="false"
+            android:contentDescription="@string/AddDeviceActivityAvailableDevicesContentDescription"
             app:layout_constraintTop_toBottomOf="@id/addDeviceActivityScanResultHeaderContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -228,7 +229,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 />
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -238,6 +238,7 @@
             android:layout_margin="10dp"
             android:paddingBottom="80dp"
             android:clipToPadding="false"
+            android:contentDescription="@string/AddDeviceActivityPairedDevicesContentDescription"
             app:layout_constraintTop_toBottomOf="@id/addDeviceActivityPairedDevicesHeaderContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
