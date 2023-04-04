@@ -75,6 +75,13 @@ class PremiumManager(private val appContext: Context) {
                 }
                 // test period has started, check the date (and whether the period is over)
                 
+                // !!!! test section !!!!!!
+                if(appProperty.loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_ToggleTestPeriod, false)){
+                    this.isTestPeriodActive = false
+                    return false
+                }
+                // END: test-period
+                
                 // load the date string
                 val savedDate = appProperty.loadSavedStringData(R.string.FileKey_PremVersion, R.string.DataKey_FirstUseDate, "invalid")
                 if(savedDate != "invalid"){

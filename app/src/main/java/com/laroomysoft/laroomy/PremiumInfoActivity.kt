@@ -52,7 +52,7 @@ class PremiumInfoActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
     
     override fun onAppPurchasePending() {
         val dialog = AlertDialog.Builder(this)
-        dialog.setMessage(getString(R.string.SetupActivity_NothingToRestore))
+        dialog.setMessage(getString(R.string.MA_PurchasePending))
         dialog.setIcon(R.drawable.ic_announcement_36dp)
         dialog.setTitle(R.string.GeneralString_Purchase)
         dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->

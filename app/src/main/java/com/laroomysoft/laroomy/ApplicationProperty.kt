@@ -46,6 +46,9 @@ const val DEVICE_SETTINGS_ACTIVITY_ELEMENT_INDEX_DUMMY = 1025
 // change this to true to enable an internal verbose log output (this means not the user-log!)
 const val verboseLog = false
 
+// enable or show testing elements
+const val testVersion = true
+
 // default value
 const val COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE = false
 

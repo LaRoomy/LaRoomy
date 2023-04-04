@@ -72,16 +72,16 @@
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/resetAppActivitySelectAllCheckBox"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
             android:text="@string/ResetAppActivity_SelectAllCheckBoxText"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:minHeight="48dp"
+            android:maxWidth="300dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/resetAppActivityDataToResetTextView"
-            tools:ignore="TouchTargetSizeCheck" />
+            app:layout_constraintTop_toBottomOf="@id/resetAppActivityDataToResetTextView" />
 
         <View
             android:layout_width="match_parent"
@@ -109,14 +109,14 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/resetAppActivityResetAppSettingsCheckBox"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ResetAppActivity_ResetAppSettingsCheckBoxText"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:minHeight="48dp"
+                android:maxWidth="300dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="TouchTargetSizeCheck" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
@@ -131,15 +131,15 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/resetAppActivityResetUUIDProfilesCheckBox"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/ResetAppActivity_ResetUUIDProfilesCheckBoxText"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:minHeight="48dp"
+                android:maxWidth="300dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetAppSettingsCheckBoxHintTextView"
-                tools:ignore="TouchTargetSizeCheck" />
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetAppSettingsCheckBoxHintTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
@@ -154,15 +154,15 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/resetAppActivityResetPropertyCacheCheckBox"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="@string/ResetAppActivity_ResetPropertyCacheCheckboxText"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:minHeight="48dp"
+                android:maxWidth="300dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBoxHintTextView"
-                tools:ignore="TouchTargetSizeCheck" />
+                app:layout_constraintTop_toBottomOf="@id/resetAppActivityResetUUIDProfilesCheckBoxHintTextView" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"

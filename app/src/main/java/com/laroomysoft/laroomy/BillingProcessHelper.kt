@@ -380,6 +380,9 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
                         }
                         (it.purchaseState == Purchase.PurchaseState.PENDING) -> {
                             purchaseIsPending = true
+                            if(callback != null){
+                                callback?.onPendingPurchaseDetected()
+                            }
                             return@forEach
                         }
                     }
@@ -402,5 +405,6 @@ class BillingProcessHelper(activity: Activity) : PurchasesUpdatedListener, Billi
         fun onAppPurchasePending(){}
         fun onPurchaseRestored(){}
         fun onNothingToRestore(){}
+        fun onPendingPurchaseDetected(){}
     }
 }

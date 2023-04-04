@@ -136,7 +136,7 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
         }
         
         this.premiumTestPeriodRemainderTextView = findViewById<AppCompatTextView?>(R.id.setupActivityPremiumAppUserTestEndTextView).apply {
-            if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive){
+            if((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive && (!(applicationContext as ApplicationProperty).billingProcessHelper.purchaseIsPending)){
                 val strToSet = "$text  ${(applicationContext as ApplicationProperty).premiumManager.remainingTestPeriodDays}"
                 text = strToSet
             } else {
@@ -344,6 +344,62 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
                     )
                 }
             }
+        
+        // !!! test section
+        // this is only shown if the testVersion flag value is set
+        if(testVersion){
+            findViewById<AppCompatTextView>(R.id.setupActivityToggleTestPeriodLink).apply {
+                // show the toggle ling
+                visibility = View.VISIBLE
+                
+                setOnClickListener {
+                    val on =
+                        (applicationContext as ApplicationProperty).loadBooleanData(R.string.FileKey_AppSettings, R.string.DataKey_ToggleTestPeriod, false)
+                    
+                    when(on){
+                        true -> {
+                            (applicationContext as ApplicationProperty).saveBooleanData(false, R.string.FileKey_AppSettings, R.string.DataKey_ToggleTestPeriod)
+                        }
+                        else -> {
+                            (applicationContext as ApplicationProperty).saveBooleanData(true, R.string.FileKey_AppSettings, R.string.DataKey_ToggleTestPeriod)
+                        }
+                    }
+                    val dialog = AlertDialog.Builder(this@AppSettingsActivity)
+                    dialog.setMessage("Test period activity toggled. New state is: ${!on}")
+                    dialog.setIcon(R.drawable.ic_announcement_36dp)
+                    dialog.setTitle("Test-Period")
+                    dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                        dialogInterface.dismiss()
+                        this@AppSettingsActivity.controlPremiumSectionState(PremiumSectionState.Unpaid)
+                    }
+                    dialog.create()
+                    dialog.show()
+                }
+            }
+            findViewById<AppCompatTextView>(R.id.setupActivityRevokePurchaseButton).apply {
+                // show the link
+                visibility = View.VISIBLE
+                
+                setOnClickListener {
+                    (applicationContext as ApplicationProperty).saveBooleanData(
+                        false,
+                        R.string.FileKey_PremVersion,
+                        R.string.DataKey_PurchaseDoneByUser
+                    )
+    
+                    val dialog = AlertDialog.Builder(this@AppSettingsActivity)
+                    dialog.setMessage("Purchase revoked !!")
+                    dialog.setIcon(R.drawable.ic_announcement_36dp)
+                    dialog.setTitle("Revoke..")
+                    dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                        dialogInterface.dismiss()
+                        this@AppSettingsActivity.controlPremiumSectionState(PremiumSectionState.Unpaid)
+                    }
+                    dialog.create()
+                    dialog.show()
+                }
+            }
+        }
     }
     
     override fun onResume() {

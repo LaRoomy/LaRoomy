@@ -433,41 +433,60 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
     }
     
     private fun controlActionBannerVisibleState(){
-        this.actionBanner.apply {
-            if(appProperty.premiumManager.userHasPurchased){
-                // the user has purchased, so hide the banner and do nothing else
-                this.visibility = View.GONE
-            } else {
-                // the user has not purchased, so this must be unpaid or test version
-                if ((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive) {
-                    // test period is active
-                    if (!(applicationContext as ApplicationProperty).loadBooleanData(
-                            R.string.FileKey_PremVersion,
-                            R.string.DataKey_HideMainActivityTestBanner,
-                            false
-                        )
-                    ) {
-                        // the user has NOT pressed hide in a previous execution
-                        // so show the banner
-                        this.visibility = View.VISIBLE
-                    }
-                    // else : user has pressed hide, so hide the banner until the period is over
+        runOnUiThread {
+            this.actionBanner.apply {
+                if (appProperty.premiumManager.userHasPurchased) {
+                    // the user has purchased, so hide the banner and do nothing else
+                    this.visibility = View.GONE
                 } else {
-                    // must be unpaid version
-                    // >> change hide button text to 'purchase'
-                    hideLink.apply {
-                        text = getString(R.string.MainActivity_ActionBanner_ButtonTextPurchase)
+                    // the user has not purchased, so this must be unpaid or test version
+            
+                    var normalProcessing = true
+                    
+                    // check if a purchase is pending and hide the banner in pending state
+                    if (appProperty.billingHelperCreated) {
+                        if (appProperty.billingProcessHelper.purchaseIsPending) {
+                            // hide the banner
+                            this.visibility = View.GONE
+                            normalProcessing = false
+                        }
                     }
-                    // change action text
-                    actionTextView.apply {
-                        text = getString(R.string.MainActivity_ActionBannerText_UnpaidVersion)
+            
+                    if(normalProcessing) {
+                        // normal processing (no purchase is pending):
+                        if ((applicationContext as ApplicationProperty).premiumManager.isTestPeriodActive) {
+                            // test period is active
+                            if (!(applicationContext as ApplicationProperty).loadBooleanData(
+                                    R.string.FileKey_PremVersion,
+                                    R.string.DataKey_HideMainActivityTestBanner,
+                                    false
+                                )
+                            ) {
+                                // the user has NOT pressed hide in a previous execution
+                                // so show the banner
+                                this.visibility = View.VISIBLE
+                            }
+                            // else : user has pressed hide, so hide the banner until the period is over
+                        } else {
+                            // must be unpaid version
+                            // >> change hide button text to 'purchase'
+                            hideLink.apply {
+                                text =
+                                    getString(R.string.MainActivity_ActionBanner_ButtonTextPurchase)
+                            }
+                            // change action text
+                            actionTextView.apply {
+                                text =
+                                    getString(R.string.MainActivity_ActionBannerText_UnpaidVersion)
+                            }
+                            // change action image
+                            actionBannerImage.apply {
+                                setImageResource(R.drawable.ic_no_premium_48dp)
+                            }
+                            // show banner
+                            this.visibility = View.VISIBLE
+                        }
                     }
-                    // change action image
-                    actionBannerImage.apply {
-                        setImageResource(R.drawable.ic_no_premium_48dp)
-                    }
-                    // show banner
-                    this.visibility = View.VISIBLE
                 }
             }
         }
@@ -868,11 +887,16 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
     
     override fun onAppPurchasePending() {
         notifyUser(getString(R.string.MA_PurchasePending))
+        controlActionBannerVisibleState()
     }
     
     override fun onAppPurchased() {
         appProperty.premiumManager.checkPremiumAppStatus()
         updateRecyclerToPremiumIfApplicable()
+        controlActionBannerVisibleState()
+    }
+    
+    override fun onPendingPurchaseDetected() {
         controlActionBannerVisibleState()
     }
 }

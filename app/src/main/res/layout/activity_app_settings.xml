@@ -689,5 +689,38 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityResetDataButton" />
 
+        <!-- test section - remove before end release -->
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/setupActivityToggleTestPeriodLink"
+            android:text="@string/ToggleTestPeriod_ButtonText"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/clickableTextColor"
+            android:minHeight="48dp"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityResetDataButton" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/setupActivityRevokePurchaseButton"
+            android:text="@string/RevokePurchaseButtonText"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/clickableTextColor"
+            android:minHeight="48dp"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setupActivityToggleTestPeriodLink" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
