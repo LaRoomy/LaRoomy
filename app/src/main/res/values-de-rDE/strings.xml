@@ -15,7 +15,7 @@
     <string name="MA_PurchasePending">Deine Kaufanforderung wurde empfangen aber noch nicht bestätigt. Premium Funktionen stehen zur Verfügung sobald der Kauf bestätigt wurde.</string>
 
 
-    <string name="MainActivity_ActionBannerText_TestPeriodActive">Du befindest dich in einem 30 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App</string>
+    <string name="MainActivity_ActionBannerText_TestPeriodActive">Du befindest dich in einem 7 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App</string>
     <string name="MainActivity_ActionBannerText_UnpaidVersion">Der Funktionsumfang ist eingeschränkt. Werden Sie Premium Benutzer um alle Funktionen der App zu nutzen.</string>
     <string name="MainActivity_ActionBanner_MoreInfoButtonText">Weitere Infos</string>
     <string name="MainActivity_ActionBanner_DoNotShowAgainButtonText">Ausblenden</string>
@@ -204,7 +204,7 @@
     <string name="SetupActivity_PremiumAppUserStatus_TestPeriod">Testzeitraum</string>
     <string name="SetupActivity_PremiumAppUserStatus_PurchasePending">Kauf unbestätigt</string>
     <string name="SetupActivity_PremiumAppStatusHint_NotPurchased">Die Funktionen der App sind eingeschränkt.</string>
-    <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">Sie befinden sich in einem 30 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">Sie befinden sich in einem 7 Tage Testzeitraum mit vollem Zugriff auf alle Funktionen der App.</string>
     <string name="SetupActivity_PremiumAppStatusHint_PurchasePending">Deine Kaufanforderung wurde empfangen aber noch nicht bestätigt.</string>
     <string name="SetupActivity_PremiumAppStatusHint_TestEndIn">Tage bis zum Ende des Testzeitraumes:</string>
     <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Weitere Informationen</string>
@@ -371,7 +371,7 @@
 
     <string name="PremiumInfoActivity_LaRoomyBrandingText">LaRoomy</string>
     <string name="PremiumInfoActivity_ActionHeaderText">Werde Premium Benutzer und schalte alle Funktionen der App frei:</string>
-    <string name="PremiumInfoActivity_ActionSubText">Durch den einmaligen Erwerb des Premium-Status werden alle Funktionen für immer freigeschaltet. App Entwicklung und Instandhaltung ist kostspielig und zeitaufwändig. Mit deinem Kauf trägst du dazu bei dieses Projekt aktiv zu halten.</string>
+    <string name="PremiumInfoActivity_ActionSubText">Durch den einmaligen Erwerb des Premium-Status werden alle Funktionen für immer freigeschaltet. App Entwicklung und Instandhaltung ist komplex und zeitaufwändig. Mit deinem Kauf trägst du dazu bei dieses Projekt aktiv zu halten.</string>
     <string name="PremiumInfoActivity_AdvantageOneText">Unbegrenzte Geräte-Anzahl</string>
     <string name="PremiumInfoActivity_AdvantageTwoText">Zugriff auf alle Geräte-Eigenschaften</string>
     <string name="PremiumInfoActivity_AdvantageThreeText">Icons für Geräte und Geräte-Eigenschaften</string>

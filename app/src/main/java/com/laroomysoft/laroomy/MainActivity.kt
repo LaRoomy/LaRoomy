@@ -865,9 +865,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
             if (appProperty.billingHelperCreated) {
                 if (appProperty.billingProcessHelper.recentlyPurchased) {
                     this.availableDevicesViewAdapter.apply {
-                        if (itemCount > 2) {
-                            notifyItemRangeChanged(2, itemCount)
-                        }
+                        //if (itemCount > 2) {
+                            notifyItemRangeChanged(0, itemCount)
+                        //}
                     }
                 }
             }

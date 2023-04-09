@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">LaRoomy</string>
-    <string name="app_version" translatable="false">App-Version 1.1.7</string>
+    <string name="app_version" translatable="false">App-Version 1.1.9</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Devices</string>
     <string name="MA_PopUp_SettingsTitle">Settings</string>
@@ -14,7 +14,7 @@
     <string name="MA_PurchaseRestored">Your purchase was applied to this app installation.</string>
     <string name="MA_PurchasePending">Your purchase request has been received, but has not yet been confirmed. Premium features will be available as soon as the purchase is confirmed.</string>
 
-    <string name="MainActivity_ActionBannerText_TestPeriodActive">You are in a 30 days test period with full access to all app capabilities</string>
+    <string name="MainActivity_ActionBannerText_TestPeriodActive">You are in a 7 days test period with full access to all app capabilities</string>
     <string name="MainActivity_ActionBannerText_UnpaidVersion">You are using this app with restricted capabilities. Become a premium app user to unleash the full potential.</string>
     <string name="MainActivity_ActionBanner_MoreInfoButtonText">More Info</string>
     <string name="MainActivity_ActionBanner_DoNotShowAgainButtonText">Hide</string>
@@ -193,7 +193,7 @@
     <string name="SetupActivity_PremiumAppUserStatus_TestPeriod">Test Period</string>
     <string name="SetupActivity_PremiumAppUserStatus_PurchasePending">Purchase pending</string>
     <string name="SetupActivity_PremiumAppStatusHint_NotPurchased">The app is running with a restricted functionality.</string>
-    <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">You are in a 30 days test period with full access to all app capabilities.</string>
+    <string name="SetupActivity_PremiumAppStatusHint_TestPeriod">You are in a 7 days test period with full access to all app capabilities.</string>
     <string name="SetupActivity_PremiumAppStatusHint_PurchasePending">Your purchase request has been received, but has not yet been confirmed.</string>
     <string name="SetupActivity_PremiumAppStatusHint_TestEndIn">Remaining days:</string>
     <string name="SetupActivity_PremiumAppActionLinkMoreInfoText">Get more information</string>
@@ -355,7 +355,7 @@
 
     <string name="PremiumInfoActivity_LaRoomyBrandingText">LaRoomy</string>
     <string name="PremiumInfoActivity_ActionHeaderText">Become a Premium User and unlock all App-Capabilities:</string>
-    <string name="PremiumInfoActivity_ActionSubText">By purchasing the premium-status once, all functions will be unlocked forever. App development and maintenance is a time-consuming and pricey matter. With your purchase you help to keep this project active.</string>
+    <string name="PremiumInfoActivity_ActionSubText">By purchasing the premium-status once, all functions will be unlocked forever. App development and maintenance is complex and time-consuming. With your purchase you help to keep this project active.</string>
     <string name="PremiumInfoActivity_AdvantageOneText">Unlimited number of Devices</string>
     <string name="PremiumInfoActivity_AdvantageTwoText">Access to all Device Properties</string>
     <string name="PremiumInfoActivity_AdvantageThreeText">Images for devices and Device Properties</string>

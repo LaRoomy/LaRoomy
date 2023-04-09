@@ -113,7 +113,7 @@ class PremiumManager(private val appContext: Context) {
                             this.dateInfo.isValid = true
                             
                             this.isTestPeriodActive =
-                                this.dateInfo.checkThirtyDaysPeriod()
+                                this.dateInfo.checkSevenDaysPeriod()
                             
                             if(this.isTestPeriodActive) {
                                 if(verboseLog){
@@ -154,15 +154,15 @@ class PremiumManager(private val appContext: Context) {
         var sYear = 2000
         var isValid = false
         
-        fun checkThirtyDaysPeriod() : Boolean {
+        fun checkSevenDaysPeriod() : Boolean {
             // get current date
             val calendar = Calendar.getInstance()
     
             // start date to object
-            val endDate = LocalDate.of(this.sYear, this.sMonth + 1, this.sDay).plusDays(30)
-            // add 30 days to get the date where the period ends
+            val endDate = LocalDate.of(this.sYear, this.sMonth + 1, this.sDay).plusDays(7)
+            // add 7 days to get the date where the period ends
     
-            //endDate.plusDays(30)
+            //endDate.plusDays(7)
             
             // current date to object
             val curDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH))
@@ -177,13 +177,13 @@ class PremiumManager(private val appContext: Context) {
             val curMonth = calendar.get(Calendar.MONTH) + 1 // the month is zero based, so increase
             val curYear = calendar.get(Calendar.YEAR)
     
-            return if(this.checkThirtyDaysPeriod()){
+            return if(this.checkSevenDaysPeriod()){
                 // start date to object
                 val startDate = LocalDate.of(this.sYear, this.sMonth + 1, this.sDay)
                 // cur date to object
                 val curDate = LocalDate.of(curYear, curMonth, curDay)
                 // get days (the period minus the expiration)
-                (30 - startDate.until(curDate).days)
+                (7 - startDate.until(curDate).days)
             } else {
                 // period is over
                 0

@@ -3,6 +3,7 @@ package com.laroomysoft.laroomy
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.animation.AnimationUtils
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
@@ -36,6 +37,10 @@ class PremiumInfoActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
         // add unlock premium button functionality
         this.unlockPremiumButton = findViewById<AppCompatButton?>(R.id.premiumInfoActivityUnlockButton).apply {
             setOnClickListener {
+                // start bounce animation
+                val buttonAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+                it.startAnimation(buttonAnimation)
+                // start purchase process
                 if((this@PremiumInfoActivity.applicationContext as ApplicationProperty).billingHelperCreated) {
                     (this@PremiumInfoActivity.applicationContext as ApplicationProperty).billingProcessHelper.callback = this@PremiumInfoActivity
                     MainScope().launch {
