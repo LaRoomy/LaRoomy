@@ -381,10 +381,14 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
         }
         // check non-premium condition
         if(!appProperty.premiumManager.isPremiumAppVersion && index > NON_PREMIUM_MAX_DEVICE_LIST_INDEX){
-            // the user has not purchased and test period is over
-            // so bounce the premium banner and do nothing else
-            val bannerAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
-            this.actionBanner.startAnimation(bannerAnimation)
+            // when the purchase is pending, the banner is not visible, so nothing should be done here
+            if(!appProperty.billingProcessHelper.purchaseIsPending){
+                // the user has not purchased and test period is over
+                // so bounce the premium banner and do nothing else
+                val bannerAnimation =
+                    AnimationUtils.loadAnimation(applicationContext, R.anim.bounce)
+                this.actionBanner.startAnimation(bannerAnimation)
+            }
         } else {
             // normal execution
             if (!preventListSelection) {
