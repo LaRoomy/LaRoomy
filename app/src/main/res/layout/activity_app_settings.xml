@@ -689,8 +689,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityResetDataButton" />
 
-        <!-- test section - remove before end release -->
+        <!-- test section - remove before final release -->
 
+<!--
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -720,7 +721,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/setupActivityToggleTestPeriodLink" />
-
+-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

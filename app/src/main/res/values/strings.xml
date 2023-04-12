@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">LaRoomy</string>
-    <string name="app_version" translatable="false">App-Version 1.1.9</string>
+    <string name="app_version" translatable="false">App-Version 1.2.3</string>
     <!-- UI Strings -->
     <string name="MA_AvailableDevicesPresentationTextViewText">Devices</string>
     <string name="MA_PopUp_SettingsTitle">Settings</string>
@@ -458,9 +458,9 @@
     <string name="TextListPresenterListElementPlaceholderText">List Element</string>
 
     <!-- Elements for testing purposes -->
-    <string name="ToggleTestPeriod_ButtonText" translatable="false">Toggle Test-Period</string>
-    <string name="DataKey_ToggleTestPeriod" translatable="false">toggle_test_period</string>
-    <string name="RevokePurchaseButtonText" translatable="false">Revoke Purchase</string>
+<!--    <string name="ToggleTestPeriod_ButtonText" translatable="false">Toggle Test-Period</string>-->
+<!--    <string name="DataKey_ToggleTestPeriod" translatable="false">toggle_test_period</string>-->
+<!--    <string name="RevokePurchaseButtonText" translatable="false">Revoke Purchase</string>-->
 
     <!-- currently unused:
 

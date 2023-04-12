@@ -347,6 +347,7 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
         
         // !!! test section
         // this is only shown if the testVersion flag value is set
+/*
         if(testVersion){
             findViewById<AppCompatTextView>(R.id.setupActivityToggleTestPeriodLink).apply {
                 // show the toggle ling
@@ -376,30 +377,35 @@ class AppSettingsActivity : AppCompatActivity(), BillingProcessHelper.BillingEve
                     dialog.show()
                 }
             }
-            findViewById<AppCompatTextView>(R.id.setupActivityRevokePurchaseButton).apply {
-                // show the link
-                visibility = View.VISIBLE
-                
-                setOnClickListener {
-                    (applicationContext as ApplicationProperty).saveBooleanData(
-                        false,
-                        R.string.FileKey_PremVersion,
-                        R.string.DataKey_PurchaseDoneByUser
-                    )
-    
-                    val dialog = AlertDialog.Builder(this@AppSettingsActivity)
-                    dialog.setMessage("Purchase revoked !!")
-                    dialog.setIcon(R.drawable.ic_announcement_36dp)
-                    dialog.setTitle("Revoke..")
-                    dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
-                        dialogInterface.dismiss()
-                        this@AppSettingsActivity.controlPremiumSectionState(PremiumSectionState.Unpaid)
-                    }
-                    dialog.create()
-                    dialog.show()
+        }
+        
+ */
+ 
+/*
+        findViewById<AppCompatTextView>(R.id.setupActivityPremiumAppUserStatusDescriptorView).apply {
+            // show the link
+            visibility = View.VISIBLE
+            
+            setOnClickListener {
+                (applicationContext as ApplicationProperty).saveBooleanData(
+                    false,
+                    R.string.FileKey_PremVersion,
+                    R.string.DataKey_PurchaseDoneByUser
+                )
+
+                val dialog = AlertDialog.Builder(this@AppSettingsActivity)
+                dialog.setMessage("Purchase revoked !!")
+                dialog.setIcon(R.drawable.ic_announcement_36dp)
+                dialog.setTitle("Revoke..")
+                dialog.setPositiveButton(R.string.GeneralString_OK) { dialogInterface: DialogInterface, _: Int ->
+                    dialogInterface.dismiss()
+                    this@AppSettingsActivity.controlPremiumSectionState(PremiumSectionState.Unpaid)
                 }
+                dialog.create()
+                dialog.show()
             }
         }
+*/
     }
     
     override fun onResume() {

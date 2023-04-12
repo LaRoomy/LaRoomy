@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.*
-import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -363,6 +362,9 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
                 false
             this.availableDevicesViewAdapter.notifyItemInserted(this.availableDevices.size - 1)
         }
+        
+        // check if the test period has expired
+        this.checkIfTestPeriodIsOver()
     
         // show / hide the action banner and set the content based on the current premium status (testVersion/unPaid/Premium)
         this.controlActionBannerVisibleState()
@@ -372,13 +374,35 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
     
         // reset the selection in the recyclerView
         this.resetSelectionInDeviceListView()
-        
     }
 
     override fun onItemClicked(index: Int, data: LaRoomyDevicePresentationModel) {
         if(verboseLog){
             Log.d("MainActivity", "List Element Clicked at index: $index with name: ${data.name} and address: ${data.address}")
         }
+        // check non-premium condition
+        if(appProperty.premiumManager.isPremiumAppVersion || index <= NON_PREMIUM_MAX_DEVICE_LIST_INDEX){
+            // normal execution
+            if (!preventListSelection) {
+                setItemColors(
+                    index,
+                    R.color.max_contrast_text_color,
+                    R.drawable.my_devices_list_element_selected_background
+                )
+        
+                val intent =
+                    Intent(this@MainActivity, LoadingActivity::class.java)
+                intent.putExtra("DeviceListIndex", index)
+                startActivity(intent)
+        
+                // set param for auto-connect function
+                (applicationContext as ApplicationProperty).isBackNavigationToMain = true
+            }
+        }
+        
+        // old:
+    
+/*
         // check non-premium condition
         if(!appProperty.premiumManager.isPremiumAppVersion && index > NON_PREMIUM_MAX_DEVICE_LIST_INDEX){
             // when the purchase is pending, the banner is not visible, so nothing should be done here
@@ -397,16 +421,17 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
                     R.color.max_contrast_text_color,
                     R.drawable.my_devices_list_element_selected_background
                 )
-        
+            
                 val intent =
                     Intent(this@MainActivity, LoadingActivity::class.java)
                 intent.putExtra("DeviceListIndex", index)
                 startActivity(intent)
-        
+            
                 // set param for auto-connect function
                 (applicationContext as ApplicationProperty).isBackNavigationToMain = true
             }
         }
+*/
     }
     
     private fun onActionBannerMoreInfoLinkClicked(){
@@ -869,15 +894,34 @@ class MainActivity : AppCompatActivity(), OnDeviceListItemClickListener, Billing
             if (appProperty.billingHelperCreated) {
                 if (appProperty.billingProcessHelper.recentlyPurchased) {
                     this.availableDevicesViewAdapter.apply {
-                        //if (itemCount > 2) {
-                            notifyItemRangeChanged(0, itemCount)
-                        //}
+                        notifyItemRangeChanged(0, itemCount)
                     }
                 }
             }
         } catch (e: java.lang.Exception){
             if(verboseLog){
                 Log.e("MainActivity", "MainActivity::updateRecyclerToPremiumIfApplicable: severe error: $e")
+            }
+        }
+    }
+    
+    private fun checkIfTestPeriodIsOver(){
+        // only execute if the user has not purchased
+        if(!appProperty.premiumManager.userHasPurchased) {
+            // check if the test period is active
+            if (appProperty.premiumManager.isTestPeriodActive) {
+                // it's active
+                // refresh the premium manager
+                appProperty.premiumManager.checkPremiumAppStatus()
+        
+                // check test period again
+                if (!appProperty.premiumManager.isTestPeriodActive) {
+                    // the period has elapsed since the last execution of the app
+                    // -> refresh main activity list
+                    this.availableDevicesViewAdapter.apply {
+                        notifyItemRangeChanged(0, itemCount)
+                    }
+                }
             }
         }
     }

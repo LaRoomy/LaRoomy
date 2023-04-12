@@ -47,7 +47,7 @@ const val DEVICE_SETTINGS_ACTIVITY_ELEMENT_INDEX_DUMMY = 1025
 const val verboseLog = false
 
 // enable or show testing elements
-const val testVersion = true
+//const val testVersion = false
 
 // default value
 const val COMPLEX_PROPERTY_STANDALONE_MODE_DEFAULT_VALUE = false
